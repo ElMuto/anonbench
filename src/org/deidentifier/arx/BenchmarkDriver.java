@@ -1,7 +1,7 @@
 /*
- * Source code of our CBMS 2014 paper "A benchmark of globally-optimal 
- *      methods for the de-identification of biomedical data"
- *      
+ * Source code of our CBMS 2014 paper "A benchmark of globally-optimal
+ * methods for the de-identification of biomedical data"
+ * 
  * Copyright (C) 2014 Florian Kohlmayer, Fabian Prasser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -29,15 +29,17 @@ import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmBFS;
 import org.deidentifier.arx.algorithm.AlgorithmDFS;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
+import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
 import org.deidentifier.arx.algorithm.AlgorithmIncognito;
 import org.deidentifier.arx.algorithm.AlgorithmOLA;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
 import org.deidentifier.arx.framework.data.Dictionary;
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.Node;
+import org.deidentifier.arx.framework.lattice.VirtualLattice;
 import org.deidentifier.arx.test.TestConfiguration;
 
 import de.linearbits.subframe.Benchmark;
@@ -112,12 +114,12 @@ public class BenchmarkDriver {
 
         // Execute
         implementation.traverse();
-        
+
         // Collect
         Node optimum = implementation.getGlobalOptimum();
         String loss = String.valueOf(optimum.getInformationLoss().getValue());
         int[] transformation = optimum.getTransformation();
-        
+
         return new TestConfiguration(dataset, criteria, loss, transformation);
     }
 
@@ -150,18 +152,25 @@ public class BenchmarkDriver {
         config.initialize(manager);
 
         // Build or clean the lattice
-        Lattice lattice = new LatticeBuilder(manager.getMaxLevels(),
-                                             manager.getMinLevels()).build();
+        AbstractLattice lattice;
+        // Heurakles does not need materialized lattice
+        if (BenchmarkAlgorithm.HEURAKLES == algorithm) {
+            lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
+        }
+        else {
+            lattice = new LatticeBuilder(manager.getMaxLevels(),
+                                         manager.getMinLevels()).build();
+        }
 
         // Build a node checker, for all algorithms but Incognito
         INodeChecker checker = null;
-        if (algorithm != BenchmarkAlgorithm.INCOGNITO){
-            checker = new NodeChecker(  manager,
-                                        config.getMetric(),
-                                        config.getInternalConfiguration(),
-                                        historySize,
-                                        snapshotSizeDataset,
-                                        snapshotSizeSnapshot);
+        if (algorithm != BenchmarkAlgorithm.INCOGNITO) {
+            checker = new NodeChecker(manager,
+                                      config.getMetric(),
+                                      config.getInternalConfiguration(),
+                                      historySize,
+                                      snapshotSizeDataset,
+                                      snapshotSizeSnapshot);
         }
 
         // Initialize the metric
@@ -184,14 +193,17 @@ public class BenchmarkDriver {
             break;
         case INCOGNITO:
             implementation = new AlgorithmIncognito(lattice, manager,
-                                                             config.getMetric(),
-                                                             config.getInternalConfiguration(),
-                                                             historySize,
-                                                             snapshotSizeDataset,
-                                                             snapshotSizeSnapshot);
+                                                    config.getMetric(),
+                                                    config.getInternalConfiguration(),
+                                                    historySize,
+                                                    snapshotSizeDataset,
+                                                    snapshotSizeSnapshot);
             break;
         case OLA:
             implementation = new AlgorithmOLA(lattice, checker);
+            break;
+        case HEURAKLES:
+            implementation = new AlgorithmHeurakles(lattice, checker);
             break;
         default:
             throw new RuntimeException("Invalid algorithm");

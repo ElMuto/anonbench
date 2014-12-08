@@ -21,7 +21,7 @@
 package org.deidentifier.arx.algorithm;
 
 import org.deidentifier.arx.framework.check.INodeChecker;
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 
 /**
@@ -44,10 +44,10 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
      * @param lattice
      * @param checker
      */
-    protected AbstractBenchmarkAlgorithm(Lattice lattice, INodeChecker checker) {
+    protected AbstractBenchmarkAlgorithm(AbstractLattice lattice, INodeChecker checker) {
         super(lattice, checker);
         this.hierarchyHeights = lattice.getTop().getTransformation().clone();
-        for (int i=0; i<hierarchyHeights.length; i++) {
+        for (int i = 0; i < hierarchyHeights.length; i++) {
             this.hierarchyHeights[i]++;
         }
     }
@@ -134,7 +134,7 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
      * @param lattice
      * @param anonymous
      */
-    protected void setAnonymous(Lattice lattice, Node node, boolean anonymous) {
+    protected void setAnonymous(AbstractLattice lattice, Node node, boolean anonymous) {
         if (anonymous) {
             lattice.setProperty(node, Node.PROPERTY_ANONYMOUS);
         } else {
@@ -156,7 +156,7 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
      * @param node
      * @param lattice
      */
-    protected void tag(Lattice lattice, Node node) {
+    protected void tag(AbstractLattice lattice, Node node) {
         if (node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
             tagAnonymous(lattice, node);
         }
@@ -178,7 +178,7 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
      * @param node
      * @param lattice
      */
-    protected void tagAnonymous(Lattice lattice, Node node) {
+    protected void tagAnonymous(AbstractLattice lattice, Node node) {
         lattice.setPropertyUpwards(node, true, Node.PROPERTY_ANONYMOUS |
                                                Node.PROPERTY_SUCCESSORS_PRUNED);
     }
@@ -196,7 +196,7 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
      * @param node
      * @param lattice
      */
-    protected void tagNotAnonymous(Lattice lattice, Node node) {
+    protected void tagNotAnonymous(AbstractLattice lattice, Node node) {
         lattice.setPropertyDownwards(node, false, Node.PROPERTY_NOT_ANONYMOUS);
     }
 
@@ -207,4 +207,14 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     protected void tagNotAnonymous(Node node) {
         tagNotAnonymous(lattice, node);
     }
+
+    /**
+     * Returns whether this algorithm requires a materialized lattice.
+     * @return
+     */
+    @Override
+    public boolean isMaterializedLatticeRequired() {
+        return true;
+    }
+    
 }

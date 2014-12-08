@@ -1,7 +1,7 @@
 /*
- * Source code of our CBMS 2014 paper "A benchmark of globally-optimal 
- *      methods for the de-identification of biomedical data"
- *      
+ * Source code of our CBMS 2014 paper "A benchmark of globally-optimal
+ * methods for the de-identification of biomedical data"
+ * 
  * Copyright (C) 2014 Florian Kohlmayer, Fabian Prasser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,8 @@ import java.util.PriorityQueue;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
 import org.deidentifier.arx.framework.data.GeneralizationHierarchy;
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
+import org.deidentifier.arx.framework.lattice.MaterializedLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 
 /**
@@ -65,12 +66,12 @@ public class AlgorithmFlash extends AbstractBenchmarkAlgorithm {
      *            The checker
      * @param new FLASHStrategy(lattice, manager.getHierarchies() The strategy
      */
-    public AlgorithmFlash(final Lattice lattice,
+    public AlgorithmFlash(final AbstractLattice lattice,
                           final INodeChecker checker,
                           final GeneralizationHierarchy[] hierarchies) {
 
         super(lattice, checker);
-        this.strategy = new FLASHStrategy(lattice, hierarchies);
+        this.strategy = new FLASHStrategy((MaterializedLattice) lattice, hierarchies);
         this.pqueue = new PriorityQueue<Node>(11, strategy);
         this.sorted = new boolean[lattice.getSize()];
         this.path = new ArrayList<Node>();
@@ -130,7 +131,7 @@ public class AlgorithmFlash extends AbstractBenchmarkAlgorithm {
                 check(node);
                 tag(node);
                 if (!isAnonymous(node)) {
-                    for (final Node up : node.getSuccessors()) {
+                    for (final Node up : node.getSuccessors(true)) {
                         if (!isTagged(up)) {
                             pqueue.add(up);
                         }
@@ -162,7 +163,7 @@ public class AlgorithmFlash extends AbstractBenchmarkAlgorithm {
         while (found) {
             found = false;
             this.sort(current);
-            for (final Node candidate : current.getSuccessors()) {
+            for (final Node candidate : current.getSuccessors(true)) {
                 if (!isTagged(candidate)) {
                     current = candidate;
                     path.add(candidate);
@@ -182,7 +183,7 @@ public class AlgorithmFlash extends AbstractBenchmarkAlgorithm {
      * @return the node[]
      */
     private final Node[] sort(final int level) {
-        
+
         // Create
         List<Node> result = new ArrayList<Node>();
         Node[] nlevel = lattice.getLevels()[level];
@@ -206,7 +207,7 @@ public class AlgorithmFlash extends AbstractBenchmarkAlgorithm {
      */
     private final void sort(final Node current) {
         if (!sorted[current.id]) {
-            Arrays.sort(current.getSuccessors(), strategy);
+            Arrays.sort(current.getSuccessors(true), strategy);
             sorted[current.id] = true;
         }
     }

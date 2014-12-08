@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 
 /**
@@ -64,7 +64,7 @@ public class AlgorithmOLA extends AbstractBenchmarkAlgorithm {
      * @param lattice the lattice
      * @param checker the checker
      */
-    public AlgorithmOLA(final Lattice lattice, final INodeChecker checker) {
+    public AlgorithmOLA(final AbstractLattice lattice, final INodeChecker checker) {
 
         super(lattice, checker);
 
@@ -147,13 +147,13 @@ public class AlgorithmOLA extends AbstractBenchmarkAlgorithm {
 
         // Traverse
         if (anonymous) {
-            for (final Node up : node.getSuccessors()) {
+            for (final Node up : node.getSuccessors(true)) {
                 if (!isTagged(up)) {
                     doTag(up, anonymous);
                 }
             }
         } else {
-            for (final Node down : node.getPredecessors()) {
+            for (final Node down : node.getPredecessors(true)) {
                 if (!isTagged(down)) {
                     doTag(down, anonymous);
                 }

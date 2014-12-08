@@ -22,7 +22,7 @@ package org.deidentifier.arx.algorithm;
 
 import java.util.ArrayList;
 
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 
 /**
@@ -66,7 +66,7 @@ public class IncognitoContext {
      * Returns the current local lattice
      * @return
      */
-    public Lattice getLocalLattice() {
+    public AbstractLattice getLocalLattice() {
         return this.lattice.getLattice();
     }
     

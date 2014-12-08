@@ -20,7 +20,7 @@
 
 package org.deidentifier.arx.algorithm;
 
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 
 /**
@@ -32,10 +32,10 @@ import org.deidentifier.arx.framework.lattice.Node;
 public class IncognitoLattice {
 
     /** The lattice. */
-    private final Lattice lattice;
+    private final AbstractLattice lattice;
 
     /** The map. */
-    private final NodeMap map;
+    private final NodeMap         map;
 
     /**
      * Instantiates a new lattice incognito.
@@ -43,7 +43,7 @@ public class IncognitoLattice {
      * @param lattice the lattice
      * @param hierarchyHeights TODO
      */
-    public IncognitoLattice(final Lattice lattice, int[] hierarchyHeights) {
+    public IncognitoLattice(final AbstractLattice lattice, int[] hierarchyHeights) {
         this.lattice = lattice;
         map = new NodeMap(hierarchyHeights);
         for (int i = 0; i < lattice.getLevels().length; i++) {
@@ -59,7 +59,7 @@ public class IncognitoLattice {
      * 
      * @return the lattice
      */
-    public Lattice getLattice() {
+    public AbstractLattice getLattice() {
         return lattice;
     }
 

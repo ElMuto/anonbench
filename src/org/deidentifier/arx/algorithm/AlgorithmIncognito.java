@@ -32,7 +32,7 @@ import org.deidentifier.arx.framework.check.INodeChecker.Result;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
 import org.deidentifier.arx.framework.data.DataManager;
-import org.deidentifier.arx.framework.lattice.Lattice;
+import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.Node;
 import org.deidentifier.arx.metric.Metric;
@@ -61,7 +61,7 @@ public class AlgorithmIncognito extends AbstractBenchmarkAlgorithm {
      * @param snapshotSizeDataset
      * @param snapshotSizeSnapshot
      */
-    public AlgorithmIncognito(Lattice lattice,
+    public AlgorithmIncognito(AbstractLattice lattice,
                               DataManager manager,
                               Metric<?> metric,
                               ARXConfigurationInternal config,
@@ -82,7 +82,7 @@ public class AlgorithmIncognito extends AbstractBenchmarkAlgorithm {
      * @param lattice the lattice
      * @param checker the checker
      */
-    private AlgorithmIncognito(Lattice lattice, Metric<?> metric, INodeChecker checker) {
+    private AlgorithmIncognito(AbstractLattice lattice, Metric<?> metric, INodeChecker checker) {
         super(lattice, checker);
         this.metric = metric;
         // Set strategy

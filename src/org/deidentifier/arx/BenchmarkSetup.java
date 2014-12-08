@@ -1,7 +1,7 @@
 /*
- * Source code of our CBMS 2014 paper "A benchmark of globally-optimal 
- *      methods for the de-identification of biomedical data"
- *      
+ * Source code of our CBMS 2014 paper "A benchmark of globally-optimal
+ * methods for the de-identification of biomedical data"
+ * 
  * Copyright (C) 2014 Florian Kohlmayer, Fabian Prasser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -63,6 +63,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Incognito";
+            }
+        },
+        HEURAKLES {
+            @Override
+            public String toString() {
+                return "Heurakles";
             }
         },
     }
@@ -132,12 +138,13 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkAlgorithm[] getAlgorithms() {
-        return new BenchmarkAlgorithm[] { 
+        return new BenchmarkAlgorithm[] {
                 BenchmarkAlgorithm.FLASH,
-                BenchmarkAlgorithm.OLA,
-                BenchmarkAlgorithm.INCOGNITO,
-                BenchmarkAlgorithm.DFS,
-                BenchmarkAlgorithm.BFS
+                // BenchmarkAlgorithm.OLA,
+                // BenchmarkAlgorithm.INCOGNITO,
+                // BenchmarkAlgorithm.DFS,
+                // BenchmarkAlgorithm.BFS,
+                BenchmarkAlgorithm.HEURAKLES
         };
     }
 
@@ -178,18 +185,24 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkCriterion[][] getCriteria() {
-        BenchmarkCriterion[][] result = new BenchmarkCriterion[11][];
+        BenchmarkCriterion[][] result = new BenchmarkCriterion[4][];
         result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
         result[1] = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY };
         result[2] = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
         result[3] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE };
-        result[4] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY };
-        result[5] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS };
-        result[6] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE };
-        result[7] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY };
-        result[8] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS };
-        result[9] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY };
-        result[10] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS };
+        // result[4] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY };
+        // result[5] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS };
+        // result[6] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE };
+        // result[7] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY };
+        // result[8] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS };
+        // result[9] = new BenchmarkCriterion[] {
+        // BenchmarkCriterion.K_ANONYMITY,
+        // BenchmarkCriterion.D_PRESENCE,
+        // BenchmarkCriterion.L_DIVERSITY };
+        // result[10] = new BenchmarkCriterion[] {
+        // BenchmarkCriterion.K_ANONYMITY,
+        // BenchmarkCriterion.D_PRESENCE,
+        // BenchmarkCriterion.T_CLOSENESS };
         return result;
     }
 
@@ -204,7 +217,7 @@ public class BenchmarkSetup {
     }
 
     /**
-     * Configures and returns the dataset 
+     * Configures and returns the dataset
      * @param dataset
      * @param criteria
      * @return
@@ -256,13 +269,13 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkDataset[] getDatasets() {
-        return new BenchmarkDataset[] { 
-         BenchmarkDataset.ADULT,
-         BenchmarkDataset.CUP,
-         BenchmarkDataset.FARS,
-         BenchmarkDataset.ATUS,
-         BenchmarkDataset.IHIS
-                                        };
+        return new BenchmarkDataset[] {
+                BenchmarkDataset.ADULT
+        // BenchmarkDataset.CUP,
+        // BenchmarkDataset.FARS,
+        // BenchmarkDataset.ATUS,
+        // BenchmarkDataset.IHIS
+        };
     }
 
     /**
@@ -297,48 +310,48 @@ public class BenchmarkSetup {
     public static String[] getQuasiIdentifyingAttributes(BenchmarkDataset dataset) {
         switch (dataset) {
         case ADULT:
-            return new String[] {   "age",
-                                    "education",
-                                    "marital-status",
-                                    "native-country",
-                                    "race",
-                                    "salary-class",
-                                    "sex",
-                                    "workclass" };
+            return new String[] { "age",
+                    "education",
+                    "marital-status",
+                    "native-country",
+                    "race",
+                    "salary-class",
+                    "sex",
+                    "workclass" };
         case ATUS:
-            return new String[] {   "Age",
-                                    "Birthplace",
-                                    "Citizenship status",
-                                    "Labor force status",
-                                    "Marital status",
-                                    "Race",
-                                    "Region",
-                                    "Sex" };
+            return new String[] { "Age",
+                    "Birthplace",
+                    "Citizenship status",
+                    "Labor force status",
+                    "Marital status",
+                    "Race",
+                    "Region",
+                    "Sex" };
         case CUP:
-            return new String[] {   "AGE",
-                                    "GENDER",
-                                    "INCOME",
-                                    "MINRAMNT",
-                                    "NGIFTALL",
-                                    "STATE",
-                                    "ZIP" };
+            return new String[] { "AGE",
+                    "GENDER",
+                    "INCOME",
+                    "MINRAMNT",
+                    "NGIFTALL",
+                    "STATE",
+                    "ZIP" };
         case FARS:
-            return new String[] {   "iage",
-                                    "ideathday",
-                                    "ideathmon",
-                                    "ihispanic",
-                                    "iinjury",
-                                    "irace",
-                                    "isex" };
+            return new String[] { "iage",
+                    "ideathday",
+                    "ideathmon",
+                    "ihispanic",
+                    "iinjury",
+                    "irace",
+                    "isex" };
         case IHIS:
-            return new String[] {   "AGE",
-                                    "MARSTAT",
-                                    "PERNUM",
-                                    "QUARTER",
-                                    "RACEA",
-                                    "REGION",
-                                    "SEX",
-                                    "YEAR" };
+            return new String[] { "AGE",
+                    "MARSTAT",
+                    "PERNUM",
+                    "QUARTER",
+                    "RACEA",
+                    "REGION",
+                    "SEX",
+                    "YEAR" };
         default:
             throw new RuntimeException("Invalid dataset");
         }
