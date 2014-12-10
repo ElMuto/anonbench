@@ -103,8 +103,9 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private void assureChecked(final Node node) {
         if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
-            lattice.setChecked(node, checker.check(node, true));
-            trackOptimum(node);
+        	check(node);
+//            lattice.setChecked(node, checker.check(node, true));
+//            trackOptimum(node);
         }
     }
 
