@@ -29,6 +29,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 
 import de.linearbits.subframe.Benchmark;
+import de.linearbits.subframe.analyzer.ValueBuffer;
 import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
 import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyzer;
 
@@ -51,6 +52,8 @@ public class BenchmarkMain {
     public static final int        NUMBER_OF_ROLLUPS = BENCHMARK.addMeasure("Number of rollups");
     /** Label for size of lattice */
     public static final int        LATTICE_SIZE      = BENCHMARK.addMeasure("Size of lattice");
+    /** Label for information loss */
+    public static final int        INFORMATION_LOSS  = BENCHMARK.addMeasure("Information loss");
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
@@ -58,6 +61,7 @@ public class BenchmarkMain {
         BENCHMARK.addAnalyzer(NUMBER_OF_CHECKS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(LATTICE_SIZE, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer()); // Should be changed for nondeterministic algorithms
     }
 
     /**
