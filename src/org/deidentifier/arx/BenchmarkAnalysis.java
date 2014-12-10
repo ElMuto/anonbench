@@ -266,6 +266,10 @@ public class BenchmarkAnalysis {
             params.minY = 1d;
             params.maxY = getMax(series, 1);
             params.printValuesFormatString= "%.0f";
+        } else if (variable.equals("Size of lattice")) {
+            params.minY = 1d;
+            params.maxY = getMax(series, 1);
+            params.printValuesFormatString= "%.0f";
         }
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
