@@ -49,12 +49,15 @@ public class BenchmarkMain {
     public static final int        NUMBER_OF_CHECKS  = BENCHMARK.addMeasure("Number of checks");
     /** Label for number of roll-ups */
     public static final int        NUMBER_OF_ROLLUPS = BENCHMARK.addMeasure("Number of rollups");
+    /** Label for size of lattice */
+    public static final int        LATTICE_SIZE      = BENCHMARK.addMeasure("Size of lattice");
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(NUMBER_OF_CHECKS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(LATTICE_SIZE, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
     }
 
     /**
