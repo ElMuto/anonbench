@@ -53,7 +53,7 @@ import de.linearbits.subframe.render.PlotGroup;
 public class BenchmarkAnalysis {
     
     /** The variables */
-    private static final String[] VARIABLES = {"Number of checks", "Number of rollups", "Execution time"};
+    private static final String[] VARIABLES = {"Number of checks", "Number of rollups", "Execution time", "Size of lattice"};
 
     /**
      * Main
@@ -198,6 +198,7 @@ public class BenchmarkAnalysis {
         generateTable(file, VARIABLES[0], true);
         generateTable(file, VARIABLES[1], false);
         generateTable(file, VARIABLES[2], true);
+        generateTable(file, VARIABLES[3], true);
     }
 
     /**
@@ -262,6 +263,10 @@ public class BenchmarkAnalysis {
             }
             params.printValuesFormatString= "%.0f";
         } else if (variable.equals("Number of checks")) {
+            params.minY = 1d;
+            params.maxY = getMax(series, 1);
+            params.printValuesFormatString= "%.0f";
+        } else if (variable.equals("Size of lattice")) {
             params.minY = 1d;
             params.maxY = getMax(series, 1);
             params.printValuesFormatString= "%.0f";

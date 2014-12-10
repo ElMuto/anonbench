@@ -142,7 +142,7 @@ public class BenchmarkSetup {
                 BenchmarkAlgorithm.FLASH,
                 // BenchmarkAlgorithm.OLA,
                 // BenchmarkAlgorithm.INCOGNITO,
-                // BenchmarkAlgorithm.DFS,
+                 BenchmarkAlgorithm.DFS,
                 // BenchmarkAlgorithm.BFS,
                 BenchmarkAlgorithm.HEURAKLES
         };
