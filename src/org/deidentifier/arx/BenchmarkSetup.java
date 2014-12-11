@@ -27,6 +27,8 @@ import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.metric.Metric;
+import org.deidentifier.arx.metric.Metric.AggregateFunction;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -35,34 +37,10 @@ import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 public class BenchmarkSetup {
 
     public static enum BenchmarkAlgorithm {
-        BFS {
-            @Override
-            public String toString() {
-                return "BFS";
-            }
-        },
-        DFS {
-            @Override
-            public String toString() {
-                return "DFS";
-            }
-        },
         FLASH {
             @Override
             public String toString() {
                 return "Flash";
-            }
-        },
-        OLA {
-            @Override
-            public String toString() {
-                return "OLA";
-            }
-        },
-        INCOGNITO {
-            @Override
-            public String toString() {
-                return "Incognito";
             }
         },
         HEURAKLES {
@@ -140,10 +118,6 @@ public class BenchmarkSetup {
     public static BenchmarkAlgorithm[] getAlgorithms() {
         return new BenchmarkAlgorithm[] {
                 BenchmarkAlgorithm.FLASH,
-                // BenchmarkAlgorithm.OLA,
-                // BenchmarkAlgorithm.INCOGNITO,
-                 BenchmarkAlgorithm.DFS,
-                // BenchmarkAlgorithm.BFS,
                 BenchmarkAlgorithm.HEURAKLES
         };
     }
@@ -152,11 +126,18 @@ public class BenchmarkSetup {
      * Returns a configuration for the ARX framework
      * @param dataset
      * @param criteria
+     * @param suppression
+     * @param metric
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset,
+                                                    Metric<?> metric,
+                                                    double suppression,
+                                                    BenchmarkCriterion... criteria) throws IOException {
         ARXConfiguration config = ARXConfiguration.create();
+        config.setMetric(metric);
+        config.setMaxOutliers(suppression);
         for (BenchmarkCriterion c : criteria) {
             switch (c) {
             case D_PRESENCE:
@@ -181,15 +162,38 @@ public class BenchmarkSetup {
     }
 
     /**
+     * Returns all suppression parameters
+     * @return
+     */
+    public static double[] getSuppression() {
+        return new double[] { 0d, 0.05d };
+    }
+
+    /**
+     * Returns all metrics
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public static Metric[] getMetrics() {
+        return new Metric[] {
+                Metric.createLossMetric(AggregateFunction.ARITHMETIC_MEAN), // TODO: Should be geometric mean, if possible
+                Metric.createEntropyMetric(),
+                Metric.createPrecisionMetric(),
+                Metric.createAECSMetric(),
+                Metric.createDiscernabilityMetric()
+        };
+    }
+
+    /**
      * Returns all sets of criteria
      * @return
      */
     public static BenchmarkCriterion[][] getCriteria() {
-        BenchmarkCriterion[][] result = new BenchmarkCriterion[4][];
+        BenchmarkCriterion[][] result = new BenchmarkCriterion[1][];
         result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-        result[1] = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY };
-        result[2] = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
-        result[3] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE };
+        // result[1] = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY };
+        // result[2] = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
+        // result[3] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE };
         // result[4] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY };
         // result[5] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS };
         // result[6] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE };
@@ -270,11 +274,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-        		BenchmarkDataset.ADULT,
-//        		BenchmarkDataset.CUP,
-        		BenchmarkDataset.FARS
-//        		BenchmarkDataset.ATUS,
-//        		BenchmarkDataset.IHIS
+                BenchmarkDataset.ADULT,
+                BenchmarkDataset.CUP,
+                BenchmarkDataset.FARS,
+                BenchmarkDataset.ATUS,
+                BenchmarkDataset.IHIS
         };
     }
 

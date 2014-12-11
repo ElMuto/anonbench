@@ -21,6 +21,7 @@
 package org.deidentifier.arx.algorithm;
 
 import org.deidentifier.arx.framework.check.INodeChecker;
+import org.deidentifier.arx.framework.check.StateMachine.TransitionType;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 
@@ -34,6 +35,8 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     protected int   rollups;
     /** The number of checks */
     protected int   checks;
+    /** The number of snapshot-based optimizations */
+    protected int   snapshots;
     /** The node checked previously */
     protected Node  previous;
     /** The hierarchy heights for each QI. */
@@ -69,6 +72,14 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     }
 
     /**
+     * Returns the number of snapshot-based optimizations applied
+     * @return
+     */
+    public int getNumSnapshots() {
+        return snapshots;
+    }
+
+    /**
      * Performs a check and keeps track of potential rollups
      * @param node
      */
@@ -78,6 +89,7 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
         lattice.setChecked(node, checker.check(node, true));
         trackOptimum(node);
         checks++;
+        snapshots += (checker.getTransitionType() == TransitionType.SNAPSHOT) ? 1 : 0;
 
         // Store
         if (previous == null) {
@@ -216,5 +228,5 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     public boolean isMaterializedLatticeRequired() {
         return true;
     }
-    
+
 }

@@ -26,20 +26,18 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
-import org.deidentifier.arx.algorithm.AlgorithmBFS;
-import org.deidentifier.arx.algorithm.AlgorithmDFS;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
-import org.deidentifier.arx.algorithm.AlgorithmIncognito;
-import org.deidentifier.arx.algorithm.AlgorithmOLA;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
 import org.deidentifier.arx.framework.data.Dictionary;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.LatticeBuilder;
+import org.deidentifier.arx.framework.lattice.MaterializedLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 import org.deidentifier.arx.framework.lattice.VirtualLattice;
+import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.test.TestConfiguration;
 
 import de.linearbits.subframe.Benchmark;
@@ -77,16 +75,18 @@ public class BenchmarkDriver {
      * @param dataset
      * @param criteria
      * @param algorithm
+     * @param suppression
+     * @param metric
      * @param warmup
      * @throws IOException
      */
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
-                          boolean warmup) throws IOException {
+                          Metric<?> metric, double suppression, boolean warmup) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
 
         // Execute
         if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
@@ -94,6 +94,7 @@ public class BenchmarkDriver {
         if (!warmup) benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
         if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
         if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
+        if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
         if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
         if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum().getInformationLoss().toString());
     }
@@ -109,10 +110,10 @@ public class BenchmarkDriver {
      */
     public TestConfiguration test(BenchmarkDataset dataset,
                                   BenchmarkCriterion[] criteria,
-                                  BenchmarkAlgorithm algorithm) throws IOException {
+                                  BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
 
         // Execute
         implementation.traverse();
@@ -129,15 +130,18 @@ public class BenchmarkDriver {
      * @param dataset
      * @param criteria
      * @param algorithm
+     * @param suppression
+     * @param metric
      * @return
      * @throws IOException
      */
-    private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
-                                                         BenchmarkCriterion[] criteria,
-                                                         BenchmarkAlgorithm algorithm) throws IOException {
+    private AbstractBenchmarkAlgorithm
+            getImplementation(BenchmarkDataset dataset,
+                              BenchmarkCriterion[] criteria,
+                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
         // Prepare
         Data data = BenchmarkSetup.getData(dataset, criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, criteria);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, criteria);
         DataHandle handle = data.getHandle();
 
         // Encode
@@ -165,15 +169,12 @@ public class BenchmarkDriver {
         }
 
         // Build a node checker, for all algorithms but Incognito
-        INodeChecker checker = null;
-        if (algorithm != BenchmarkAlgorithm.INCOGNITO) {
-            checker = new NodeChecker(manager,
-                                      config.getMetric(),
-                                      config.getInternalConfiguration(),
-                                      historySize,
-                                      snapshotSizeDataset,
-                                      snapshotSizeSnapshot);
-        }
+        INodeChecker checker = new NodeChecker(manager,
+                                               config.getMetric(),
+                                               config.getInternalConfiguration(),
+                                               historySize,
+                                               snapshotSizeDataset,
+                                               snapshotSizeSnapshot);
 
         // Initialize the metric
         config.getMetric().initialize(handle.getDefinition(),
@@ -184,25 +185,8 @@ public class BenchmarkDriver {
         // Create an algorithm instance
         AbstractBenchmarkAlgorithm implementation;
         switch (algorithm) {
-        case BFS:
-            implementation = new AlgorithmBFS(lattice, checker);
-            break;
-        case DFS:
-            implementation = new AlgorithmDFS(lattice, checker);
-            break;
         case FLASH:
-            implementation = new AlgorithmFlash(lattice, checker, manager.getHierarchies());
-            break;
-        case INCOGNITO:
-            implementation = new AlgorithmIncognito(lattice, manager,
-                                                    config.getMetric(),
-                                                    config.getInternalConfiguration(),
-                                                    historySize,
-                                                    snapshotSizeDataset,
-                                                    snapshotSizeSnapshot);
-            break;
-        case OLA:
-            implementation = new AlgorithmOLA(lattice, checker);
+            implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
             implementation = new AlgorithmHeurakles(lattice, checker);

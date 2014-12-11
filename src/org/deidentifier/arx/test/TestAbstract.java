@@ -1,7 +1,7 @@
 /*
- * Source code of our CBMS 2014 paper "A benchmark of globally-optimal 
- *      methods for the de-identification of biomedical data"
- *      
+ * Source code of our CBMS 2014 paper "A benchmark of globally-optimal
+ * methods for the de-identification of biomedical data"
+ * 
  * Copyright (C) 2014 Florian Kohlmayer, Fabian Prasser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
+import org.deidentifier.arx.metric.Metric;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,22 +60,19 @@ public abstract class TestAbstract extends TestCase {
 
     @Test
     public void test() throws IOException {
-        
+
         // Initialize
         BenchmarkDriver driver = new BenchmarkDriver(null);
 
         // For each algorithm
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
-            
-            // Skip BFS, as it simply takes too long
-            if (algorithm == BenchmarkAlgorithm.BFS) {
-                continue;
-            }
-                
+
             // Collect
-            TestConfiguration result = driver.test(config.dataset, 
-                                                   config.criteria, 
-                                                   algorithm);
+            TestConfiguration result = driver.test(config.dataset,
+                                                   config.criteria,
+                                                   algorithm,
+                                                   Metric.createEntropyMetric(),
+                                                   0d);
             // Check
             assertEquals(algorithm + ": Information loss doesn't match", config.informationLoss, result.informationLoss);
             assertTrue(algorithm + ": Transformation doesn't match", Arrays.equals(result.transformation, config.transformation));

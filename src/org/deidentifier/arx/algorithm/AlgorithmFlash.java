@@ -1,8 +1,6 @@
 /*
- * Source code of our CBMS 2014 paper "A benchmark of globally-optimal
- * methods for the de-identification of biomedical data"
- * 
- * Copyright (C) 2014 Florian Kohlmayer, Fabian Prasser
+ * ARX: Powerful Data Anonymization
+ * Copyright (C) 2012 - 2014 Florian Kohlmayer, Fabian Prasser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,195 +18,685 @@
 
 package org.deidentifier.arx.algorithm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.PriorityQueue;
-
+import org.deidentifier.arx.ARXConfiguration.ARXConfigurationInternal;
+import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
 import org.deidentifier.arx.framework.data.GeneralizationHierarchy;
-import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.MaterializedLattice;
 import org.deidentifier.arx.framework.lattice.Node;
+import org.deidentifier.arx.framework.lattice.NodeAction;
+import org.deidentifier.arx.framework.lattice.NodeAction.NodeActionConstant;
+import org.deidentifier.arx.framework.lattice.NodeAction.NodeActionInverse;
+import org.deidentifier.arx.framework.lattice.NodeAction.NodeActionOR;
+import org.deidentifier.arx.metric.Metric;
 
 /**
- * This class implements the FLASH algorithm as proposed in:<br>
- * <br>
- * Florian Kohlmayer*, Fabian Prasser* et al. Flash: Efficient, Stable and Optimal K-Anonymity.
- * Proceedings of the 4th IEEE International Conference on Information Privacy, Security, Risk and Trust (PASSAT), 2012.
- * 
+ * This class provides a static method for instantiating the FLASH algorithm.
+ *
  * @author Fabian Prasser
  * @author Florian Kohlmayer
  */
-public class AlgorithmFlash extends AbstractBenchmarkAlgorithm {
+public class AlgorithmFlash {
 
-    /** The heap. */
-    private final PriorityQueue<Node> pqueue;
+    /**
+     * Monotonicity.
+     */
+    private static enum Monotonicity {
 
-    /** The current path. */
-    private final ArrayList<Node>     path;
+        /** TODO */
+        FULL,
 
-    /** Are the pointers for a node with id 'index' already sorted?. */
-    private final boolean[]           sorted;
+        /** TODO */
+        PARTIAL,
 
-    /** The strategy. */
-    private final FLASHStrategy       strategy;
+        /** TODO */
+        NONE
+    }
 
     /**
      * Creates a new instance of the FLASH algorithm.
-     * 
+     *
      * @param lattice
-     *            The lattice
-     * @param history
-     *            The history
      * @param checker
-     *            The checker
-     * @param new FLASHStrategy(lattice, manager.getHierarchies() The strategy
+     * @param hierarchies
+     * @return
      */
-    public AlgorithmFlash(final AbstractLattice lattice,
-                          final INodeChecker checker,
-                          final GeneralizationHierarchy[] hierarchies) {
-
-        super(lattice, checker);
-        this.strategy = new FLASHStrategy((MaterializedLattice) lattice, hierarchies);
-        this.pqueue = new PriorityQueue<Node>(11, strategy);
-        this.sorted = new boolean[lattice.getSize()];
-        this.path = new ArrayList<Node>();
-        // Set strategy
-        checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_NON_ANONYMOUS);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.deidentifier.ARX.algorithm.AbstractAlgorithm#traverse()
-     */
-    @Override
-    public void traverse() {
+    public static AbstractBenchmarkAlgorithm create(final MaterializedLattice lattice,
+                                                    final INodeChecker checker,
+                                                    final GeneralizationHierarchy[] hierarchies) {
 
         // Init
-        pqueue.clear();
+        final FLASHStrategy strategy = new FLASHStrategy(lattice, hierarchies);
+        ARXConfigurationInternal config = checker.getConfiguration();
+        Metric<?> metric = checker.getMetric();
 
-        // For each node
-        final int length = lattice.getLevels().length;
-        for (int i = 0; i < length; i++) {
-            Node[] level;
-            level = this.sort(i);
-            for (final Node node : level) {
-                if (!isTagged(node)) {
-                    pqueue.add(node);
-                    while (!pqueue.isEmpty()) {
-                        Node head = pqueue.poll();
-                        // if anonymity is unknown
-                        if (!isTagged(head)) {
-                            findPath(head);
-                            head = checkPathBinary(path);
-                        }
-                    }
+        // NOTE:
+        // - If we assume practical monotonicity then we assume
+        // monotonicity for both criterion AND metric
+        // - Without suppression we assume monotonicity for all criteria
+        // - Without suppression we assume monotonicity for all metrics
+
+        // Determine monotonicity of metric
+        Monotonicity monotonicityMetric;
+        if (metric.isMonotonic() || (config.getMaxOutliers() == 0d) || config.isPracticalMonotonicity()) {
+            monotonicityMetric = Monotonicity.FULL;
+        } else {
+            monotonicityMetric = Monotonicity.NONE;
+        }
+
+        // First, determine whether the overall set of criteria is monotonic
+        Monotonicity monotonicityCriteria = Monotonicity.FULL;
+        for (PrivacyCriterion criterion : config.getCriteria()) {
+            if (!(criterion.isMonotonic() || (config.getMaxOutliers() == 0d) || config.isPracticalMonotonicity())) {
+                if (config.getMinimalGroupSize() != Integer.MAX_VALUE) {
+                    monotonicityCriteria = Monotonicity.PARTIAL;
+                } else {
+                    monotonicityCriteria = Monotonicity.NONE;
+                }
+                break;
+            }
+        }
+
+        // ******************************
+        // CASE 1
+        // ******************************
+        if ((monotonicityCriteria == Monotonicity.FULL) && (monotonicityMetric == Monotonicity.FULL)) {
+            return createFullFull(lattice, checker, strategy);
+        }
+
+        // ******************************
+        // CASE 2
+        // ******************************
+        if ((monotonicityCriteria == Monotonicity.FULL) && (monotonicityMetric == Monotonicity.NONE)) {
+            return createFullNone(lattice, checker, strategy);
+        }
+
+        // ******************************
+        // CASE 3
+        // ******************************
+        if ((monotonicityCriteria == Monotonicity.PARTIAL) && (monotonicityMetric == Monotonicity.FULL)) {
+            return createPartialFull(lattice, checker, strategy);
+        }
+
+        // ******************************
+        // CASE 4
+        // ******************************
+        if ((monotonicityCriteria == Monotonicity.PARTIAL) && (monotonicityMetric == Monotonicity.NONE)) {
+            return createPartialNone(lattice, checker, strategy);
+        }
+
+        // ******************************
+        // CASE 5
+        // ******************************
+        if ((monotonicityCriteria == Monotonicity.NONE) && (monotonicityMetric == Monotonicity.FULL)) {
+            return createNoneFull(lattice, checker, strategy);
+        }
+
+        // ******************************
+        // CASE 6
+        // ******************************
+        if ((monotonicityCriteria == Monotonicity.NONE) && (monotonicityMetric == Monotonicity.NONE)) {
+            return createNoneNone(lattice, checker, strategy);
+        }
+
+        throw new IllegalStateException("Oops");
+    }
+
+    /**
+     * Semantics of method name: monotonicity of criteria + monotonicity of metric.
+     *
+     * @param lattice
+     * @param checker
+     * @param strategy
+     * @return
+     */
+    private static AbstractBenchmarkAlgorithm createFullFull(final MaterializedLattice lattice,
+                                                             final INodeChecker checker,
+                                                             final FLASHStrategy strategy) {
+
+        // We focus on the anonymity property
+        int anonymityProperty = Node.PROPERTY_ANONYMOUS;
+
+        // Skip nodes for which the anonymity property is known
+        NodeAction triggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        };
+
+        // We predictively tag the anonymity property
+        NodeAction triggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                if (node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+                    lattice.setPropertyUpwards(node, false, Node.PROPERTY_ANONYMOUS | Node.PROPERTY_SUCCESSORS_PRUNED);
+                    lattice.setProperty(node, Node.PROPERTY_SUCCESSORS_PRUNED);
+                } else {
+                    lattice.setPropertyDownwards(node, false, Node.PROPERTY_NOT_ANONYMOUS);
                 }
             }
-        }
+
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        };
+
+        // No evaluation
+        NodeAction triggerEvaluate = new NodeActionConstant(false);
+        NodeAction triggerCheck = new NodeActionInverse(triggerSkip);
+        NodeAction triggerFireEvent = new NodeActionOR(triggerSkip) {
+            @Override
+            protected boolean additionalConditionAppliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+        };
+
+        // Only one binary phase
+        // Deactivate pruning due to lower bound as it increases number of checks needed
+        FLASHConfiguration config = FLASHConfiguration.createBinaryPhaseConfiguration(new FLASHPhaseConfiguration(anonymityProperty,
+                                                                                                                  triggerTag,
+                                                                                                                  triggerCheck,
+                                                                                                                  triggerEvaluate,
+                                                                                                                  triggerSkip),
+                                                                                      History.STORAGE_TRIGGER_NON_ANONYMOUS,
+                                                                                      triggerFireEvent,
+                                                                                      false);
+
+        return new FLASHAlgorithmImpl(lattice, checker, strategy, config);
     }
 
     /**
-     * Checks a path binary.
-     * 
-     * @param path
-     *            The path
+     * Semantics of method name: monotonicity of criteria + monotonicity of metric.
+     *
+     * @param lattice
+     * @param checker
+     * @param strategy
+     * @return
      */
-    private final Node checkPathBinary(final List<Node> path) {
-        int low = 0;
-        int high = path.size() - 1;
-        Node lastAnonymousNode = null;
+    private static AbstractBenchmarkAlgorithm createFullNone(final MaterializedLattice lattice,
+                                                             final INodeChecker checker,
+                                                             final FLASHStrategy strategy) {
 
-        while (low <= high) {
+        /* *******************************
+         * BINARY PHASE
+         * *******************************
+         */
 
-            final int mid = (low + high) >>> 1;
-            final Node node = path.get(mid);
+        // We focus on the anonymity property
+        int binaryAnonymityProperty = Node.PROPERTY_ANONYMOUS;
 
-            if (!isTagged(node)) {
-                check(node);
-                tag(node);
-                if (!isAnonymous(node)) {
-                    for (final Node up : node.getSuccessors(true)) {
-                        if (!isTagged(up)) {
-                            pqueue.add(up);
-                        }
-                    }
+        // Skip nodes for which the anonymity property is known
+        NodeAction binaryTriggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        };
+
+        // We predictively tag the anonymity property
+        NodeAction binaryTriggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                if (node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+                    lattice.setPropertyUpwards(node, false, Node.PROPERTY_ANONYMOUS);
+                } else {
+                    lattice.setPropertyDownwards(node, false, Node.PROPERTY_NOT_ANONYMOUS);
                 }
             }
 
-            if (isAnonymous(node)) {
-                lastAnonymousNode = node;
-                high = mid - 1;
-            } else {
-                low = mid + 1;
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
             }
-        }
-        return lastAnonymousNode;
+        };
+
+        // No evaluation
+        NodeAction binaryTriggerCheck = new NodeActionInverse(binaryTriggerSkip);
+        NodeAction binaryTriggerEvaluate = new NodeActionConstant(false);
+
+        /* *******************************
+         * LINEAR PHASE
+         * *******************************
+         */
+
+        // We focus on the anonymity property
+        int linearAnonymityProperty = Node.PROPERTY_ANONYMOUS;
+
+        // We skip nodes which are not anonymous or which have already been visited during the second phase
+        NodeAction linearTriggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_VISITED);
+            }
+        };
+
+        // We evaluate nodes which have not been skipped, if the metric is independent
+        NodeAction linearTriggerEvaluate = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return checker.getMetric().isIndependent() &&
+                       !node.hasProperty(Node.PROPERTY_CHECKED) &&
+                       !node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        };
+
+        // We check nodes which have not been skipped, if the metric is dependent
+        NodeAction linearTriggerCheck = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return !checker.getMetric().isIndependent() &&
+                       !node.hasProperty(Node.PROPERTY_CHECKED) &&
+                       !node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        };
+
+        // Mark nodes as already visited during the second phase
+        NodeAction linearTriggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                lattice.setProperty(node, Node.PROPERTY_VISITED);
+            }
+
+            @Override
+            public boolean appliesTo(Node node) {
+                return true;
+            }
+        };
+
+        // Fire event
+        NodeAction triggerFireEvent = new NodeActionOR(linearTriggerSkip) {
+            @Override
+            protected boolean additionalConditionAppliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+        };
+
+        // Two interwoven phases
+        FLASHConfiguration config = FLASHConfiguration.createTwoPhaseConfiguration(new FLASHPhaseConfiguration(binaryAnonymityProperty,
+                                                                                                               binaryTriggerTag,
+                                                                                                               binaryTriggerCheck,
+                                                                                                               binaryTriggerEvaluate,
+                                                                                                               binaryTriggerSkip),
+                                                                                   new FLASHPhaseConfiguration(linearAnonymityProperty,
+                                                                                                               linearTriggerTag,
+                                                                                                               linearTriggerCheck,
+                                                                                                               linearTriggerEvaluate,
+                                                                                                               linearTriggerSkip),
+                                                                                   History.STORAGE_TRIGGER_ALL,
+                                                                                   triggerFireEvent,
+                                                                                   true);
+
+        return new FLASHAlgorithmImpl(lattice, checker, strategy, config);
     }
 
     /**
-     * Greedily find a path.
-     * 
-     * @param current
-     *            The current
-     * @return the list
+     * Semantics of method name: monotonicity of criteria + monotonicity of metric.
+     *
+     * @param lattice
+     * @param checker
+     * @param strategy
+     * @return
      */
-    private final List<Node> findPath(Node current) {
-        path.clear();
-        path.add(current);
-        boolean found = true;
-        while (found) {
-            found = false;
-            this.sort(current);
-            for (final Node candidate : current.getSuccessors(true)) {
-                if (!isTagged(candidate)) {
-                    current = candidate;
-                    path.add(candidate);
-                    found = true;
-                    break;
+    private static AbstractBenchmarkAlgorithm createNoneFull(final MaterializedLattice lattice,
+                                                             final INodeChecker checker,
+                                                             final FLASHStrategy strategy) {
+
+        // We focus on the anonymity property
+        int anonymityProperty = Node.PROPERTY_ANONYMOUS;
+
+        // We skip nodes for which the anonymity property is known or which have insufficient utility
+        NodeAction triggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_INSUFFICIENT_UTILITY);
+            }
+        };
+
+        // No evaluation
+        NodeAction triggerEvaluate = new NodeActionConstant(false);
+        NodeAction triggerCheck = new NodeActionInverse(triggerSkip);
+        NodeAction triggerFireEvent = new NodeActionOR(triggerSkip) {
+            @Override
+            protected boolean additionalConditionAppliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+        };
+
+        // We predictively tag nodes with insufficient utility because of the monotonic metric
+        NodeAction triggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                lattice.setPropertyUpwards(node, false, Node.PROPERTY_INSUFFICIENT_UTILITY | Node.PROPERTY_SUCCESSORS_PRUNED);
+                lattice.setProperty(node, Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS);
+            }
+        };
+
+        // Only one linear phase
+        FLASHConfiguration config = FLASHConfiguration.createLinearPhaseConfiguration(new FLASHPhaseConfiguration(anonymityProperty,
+                                                                                                                  triggerTag,
+                                                                                                                  triggerCheck,
+                                                                                                                  triggerEvaluate,
+                                                                                                                  triggerSkip),
+                                                                                      History.STORAGE_TRIGGER_ALL,
+                                                                                      triggerFireEvent,
+                                                                                      true);
+
+        return new FLASHAlgorithmImpl(lattice, checker, strategy, config);
+    }
+
+    /**
+     * Semantics of method name: monotonicity of criteria + monotonicity of metric.
+     *
+     * @param lattice
+     * @param checker
+     * @param strategy
+     * @return
+     */
+    private static AbstractBenchmarkAlgorithm createNoneNone(MaterializedLattice lattice,
+                                                             INodeChecker checker,
+                                                             FLASHStrategy strategy) {
+
+        // We focus on the anonymity property
+        int anonymityProperty = Node.PROPERTY_ANONYMOUS;
+
+        // Skip nodes for which the anonymity property is known
+        NodeAction triggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        };
+
+        // No evaluation, no tagging
+        NodeAction triggerEvaluate = new NodeActionConstant(false);
+        NodeAction triggerCheck = new NodeActionInverse(triggerSkip);
+        NodeAction triggerTag = new NodeActionConstant(false);
+        NodeAction triggerFireEvent = new NodeActionOR(triggerSkip) {
+            @Override
+            protected boolean additionalConditionAppliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+        };
+
+        // Only one linear phase
+        FLASHConfiguration config = FLASHConfiguration.createLinearPhaseConfiguration(new FLASHPhaseConfiguration(anonymityProperty,
+                                                                                                                  triggerTag,
+                                                                                                                  triggerCheck,
+                                                                                                                  triggerEvaluate,
+                                                                                                                  triggerSkip),
+                                                                                      History.STORAGE_TRIGGER_ALL,
+                                                                                      triggerFireEvent,
+                                                                                      true);
+
+        return new FLASHAlgorithmImpl(lattice, checker, strategy, config);
+    }
+
+    /**
+     * Semantics of method name: monotonicity of criteria + monotonicity of metric.
+     *
+     * @param lattice
+     * @param checker
+     * @param strategy
+     * @return
+     */
+    private static AbstractBenchmarkAlgorithm createPartialFull(final MaterializedLattice lattice,
+                                                                final INodeChecker checker,
+                                                                final FLASHStrategy strategy) {
+        /* *******************************
+         * BINARY PHASE
+         * *******************************
+         */
+
+        // We focus on the k-anonymity property
+        int binaryAnonymityProperty = Node.PROPERTY_K_ANONYMOUS;
+
+        // Skip nodes for which the k-anonymity property is known or which have insufficient utility
+        NodeAction binaryTriggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_INSUFFICIENT_UTILITY);
+            }
+        };
+
+        // We predictively tag the k-anonymity property and the insufficient utility property
+        NodeAction binaryTriggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                // Tag k-anonymity
+                if (node.hasProperty(Node.PROPERTY_K_ANONYMOUS)) {
+                    lattice.setPropertyUpwards(node, false, Node.PROPERTY_K_ANONYMOUS);
+                } else {
+                    lattice.setPropertyDownwards(node, false, Node.PROPERTY_NOT_K_ANONYMOUS);
+                }
+
+                // Tag insufficient utility
+                if (node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+                    lattice.setPropertyUpwards(node, false, Node.PROPERTY_INSUFFICIENT_UTILITY | Node.PROPERTY_SUCCESSORS_PRUNED);
+                    lattice.setProperty(node, Node.PROPERTY_SUCCESSORS_PRUNED);
                 }
             }
-        }
-        return path;
-    }
 
-    /**
-     * Sorts a level.
-     * 
-     * @param level
-     *            The level
-     * @return the node[]
-     */
-    private final Node[] sort(final int level) {
-
-        // Create
-        List<Node> result = new ArrayList<Node>();
-        Node[] nlevel = lattice.getLevels()[level];
-        for (Node n : nlevel) {
-            if (!isTagged(n)) {
-                result.add(n);
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_ANONYMOUS);
             }
-        }
+        };
 
-        // Sort
-        Node[] resultArray = result.toArray(new Node[result.size()]);
-        Arrays.sort(resultArray, strategy);
-        return resultArray;
+        // No evaluation
+        NodeAction binaryTriggerCheck = new NodeActionInverse(binaryTriggerSkip);
+        NodeAction binaryTriggerEvaluate = new NodeActionConstant(false);
+
+        /* *******************************
+         * LINEAR PHASE
+         * *******************************
+         */
+
+        // We focus on the anonymity property
+        int linearAnonymityProperty = Node.PROPERTY_ANONYMOUS;
+
+        // We skip nodes for which the anonymity property is known, which are not k-anonymous,
+        // or which have insufficient utility
+        NodeAction linearTriggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_VISITED) ||
+                       node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_INSUFFICIENT_UTILITY);
+            }
+        };
+
+        // No evaluation
+        NodeAction linearTriggerEvaluate = new NodeActionConstant(false);
+
+        // We check nodes which have not been skipped
+        NodeAction linearTriggerCheck = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return !node.hasProperty(Node.PROPERTY_VISITED) &&
+                       !node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS) &&
+                       !node.hasProperty(Node.PROPERTY_INSUFFICIENT_UTILITY) &&
+                       !node.hasProperty(Node.PROPERTY_CHECKED);
+            }
+        };
+
+        // We predictively tag the insufficient utility property
+        NodeAction linearTriggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                lattice.setProperty(node, Node.PROPERTY_VISITED);
+                if (node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+                    lattice.setPropertyUpwards(node, false, Node.PROPERTY_INSUFFICIENT_UTILITY | Node.PROPERTY_SUCCESSORS_PRUNED);
+                    lattice.setProperty(node, Node.PROPERTY_SUCCESSORS_PRUNED);
+                }
+            }
+
+            @Override
+            public boolean appliesTo(Node node) {
+                return true;
+            }
+        };
+
+        // Fire event
+        NodeAction triggerFireEvent = new NodeActionOR(linearTriggerSkip) {
+            @Override
+            protected boolean additionalConditionAppliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+        };
+
+        // Two interwoven phases
+        FLASHConfiguration config = FLASHConfiguration.createTwoPhaseConfiguration(new FLASHPhaseConfiguration(binaryAnonymityProperty,
+                                                                                                               binaryTriggerTag,
+                                                                                                               binaryTriggerCheck,
+                                                                                                               binaryTriggerEvaluate,
+                                                                                                               binaryTriggerSkip),
+                                                                                   new FLASHPhaseConfiguration(linearAnonymityProperty,
+                                                                                                               linearTriggerTag,
+                                                                                                               linearTriggerCheck,
+                                                                                                               linearTriggerEvaluate,
+                                                                                                               linearTriggerSkip),
+                                                                                   History.STORAGE_TRIGGER_ALL,
+                                                                                   triggerFireEvent,
+                                                                                   true);
+
+        return new FLASHAlgorithmImpl(lattice, checker, strategy, config);
     }
 
     /**
-     * Sorts upwards pointers of a node.
-     * 
-     * @param current
-     *            The current
+     * Semantics of method name: monotonicity of criteria + monotonicity of metric.
+     *
+     * @param lattice
+     * @param checker
+     * @param strategy
+     * @return
      */
-    private final void sort(final Node current) {
-        if (!sorted[current.id]) {
-            Arrays.sort(current.getSuccessors(true), strategy);
-            sorted[current.id] = true;
-        }
+    private static AbstractBenchmarkAlgorithm createPartialNone(final MaterializedLattice lattice,
+                                                                final INodeChecker checker,
+                                                                final FLASHStrategy strategy) {
+        /* *******************************
+         * BINARY PHASE
+         * *******************************
+         */
+
+        // We focus on the k-anonymity property
+        int binaryAnonymityProperty = Node.PROPERTY_K_ANONYMOUS;
+
+        // Skip nodes for which the k-anonymity property is known
+        NodeAction binaryTriggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS);
+            }
+        };
+
+        // We predictively tag the k-anonymity property
+        NodeAction binaryTriggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                if (node.hasProperty(Node.PROPERTY_K_ANONYMOUS)) {
+                    lattice.setPropertyUpwards(node, false, Node.PROPERTY_K_ANONYMOUS);
+                } else {
+                    lattice.setPropertyDownwards(node, false, Node.PROPERTY_NOT_K_ANONYMOUS);
+                }
+            }
+
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_K_ANONYMOUS) ||
+                       node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS);
+            }
+        };
+
+        // No evaluation
+        NodeAction binaryTriggerCheck = new NodeActionInverse(binaryTriggerSkip);
+        NodeAction binaryTriggerEvaluate = new NodeActionConstant(false);
+
+        /* *******************************
+         * LINEAR PHASE
+         * *******************************
+         */
+
+        // We focus on the anonymity property
+        int linearAnonymityProperty = Node.PROPERTY_ANONYMOUS;
+
+        // We skip nodes for which are not k-anonymous and which have not been visited yet in the 2nd phase
+        NodeAction linearTriggerSkip = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_VISITED) ||
+                       node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS);
+            }
+        };
+
+        // No evaluation
+        NodeAction linearTriggerEvaluate = new NodeActionConstant(false);
+
+        // We check nodes which are k-anonymous and have not been checked already
+        NodeAction linearTriggerCheck = new NodeAction() {
+            @Override
+            public boolean appliesTo(Node node) {
+                return !node.hasProperty(Node.PROPERTY_CHECKED) &&
+                       !node.hasProperty(Node.PROPERTY_NOT_K_ANONYMOUS);
+            }
+        };
+
+        // Mark nodes as already visited during the second phase
+        NodeAction linearTriggerTag = new NodeAction() {
+            @Override
+            public void action(Node node) {
+                lattice.setProperty(node, Node.PROPERTY_VISITED);
+            }
+
+            @Override
+            public boolean appliesTo(Node node) {
+                return true;
+            }
+        };
+
+        // Fire event
+        NodeAction triggerFireEvent = new NodeActionOR(linearTriggerSkip) {
+            @Override
+            protected boolean additionalConditionAppliesTo(Node node) {
+                return node.hasProperty(Node.PROPERTY_SUCCESSORS_PRUNED);
+            }
+        };
+
+        // Two interwoven phases
+        FLASHConfiguration config = FLASHConfiguration.createTwoPhaseConfiguration(new FLASHPhaseConfiguration(binaryAnonymityProperty,
+                                                                                                               binaryTriggerTag,
+                                                                                                               binaryTriggerCheck,
+                                                                                                               binaryTriggerEvaluate,
+                                                                                                               binaryTriggerSkip),
+                                                                                   new FLASHPhaseConfiguration(linearAnonymityProperty,
+                                                                                                               linearTriggerTag,
+                                                                                                               linearTriggerCheck,
+                                                                                                               linearTriggerEvaluate,
+                                                                                                               linearTriggerSkip),
+                                                                                   History.STORAGE_TRIGGER_ALL,
+                                                                                   triggerFireEvent,
+                                                                                   true);
+
+        return new FLASHAlgorithmImpl(lattice, checker, strategy, config);
     }
 }
