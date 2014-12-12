@@ -176,7 +176,7 @@ public class BenchmarkSetup {
     @SuppressWarnings("rawtypes")
     public static Metric[] getMetrics() {
         return new Metric[] {
-                Metric.createLossMetric(AggregateFunction.ARITHMETIC_MEAN), // TODO: Should be geometric mean, if possible
+                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN), // TODO: Should be geometric mean, if possible
                 Metric.createEntropyMetric(),
                 Metric.createPrecisionMetric(),
                 Metric.createAECSMetric(),

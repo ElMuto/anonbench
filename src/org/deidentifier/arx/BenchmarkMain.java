@@ -32,7 +32,6 @@ import org.deidentifier.arx.metric.Metric;
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.ValueBuffer;
 import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
-import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyzer;
 
 /**
  * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
@@ -42,30 +41,31 @@ import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyze
 public class BenchmarkMain {
 
     /** Repetitions */
-    private static final int       REPETITIONS         = 3;
+    private static final int         REPETITIONS         = 3;
     /** The benchmark instance */
-    private static final Benchmark BENCHMARK           = new Benchmark(new String[] {
-                                                       "Algorithm",
-                                                       "Dataset",
-                                                       "Criteria",
-                                                       "Metric",
-                                                       "Suppression" });
+    protected static final Benchmark BENCHMARK           = new Benchmark(new String[] {
+                                                         "Algorithm",
+                                                         "Dataset",
+                                                         "Criteria",
+                                                         "Metric",
+                                                         "Suppression" });
     /** Label for execution times */
-    public static final int        EXECUTION_TIME      = BENCHMARK.addMeasure("Execution time");
+    public static final int          EXECUTION_TIME      = BENCHMARK.addMeasure("Execution time");
     /** Label for number of checks */
-    public static final int        NUMBER_OF_CHECKS    = BENCHMARK.addMeasure("Number of checks");
+    public static final int          NUMBER_OF_CHECKS    = BENCHMARK.addMeasure("Number of checks");
     /** Label for number of roll-ups */
-    public static final int        NUMBER_OF_ROLLUPS   = BENCHMARK.addMeasure("Number of rollups");
+    public static final int          NUMBER_OF_ROLLUPS   = BENCHMARK.addMeasure("Number of rollups");
     /** Label for number of roll-ups */
-    public static final int        NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure("Number of snapshots");
+    public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure("Number of snapshots");
     /** Label for size of lattice */
-    public static final int        LATTICE_SIZE        = BENCHMARK.addMeasure("Size of lattice");
+    public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure("Size of lattice");
     /** Label for information loss */
-    public static final int        INFORMATION_LOSS    = BENCHMARK.addMeasure("Information loss");
+    public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure("Information loss");
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
-        BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(REPETITIONS));
+        // TODO currently not working since only one value per criteria-combination is written to output and standardDeviation results in Nan
+        // BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(NUMBER_OF_CHECKS, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUMBER_OF_SNAPSHOTS, new ValueBuffer());
@@ -113,6 +113,7 @@ public class BenchmarkMain {
                                              metric.getName(),
                                              String.valueOf(suppression));
 
+                            // TODO check how the #repetitions affect the result values
                             // Repeat
                             for (int i = 0; i < REPETITIONS; i++) {
                                 driver.anonymize(data, criteria, algorithm, metric, suppression, false);
