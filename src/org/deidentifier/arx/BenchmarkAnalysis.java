@@ -122,17 +122,17 @@ public class BenchmarkAnalysis {
     /**
      * Generates a single table
      * @param file
-     * @param variable
-     * @param lowerIsBetter
      * @param suppression
      * @param metric
-     * @param analzyer
+     * @param variable
+     * @param measure
+     * @param lowerIsBetter
      * @throws ParseException
      * @throws IOException
      */
     private static void
-            generateTable(CSVFile file, String variable, boolean lowerIsBetter, String suppression, Metric<?> metric, Analyzer<?> analyzer) throws ParseException,
-                                                                                                                                           IOException {
+            generateTable(CSVFile file, String suppression, Metric<?> metric, String variable, String measure, boolean lowerIsBetter) throws ParseException,
+                                                                                                                                     IOException {
 
         // Create csv header
         String[] header1 = new String[BenchmarkSetup.getDatasets().length + 1];
@@ -170,23 +170,16 @@ public class BenchmarkAnalysis {
 
                 // Select data for the given data point
                 Selector<String[]> selector = file.getSelectorBuilder()
-                                                  .field("Criteria")
-                                                  .equals(scriteria)
-                                                  .and()
-                                                  .field("Dataset")
-                                                  .equals(dataset)
-                                                  .and()
-                                                  .field("Suppression")
-                                                  .equals(suppression)
-                                                  .and()
-                                                  .field("Metric")
-                                                  .equals(metric.getName())
+                                                  .field("Criteria").equals(scriteria).and()
+                                                  .field("Dataset").equals(dataset).and()
+                                                  .field("Suppression").equals(suppression).and()
+                                                  .field("Metric").equals(metric.getName())
                                                   .build();
 
                 // Create series
                 Series2D series = new Series2D(file, selector,
                                                new Field("Algorithm"),
-                                               new Field(variable, analyzer.getLabel()));
+                                               new Field(variable, measure));
 
                 // Select from series
                 for (Point2D point : series.getData()) {
@@ -228,10 +221,9 @@ public class BenchmarkAnalysis {
         }
 
         // Write to file
-        csv.write(new File("results/table_" + variable.toLowerCase().replaceAll(" ", "_") +
-                           suppression.toLowerCase().replaceAll(" ", "_") + "_" +
+        csv.write(new File("results/table_" + variable.toLowerCase().replaceAll(" ", "_") + "_" +
                            metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
-                           analyzer.getLabel().toLowerCase().replaceAll(" ", "_") + ".csv"));
+                           suppression.toLowerCase().replaceAll(" ", "_") + ".csv"));
     }
 
     /**
@@ -250,28 +242,11 @@ public class BenchmarkAnalysis {
             for (double suppr : BenchmarkSetup.getSuppression()) {
                 String suppression = String.valueOf(suppr);
 
-                // For each variable
-
-                // execution time
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.EXECUTION_TIME)) {
-                    generateTable(file, VARIABLES[0], true, suppression, metric, analyzer);
-                }
-                // number of checks
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.NUMBER_OF_CHECKS)) {
-                    generateTable(file, VARIABLES[1], true, suppression, metric, analyzer);
-                }
-                // number of rollups
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.NUMBER_OF_ROLLUPS)) {
-                    generateTable(file, VARIABLES[2], false, suppression, metric, analyzer);
-                }
-                // number of snapshots
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.NUMBER_OF_SNAPSHOTS)) {
-                    generateTable(file, VARIABLES[3], false, suppression, metric, analyzer);
-                }
-                // information loss
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.INFORMATION_LOSS)) {
-                    generateTable(file, VARIABLES[4], true, suppression, metric, analyzer);
-                }
+                generateTable(file, suppression, metric, VARIABLES[0], Analyzer.ARITHMETIC_MEAN, true);
+                generateTable(file, suppression, metric, VARIABLES[1], Analyzer.VALUE, true);
+                generateTable(file, suppression, metric, VARIABLES[2], Analyzer.VALUE, false);
+                generateTable(file, suppression, metric, VARIABLES[3], Analyzer.VALUE, false);
+                generateTable(file, suppression, metric, VARIABLES[4], Analyzer.VALUE, true);
             }
         }
     }
