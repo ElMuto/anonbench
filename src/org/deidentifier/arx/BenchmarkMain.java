@@ -32,6 +32,7 @@ import org.deidentifier.arx.metric.Metric;
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.ValueBuffer;
 import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
+import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyzer;
 
 /**
  * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
@@ -64,8 +65,7 @@ public class BenchmarkMain {
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
-        // TODO currently not working since only one value per criteria-combination is written to output and standardDeviation results in Nan
-        // BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(REPETITIONS));
         BENCHMARK.addAnalyzer(NUMBER_OF_CHECKS, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUMBER_OF_SNAPSHOTS, new ValueBuffer());
@@ -113,7 +113,6 @@ public class BenchmarkMain {
                                              metric.getName(),
                                              String.valueOf(suppression));
 
-                            // TODO check how the #repetitions affect the result values
                             // Repeat
                             for (int i = 0; i < REPETITIONS; i++) {
                                 driver.anonymize(data, criteria, algorithm, metric, suppression, false);

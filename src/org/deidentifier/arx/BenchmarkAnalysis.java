@@ -35,6 +35,7 @@ import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
 import de.linearbits.subframe.analyzer.Analyzer;
+import de.linearbits.subframe.analyzer.buffered.BufferedGeometricMeanAnalyzer;
 import de.linearbits.subframe.graph.Field;
 import de.linearbits.subframe.graph.Function;
 import de.linearbits.subframe.graph.Labels;
@@ -84,36 +85,23 @@ public class BenchmarkAnalysis {
 
         List<PlotGroup> groups = new ArrayList<PlotGroup>();
 
-        // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics())
-        {
-            // for each suppression
-            for (double suppr : BenchmarkSetup.getSuppression()) {
-                String suppression = String.valueOf(suppr);
+        // For each combination of criteria
+        for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+            String scriteria = Arrays.toString(criteria);
+            
+            // for each metric
+            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
 
-                // For each variable
+                // for each suppression
+                for (double suppr : BenchmarkSetup.getSuppression()) {
+                    String suppression = String.valueOf(suppr);
 
-                // execution time
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.EXECUTION_TIME)) {
-                    groups.add(getGroup(file, VARIABLES[0], "Dataset", suppression, metric, analyzer));
+                    groups.add(getGroup(file, VARIABLES[0], Analyzer.ARITHMETIC_MEAN, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES[1], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES[2], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES[3], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES[4], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
                 }
-                // number of checks
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.NUMBER_OF_CHECKS)) {
-                    groups.add(getGroup(file, VARIABLES[1], "Dataset", suppression, metric, analyzer));
-                }
-                // number of rollups
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.NUMBER_OF_ROLLUPS)) {
-                    groups.add(getGroup(file, VARIABLES[2], "Dataset", suppression, metric, analyzer));
-                }
-                // number of snapshots
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.NUMBER_OF_SNAPSHOTS)) {
-                    groups.add(getGroup(file, VARIABLES[3], "Dataset", suppression, metric, analyzer));
-                }
-                // information loss
-                for (Analyzer<?> analyzer : BenchmarkMain.BENCHMARK.getAnalyzers().get(BenchmarkMain.INFORMATION_LOSS)) {
-                    groups.add(getGroup(file, VARIABLES[4], "Dataset", suppression, metric, analyzer));
-                }
-
             }
         }
         LaTeX.plot(groups, "results/results");
@@ -236,8 +224,8 @@ public class BenchmarkAnalysis {
         CSVFile file = new CSVFile(new File("results/results.csv"));
 
         // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics())
-        {
+        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+            
             // for each suppression
             for (double suppr : BenchmarkSetup.getSuppression()) {
                 String suppression = String.valueOf(suppr);
@@ -254,19 +242,22 @@ public class BenchmarkAnalysis {
     /**
      * Returns a plot group
      * @param file
+     * @param variable
+     * @param measure
      * @param focus
+     * @param scriteria
      * @param suppression TODO
-     * @param metric TODO
-     * @param analyzer TODO
+     * @param metric
      * @return
      * @throws ParseException
      */
     private static PlotGroup getGroup(CSVFile file,
                                       String variable,
+                                      String measure,
                                       String focus,
+                                      String scriteria,
                                       String suppression,
-                                      Metric<?> metric,
-                                      Analyzer<?> analyzer) throws ParseException {
+                                      Metric<?> metric) throws ParseException {
 
         // Prepare
         List<Plot<?>> plots = new ArrayList<Plot<?>>();
@@ -275,7 +266,7 @@ public class BenchmarkAnalysis {
         // Collect data for all algorithms
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
-            Series3D _series = getSeries(file, algorithm.toString(), variable, focus, analyzer, suppression, metric);
+            Series3D _series = getSeries(file, algorithm.toString(), variable, measure, focus, scriteria, suppression, metric);
             if (series == null) series = _series;
             else series.append(_series);
         }
@@ -299,11 +290,9 @@ public class BenchmarkAnalysis {
         }
 
         // Create plot
-        // TODO adjust y-axis label according to used analyzer
         plots.add(new PlotHistogramClustered("",
-                                             new Labels(focus, "Geom. mean of " + variable.toLowerCase()),
+                                             new Labels(focus, variable),
                                              series));
-        // TODO add heading indicating the combination of used params
 
         // Define params
         GnuPlotParams params = new GnuPlotParams();
@@ -314,7 +303,8 @@ public class BenchmarkAnalysis {
             params.minY = 0.001d;
             params.maxY = getMax(series, 2);
             params.printValuesFormatString = "%.2f";
-        } else if (variable.equals("Number of rollups")) {
+        }
+        else if (variable.equals("Number of rollups")) {
             params.minY = 1d;
             if (focus.equals("Criteria")) {
                 params.maxY = getMax(series, 0);
@@ -335,12 +325,24 @@ public class BenchmarkAnalysis {
             params.minY = 1d;
             params.maxY = getMax(series, 1);
             params.printValuesFormatString = "%.0f";
-        }
-        // TODO check why some plots do not have values
-        else if (variable.equals("Information loss")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
+        } else if (variable.equals("Information loss")) {
+            if (getMin(series) < 1) {
+                params.minY = 0.001d;
+                params.maxY = getMax(series, 1);
+                params.printValuesFormatString = "%.2f";
+            } else if (getMin(series) < 100000d) {
+                params.minY = 1d;
+                params.maxY = getMax(series, 1);
+                params.printValuesFormatString = "%.0f";
+            } else if (getMin(series) > 1000000d) {
+                params.minY = 100000d;
+                params.maxY = getMax(series, 3);
+                params.printValuesFormatString = "%.2e";
+            } else {
+                params.minY = 10000d;
+                params.maxY = getMax(series, 3);
+                params.printValuesFormatString = "%.2e";
+            }
         }
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
@@ -351,7 +353,8 @@ public class BenchmarkAnalysis {
         params.ratio = 0.2d;
 
         // Return
-        return new PlotGroup(variable + " grouped by \"" + focus + "\"", plots, params, 1.0d);
+        String caption = variable + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
+        return new PlotGroup(caption, plots, params, 1.0d);
     }
 
     /**
@@ -377,6 +380,21 @@ public class BenchmarkAnalysis {
 
         throw new IllegalStateException("Cannot determine upper bound");
     }
+    
+    /**
+     * Returns the minimum for the given series
+     * @param series
+     * @return
+     */
+    private static double getMin(Series3D series) {
+
+        double min = Double.MAX_VALUE;
+        for (Point3D point : series.getData()) {
+            min = Math.min(Double.valueOf(point.z), min);
+        }
+        
+        return min;
+    }
 
     /**
      * Returns a series<br>
@@ -384,11 +402,12 @@ public class BenchmarkAnalysis {
      * 
      * @param file
      * @param algorithm
+     * @param variable
+     * @param measure
      * @param focus
-     * @param analyzer needs to be of type {@link Double}
+     * @param scriteria
      * @param suppression
      * @param metric
-     * @param dataset
      * @return
      * @throws ParseException
      */
@@ -396,21 +415,28 @@ public class BenchmarkAnalysis {
             getSeries(CSVFile file,
                       String algorithm,
                       String variable,
-                      String focus, Analyzer<?> analyzer, String suppression, Metric<?> metric) throws ParseException {
+                      String measure,
+                      String focus,
+                      String scriteria,
+                      String suppression,
+                      Metric<?> metric) throws ParseException {
 
         // Select data for the given algorithm
         Selector<String[]> selector = file.getSelectorBuilder().field("Algorithm").equals(algorithm).and()
-                                          .field("Suppression").equals(suppression)
-                                          .and()
-                                          .field("Metric").equals(metric.getName())
+                                          .field("Suppression").equals(suppression).and()
+                                          .field("Metric").equals(metric.getName()).and()
+                                          .field("Criteria").equals(scriteria)
                                           .build();
 
-        // Create series
+        // Create series.
+        // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
+        // because by definition of selector each combination of x and y coordinates is unique
+        // and thus only one z coordinate is being encountered.
         Series3D series = new Series3D(file, selector,
                                        new Field(focus),
                                        new Field("Algorithm"),
-                                       new Field(variable, analyzer.getLabel()),
-                                       (Analyzer<Double>) analyzer);
+                                       new Field(variable, measure),
+                                       new BufferedGeometricMeanAnalyzer());
 
         return series;
     }
