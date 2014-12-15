@@ -20,7 +20,7 @@ import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
 import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyzer;
 
 public class InformationLossTest {
-    
+
     /** Repetitions */
     private static final int         REPETITIONS         = 1;
     /** The benchmark instance */
@@ -61,37 +61,50 @@ public class InformationLossTest {
      */
     public static void main(String[] args) throws IOException {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
-        
-        BenchmarkAlgorithm[] algorithms = {BenchmarkAlgorithm.FLASH, BenchmarkAlgorithm.HEURAKLES};
-        BenchmarkDataset[] datasets = {BenchmarkDataset.ADULT, BenchmarkDataset.CUP};
-        BenchmarkCriterion[] criteria = {BenchmarkCriterion.K_ANONYMITY};
-        Metric<AbstractILMultiDimensional> metric = Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN);
-        double suppression = 0.05d;
-       
-        for(BenchmarkDataset data: datasets) {
-            for(BenchmarkAlgorithm algorithm : algorithms) {
-             // Warmup run
-                driver.anonymize(data, criteria, algorithm, metric, suppression, true);
+        String file = "results/resultsTest.csv";
 
-                // Print status info
-                System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
-                                   " / " + suppression + " / " +
-                                   Arrays.toString(criteria));
+        BenchmarkAlgorithm[] algorithms = { BenchmarkAlgorithm.FLASH, BenchmarkAlgorithm.HEURAKLES };
+        BenchmarkDataset[] datasets = { BenchmarkDataset.ADULT, BenchmarkDataset.CUP };
+        BenchmarkCriterion[] criteria = { BenchmarkCriterion.K_ANONYMITY };
+        Metric<AbstractILMultiDimensional> lossMetric = Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN);
+        Metric<AbstractILMultiDimensional> entropyMetric = Metric.createEntropyMetric();
+        double suppression = 0.05d;
+
+        // Runs for loss metric
+        for (BenchmarkDataset data : datasets) {
+            for (BenchmarkAlgorithm algorithm : algorithms) {
+                // Warmup run
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, true);
 
                 // Benchmark
                 BENCHMARK.addRun(algorithm.toString(),
                                  data.toString(),
                                  Arrays.toString(criteria),
-                                 metric.getName(),
+                                 lossMetric.getName(),
                                  String.valueOf(suppression));
 
-                driver.anonymize(data, criteria, algorithm, metric, suppression, false);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, false);
 
                 // Write results incrementally
-                BENCHMARK.getResults().write(new File("results/resultsTest.csv"));
+                BENCHMARK.getResults().write(new File(file));
             }
         }
+
+        // Runs for Non-monotonic non-uniform entropy
+        // Warmup run
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, true);
+
+        // Benchmark
+        BENCHMARK.addRun(BenchmarkAlgorithm.FLASH,
+                         BenchmarkDataset.ADULT.toString(),
+                         Arrays.toString(criteria),
+                         entropyMetric.getName(),
+                         String.valueOf(suppression));
+
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, false);
+
+        // Write results incrementally
+        BENCHMARK.getResults().write(new File(file));
+
     }
 }
-
-
