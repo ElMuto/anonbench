@@ -83,14 +83,13 @@ public class BenchmarkAnalysis {
 
         CSVFile file = new CSVFile(new File("results/results.csv"));
 
-        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+        // for each metric
+        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+            List<PlotGroup> groups = new ArrayList<PlotGroup>();
 
-        // For each combination of criteria
-        for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-            String scriteria = Arrays.toString(criteria);
-            
-            // for each metric
-            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+            // For each combination of criteria
+            for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                String scriteria = Arrays.toString(criteria);
 
                 // for each suppression
                 for (double suppr : BenchmarkSetup.getSuppression()) {
@@ -103,8 +102,8 @@ public class BenchmarkAnalysis {
                     groups.add(getGroup(file, VARIABLES[4], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
                 }
             }
+            LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
         }
-        LaTeX.plot(groups, "results/results");
     }
 
     /**
