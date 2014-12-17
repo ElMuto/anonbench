@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkDriver;
-import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
-import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
 import org.deidentifier.arx.metric.v2.AbstractILMultiDimensional;
@@ -74,7 +72,7 @@ public class InformationLossTest {
         for (BenchmarkDataset data : datasets) {
             for (BenchmarkAlgorithm algorithm : algorithms) {
                 // Warmup run
-                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, true);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, true, true);
 
                 // Benchmark
                 BENCHMARK.addRun(algorithm.toString(),
@@ -83,7 +81,7 @@ public class InformationLossTest {
                                  lossMetric.getName(),
                                  String.valueOf(suppression));
 
-                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, false);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, false, true);
 
                 // Write results incrementally
                 BENCHMARK.getResults().write(new File(file));
@@ -92,7 +90,7 @@ public class InformationLossTest {
 
         // Runs for Non-monotonic non-uniform entropy
         // Warmup run
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, true);
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, true, true);
 
         // Benchmark
         BENCHMARK.addRun(BenchmarkAlgorithm.FLASH,
@@ -101,7 +99,7 @@ public class InformationLossTest {
                          entropyMetric.getName(),
                          String.valueOf(suppression));
 
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, false);
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, false, true);
 
         // Write results incrementally
         BENCHMARK.getResults().write(new File(file));

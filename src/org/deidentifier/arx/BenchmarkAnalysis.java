@@ -27,7 +27,9 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -53,14 +55,38 @@ import de.linearbits.subframe.render.PlotGroup;
 
 public class BenchmarkAnalysis {
 
-    /** The variables */
-    // TODO refactor to use of enum
-    private static final String[] VARIABLES = {
-                                            "Execution time",
-                                            "Number of checks",
-                                            "Number of rollups",
-                                            "Number of snapshots",
-                                            "Information loss" };
+    /**
+     * Enum for all variables used in the analysis.
+     */
+    protected static enum VARIABLES {
+        EXECUTION_TIME("Execution time"),
+        NUMBER_OF_CHECKS("Number of checks"),
+        NUMBER_OF_ROLLUPS("Number of rollups"),
+        NUMBER_OF_SNAPSHOTS("Number of snapshots"),
+        INFORMATION_LOSS("Information loss"),
+        LATTICE_SIZE("Size of lattice"),
+        INFORMATION_LOSS_MINIMUM("Information loss minimum"),
+        INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
+        INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
+        INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)");
+
+        protected final String                val;
+        private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
+
+        static {
+            for (VARIABLES value : VARIABLES.values()) {
+                value2Enum.put(value.val, value);
+            }
+        }
+
+        private VARIABLES(String val) {
+            this.val = val;
+        }
+
+        public static VARIABLES getEnum(String val) {
+            return value2Enum.get(val);
+        }
+    }
 
     /**
      * Main
@@ -95,11 +121,17 @@ public class BenchmarkAnalysis {
                 for (double suppr : BenchmarkSetup.getSuppression()) {
                     String suppression = String.valueOf(suppr);
 
-                    groups.add(getGroup(file, VARIABLES[0], Analyzer.ARITHMETIC_MEAN, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES[1], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES[2], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES[3], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES[4], Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file,
+                                        VARIABLES.EXECUTION_TIME,
+                                        Analyzer.ARITHMETIC_MEAN,
+                                        "Dataset",
+                                        scriteria,
+                                        suppression,
+                                        metric));
+                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
                 }
             }
             LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
@@ -118,8 +150,8 @@ public class BenchmarkAnalysis {
      * @throws IOException
      */
     private static void
-            generateTable(CSVFile file, String suppression, Metric<?> metric, String variable, String measure, boolean lowerIsBetter) throws ParseException,
-                                                                                                                                     IOException {
+            generateTable(CSVFile file, String suppression, Metric<?> metric, VARIABLES variable, String measure, boolean lowerIsBetter) throws ParseException,
+                                                                                                                                        IOException {
 
         // Create csv header
         String[] header1 = new String[BenchmarkSetup.getDatasets().length + 1];
@@ -166,7 +198,7 @@ public class BenchmarkAnalysis {
                 // Create series
                 Series2D series = new Series2D(file, selector,
                                                new Field("Algorithm"),
-                                               new Field(variable, measure));
+                                               new Field(variable.val, measure));
 
                 // Select from series
                 for (Point2D point : series.getData()) {
@@ -208,7 +240,7 @@ public class BenchmarkAnalysis {
         }
 
         // Write to file
-        csv.write(new File("results/table_" + variable.toLowerCase().replaceAll(" ", "_") + "_" +
+        csv.write(new File("results/table_" + variable.val.toLowerCase().replaceAll(" ", "_") + "_" +
                            metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
                            suppression.toLowerCase().replaceAll(" ", "_") + ".csv"));
     }
@@ -224,16 +256,16 @@ public class BenchmarkAnalysis {
 
         // for each metric
         for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-            
+
             // for each suppression
             for (double suppr : BenchmarkSetup.getSuppression()) {
                 String suppression = String.valueOf(suppr);
 
-                generateTable(file, suppression, metric, VARIABLES[0], Analyzer.ARITHMETIC_MEAN, true);
-                generateTable(file, suppression, metric, VARIABLES[1], Analyzer.VALUE, true);
-                generateTable(file, suppression, metric, VARIABLES[2], Analyzer.VALUE, false);
-                generateTable(file, suppression, metric, VARIABLES[3], Analyzer.VALUE, false);
-                generateTable(file, suppression, metric, VARIABLES[4], Analyzer.VALUE, true);
+                generateTable(file, suppression, metric, VARIABLES.EXECUTION_TIME, Analyzer.ARITHMETIC_MEAN, true);
+                generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, true);
+                generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, false);
+                generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, false);
+                generateTable(file, suppression, metric, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, true);
             }
         }
     }
@@ -251,7 +283,7 @@ public class BenchmarkAnalysis {
      * @throws ParseException
      */
     private static PlotGroup getGroup(CSVFile file,
-                                      String variable,
+                                      VARIABLES variable,
                                       String measure,
                                       String focus,
                                       String scriteria,
@@ -265,7 +297,7 @@ public class BenchmarkAnalysis {
         // Collect data for all algorithms
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
-            Series3D _series = getSeries(file, algorithm.toString(), variable, measure, focus, scriteria, suppression, metric);
+            Series3D _series = getSeries(file, algorithm.toString(), variable.val, measure, focus, scriteria, suppression, metric);
             if (series == null) series = _series;
             else series.append(_series);
         }
@@ -279,7 +311,7 @@ public class BenchmarkAnalysis {
         });
 
         // Transform execution times from nanos to seconds
-        if (variable.equals("Execution time")) {
+        if (VARIABLES.EXECUTION_TIME == variable) {
             series.transform(new Function<Point3D>() {
                 @Override
                 public Point3D apply(Point3D t) {
@@ -290,7 +322,7 @@ public class BenchmarkAnalysis {
 
         // Create plot
         plots.add(new PlotHistogramClustered("",
-                                             new Labels(focus, variable),
+                                             new Labels(focus, variable.val),
                                              series));
 
         // Define params
@@ -298,101 +330,52 @@ public class BenchmarkAnalysis {
         params.rotateXTicks = 0;
         params.printValues = true;
         params.size = 1.5;
-        if (variable.equals("Execution time")) {
-            params.minY = 0.001d;
-            params.maxY = getMax(series, 2);
+        params.logY = false;
+
+        double max = getMax(series);
+        double padding = max * 0.3d;
+
+        params.minY = 0d;
+        params.printValuesFormatString = "%.0f";
+
+        if (VARIABLES.EXECUTION_TIME == variable || max < 10d) {
             params.printValuesFormatString = "%.2f";
         }
-        else if (variable.equals("Number of rollups")) {
-            params.minY = 1d;
-            if (focus.equals("Criteria")) {
-                params.maxY = getMax(series, 0);
-            } else {
-                params.maxY = getMax(series, 1);
-            }
-            params.printValuesFormatString = "%.0f";
+
+        if (max >= 10000d) {
+            padding = max * 0.7d;
+            params.printValuesFormatString = "%.2e";
         }
-        else if (variable.equals("Number of snapshots")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
-        } else if (variable.equals("Number of checks")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
-        } else if (variable.equals("Size of lattice")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
-        } else if (variable.equals("Information loss")) {
-            if (getMin(series) < 1) {
-                params.minY = 0.001d;
-                params.maxY = getMax(series, 1);
-                params.printValuesFormatString = "%.2f";
-            } else if (getMin(series) < 100000d) {
-                params.minY = 1d;
-                params.maxY = getMax(series, 1);
-                params.printValuesFormatString = "%.0f";
-            } else if (getMin(series) > 1000000d) {
-                params.minY = 100000d;
-                params.maxY = getMax(series, 3);
-                params.printValuesFormatString = "%.2e";
-            } else {
-                params.minY = 10000d;
-                params.maxY = getMax(series, 3);
-                params.printValuesFormatString = "%.2e";
-            }
-        }
+
+        params.maxY = max + padding;
+
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
         } else {
             params.keypos = KeyPos.AT(2, params.maxY * 1.1d, "horiz bot center");
         }
-        params.logY = true;
+
         params.ratio = 0.2d;
 
         // Return
-        String caption = variable + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
+        String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " +
+                         suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
         return new PlotGroup(caption, plots, params, 1.0d);
     }
-
+    
     /**
      * Returns a maximum for the given series
      * @param series
-     * @param offset Additional exponent
      * @return
      */
-    private static double getMax(Series3D series, int offset) {
+    private static double getMax(Series3D series) {
 
         double max = -Double.MAX_VALUE;
         for (Point3D point : series.getData()) {
             max = Math.max(Double.valueOf(point.z), max);
         }
 
-        // Find smallest exponent larger than max
-        for (int i = 0; i < 20; i++) {
-            double limit = Math.pow(10d, i);
-            if (limit >= max) {
-                return Math.pow(10d, i + offset);
-            }
-        }
-
-        throw new IllegalStateException("Cannot determine upper bound");
-    }
-    
-    /**
-     * Returns the minimum for the given series
-     * @param series
-     * @return
-     */
-    private static double getMin(Series3D series) {
-
-        double min = Double.MAX_VALUE;
-        for (Point3D point : series.getData()) {
-            min = Math.min(Double.valueOf(point.z), min);
-        }
-        
-        return min;
+        return max;
     }
 
     /**

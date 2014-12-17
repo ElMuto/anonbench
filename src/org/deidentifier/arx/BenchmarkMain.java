@@ -51,17 +51,17 @@ public class BenchmarkMain {
                                                          "Metric",
                                                          "Suppression" });
     /** Label for execution times */
-    public static final int          EXECUTION_TIME      = BENCHMARK.addMeasure("Execution time");
+    public static final int          EXECUTION_TIME      = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.EXECUTION_TIME.val);
     /** Label for number of checks */
-    public static final int          NUMBER_OF_CHECKS    = BENCHMARK.addMeasure("Number of checks");
+    public static final int          NUMBER_OF_CHECKS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_CHECKS.val);
     /** Label for number of roll-ups */
-    public static final int          NUMBER_OF_ROLLUPS   = BENCHMARK.addMeasure("Number of rollups");
+    public static final int          NUMBER_OF_ROLLUPS   = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_ROLLUPS.val);
     /** Label for number of roll-ups */
-    public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure("Number of snapshots");
+    public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
     /** Label for size of lattice */
-    public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure("Size of lattice");
+    public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
     /** Label for information loss */
-    public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure("Information loss");
+    public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
@@ -99,7 +99,7 @@ public class BenchmarkMain {
                         for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
                             // Warmup run
-                            driver.anonymize(data, criteria, algorithm, metric, suppression, true);
+                            driver.anonymize(data, criteria, algorithm, metric, suppression, true, true);
 
                             // Print status info
                             System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
@@ -115,7 +115,7 @@ public class BenchmarkMain {
 
                             // Repeat
                             for (int i = 0; i < REPETITIONS; i++) {
-                                driver.anonymize(data, criteria, algorithm, metric, suppression, false);
+                                driver.anonymize(data, criteria, algorithm, metric, suppression, false, true);
                             }
 
                             // Write results incrementally

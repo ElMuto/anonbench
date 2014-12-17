@@ -28,6 +28,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
+import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
@@ -40,6 +41,7 @@ import org.deidentifier.arx.framework.lattice.VirtualLattice;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.test.TestConfiguration;
 
+import cern.colt.Arrays;
 import de.linearbits.subframe.Benchmark;
 
 /**
@@ -78,25 +80,42 @@ public class BenchmarkDriver {
      * @param suppression
      * @param metric
      * @param warmup
+     * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
      * @throws IOException
      */
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
-                          Metric<?> metric, double suppression, boolean warmup) throws IOException {
+                          Metric<?> metric, double suppression, boolean warmup, boolean benchmarkRun) throws IOException {
 
         // Build implementation
         AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
 
-        // Execute
-        if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
-        implementation.traverse();
-        if (!warmup) benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
-        if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
-        if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
-        if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
-        if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
-        if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum().getInformationLoss().toString());
+        // for real benchmark run
+        if (benchmarkRun) {
+            // Execute
+            if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
+            implementation.traverse();
+            if (!warmup) benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
+            if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
+            if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
+            if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
+            if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
+            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum()
+                                                                                          .getInformationLoss()
+                                                                                          .toString());
+        }
+        // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
+        else {
+            AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
+            algo.traverse();
+            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
+            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
+                               (Arrays.toString(algo.getGlobalMinimum().getTransformation())));
+            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MAXIMUM, (algo.getGlobalMaximum().getInformationLoss()));
+            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION,
+                               (Arrays.toString(algo.getGlobalMaximum().getTransformation())));
+        }
     }
 
     /**
@@ -190,6 +209,9 @@ public class BenchmarkDriver {
             break;
         case HEURAKLES:
             implementation = new AlgorithmHeurakles(lattice, checker);
+            break;
+        case INFORMATION_LOSS_BOUNDS:
+            implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);
             break;
         default:
             throw new RuntimeException("Invalid algorithm");

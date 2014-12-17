@@ -49,6 +49,12 @@ public class BenchmarkSetup {
                 return "Heurakles";
             }
         },
+        INFORMATION_LOSS_BOUNDS {
+            @Override
+            public String toString() {
+                return "InformationLossBounds";
+            }
+        },
     }
 
     public static enum BenchmarkCriterion {
