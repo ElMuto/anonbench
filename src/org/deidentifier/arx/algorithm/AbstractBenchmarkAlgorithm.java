@@ -86,7 +86,8 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     protected void check(Node node) {
 
         // Check
-        lattice.setChecked(node, checker.check(node, true));
+        boolean forceMeasureInfoLoss = isForceMeasureInfoLossRequired();
+        lattice.setChecked(node, checker.check(node, forceMeasureInfoLoss));
         trackOptimum(node);
         checks++;
         snapshots += (checker.getTransitionType() == TransitionType.SNAPSHOT) ? 1 : 0;
@@ -229,4 +230,11 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
         return true;
     }
 
+    /**
+     * Returns whether information loss measure should be forced or not
+     * @return
+     */
+    protected boolean isForceMeasureInfoLossRequired() {
+        return false;
+    }
 }
