@@ -116,5 +116,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     public boolean isMaterializedLatticeRequired() {
         return false;
     }
-
+    
+    /**
+     * Returns whether information loss measure should be forced or not
+     * @return
+     */
+    @Override
+    protected boolean isForceMeasureInfoLossRequired() {
+        return true;
+    }
 }

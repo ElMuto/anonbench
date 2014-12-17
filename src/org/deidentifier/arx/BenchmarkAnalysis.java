@@ -298,62 +298,51 @@ public class BenchmarkAnalysis {
         params.rotateXTicks = 0;
         params.printValues = true;
         params.size = 1.5;
-        if (variable.equals("Execution time")) {
-            params.minY = 0.001d;
-            params.maxY = getMax(series, 2);
+        params.logY = false;
+        
+        double max = getMax(series);
+        double padding = max * 0.3d;
+        
+        params.minY = 0d;
+        params.printValuesFormatString = "%.0f";
+        
+        if (variable.equals("Execution time") || max < 10d) {
             params.printValuesFormatString = "%.2f";
         }
-        else if (variable.equals("Number of rollups")) {
-            params.minY = 1d;
-            if (focus.equals("Criteria")) {
-                params.maxY = getMax(series, 0);
-            } else {
-                params.maxY = getMax(series, 1);
-            }
-            params.printValuesFormatString = "%.0f";
+
+        if (max >= 10000d) {
+            padding = max * 0.7d;
+            params.printValuesFormatString = "%.2e";
         }
-        else if (variable.equals("Number of snapshots")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
-        } else if (variable.equals("Number of checks")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
-        } else if (variable.equals("Size of lattice")) {
-            params.minY = 1d;
-            params.maxY = getMax(series, 1);
-            params.printValuesFormatString = "%.0f";
-        } else if (variable.equals("Information loss")) {
-            if (getMin(series) < 1) {
-                params.minY = 0.001d;
-                params.maxY = getMax(series, 1);
-                params.printValuesFormatString = "%.2f";
-            } else if (getMin(series) < 100000d) {
-                params.minY = 1d;
-                params.maxY = getMax(series, 1);
-                params.printValuesFormatString = "%.0f";
-            } else if (getMin(series) > 1000000d) {
-                params.minY = 100000d;
-                params.maxY = getMax(series, 3);
-                params.printValuesFormatString = "%.2e";
-            } else {
-                params.minY = 10000d;
-                params.maxY = getMax(series, 3);
-                params.printValuesFormatString = "%.2e";
-            }
-        }
+
+        params.maxY = max + padding;
+
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
         } else {
             params.keypos = KeyPos.AT(2, params.maxY * 1.1d, "horiz bot center");
         }
-        params.logY = true;
+        
         params.ratio = 0.2d;
 
         // Return
         String caption = variable + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
         return new PlotGroup(caption, plots, params, 1.0d);
+    }
+    
+    /**
+     * Returns a maximum for the given series
+     * @param series
+     * @return
+     */
+    private static double getMax(Series3D series) {
+
+        double max = -Double.MAX_VALUE;
+        for (Point3D point : series.getData()) {
+            max = Math.max(Double.valueOf(point.z), max);
+        }
+        
+        return max;
     }
 
     /**
@@ -364,10 +353,7 @@ public class BenchmarkAnalysis {
      */
     private static double getMax(Series3D series, int offset) {
 
-        double max = -Double.MAX_VALUE;
-        for (Point3D point : series.getData()) {
-            max = Math.max(Double.valueOf(point.z), max);
-        }
+        double max = getMax(series);
 
         // Find smallest exponent larger than max
         for (int i = 0; i < 20; i++) {
@@ -380,21 +366,6 @@ public class BenchmarkAnalysis {
         throw new IllegalStateException("Cannot determine upper bound");
     }
     
-    /**
-     * Returns the minimum for the given series
-     * @param series
-     * @return
-     */
-    private static double getMin(Series3D series) {
-
-        double min = Double.MAX_VALUE;
-        for (Point3D point : series.getData()) {
-            min = Math.min(Double.valueOf(point.z), min);
-        }
-        
-        return min;
-    }
-
     /**
      * Returns a series<br>
      * currently only analyzers of type Double are supported
