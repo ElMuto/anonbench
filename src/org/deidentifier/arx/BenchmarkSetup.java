@@ -115,12 +115,6 @@ public class BenchmarkSetup {
                 return "Ihis";
             }
         },
-        CUP98 {
-            @Override
-            public String toString() {
-                return "Cup98";
-            }
-        }
     }
 
     /**
@@ -258,9 +252,6 @@ public class BenchmarkSetup {
         case IHIS:
             data = Data.create("data/ihis.csv", ';');
             break;
-        case CUP98:
-            data = Data.create("data/cup98.csv", ';');
-            break;
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -289,12 +280,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-//                BenchmarkDataset.ADULT,
-//                BenchmarkDataset.CUP,
-//                BenchmarkDataset.FARS,
-//                BenchmarkDataset.ATUS,
-//                BenchmarkDataset.IHIS,
-                BenchmarkDataset.CUP98
+                BenchmarkDataset.ADULT,
+                BenchmarkDataset.CUP,
+                BenchmarkDataset.FARS,
+                BenchmarkDataset.ATUS,
+                BenchmarkDataset.IHIS
         };
     }
 
@@ -317,8 +307,6 @@ public class BenchmarkSetup {
             return Hierarchy.create("hierarchies/fars_hierarchy_" + attribute + ".csv", ';');
         case IHIS:
             return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
-        case CUP98:
-            return Hierarchy.create("hierarchies/cup98_hierarchy_" + attribute + ".csv", ';');
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -374,23 +362,6 @@ public class BenchmarkSetup {
                     "REGION",
                     "SEX",
                     "YEAR" };
-        case CUP98:
-            return new String[] { "AGE",
-                    "GENDER",
-                    "INCOME",
-                    "MINRAMNT",
-                    "NGIFTALL",
-                    "STATE",
-                    "ZIP",
-                    "HIT",
-                    "POP901",
-                    "POP902",
-                    "POP903",
-//                    "ETH1",
-//                    "RAMNTALL",
-//                    "MAXRAMNT",
-//                    "LASTGIFT"
-                    };
         default:
             throw new RuntimeException("Invalid dataset");
         }
