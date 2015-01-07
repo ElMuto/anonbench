@@ -68,7 +68,8 @@ public class BenchmarkAnalysis {
         INFORMATION_LOSS_MINIMUM("Information loss minimum"),
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
-        INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)");
+        INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)"),
+        INFORMATION_LOSS_PERCENTAGE("Relative information loss");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
