@@ -43,6 +43,8 @@ public class BenchmarkMain {
 
     /** Repetitions */
     private static final int         REPETITIONS         = 3;
+    /** Minimal number of QIs to use for the QI count scaling benchmark */
+    private static final int         QI_COUNT_MIN        = 5;
     /** The benchmark instance */
     protected static final Benchmark BENCHMARK           = new Benchmark(new String[] {
                                                          "Algorithm",
@@ -60,6 +62,8 @@ public class BenchmarkMain {
     public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
     /** Label for size of lattice */
     public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
+    /** Label for QI count */
+    public static final int          QI_COUNT            = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.QI_COUNT.val);
     /** Label for information loss */
     public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
 
@@ -70,6 +74,7 @@ public class BenchmarkMain {
         BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUMBER_OF_SNAPSHOTS, new ValueBuffer());
         BENCHMARK.addAnalyzer(LATTICE_SIZE, new ValueBuffer());
+        BENCHMARK.addAnalyzer(QI_COUNT, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer());
     }
 
@@ -86,44 +91,71 @@ public class BenchmarkMain {
         // For each algorithm
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
-            // For each dataset
-            for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+            // For each metric
+            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
 
-                // For each metric
-                for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+                // For each suppression factor
+                for (double suppression : BenchmarkSetup.getSuppression()) {
 
-                    // For each suppression factor
-                    for (double suppression : BenchmarkSetup.getSuppression()) {
+                    // For each combination of criteria
+                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
-                        // For each combination of criteria
-                        for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                        // For each dataset
+                        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
-                            // Warmup run
-                            driver.anonymize(data, criteria, algorithm, metric, suppression, true, true);
+                            int qiCount = BenchmarkSetup.getQuasiIdentifyingAttributes(data).length;
+                            runBenchmark(driver, algorithm, data, criteria, metric, suppression, qiCount);
 
-                            // Print status info
-                            System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
-                                               " / " + suppression + " / " +
-                                               Arrays.toString(criteria));
+                        }
 
-                            // Benchmark
-                            BENCHMARK.addRun(algorithm.toString(),
-                                             data.toString(),
-                                             Arrays.toString(criteria),
-                                             metric.getName(),
-                                             String.valueOf(suppression));
+                        // For each QI scaling benchmark dataset
+                        for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
 
-                            // Repeat
-                            for (int i = 0; i < REPETITIONS; i++) {
-                                driver.anonymize(data, criteria, algorithm, metric, suppression, false, true);
+                            for (int qiCount = QI_COUNT_MIN; qiCount <= BenchmarkSetup.getQuasiIdentifyingAttributes(data).length; qiCount++) {
+
+                                runBenchmark(driver,
+                                             algorithm,
+                                             data,
+                                             criteria,
+                                             metric,
+                                             suppression,
+                                             qiCount);
+
                             }
-
-                            // Write results incrementally
-                            BENCHMARK.getResults().write(new File("results/results.csv"));
                         }
                     }
                 }
             }
         }
+    }
+
+    public static void runBenchmark(BenchmarkDriver driver,
+                                    BenchmarkAlgorithm algorithm,
+                                    BenchmarkDataset data,
+                                    BenchmarkCriterion[] criteria,
+                                    Metric<?> metric,
+                                    double suppression,
+                                    int qiCount) throws IOException {
+        // Warmup run
+        driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, true, true);
+
+        // Print status info
+        System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
+                           " / " + suppression + " / " + Arrays.toString(criteria) + " / " + qiCount + " QIs");
+
+        // Benchmark
+        BENCHMARK.addRun(algorithm.toString(),
+                         data.toString(),
+                         Arrays.toString(criteria),
+                         metric.getName(),
+                         String.valueOf(suppression));
+
+        // Repeat
+        for (int i = 0; i < REPETITIONS; i++) {
+            driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, false, true);
+        }
+
+        // Write results incrementally
+        BENCHMARK.getResults().write(new File("results/results.csv"));
     }
 }

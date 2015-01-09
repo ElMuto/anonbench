@@ -21,6 +21,7 @@
 package org.deidentifier.arx;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.criteria.DPresence;
@@ -146,6 +147,7 @@ public class BenchmarkSetup {
     public static ARXConfiguration getConfiguration(BenchmarkDataset dataset,
                                                     Metric<?> metric,
                                                     double suppression,
+                                                    int qiCount,
                                                     BenchmarkCriterion... criteria) throws IOException {
         ARXConfiguration config = ARXConfiguration.create();
         config.setMetric(metric);
@@ -153,7 +155,7 @@ public class BenchmarkSetup {
         for (BenchmarkCriterion c : criteria) {
             switch (c) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, getResearchSubset(dataset)));
+                config.addCriterion(new DPresence(0.05d, 0.15d, getResearchSubset(dataset, qiCount)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(5));
@@ -190,9 +192,9 @@ public class BenchmarkSetup {
         return new Metric[] {
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
                 Metric.createEntropyMetric(),
-                Metric.createPrecisionMetric(),
-                Metric.createAECSMetric(),
-                Metric.createDiscernabilityMetric()
+//                Metric.createPrecisionMetric(),
+//                Metric.createAECSMetric(),
+//                Metric.createDiscernabilityMetric()
         };
     }
 
@@ -228,8 +230,8 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static Data getData(BenchmarkDataset dataset) throws IOException {
-        return getData(dataset, null);
+    public static Data getData(BenchmarkDataset dataset, int qiCount) throws IOException {
+        return getData(dataset, null, qiCount);
     }
 
     /**
@@ -240,7 +242,7 @@ public class BenchmarkSetup {
      * @throws IOException
      */
     @SuppressWarnings("incomplete-switch")
-    public static Data getData(BenchmarkDataset dataset, BenchmarkCriterion[] criteria) throws IOException {
+    public static Data getData(BenchmarkDataset dataset, BenchmarkCriterion[] criteria, int qiCount) throws IOException {
         Data data = null;
         switch (dataset) {
         case ADULT:
@@ -266,7 +268,7 @@ public class BenchmarkSetup {
         }
 
         if (criteria != null) {
-            for (String qi : getQuasiIdentifyingAttributes(dataset)) {
+            for (String qi : Arrays.copyOf(getQuasiIdentifyingAttributes(dataset), qiCount)) {
                 data.getDefinition().setAttributeType(qi, getHierarchy(dataset, qi));
             }
             for (BenchmarkCriterion c : criteria) {
@@ -284,20 +286,29 @@ public class BenchmarkSetup {
     }
 
     /**
-     * Returns all datasets
+     * Returns all datasets for the conventional benchmark
      * @return
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-//                BenchmarkDataset.ADULT,
-//                BenchmarkDataset.CUP,
+                BenchmarkDataset.ADULT,
+                BenchmarkDataset.CUP,
 //                BenchmarkDataset.FARS,
 //                BenchmarkDataset.ATUS,
-//                BenchmarkDataset.IHIS,
+//                BenchmarkDataset.IHIS
+        };
+    }
+    
+    /**
+     * Returns all datasets for the QI count scaling benchmark
+     * @return
+     */
+    public static BenchmarkDataset[] getQICountScalingDatasets() {
+        return new BenchmarkDataset[] {
                 BenchmarkDataset.CUP98
         };
     }
-
+    
     /**
      * Returns the generalization hierarchy for the dataset and attribute
      * @param dataset
@@ -325,7 +336,7 @@ public class BenchmarkSetup {
     }
 
     /**
-     * Returns the quasi-identifiers for the dataset
+     * Returns the quasi-identifiers for the dataset.
      * @param dataset
      * @return
      */
@@ -383,9 +394,9 @@ public class BenchmarkSetup {
                     "STATE",
                     "ZIP",
                     "HIT",
-                    "POP901",
-                    "POP902",
-                    "POP903",
+//                    "POP901",
+//                    "POP902",
+//                    "POP903",
 //                    "ETH1",
 //                    "RAMNTALL",
 //                    "MAXRAMNT",
@@ -402,18 +413,18 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static DataSubset getResearchSubset(BenchmarkDataset dataset) throws IOException {
+    public static DataSubset getResearchSubset(BenchmarkDataset dataset, int qiCount) throws IOException {
         switch (dataset) {
         case ADULT:
-            return DataSubset.create(getData(dataset), Data.create("data/adult_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/adult_subset.csv", ';'));
         case ATUS:
-            return DataSubset.create(getData(dataset), Data.create("data/atus_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/atus_subset.csv", ';'));
         case CUP:
-            return DataSubset.create(getData(dataset), Data.create("data/cup_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/cup_subset.csv", ';'));
         case FARS:
-            return DataSubset.create(getData(dataset), Data.create("data/fars_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/fars_subset.csv", ';'));
         case IHIS:
-            return DataSubset.create(getData(dataset), Data.create("data/ihis_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/ihis_subset.csv", ';'));
         default:
             throw new RuntimeException("Invalid dataset");
         }

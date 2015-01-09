@@ -33,9 +33,11 @@ import java.util.Map;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
+import de.linearbits.objectselector.SelectorBuilder;
 import de.linearbits.subframe.analyzer.Analyzer;
 import de.linearbits.subframe.analyzer.buffered.BufferedGeometricMeanAnalyzer;
 import de.linearbits.subframe.graph.Field;
@@ -65,6 +67,7 @@ public class BenchmarkAnalysis {
         NUMBER_OF_SNAPSHOTS("Number of snapshots"),
         INFORMATION_LOSS("Information loss"),
         LATTICE_SIZE("Size of lattice"),
+        QI_COUNT("QI count"),
         INFORMATION_LOSS_MINIMUM("Information loss minimum"),
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
@@ -297,7 +300,15 @@ public class BenchmarkAnalysis {
         // Collect data for all algorithms
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
-            Series3D _series = getSeries(file, algorithm.toString(), variable.val, measure, focus, scriteria, suppression, metric);
+            Series3D _series = getSeries(file,
+                                         algorithm.toString(),
+                                         variable.val,
+                                         measure,
+                                         focus,
+                                         scriteria,
+                                         suppression,
+                                         BenchmarkSetup.getDatasets(),
+                                         metric);
             if (series == null) series = _series;
             else series.append(_series);
         }
@@ -362,7 +373,7 @@ public class BenchmarkAnalysis {
                          suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
         return new PlotGroup(caption, plots, params, 1.0d);
     }
-    
+
     /**
      * Returns a maximum for the given series
      * @param series
@@ -401,6 +412,7 @@ public class BenchmarkAnalysis {
                       String focus,
                       String scriteria,
                       String suppression,
+                      BenchmarkDataset[] datasets,
                       Metric<?> metric) throws ParseException {
 
         // Select data for the given algorithm

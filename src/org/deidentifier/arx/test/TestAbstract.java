@@ -72,7 +72,8 @@ public abstract class TestAbstract extends TestCase {
                                                    config.criteria,
                                                    algorithm,
                                                    Metric.createEntropyMetric(),
-                                                   0d);
+                                                   0d,
+                                                   0);
             // Check
             assertEquals(algorithm + ": Information loss doesn't match", config.informationLoss, result.informationLoss);
             assertTrue(algorithm + ": Transformation doesn't match", Arrays.equals(result.transformation, config.transformation));
