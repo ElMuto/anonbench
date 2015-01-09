@@ -102,8 +102,16 @@ public class BoundAnalysis {
         results.addHeader1Column(VARIABLES.INFORMATION_LOSS_MINIMUM.val);
         results.addHeader2Column("Value");
 
+        // add header column information loss minimum (transformation)
+        results.addHeader1Column(VARIABLES.INFORMATION_LOSS_MINIMUM_TRANSFORMATION.val);
+        results.addHeader2Column("Value");
+
         // add header column information loss maximum
         results.addHeader1Column(VARIABLES.INFORMATION_LOSS_MAXIMUM.val);
+        results.addHeader2Column("Value");
+
+        // add header column information loss maximum (transformation)
+        results.addHeader1Column(VARIABLES.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION.val);
         results.addHeader2Column("Value");
 
         // add header column information loss percentage
@@ -114,6 +122,8 @@ public class BoundAnalysis {
         Selector<String[]> selector;
         double min = 0;
         double max = 0;
+        String minTransformation = "";
+        String maxTransformation = "";
 
         // For each dataset
         for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
@@ -142,7 +152,9 @@ public class BoundAnalysis {
                             if (selector.isSelected(line)) {
                                 // save min and max information loss
                                 min = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_MINIMUM.val, "Value"));
+                                minTransformation = csvline.get(VARIABLES.INFORMATION_LOSS_MINIMUM_TRANSFORMATION.val, "Value");
                                 max = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_MAXIMUM.val, "Value"));
+                                maxTransformation = csvline.get(VARIABLES.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION.val, "Value");
                                 break;
                             }
                         }
@@ -176,7 +188,9 @@ public class BoundAnalysis {
                                     value = ((value - min) / (max - min)) * 100.0;
                                     // add the value to the line
                                     csvLine.addColumn(String.valueOf(min));
+                                    csvLine.addColumn(minTransformation);
                                     csvLine.addColumn(String.valueOf(max));
+                                    csvLine.addColumn(maxTransformation);
                                     csvLine.addColumn(String.valueOf(value));
                                     break;
                                 }

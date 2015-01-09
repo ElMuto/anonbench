@@ -104,6 +104,8 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum()
                                                                                           .getInformationLoss()
                                                                                           .toString());
+            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION,
+                                            Arrays.toString(implementation.getGlobalOptimum().getTransformation()));
         }
         // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
         else {

@@ -69,7 +69,8 @@ public class BenchmarkAnalysis {
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
         INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)"),
-        INFORMATION_LOSS_PERCENTAGE("Relative information loss");
+        INFORMATION_LOSS_PERCENTAGE("Relative information loss"),
+        INFORMATION_LOSS_TRANSFORMATION("Information loss (Transformation)");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
@@ -97,7 +98,7 @@ public class BenchmarkAnalysis {
      */
     public static void main(String[] args) throws IOException, ParseException {
 
-        generateTables();
+        // generateTables();
         generatePlots();
     }
 
@@ -108,7 +109,7 @@ public class BenchmarkAnalysis {
      */
     private static void generatePlots() throws IOException, ParseException {
 
-        CSVFile file = new CSVFile(new File("results/results.csv"));
+        CSVFile file = new CSVFile(new File("results/resultsComplete.csv"));
 
         // for each metric
         for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
@@ -122,17 +123,24 @@ public class BenchmarkAnalysis {
                 for (double suppr : BenchmarkSetup.getSuppression()) {
                     String suppression = String.valueOf(suppr);
 
+                    // groups.add(getGroup(file,
+                    // VARIABLES.EXECUTION_TIME,
+                    // Analyzer.ARITHMETIC_MEAN,
+                    // "Dataset",
+                    // scriteria,
+                    // suppression,
+                    // metric));
+                    // groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    // groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    // groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+//                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
                     groups.add(getGroup(file,
-                                        VARIABLES.EXECUTION_TIME,
-                                        Analyzer.ARITHMETIC_MEAN,
+                                        VARIABLES.INFORMATION_LOSS_PERCENTAGE,
+                                        Analyzer.VALUE,
                                         "Dataset",
                                         scriteria,
                                         suppression,
                                         metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
                 }
             }
             LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
@@ -333,8 +341,14 @@ public class BenchmarkAnalysis {
         params.size = 1.5;
         params.logY = false;
 
-        double max = getMax(series);
-        double padding = max * 0.3d;
+        double max = 0d;
+        double padding = 0d;
+        if (VARIABLES.INFORMATION_LOSS_PERCENTAGE != variable) {
+            max = getMax(series);
+            padding = max * 0.3d;
+        } else {
+            max = 100d;
+        }
 
         params.minY = 0d;
         params.printValuesFormatString = "%.0f";
@@ -363,7 +377,7 @@ public class BenchmarkAnalysis {
                          suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
         return new PlotGroup(caption, plots, params, 1.0d);
     }
-    
+
     /**
      * Returns a maximum for the given series
      * @param series
