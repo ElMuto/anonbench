@@ -123,6 +123,7 @@ public class BenchmarkAnalysis {
                 // for each suppression
                 for (double suppr : BenchmarkSetup.getSuppression()) {
                     String suppression = String.valueOf(suppr);
+                    BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
 
                     groups.add(getGroup(file,
                                         VARIABLES.EXECUTION_TIME,
@@ -130,11 +131,40 @@ public class BenchmarkAnalysis {
                                         "Dataset",
                                         scriteria,
                                         suppression,
+                                        datasets,
                                         metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file,
+                                        VARIABLES.NUMBER_OF_CHECKS,
+                                        Analyzer.VALUE,
+                                        "Dataset",
+                                        scriteria,
+                                        suppression,
+                                        datasets,
+                                        metric));
+                    groups.add(getGroup(file,
+                                        VARIABLES.NUMBER_OF_ROLLUPS,
+                                        Analyzer.VALUE,
+                                        "Dataset",
+                                        scriteria,
+                                        suppression,
+                                        datasets,
+                                        metric));
+                    groups.add(getGroup(file,
+                                        VARIABLES.NUMBER_OF_SNAPSHOTS,
+                                        Analyzer.VALUE,
+                                        "Dataset",
+                                        scriteria,
+                                        suppression,
+                                        datasets,
+                                        metric));
+                    groups.add(getGroup(file,
+                                        VARIABLES.INFORMATION_LOSS,
+                                        Analyzer.VALUE,
+                                        "Dataset",
+                                        scriteria,
+                                        suppression,
+                                        datasets,
+                                        metric));
                 }
             }
             LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
@@ -291,6 +321,7 @@ public class BenchmarkAnalysis {
                                       String focus,
                                       String scriteria,
                                       String suppression,
+                                      BenchmarkDataset[] datasets,
                                       Metric<?> metric) throws ParseException {
 
         // Prepare
@@ -307,7 +338,7 @@ public class BenchmarkAnalysis {
                                          focus,
                                          scriteria,
                                          suppression,
-                                         BenchmarkSetup.getDatasets(),
+                                         datasets,
                                          metric);
             if (series == null) series = _series;
             else series.append(_series);
@@ -415,12 +446,22 @@ public class BenchmarkAnalysis {
                       BenchmarkDataset[] datasets,
                       Metric<?> metric) throws ParseException {
 
-        // Select data for the given algorithm
-        Selector<String[]> selector = file.getSelectorBuilder().field("Algorithm").equals(algorithm).and()
-                                          .field("Suppression").equals(suppression).and()
-                                          .field("Metric").equals(metric.getName()).and()
-                                          .field("Criteria").equals(scriteria)
-                                          .build();
+        // Select data for the given parameters
+
+        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field("Algorithm").equals(algorithm).and()
+                                                        .field("Suppression").equals(suppression).and()
+                                                        .field("Metric").equals(metric.getName()).and()
+                                                        .field("Criteria").equals(scriteria).and()
+                                                        .begin();
+
+        for (int i = 0; i < datasets.length; ++i) {
+            selectorBuilder.field("Dataset").equals(datasets[i].toString());
+            if (i < datasets.length - 1) {
+                selectorBuilder.or();
+            }
+        }
+
+        Selector<String[]> selector = selectorBuilder.end().build();
 
         // Create series.
         // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
