@@ -45,6 +45,7 @@ import de.linearbits.subframe.graph.Function;
 import de.linearbits.subframe.graph.Labels;
 import de.linearbits.subframe.graph.Plot;
 import de.linearbits.subframe.graph.PlotHistogramClustered;
+import de.linearbits.subframe.graph.PlotLinesClustered;
 import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Point3D;
 import de.linearbits.subframe.graph.Series2D;
@@ -101,6 +102,7 @@ public class BenchmarkAnalysis {
 
         generateTables();
         generatePlots();
+        generateQICountScalingPlots();
     }
 
     /**
@@ -129,6 +131,7 @@ public class BenchmarkAnalysis {
                                         VARIABLES.EXECUTION_TIME,
                                         Analyzer.ARITHMETIC_MEAN,
                                         "Dataset",
+                                        null,
                                         scriteria,
                                         suppression,
                                         datasets,
@@ -137,6 +140,7 @@ public class BenchmarkAnalysis {
                                         VARIABLES.NUMBER_OF_CHECKS,
                                         Analyzer.VALUE,
                                         "Dataset",
+                                        null,
                                         scriteria,
                                         suppression,
                                         datasets,
@@ -145,6 +149,7 @@ public class BenchmarkAnalysis {
                                         VARIABLES.NUMBER_OF_ROLLUPS,
                                         Analyzer.VALUE,
                                         "Dataset",
+                                        null,
                                         scriteria,
                                         suppression,
                                         datasets,
@@ -153,6 +158,7 @@ public class BenchmarkAnalysis {
                                         VARIABLES.NUMBER_OF_SNAPSHOTS,
                                         Analyzer.VALUE,
                                         "Dataset",
+                                        null,
                                         scriteria,
                                         suppression,
                                         datasets,
@@ -161,6 +167,7 @@ public class BenchmarkAnalysis {
                                         VARIABLES.INFORMATION_LOSS,
                                         Analyzer.VALUE,
                                         "Dataset",
+                                        null,
                                         scriteria,
                                         suppression,
                                         datasets,
@@ -169,6 +176,46 @@ public class BenchmarkAnalysis {
             }
             LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
         }
+    }
+
+    /**
+     * Generate the plots for the QI count scaling benchmark
+     * @throws IOException
+     * @throws ParseException
+     */
+    private static void generateQICountScalingPlots() throws IOException, ParseException {
+
+        CSVFile file = new CSVFile(new File("results/results.csv"));
+
+        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
+        // for each metric
+        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+
+            // For each combination of criteria
+            for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                String scriteria = Arrays.toString(criteria);
+
+                // for each suppression
+                for (double suppr : BenchmarkSetup.getSuppression()) {
+                    String suppression = String.valueOf(suppr);
+
+                    for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
+                        groups.add(getGroup(file,
+                                            VARIABLES.EXECUTION_TIME,
+                                            Analyzer.ARITHMETIC_MEAN,
+                                            "QI count",
+                                            "Value",
+                                            scriteria,
+                                            suppression,
+                                            new BenchmarkDataset[] { dataset },
+                                            metric));
+                    }
+                }
+            }
+        }
+
+        LaTeX.plot(groups, "results/results_QI_count_scaling");
     }
 
     /**
@@ -319,6 +366,7 @@ public class BenchmarkAnalysis {
                                       VARIABLES variable,
                                       String measure,
                                       String focus,
+                                      String focusMeasure,
                                       String scriteria,
                                       String suppression,
                                       BenchmarkDataset[] datasets,
@@ -336,6 +384,7 @@ public class BenchmarkAnalysis {
                                          variable.val,
                                          measure,
                                          focus,
+                                         focusMeasure,
                                          scriteria,
                                          suppression,
                                          datasets,
@@ -345,12 +394,14 @@ public class BenchmarkAnalysis {
         }
 
         // Make sure labels are printed correctly
-        series.transform(new Function<Point3D>() {
-            @Override
-            public Point3D apply(Point3D t) {
-                return new Point3D("\"" + t.x + "\"", t.y, t.z);
-            }
-        });
+        if (!focus.equals("QI count")) {
+            series.transform(new Function<Point3D>() {
+                @Override
+                public Point3D apply(Point3D t) {
+                    return new Point3D("\"" + t.x + "\"", t.y, t.z);
+                }
+            });
+        }
 
         // Transform execution times from nanos to seconds
         if (VARIABLES.EXECUTION_TIME == variable) {
@@ -363,9 +414,15 @@ public class BenchmarkAnalysis {
         }
 
         // Create plot
-        plots.add(new PlotHistogramClustered("",
+        if (focus.equals("QI count")) {
+            plots.add(new PlotLinesClustered("",
                                              new Labels(focus, variable.val),
                                              series));
+        } else {
+            plots.add(new PlotHistogramClustered("",
+                                                 new Labels(focus, variable.val),
+                                                 series));
+        }
 
         // Define params
         GnuPlotParams params = new GnuPlotParams();
@@ -393,8 +450,10 @@ public class BenchmarkAnalysis {
 
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
+        } else if (focus.equals("QI count")) {
+            params.keypos = KeyPos.AT(10, params.maxY * 1.1d, "horiz bot center");
         } else {
-            params.keypos = KeyPos.AT(2, params.maxY * 1.1d, "horiz bot center");
+            params.keypos = KeyPos.AT(0.5, params.maxY * 1.1d, "horiz bot center");
         }
 
         params.ratio = 0.2d;
@@ -402,6 +461,10 @@ public class BenchmarkAnalysis {
         // Return
         String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " +
                          suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
+        if (focus.equals("QI count") && datasets.length == 1) {
+            caption += " for dataset \"" + datasets[0] + "\"";
+        }
+
         return new PlotGroup(caption, plots, params, 1.0d);
     }
 
@@ -441,6 +504,7 @@ public class BenchmarkAnalysis {
                       String variable,
                       String measure,
                       String focus,
+                      String focusMeasure,
                       String scriteria,
                       String suppression,
                       BenchmarkDataset[] datasets,
@@ -463,12 +527,14 @@ public class BenchmarkAnalysis {
 
         Selector<String[]> selector = selectorBuilder.end().build();
 
+        Field focusField = (focusMeasure == null) ? new Field(focus) : new Field(focus, focusMeasure);
+
         // Create series.
         // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
         // because by definition of selector each combination of x and y coordinates is unique
         // and thus only one z coordinate is being encountered.
         Series3D series = new Series3D(file, selector,
-                                       new Field(focus),
+                                       focusField,
                                        new Field("Algorithm"),
                                        new Field(variable, measure),
                                        new BufferedGeometricMeanAnalyzer());
