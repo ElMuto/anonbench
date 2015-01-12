@@ -20,8 +20,13 @@
 
 package org.deidentifier.arx;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.criteria.DPresence;
@@ -233,6 +238,30 @@ public class BenchmarkSetup {
     public static Data getData(BenchmarkDataset dataset, int qiCount) throws IOException {
         return getData(dataset, null, qiCount);
     }
+    
+    /**
+     * Returns the path to the file containing a dataset
+     * @param dataset
+     * @return
+     */
+    public static String getFilePath(BenchmarkDataset dataset) {
+        switch (dataset) {
+        case ADULT:
+            return "data/adult.csv";
+        case ATUS:
+            return "data/atus.csv";
+        case CUP:
+            return "data/cup.csv";
+        case FARS:
+            return "data/fars.csv";
+        case IHIS:
+            return "data/ihis.csv";
+        case CUP98:
+            return "data/cup98.csv";
+        default:
+            throw new RuntimeException("Invalid dataset");
+        }
+    }
 
     /**
      * Configures and returns the dataset
@@ -243,29 +272,7 @@ public class BenchmarkSetup {
      */
     @SuppressWarnings("incomplete-switch")
     public static Data getData(BenchmarkDataset dataset, BenchmarkCriterion[] criteria, int qiCount) throws IOException {
-        Data data = null;
-        switch (dataset) {
-        case ADULT:
-            data = Data.create("data/adult.csv", ';');
-            break;
-        case ATUS:
-            data = Data.create("data/atus.csv", ';');
-            break;
-        case CUP:
-            data = Data.create("data/cup.csv", ';');
-            break;
-        case FARS:
-            data = Data.create("data/fars.csv", ';');
-            break;
-        case IHIS:
-            data = Data.create("data/ihis.csv", ';');
-            break;
-        case CUP98:
-            data = Data.create("data/cup98.csv", ';');
-            break;
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
+        Data data = Data.create(getFilePath(dataset), ';');
 
         if (criteria != null) {
             for (String qi : Arrays.copyOf(getQuasiIdentifyingAttributes(dataset), qiCount)) {
@@ -328,11 +335,51 @@ public class BenchmarkSetup {
             return Hierarchy.create("hierarchies/fars_hierarchy_" + attribute + ".csv", ';');
         case IHIS:
             return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
-        case CUP98:
-            return Hierarchy.create("hierarchies/cup98_hierarchy_" + attribute + ".csv", ';');
         default:
-            throw new RuntimeException("Invalid dataset");
+            return createTwoLevelHierarchy(dataset, attribute);
         }
+    }
+    
+    /**
+     * Returns a dynamically created two level hierarchy
+     * @param dataset
+     * @param attribute
+     * @return
+     * @throws IOException
+     */
+    public static Hierarchy createTwoLevelHierarchy(BenchmarkDataset dataset, String attribute) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(getFilePath(dataset)));
+        
+        String[] headerLine = reader.readLine().split(";");
+        int colIdx = 0;
+        for (; colIdx < headerLine.length; ++colIdx) {
+            if (headerLine[colIdx].equals(attribute)) {
+                break;
+            }
+        }
+        if (colIdx == headerLine.length) {
+            reader.close();
+            throw new RuntimeException("Invalid attribute");
+        }
+        
+        Set<String> attributeDomain = new HashSet<String>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String value = (line.split(";"))[colIdx];
+            attributeDomain.add(value);
+        }
+        
+        reader.close();
+        
+        final String[][] hierarchy = new String[attributeDomain.size()][];
+        Iterator<String> iter = attributeDomain.iterator();
+        for (int i = 0; i < hierarchy.length; ++i) {
+            hierarchy[i] = new String[2];
+            hierarchy[i][0] = iter.next();
+            hierarchy[i][1] = "*";
+        }
+
+        return Hierarchy.create(hierarchy);
     }
 
     /**
@@ -394,13 +441,13 @@ public class BenchmarkSetup {
                     "STATE",
                     "ZIP",
                     "HIT",
-//                    "POP901",
-//                    "POP902",
-//                    "POP903",
-//                    "ETH1",
-//                    "RAMNTALL",
-//                    "MAXRAMNT",
-//                    "LASTGIFT"
+                    "POP901",
+                    "POP902",
+                    "POP903",
+                    "ETH1",
+                    "RAMNTALL",
+                    "MAXRAMNT",
+                    "LASTGIFT"
                     };
         default:
             throw new RuntimeException("Invalid dataset");
