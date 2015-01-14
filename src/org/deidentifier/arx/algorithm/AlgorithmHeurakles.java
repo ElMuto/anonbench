@@ -37,6 +37,8 @@ import org.deidentifier.arx.framework.lattice.Node;
 public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     public static final int PROPERTY_COMPLETED = 1 << 20;
+    
+    private final StopCriteria stopCriteria;
 
     /**
      * Auxiliary class for comparing nodes based on their information loss
@@ -53,16 +55,23 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         }
     }
 
+
+
     /**
      * Creates a new instance of the heurakles algorithm.
      * 
      * @param lattice The lattice
      * @param checker The checker
      */
-    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker) {
+    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker, final StopCriteria stopCriteria) {
         super(lattice, checker);
         // Set strategy
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
+        
+        if (stopCriteria == null)
+        	throw new IllegalArgumentException("stopCriteria may not be null");
+        else
+        	this.stopCriteria = stopCriteria;
     }
 
     /*
@@ -90,7 +99,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             }
             // Process the successors
             Node next;
-            while (getGlobalOptimum() == null && (next = queue.peek()) != null) {
+            while (!stopCriteria.stopCriteriaAreFulfilled() && (next = queue.peek()) != null) {
                 if (!next.hasProperty(PROPERTY_COMPLETED)) {
                     traverse(next);
                 }
@@ -123,6 +132,6 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      */
     @Override
     protected boolean isForceMeasureInfoLossRequired() {
-        return true;
+    	return true;
     }
 }
