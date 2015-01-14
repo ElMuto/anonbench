@@ -411,4 +411,50 @@ public class BenchmarkSetup {
             throw new RuntimeException("Invalid dataset");
         }
     }
+    
+    /**
+     * This inner class defines 2 stop criteria for an algorithm:
+     * it can either stop after a certain number
+     * of checked nodes or after a certain number of seconds since
+     * the algorithm has started. If both criteria are set, then the
+     * algorithm stops after the first condition is true.
+     * 
+     */
+    public class stopCriteria {
+    	private Integer numChecks;
+		private Integer numSecondsSinceStart;
+		
+		private Integer passedChecks = 0;
+		private Integer passedSeconds = 0;
+    
+    	@SuppressWarnings("unused")
+		private stopCriteria() {};
+    	
+    	public stopCriteria(Integer numChecks, Integer numSecondsSinceStart) {
+    		if (numChecks == null && numSecondsSinceStart == null)
+    			throw new IllegalArgumentException("both 'numChecks' and 'numSecondsSinceStart' may not be null");
+    		if (numChecks <= 0 ||  numSecondsSinceStart <= 0)
+    			throw new IllegalArgumentException("parameters must be bigger than 0");
+    		
+    		this.numChecks = numChecks;
+    		this.numSecondsSinceStart = numSecondsSinceStart;
+    	}
+    	
+    	public void incrementCheckCount() { passedChecks++; };
+    	
+    	public boolean areStopCriteriaFulfilled() { 
+    		boolean checksFulfilled = false;
+    		boolean secondsFulfilled = false;
+    		
+    		if (numChecks != null && passedChecks >= numChecks)
+    			checksFulfilled = true;
+    		if (numSecondsSinceStart != null && passedSeconds >= numSecondsSinceStart)
+    			secondsFulfilled = true;
+    			
+    		return (checksFulfilled || secondsFulfilled); }
+    	
+    	public Integer getNumChecks() { return numChecks; }
+
+		public Integer getNumSecondsSinceStart() { return numSecondsSinceStart; }
+    }
 }
