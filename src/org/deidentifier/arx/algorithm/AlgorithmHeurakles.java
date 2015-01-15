@@ -73,32 +73,49 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * 
      */
     private class StopCriteria {
-    	Boolean stop_after_first_anonymous = null;
-    	boolean first_anonymous_fulfilled = false;
+    	private Boolean stopAfterFirstAnonymous = null;
+    	private boolean firstAnonymousFulfilled = false;
     	
-    	Integer stop_after_num_checks = null;
-    	boolean num_checks_fulfilled = false;
+    	private Integer stopAfterNumChecks = null;
+    	private boolean numChecksFulfilled = false;
     	
-    	Integer Stop_after_num_seconds = null;
-    	boolean num_seconds_fulfilled = false;
+    	private Integer stopAfterNumSeconds = null;
+    	private boolean numSecondsFulfilled = false;    	
     	
     	/**
     	 * @return information, if the stop criteria are fulfilled
     	 */
     	public boolean stopCriteriaAreFulfilled() {
-    		return (first_anonymous_fulfilled || num_seconds_fulfilled || num_checks_fulfilled);
+//    		if (stopAfterNumChecks != null && checks >= stopAfterNumChecks)
+//    			numChecksFulfilled = true;
+//    		
+//    		if (stopAfterFirstAnonymous != null && firstAnonymousFulfilled)
+//    			System.out.println("FIRST_ANONYMOUS stop criterion is fulfilled");
+//    		
+//    		if (stopAfterNumChecks != null && numChecksFulfilled)
+//    			System.out.println("NUM_CHECKS stop criterion (n = " + checks + ") is fulfilled");
+//    		
+//    		if (stopAfterNumSeconds != null && numSecondsFulfilled)
+//    			System.out.println("NUM_SECONDS stop criterion is fulfilled");
+    		
+    		boolean fulfilled = 
+    				(stopAfterFirstAnonymous != null ? firstAnonymousFulfilled : false) || 
+    				(stopAfterNumChecks != null ? numChecksFulfilled : false) ||
+    				(stopAfterNumSeconds != null ? numSecondsFulfilled : false);
+    		
+    		return fulfilled;
     	}
     	
     	public void setFulfilled(StopCriteriaType stopCriteriaType) {
     		switch (stopCriteriaType) {
 			case STOP_AFTER_FIRST_ANONYMOUS:
-				first_anonymous_fulfilled = true;
+				firstAnonymousFulfilled = true;
 				break;
 			case STOP_AFTER_NUM_CHECKS:
-				num_checks_fulfilled = true;
+				numChecksFulfilled = true;
 				break;
 			case STOP_AFTER_NUM_SECONDS:
-				num_seconds_fulfilled = true;
+				numSecondsFulfilled = true;
 				break;
 			default:
 				break;    			
@@ -118,16 +135,26 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         // Set strategy
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         
-        this.stopCriteria = new StopCriteria();
+        stopCriteria = new StopCriteria();
     }
+    
     
     public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType) {
     	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS))
-    		throw new IllegalArgumentException("Need to supply a parameter");
+    		throw new IllegalArgumentException("Need to supply the number of checks/seconds as a second parameter");
     	
-    	this.stopCriteria.stop_after_first_anonymous = true;
+    	stopCriteria.stopAfterFirstAnonymous = true;    	
+    	return (AlgorithmHeurakles) this;
+    }
+    
+    public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType, int num) {
+    	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_CHECKS))
+    		throw new IllegalArgumentException("only STOP_AFTER_NUM_CHECKS is supported so far");
+    	if (num < 0)
+    		throw new IllegalArgumentException("num must be greater than 0");
     	
-    	return this;
+    	stopCriteria.stopAfterNumChecks = num;    	
+    	return (AlgorithmHeurakles) this;
     }
 
     /*
@@ -143,12 +170,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     }
 
     private void traverse(final Node node) {
-    	int x;
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
             // Build a PriorityQueue based on information loss containing the successors
             PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new InformationLossComparator());
             for (Node successor : successors) {
+            	if (stopCriteria.stopCriteriaAreFulfilled())
+            		break;
                 if (!successor.hasProperty(PROPERTY_COMPLETED)) {
                     assureChecked(successor);
                     queue.add(successor);
@@ -158,13 +186,10 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             Node next;
             if (getGlobalOptimum() != null)
             	stopCriteria.setFulfilled(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
-            else
-            	x = 0;
-            
-            boolean fulfilled = stopCriteria.stopCriteriaAreFulfilled();
-            
-            while (!stopCriteria.stopCriteriaAreFulfilled() && (next = queue.peek()) != null) {
-//            while (getGlobalOptimum() == null && (next = queue.peek()) != null) {
+
+            while ((next = queue.peek()) != null) {
+            	if (stopCriteria.stopCriteriaAreFulfilled())
+            		break;
                 if (!next.hasProperty(PROPERTY_COMPLETED)) {
                     traverse(next);
                 }
