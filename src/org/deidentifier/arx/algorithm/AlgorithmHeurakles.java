@@ -63,10 +63,9 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     
     /**
-     * This inner class defines 2 stop criteria for an algorithm:
-     * it can either stop after a certain number
-     * of checked nodes or after a certain number of seconds since
-     * the algorithm has started. If both criteria are set, then the
+     * This inner class defines 3 stop criteria for an algorithm:
+     * it can either stop after a certain number or after the first anonymous node
+     * has been found. If more than one criterion is set, then the
      * algorithm stops after the first condition is true.
      * 
      * @author Helmut Spengler
@@ -83,27 +82,28 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     	private boolean numSecondsFulfilled = false;    	
     	
     	/**
-    	 * @return information, if the stop criteria are fulfilled
+    	 * @return information, if the <B>activated</B> stop criteria are fulfilled
     	 */
-    	public boolean stopCriteriaAreFulfilled() {
-//    		if (stopAfterNumChecks != null && checks >= stopAfterNumChecks)
-//    			numChecksFulfilled = true;
-//    		
-//    		if (stopAfterFirstAnonymous != null && firstAnonymousFulfilled)
-//    			System.out.println("FIRST_ANONYMOUS stop criterion is fulfilled");
-//    		
-//    		if (stopAfterNumChecks != null && numChecksFulfilled)
-//    			System.out.println("NUM_CHECKS stop criterion (n = " + checks + ") is fulfilled");
-//    		
-//    		if (stopAfterNumSeconds != null && numSecondsFulfilled)
-//    			System.out.println("NUM_SECONDS stop criterion is fulfilled");
+    	public boolean stopCriteriaAreFulfilled() {    		
+    		if (stopAfterNumChecks != null && checks >= stopAfterNumChecks)
+    			numChecksFulfilled = true;    		
+
+    		final boolean printFulfillmentStatus = false;
+    		if (printFulfillmentStatus) {
+    			if (stopAfterFirstAnonymous != null && firstAnonymousFulfilled)
+    				System.out.println("FIRST_ANONYMOUS stop criterion is fulfilled");
+
+    			if (stopAfterNumChecks != null && numChecksFulfilled)
+    				System.out.println("NUM_CHECKS stop criterion (n = " + checks + ") is fulfilled");
+
+    			if (stopAfterNumSeconds != null && numSecondsFulfilled)
+    				System.out.println("NUM_SECONDS stop criterion is fulfilled");
+    		}
     		
-    		boolean fulfilled = 
+    		return 
     				(stopAfterFirstAnonymous != null ? firstAnonymousFulfilled : false) || 
     				(stopAfterNumChecks != null ? numChecksFulfilled : false) ||
     				(stopAfterNumSeconds != null ? numSecondsFulfilled : false);
-    		
-    		return fulfilled;
     	}
     	
     	public void setFulfilled(StopCriteriaType stopCriteriaType) {
@@ -139,14 +139,30 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     }
     
     
+    /**
+     * Define and activate the stop criterion STOP_AFTER_FIRST_ANONYMOUS. After this method is
+     * called with this parameter, the algorithm will stop, after the first anonymous node has been found.
+     * 
+     * @param stopCriteriaType STOP_AFTER_FIRST_ANONYMOUS is the only allowed criterion for this method.
+     * @return the algorithm object itself for supporting chained method calls
+     */
     public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType) {
     	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS))
     		throw new IllegalArgumentException("Need to supply the number of checks/seconds as a second parameter");
     	
     	stopCriteria.stopAfterFirstAnonymous = true;    	
-    	return (AlgorithmHeurakles) this;
+    	return this;
     }
     
+    /**
+     * Define and activate a stop criterion that depends on the reaching of a positive
+     * integer threshold. If this method is is called, the algorithm will stop, after
+     * this threshold has been reached.
+     * 
+     * @param stopCriteriaType currently only STOP_AFTER_NUM_CHECKS is supported. STOP_AFTER_NUM_SECONDS will follow shortly.
+     * @param num positive Integer defining the threshold
+     * @return the algorithm object itself for supporting chained method calls
+     */
     public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType, int num) {
     	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_CHECKS))
     		throw new IllegalArgumentException("only STOP_AFTER_NUM_CHECKS is supported so far");
@@ -154,7 +170,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     		throw new IllegalArgumentException("num must be greater than 0");
     	
     	stopCriteria.stopAfterNumChecks = num;    	
-    	return (AlgorithmHeurakles) this;
+    	return this;
     }
 
     /*
@@ -182,11 +198,12 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                     queue.add(successor);
                 }
             }
+            
             // Process the successors
-            Node next;
             if (getGlobalOptimum() != null)
             	stopCriteria.setFulfilled(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
 
+            Node next;
             while ((next = queue.peek()) != null) {
             	if (stopCriteria.stopCriteriaAreFulfilled())
             		break;
