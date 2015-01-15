@@ -82,7 +82,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     	private boolean numSecondsFulfilled = false;    	
     	
     	/**
-    	 * @return information, if the <B>activated</B> stop criteria are fulfilled
+    	 * @return true, after the first of the <B>activated</B> stop criteria are fulfilled
     	 */
     	public boolean stopCriteriaAreFulfilled() {    		
     		if (stopAfterNumChecks != null && checks >= stopAfterNumChecks)
