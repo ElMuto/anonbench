@@ -38,7 +38,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     public static final int PROPERTY_COMPLETED = 1 << 20;
     
-    private final StopCriteria stopCriteria;
+    public enum StopCriteriaType {
+    	STOP_AFTER_FIRST_ANONYMOUS,
+    	STOP_AFTER_NUM_SECONDS,
+    	STOP_AFTER_NUM_CHECKS
+    }
+    
+    private static StopCriteria stopCriteria;
 
     /**
      * Auxiliary class for comparing nodes based on their information loss
@@ -55,7 +61,51 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         }
     }
 
-
+    
+    /**
+     * This inner class defines 2 stop criteria for an algorithm:
+     * it can either stop after a certain number
+     * of checked nodes or after a certain number of seconds since
+     * the algorithm has started. If both criteria are set, then the
+     * algorithm stops after the first condition is true.
+     * 
+     * @author Helmut Spengler
+     * 
+     */
+    private class StopCriteria {
+    	Boolean stop_after_first_anonymous = null;
+    	boolean first_anonymous_fulfilled = false;
+    	
+    	Integer stop_after_num_checks = null;
+    	boolean num_checks_fulfilled = false;
+    	
+    	Integer Stop_after_num_seconds = null;
+    	boolean num_seconds_fulfilled = false;
+    	
+    	/**
+    	 * @return information, if the stop criteria are fulfilled
+    	 */
+    	public boolean stopCriteriaAreFulfilled() {
+    		return (first_anonymous_fulfilled || num_seconds_fulfilled || num_checks_fulfilled);
+    	}
+    	
+    	public void setFulfilled(StopCriteriaType stopCriteriaType) {
+    		switch (stopCriteriaType) {
+			case STOP_AFTER_FIRST_ANONYMOUS:
+				first_anonymous_fulfilled = true;
+				break;
+			case STOP_AFTER_NUM_CHECKS:
+				num_checks_fulfilled = true;
+				break;
+			case STOP_AFTER_NUM_SECONDS:
+				num_seconds_fulfilled = true;
+				break;
+			default:
+				break;    			
+    		}
+    	}
+    }
+    
 
     /**
      * Creates a new instance of the heurakles algorithm.
@@ -63,15 +113,21 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @param lattice The lattice
      * @param checker The checker
      */
-    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker, final StopCriteria stopCriteria) {
+    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker) {
         super(lattice, checker);
         // Set strategy
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         
-        if (stopCriteria == null)
-        	throw new IllegalArgumentException("stopCriteria may not be null");
-        else
-        	this.stopCriteria = stopCriteria;
+        this.stopCriteria = new StopCriteria();
+    }
+    
+    public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType) {
+    	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS))
+    		throw new IllegalArgumentException("Need to supply a parameter");
+    	
+    	this.stopCriteria.stop_after_first_anonymous = true;
+    	
+    	return this;
     }
 
     /*
@@ -87,6 +143,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     }
 
     private void traverse(final Node node) {
+    	int x;
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
             // Build a PriorityQueue based on information loss containing the successors
@@ -99,7 +156,15 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             }
             // Process the successors
             Node next;
+            if (getGlobalOptimum() != null)
+            	stopCriteria.setFulfilled(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
+            else
+            	x = 0;
+            
+            boolean fulfilled = stopCriteria.stopCriteriaAreFulfilled();
+            
             while (!stopCriteria.stopCriteriaAreFulfilled() && (next = queue.peek()) != null) {
+//            while (getGlobalOptimum() == null && (next = queue.peek()) != null) {
                 if (!next.hasProperty(PROPERTY_COMPLETED)) {
                     traverse(next);
                 }

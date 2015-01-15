@@ -29,7 +29,6 @@ import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
 import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
-import org.deidentifier.arx.algorithm.StopCriteria;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
@@ -209,27 +208,7 @@ public class BenchmarkDriver {
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
-            implementation = new AlgorithmHeurakles(
-            		lattice, 
-            		checker, 
-            		new StopCriteria(
-            				BenchmarkSetup.MAX_NUMBER_OF_CHECKS, 
-            				BenchmarkSetup.MAX_EXECUTION_TIME, 
-            				new StopCriteria.StopCriteriaChecker() {
-            					@Override
-            					public int getCurrentNumSecondsSinceStart() {
-            						// TODO Auto-generated method stub
-            						return 100;
-            					}
-
-            					@Override
-            					public int getCurrentNumChecks() {
-            						// TODO Auto-generated method stub
-            						return 100;
-            					}
-            				}
-            				)
-            		);
+            implementation = new AlgorithmHeurakles(lattice, checker).setStopCriterion(AlgorithmHeurakles.StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);
