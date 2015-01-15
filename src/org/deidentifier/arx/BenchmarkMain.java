@@ -35,7 +35,7 @@ import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
 import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyzer;
 
 /**
- * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
+ * Main benchmark class. Run with java -Xmx5G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
  * 
  * @author Fabian Prasser
  */
@@ -44,7 +44,7 @@ public class BenchmarkMain {
     /** Repetitions */
     private static final int         REPETITIONS         = 3;
     /** Minimal number of QIs to use for the QI count scaling benchmark */
-    private static final int         QI_COUNT_MIN        = 5;
+    private static final int         QI_COUNT_MIN        = 10;
     /** The benchmark instance */
     protected static final Benchmark BENCHMARK           = new Benchmark(new String[] {
                                                          "Algorithm",

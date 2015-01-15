@@ -121,10 +121,10 @@ public class BenchmarkSetup {
                 return "Ihis";
             }
         },
-        CUP98 {
+        SS13PMA {
             @Override
             public String toString() {
-                return "Cup98";
+                return "SS13PMA";
             }
         }
     }
@@ -197,9 +197,9 @@ public class BenchmarkSetup {
         return new Metric[] {
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
                 Metric.createEntropyMetric(),
-//                Metric.createPrecisionMetric(),
-//                Metric.createAECSMetric(),
-//                Metric.createDiscernabilityMetric()
+                Metric.createPrecisionMetric(),
+                Metric.createAECSMetric(),
+                Metric.createDiscernabilityMetric()
         };
     }
 
@@ -256,8 +256,8 @@ public class BenchmarkSetup {
             return "data/fars.csv";
         case IHIS:
             return "data/ihis.csv";
-        case CUP98:
-            return "data/cup98.csv";
+        case SS13PMA:
+            return "data/ss13pma_clean.csv";
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -300,9 +300,9 @@ public class BenchmarkSetup {
         return new BenchmarkDataset[] {
                 BenchmarkDataset.ADULT,
                 BenchmarkDataset.CUP,
-//                BenchmarkDataset.FARS,
-//                BenchmarkDataset.ATUS,
-//                BenchmarkDataset.IHIS
+                BenchmarkDataset.FARS,
+                BenchmarkDataset.ATUS,
+                BenchmarkDataset.IHIS
         };
     }
     
@@ -312,7 +312,7 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getQICountScalingDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.CUP98
+                BenchmarkDataset.SS13PMA
         };
     }
     
@@ -432,22 +432,57 @@ public class BenchmarkSetup {
                     "REGION",
                     "SEX",
                     "YEAR" };
-        case CUP98:
-            return new String[] { "AGE",
-                    "GENDER",
-                    "INCOME",
-                    "MINRAMNT",
-                    "NGIFTALL",
-                    "STATE",
-                    "ZIP",
-                    "HIT",
-                    "POP901",
-                    "POP902",
-                    "POP903",
-                    "ETH1",
-                    "RAMNTALL",
-                    "MAXRAMNT",
-                    "LASTGIFT"
+        case SS13PMA:
+            return new String[] { "pwgtp1",
+                    "pwgtp2",
+                    "pwgtp3",
+                    "pwgtp4",
+                    "pwgtp5",
+                    "pwgtp6",
+                    "pwgtp7",
+                    "pwgtp8",
+                    "pwgtp9",
+                    "pwgtp10",
+                    "pwgtp11",
+                    "pwgtp12",
+                    "pwgtp13",
+                    "pwgtp14",
+                    "pwgtp15",
+                    "pwgtp16",
+                    "pwgtp17",
+                    "pwgtp18",
+                    "pwgtp19",
+                    "pwgtp20",
+                    "pwgtp21",
+                    "pwgtp22",
+                    "pwgtp23",
+//                    "pwgtp24",
+//                    "pwgtp25",
+//                    "pwgtp26",
+//                    "pwgtp27",
+//                    "pwgtp28",
+//                    "pwgtp29",
+//                    "pwgtp30",
+//                    "pwgtp31",
+//                    "pwgtp32",
+//                    "pwgtp33",
+//                    "pwgtp34",
+//                    "pwgtp35",
+//                    "pwgtp36",
+//                    "pwgtp37",
+//                    "pwgtp38",
+//                    "pwgtp39",
+//                    "pwgtp40",
+//                    "pwgtp41",
+//                    "pwgtp42",
+//                    "pwgtp43",
+//                    "pwgtp44",
+//                    "pwgtp45",
+//                    "pwgtp46",
+//                    "pwgtp47",
+//                    "pwgtp48",
+//                    "pwgtp49",
+//                    "pwgtp50"
                     };
         default:
             throw new RuntimeException("Invalid dataset");

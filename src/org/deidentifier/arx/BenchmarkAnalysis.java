@@ -174,7 +174,10 @@ public class BenchmarkAnalysis {
                                         metric));
                 }
             }
-            LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
+
+            if (groups.isEmpty()) {
+                LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
+            }
         }
     }
 
