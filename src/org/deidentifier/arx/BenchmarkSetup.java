@@ -488,6 +488,18 @@ public class BenchmarkSetup {
             throw new RuntimeException("Invalid dataset");
         }
     }
+    
+    /**
+     * Returns the maximal number of QIs to use for a given algorithm and dataset
+     * @param algorithm
+     * @param dataset
+     * @return
+     */
+    public static int getMaxQICount(BenchmarkAlgorithm algorithm, BenchmarkDataset dataset) {
+        if (algorithm == BenchmarkAlgorithm.FLASH && dataset == BenchmarkDataset.SS13PMA)
+            return 23;
+        return getQuasiIdentifyingAttributes(dataset).length;
+    }
 
     /**
      * Returns the research subset for the dataset

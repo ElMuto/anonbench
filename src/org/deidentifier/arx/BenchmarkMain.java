@@ -112,7 +112,7 @@ public class BenchmarkMain {
                         for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
 
                             // TODO make some nicer code here
-                            for (int qiCount = QI_COUNT_MIN; algorithm.toString().equals("Flash") ? qiCount <= 23 : qiCount <= BenchmarkSetup.getQuasiIdentifyingAttributes(data).length; qiCount++) {
+                            for (int qiCount = QI_COUNT_MIN; qiCount < BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
 
                                 runBenchmark(driver,
                                              algorithm,
