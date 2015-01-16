@@ -22,6 +22,9 @@ package org.deidentifier.arx.algorithm;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
@@ -79,7 +82,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     	private boolean numChecksFulfilled = false;
     	
     	private Integer stopAfterNumSeconds = null;
-    	private boolean numSecondsFulfilled = false;    	
+    	private boolean numSecondsFulfilled = false;
+    	
+    	private ScheduledExecutorService scheduler = null;
+    	
+    	public StopCriteria() {
+    		scheduler = Executors.newScheduledThreadPool(1);
+    	}
     	
     	/**
     	 * @return information, if the <B>activated</B> stop criteria are fulfilled
@@ -100,26 +109,53 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     				System.out.println("NUM_SECONDS stop criterion is fulfilled");
     		}
     		
-    		return 
+    		boolean fulfilled = 
     				(stopAfterFirstAnonymous != null ? firstAnonymousFulfilled : false) || 
     				(stopAfterNumChecks != null ? numChecksFulfilled : false) ||
     				(stopAfterNumSeconds != null ? numSecondsFulfilled : false);
+    		
+    		return fulfilled;
     	}
     	
     	public void setFulfilled(StopCriteriaType stopCriteriaType) {
     		switch (stopCriteriaType) {
 			case STOP_AFTER_FIRST_ANONYMOUS:
-				firstAnonymousFulfilled = true;
+				if (stopAfterFirstAnonymous != null)
+					firstAnonymousFulfilled = true;
 				break;
 			case STOP_AFTER_NUM_CHECKS:
-				numChecksFulfilled = true;
+				if (stopAfterNumChecks != null)
+					numChecksFulfilled = true;
 				break;
 			case STOP_AFTER_NUM_SECONDS:
-				numSecondsFulfilled = true;
+				if (stopAfterNumSeconds != null)
+					numSecondsFulfilled = true;
 				break;
 			default:
 				break;    			
     		}
+    	}
+    	
+    	/**
+    	 * Tell the timer to start counting for the configured number of seconds
+    	 */
+    	public void startConfiguredScheduler() {
+    		if (stopAfterNumSeconds != null) {
+
+    		scheduler.schedule(
+    				new Runnable() {
+    					public void run() {
+    						System.out.println("Reached runtime of " + stopAfterNumSeconds + " seconds.");
+    						setFulfilled(StopCriteriaType.STOP_AFTER_NUM_SECONDS);
+    					}
+    				},
+    				stopAfterNumSeconds,
+    				TimeUnit.SECONDS);
+    		}
+    	}
+    	
+    	public void shutDownScheduler() {
+    		scheduler.shutdownNow();
     	}
     }
     
@@ -164,12 +200,21 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @return the algorithm object itself for supporting chained method calls
      */
     public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType, int num) {
-    	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_CHECKS))
-    		throw new IllegalArgumentException("only STOP_AFTER_NUM_CHECKS is supported so far");
+    	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_CHECKS) && !stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_SECONDS))
+    		throw new IllegalArgumentException("only STOP_AFTER_NUM_CHECKS and STOP_AFTER_NUM_SECONDS ares supported for this method");
     	if (num < 0)
     		throw new IllegalArgumentException("num must be greater than 0");
     	
-    	stopCriteria.stopAfterNumChecks = num;    	
+    	switch (stopCriteriaType) {
+		case STOP_AFTER_NUM_CHECKS:
+			stopCriteria.stopAfterNumChecks = num;    	
+			break;
+		case STOP_AFTER_NUM_SECONDS:
+			stopCriteria.stopAfterNumSeconds = num;    	
+			break;
+		default:
+			break;
+    	}
     	return this;
     }
 
@@ -180,9 +225,11 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      */
     @Override
     public void traverse() {
+    	stopCriteria.startConfiguredScheduler();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
         if (getGlobalOptimum() == null) traverse(bottom);
+        stopCriteria.shutDownScheduler();
     }
 
     private void traverse(final Node node) {

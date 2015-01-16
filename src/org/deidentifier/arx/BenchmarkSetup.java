@@ -28,7 +28,6 @@ import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
-import org.deidentifier.arx.metric.Metric.AggregateFunction;
 
 
 /**
@@ -36,9 +35,10 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  * @author Fabian Prasser
  */
 public class BenchmarkSetup {
-	
+
 	protected static final Integer HEUR_MAX_NUMBER_OF_CHECKS = null;
-	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = true;
+	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = 5;
+	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = false;
 
     public static enum BenchmarkAlgorithm {
         FLASH {
@@ -127,7 +127,7 @@ public class BenchmarkSetup {
      */
     public static BenchmarkAlgorithm[] getAlgorithms() {
         return new BenchmarkAlgorithm[] {
-                BenchmarkAlgorithm.FLASH,
+//                BenchmarkAlgorithm.FLASH,
                 BenchmarkAlgorithm.HEURAKLES
         };
     }
@@ -186,10 +186,10 @@ public class BenchmarkSetup {
     @SuppressWarnings("rawtypes")
     public static Metric[] getMetrics() {
         return new Metric[] {
-                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(),
-                Metric.createPrecisionMetric(),
-                Metric.createAECSMetric(),
+//                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
+//                Metric.createEntropyMetric(),
+//                Metric.createPrecisionMetric(),
+//                Metric.createAECSMetric(),
                 Metric.createDiscernabilityMetric()
         };
     }
@@ -284,10 +284,10 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.ADULT,
-                BenchmarkDataset.CUP,
-                BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS,
+//                BenchmarkDataset.ADULT,
+//                BenchmarkDataset.CUP,
+//                BenchmarkDataset.FARS,
+//                BenchmarkDataset.ATUS,
                 BenchmarkDataset.IHIS
         };
     }
