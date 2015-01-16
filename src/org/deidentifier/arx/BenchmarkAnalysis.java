@@ -127,55 +127,57 @@ public class BenchmarkAnalysis {
                     String suppression = String.valueOf(suppr);
                     BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
 
-                    groups.add(getGroup(file,
-                                        VARIABLES.EXECUTION_TIME,
-                                        Analyzer.ARITHMETIC_MEAN,
-                                        "Dataset",
-                                        null,
-                                        scriteria,
-                                        suppression,
-                                        datasets,
-                                        metric));
-                    groups.add(getGroup(file,
-                                        VARIABLES.NUMBER_OF_CHECKS,
-                                        Analyzer.VALUE,
-                                        "Dataset",
-                                        null,
-                                        scriteria,
-                                        suppression,
-                                        datasets,
-                                        metric));
-                    groups.add(getGroup(file,
-                                        VARIABLES.NUMBER_OF_ROLLUPS,
-                                        Analyzer.VALUE,
-                                        "Dataset",
-                                        null,
-                                        scriteria,
-                                        suppression,
-                                        datasets,
-                                        metric));
-                    groups.add(getGroup(file,
-                                        VARIABLES.NUMBER_OF_SNAPSHOTS,
-                                        Analyzer.VALUE,
-                                        "Dataset",
-                                        null,
-                                        scriteria,
-                                        suppression,
-                                        datasets,
-                                        metric));
-                    groups.add(getGroup(file,
-                                        VARIABLES.INFORMATION_LOSS,
-                                        Analyzer.VALUE,
-                                        "Dataset",
-                                        null,
-                                        scriteria,
-                                        suppression,
-                                        datasets,
-                                        metric));
+                    if (datasets.length > 0) {
+                        groups.add(getGroup(file,
+                                            VARIABLES.EXECUTION_TIME,
+                                            Analyzer.ARITHMETIC_MEAN,
+                                            "Dataset",
+                                            null,
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.NUMBER_OF_CHECKS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            null,
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.NUMBER_OF_ROLLUPS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            null,
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.NUMBER_OF_SNAPSHOTS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            null,
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.INFORMATION_LOSS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            null,
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                    }
                 }
             }
 
-            if (groups.isEmpty()) {
+            if (!groups.isEmpty()) {
                 LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
             }
         }
@@ -218,7 +220,9 @@ public class BenchmarkAnalysis {
             }
         }
 
-        LaTeX.plot(groups, "results/results_QI_count_scaling");
+        if (!groups.isEmpty()) {
+            LaTeX.plot(groups, "results/results_QI_count_scaling");
+        }
     }
 
     /**

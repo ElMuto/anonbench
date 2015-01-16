@@ -298,11 +298,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.ADULT,
-                BenchmarkDataset.CUP,
-                BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS,
-                BenchmarkDataset.IHIS
+//                BenchmarkDataset.ADULT,
+//                BenchmarkDataset.CUP,
+//                BenchmarkDataset.FARS,
+//                BenchmarkDataset.ATUS,
+//                BenchmarkDataset.IHIS
         };
     }
     
@@ -456,13 +456,13 @@ public class BenchmarkSetup {
                     "pwgtp21",
                     "pwgtp22",
                     "pwgtp23",
-//                    "pwgtp24",
-//                    "pwgtp25",
-//                    "pwgtp26",
-//                    "pwgtp27",
-//                    "pwgtp28",
-//                    "pwgtp29",
-//                    "pwgtp30",
+                    "pwgtp24",
+                    "pwgtp25",
+                    "pwgtp26",
+                    "pwgtp27",
+                    "pwgtp28",
+                    "pwgtp29",
+                    "pwgtp30",
 //                    "pwgtp31",
 //                    "pwgtp32",
 //                    "pwgtp33",

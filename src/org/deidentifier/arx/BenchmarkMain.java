@@ -62,7 +62,7 @@ public class BenchmarkMain {
     public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
     /** Label for size of lattice */
     public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
-    /** Label for QI count */
+    /** Label for QI count TODO this is not a measure! */
     public static final int          QI_COUNT            = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.QI_COUNT.val);
     /** Label for information loss */
     public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
@@ -111,7 +111,8 @@ public class BenchmarkMain {
                         // For each QI scaling benchmark dataset
                         for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
 
-                            for (int qiCount = QI_COUNT_MIN; qiCount <= BenchmarkSetup.getQuasiIdentifyingAttributes(data).length; qiCount++) {
+                            // TODO make some nicer code here
+                            for (int qiCount = QI_COUNT_MIN; algorithm.toString().equals("Flash") ? qiCount <= 23 : qiCount <= BenchmarkSetup.getQuasiIdentifyingAttributes(data).length; qiCount++) {
 
                                 runBenchmark(driver,
                                              algorithm,
