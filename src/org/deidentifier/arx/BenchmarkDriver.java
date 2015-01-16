@@ -101,7 +101,6 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
             if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
-            if (!warmup) benchmark.addValue(BenchmarkMain.QI_COUNT, qiCount);
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum()
                                                                                           .getInformationLoss()
                                                                                           .toString());

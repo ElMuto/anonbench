@@ -68,7 +68,6 @@ public class BenchmarkAnalysis {
         NUMBER_OF_SNAPSHOTS("Number of snapshots"),
         INFORMATION_LOSS("Information loss"),
         LATTICE_SIZE("Size of lattice"),
-        QI_COUNT("QI count"),
         INFORMATION_LOSS_MINIMUM("Information loss minimum"),
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
@@ -132,7 +131,6 @@ public class BenchmarkAnalysis {
                                             VARIABLES.EXECUTION_TIME,
                                             Analyzer.ARITHMETIC_MEAN,
                                             "Dataset",
-                                            null,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -141,7 +139,6 @@ public class BenchmarkAnalysis {
                                             VARIABLES.NUMBER_OF_CHECKS,
                                             Analyzer.VALUE,
                                             "Dataset",
-                                            null,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -150,7 +147,6 @@ public class BenchmarkAnalysis {
                                             VARIABLES.NUMBER_OF_ROLLUPS,
                                             Analyzer.VALUE,
                                             "Dataset",
-                                            null,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -159,7 +155,6 @@ public class BenchmarkAnalysis {
                                             VARIABLES.NUMBER_OF_SNAPSHOTS,
                                             Analyzer.VALUE,
                                             "Dataset",
-                                            null,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -168,7 +163,6 @@ public class BenchmarkAnalysis {
                                             VARIABLES.INFORMATION_LOSS,
                                             Analyzer.VALUE,
                                             "Dataset",
-                                            null,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -210,7 +204,6 @@ public class BenchmarkAnalysis {
                                             VARIABLES.EXECUTION_TIME,
                                             Analyzer.ARITHMETIC_MEAN,
                                             "QI count",
-                                            "Value",
                                             scriteria,
                                             suppression,
                                             new BenchmarkDataset[] { dataset },
@@ -373,7 +366,6 @@ public class BenchmarkAnalysis {
                                       VARIABLES variable,
                                       String measure,
                                       String focus,
-                                      String focusMeasure,
                                       String scriteria,
                                       String suppression,
                                       BenchmarkDataset[] datasets,
@@ -391,7 +383,6 @@ public class BenchmarkAnalysis {
                                          variable.val,
                                          measure,
                                          focus,
-                                         focusMeasure,
                                          scriteria,
                                          suppression,
                                          datasets,
@@ -511,7 +502,6 @@ public class BenchmarkAnalysis {
                       String variable,
                       String measure,
                       String focus,
-                      String focusMeasure,
                       String scriteria,
                       String suppression,
                       BenchmarkDataset[] datasets,
@@ -534,14 +524,12 @@ public class BenchmarkAnalysis {
 
         Selector<String[]> selector = selectorBuilder.end().build();
 
-        Field focusField = (focusMeasure == null) ? new Field(focus) : new Field(focus, focusMeasure);
-
         // Create series.
         // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
         // because by definition of selector each combination of x and y coordinates is unique
         // and thus only one z coordinate is being encountered.
         Series3D series = new Series3D(file, selector,
-                                       focusField,
+                                       new Field(focus),
                                        new Field("Algorithm"),
                                        new Field(variable, measure),
                                        new BufferedGeometricMeanAnalyzer());

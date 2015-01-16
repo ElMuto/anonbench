@@ -51,7 +51,8 @@ public class BenchmarkMain {
                                                          "Dataset",
                                                          "Criteria",
                                                          "Metric",
-                                                         "Suppression" });
+                                                         "Suppression",
+                                                         "QI count" });
     /** Label for execution times */
     public static final int          EXECUTION_TIME      = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.EXECUTION_TIME.val);
     /** Label for number of checks */
@@ -62,8 +63,6 @@ public class BenchmarkMain {
     public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
     /** Label for size of lattice */
     public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
-    /** Label for QI count TODO this is not a measure! */
-    public static final int          QI_COUNT            = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.QI_COUNT.val);
     /** Label for information loss */
     public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
 
@@ -74,7 +73,6 @@ public class BenchmarkMain {
         BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUMBER_OF_SNAPSHOTS, new ValueBuffer());
         BENCHMARK.addAnalyzer(LATTICE_SIZE, new ValueBuffer());
-        BENCHMARK.addAnalyzer(QI_COUNT, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer());
     }
 
@@ -111,8 +109,7 @@ public class BenchmarkMain {
                         // For each QI scaling benchmark dataset
                         for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
 
-                            // TODO make some nicer code here
-                            for (int qiCount = QI_COUNT_MIN; qiCount < BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
+                            for (int qiCount = QI_COUNT_MIN; qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
 
                                 runBenchmark(driver,
                                              algorithm,
@@ -149,7 +146,8 @@ public class BenchmarkMain {
                          data.toString(),
                          Arrays.toString(criteria),
                          metric.getName(),
-                         String.valueOf(suppression));
+                         String.valueOf(suppression),
+                         qiCount);
 
         // Repeat
         for (int i = 0; i < REPETITIONS; i++) {
