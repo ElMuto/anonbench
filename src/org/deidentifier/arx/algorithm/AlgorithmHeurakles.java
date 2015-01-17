@@ -93,7 +93,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     	/**
     	 * @return information, if the <B>activated</B> stop criteria are fulfilled
     	 */
-    	public boolean stopCriteriaAreFulfilled() {    		
+    	public boolean activeStopCriteriaAreFulfilled() {    		
     		if (stopAfterNumChecks != null && checks >= stopAfterNumChecks)
     			numChecksFulfilled = true;    		
 
@@ -145,7 +145,6 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     		scheduler.schedule(
     				new Runnable() {
     					public void run() {
-    						System.out.println("Reached runtime of " + stopAfterNumSeconds + " seconds.");
     						setFulfilled(StopCriteriaType.STOP_AFTER_NUM_SECONDS);
     					}
     				},
@@ -182,7 +181,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @param stopCriteriaType STOP_AFTER_FIRST_ANONYMOUS is the only allowed criterion for this method.
      * @return the algorithm object itself for supporting chained method calls
      */
-    public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType) {
+    public AlgorithmHeurakles defineAndActivateStopCriterion (StopCriteriaType stopCriteriaType) {
     	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS))
     		throw new IllegalArgumentException("Need to supply the number of checks/seconds as a second parameter");
     	
@@ -199,7 +198,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @param num positive Integer defining the threshold
      * @return the algorithm object itself for supporting chained method calls
      */
-    public AbstractBenchmarkAlgorithm setStopCriterion (StopCriteriaType stopCriteriaType, int num) {
+    public AlgorithmHeurakles defineAndActivateStopCriterion (StopCriteriaType stopCriteriaType, int num) {
     	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_CHECKS) && !stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_SECONDS))
     		throw new IllegalArgumentException("only STOP_AFTER_NUM_CHECKS and STOP_AFTER_NUM_SECONDS ares supported for this method");
     	if (num < 0)
@@ -211,6 +210,30 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 			break;
 		case STOP_AFTER_NUM_SECONDS:
 			stopCriteria.stopAfterNumSeconds = num;    	
+			break;
+		default:
+			break;
+    	}
+    	return this;
+    }
+    
+    /**
+     * Unsets and deactivates a given stop criterion, so that the algorithm continues, even if this 
+     * particular stop criterion is fulfilled
+     * 
+     * @param stopCriteriaType one of the criteria defined in enum StopCriteriaType
+     * @return the algorithm object itself for supporting chained method calls
+     */
+    public AlgorithmHeurakles unsetAndDeactivateStopCriterion(StopCriteriaType stopCriteriaType) {
+    	switch (stopCriteriaType) {
+		case STOP_AFTER_FIRST_ANONYMOUS:
+			stopCriteria.stopAfterFirstAnonymous = false;
+			break;
+		case STOP_AFTER_NUM_CHECKS:
+			stopCriteria.stopAfterNumChecks = null;
+			break;
+		case STOP_AFTER_NUM_SECONDS:
+			stopCriteria.stopAfterNumSeconds = null;
 			break;
 		default:
 			break;
@@ -238,7 +261,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             // Build a PriorityQueue based on information loss containing the successors
             PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new InformationLossComparator());
             for (Node successor : successors) {
-            	if (stopCriteria.stopCriteriaAreFulfilled())
+            	if (stopCriteria.activeStopCriteriaAreFulfilled())
             		break;
                 if (!successor.hasProperty(PROPERTY_COMPLETED)) {
                     assureChecked(successor);
@@ -252,7 +275,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
             Node next;
             while ((next = queue.peek()) != null) {
-            	if (stopCriteria.stopCriteriaAreFulfilled())
+            	if (stopCriteria.activeStopCriteriaAreFulfilled())
             		break;
                 if (!next.hasProperty(PROPERTY_COMPLETED)) {
                     traverse(next);
