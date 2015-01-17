@@ -211,9 +211,11 @@ public class BenchmarkDriver {
         case HEURAKLES:
             implementation = new AlgorithmHeurakles(lattice, checker);
             if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS != null)
-            	((AlgorithmHeurakles) implementation).setStopCriterion(AlgorithmHeurakles.StopCriteriaType.STOP_AFTER_NUM_CHECKS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS);
+            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_CHECKS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS);
+            if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS != null)
+            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_SECONDS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS);
             if (BenchmarkSetup.HEUR_STOP_AFTER_FIRST_ANONYMOUS)
-            	((AlgorithmHeurakles) implementation).setStopCriterion(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
+            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);

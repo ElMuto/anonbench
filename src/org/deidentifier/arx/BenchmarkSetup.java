@@ -36,8 +36,9 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  * @author Fabian Prasser
  */
 public class BenchmarkSetup {
-	
+
 	protected static final Integer HEUR_MAX_NUMBER_OF_CHECKS = null;
+	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = null;
 	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = true;
 
     public static enum BenchmarkAlgorithm {
@@ -176,8 +177,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 0.05d };
-    }
+        return new double[] { 0d, 0.05d };    }
 
     /**
      * Returns all metrics
