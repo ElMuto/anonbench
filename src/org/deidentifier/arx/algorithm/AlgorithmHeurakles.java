@@ -40,30 +40,13 @@ import org.deidentifier.arx.framework.lattice.Node;
 public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     public static final int PROPERTY_COMPLETED = 1 << 20;
+    private static StopCriteria stopCriteria;
     
     public enum StopCriteriaType {
     	STOP_AFTER_FIRST_ANONYMOUS,
     	STOP_AFTER_NUM_SECONDS,
     	STOP_AFTER_NUM_CHECKS
     }
-    
-    private static StopCriteria stopCriteria;
-
-    /**
-     * Auxiliary class for comparing nodes based on their information loss
-     * 
-     * @author Raffael Bild
-     * 
-     */
-    public class InformationLossComparator implements Comparator<Node>
-    {
-        @Override
-        public int compare(Node x, Node y)
-        {
-            return x.getInformationLoss().compareTo(y.getInformationLoss());
-        }
-    }
-
     
     /**
      * This inner class defines 3 stop criteria for an algorithm:
@@ -258,8 +241,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     private void traverse(final Node node) {
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
-            // Build a PriorityQueue based on information loss containing the successors
-            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new InformationLossComparator());
+        	// Build a PriorityQueue based on information loss containing the successors
+        	PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, 
+        			new Comparator<Node> () {
+        				@Override
+        				public int compare(Node x, Node y) { return x.getInformationLoss().compareTo(y.getInformationLoss()); }
+        			});
+        	
             for (Node successor : successors) {
             	if (stopCriteria.activeStopCriteriaAreFulfilled())
             		break;
