@@ -80,6 +80,7 @@ public class BenchmarkDriver {
      * @param algorithm
      * @param suppression
      * @param metric
+     * @param maxCheckCount the number of checks, after which Heurakles should terminate. This parameter is ignored by the other algorithms
      * @param warmup
      * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
      * @throws IOException
@@ -88,9 +89,30 @@ public class BenchmarkDriver {
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
                           Metric<?> metric, double suppression, boolean warmup, boolean benchmarkRun) throws IOException {
+    	
+    	anonymize(dataset, criteria, algorithm, metric, suppression, -1, warmup, benchmarkRun);
+    }
+
+    /**
+     * Performs data anonymization
+     * 
+     * @param dataset
+     * @param criteria
+     * @param algorithm
+     * @param suppression
+     * @param metric
+     * @param maxCheckCount the number of checks, after which Heurakles should terminate. This parameter is ignored by the other algorithms
+     * @param warmup
+     * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
+     * @throws IOException
+     */
+    public void anonymize(BenchmarkDataset dataset,
+                          BenchmarkCriterion[] criteria,
+                          BenchmarkAlgorithm algorithm,
+                          Metric<?> metric, double suppression, Integer maxCheckCount, boolean warmup, boolean benchmarkRun) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, maxCheckCount);
 
         // for real benchmark run
         if (benchmarkRun) {
@@ -150,8 +172,8 @@ public class BenchmarkDriver {
      * @param dataset
      * @param criteria
      * @param algorithm
-     * @param suppression
      * @param metric
+     * @param suppression
      * @return
      * @throws IOException
      */
@@ -159,6 +181,23 @@ public class BenchmarkDriver {
             getImplementation(BenchmarkDataset dataset,
                               BenchmarkCriterion[] criteria,
                               BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
+    	return getImplementation(dataset, criteria, algorithm, metric, suppression, null);
+    }
+
+    /**
+     * @param dataset
+     * @param criteria
+     * @param algorithm
+     * @param metric
+     * @param suppression
+     * @param maxCheckCount the number of checks, after which heurakles should terminate. This parameter is ignored by the other algorithms
+     * @return
+     * @throws IOException
+     */
+    private AbstractBenchmarkAlgorithm
+            getImplementation(BenchmarkDataset dataset,
+                              BenchmarkCriterion[] criteria,
+                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression, Integer maxCheckCount) throws IOException {
         // Prepare
         Data data = BenchmarkSetup.getData(dataset, criteria);
         ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, criteria);
@@ -210,8 +249,8 @@ public class BenchmarkDriver {
             break;
         case HEURAKLES:
             implementation = new AlgorithmHeurakles(lattice, checker, BenchmarkSetup.HEUR_TRY_TO_PRUNE);
-            if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS != null)
-            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_CHECKS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS);
+            if (maxCheckCount != null)
+            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_CHECKS, maxCheckCount);
             if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS != null)
             	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_SECONDS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS);
             if (BenchmarkSetup.HEUR_STOP_AFTER_FIRST_ANONYMOUS)

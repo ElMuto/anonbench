@@ -96,31 +96,40 @@ public class BenchmarkMain {
                     for (double suppression : BenchmarkSetup.getSuppression()) {
 
                         // For each combination of criteria
-                        for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                    	for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                    		
+                        	// for each checkCount-setting. Since this is only relevant for the Heurakles algorithm
+                    		// we make sure that the loop is only executed once for the other algorithms
+                    		Integer [] checkCountConfig = algorithm.equals(BenchmarkAlgorithm.HEURAKLES) ? BenchmarkSetup.getHeuraklesCheckCountConfigurations() : new Integer [] { null };
+                    		for (Integer maxCheckCount : checkCountConfig) {
 
-                            // Warmup run
-                            driver.anonymize(data, criteria, algorithm, metric, suppression, true, true);
+                    			// Warmup run
+                    			driver.anonymize(data, criteria, algorithm, metric, suppression, maxCheckCount, true, true);
 
-                            // Print status info
-                            System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
-                                               " / " + suppression + " / " +
-                                               Arrays.toString(criteria));
+                    			// Print status info
+                    			String statusString = "Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
+                    					" / " + suppression + " / " +
+                    					Arrays.toString(criteria);
+                    			statusString += algorithm.equals(BenchmarkAlgorithm.HEURAKLES) ? " / " + maxCheckCount + " checks": "";
+                    			System.out.println(statusString);
 
-                            // Benchmark
-                            BENCHMARK.addRun(algorithm.toString(),
-                                             data.toString(),
-                                             Arrays.toString(criteria),
-                                             metric.getName(),
-                                             String.valueOf(suppression));
+                    			// Benchmark
+                    			BENCHMARK.addRun(algorithm.toString(),
+                    					data.toString(),
+                    					Arrays.toString(criteria),
+                    					metric.getName(),
+                    					String.valueOf(suppression));
 
-                            // Repeat
-                            for (int i = 0; i < REPETITIONS; i++) {
-                                driver.anonymize(data, criteria, algorithm, metric, suppression, false, true);
-                            }
+                    			// Repeat
+                    			for (int i = 0; i < REPETITIONS; i++) {
+                    				driver.anonymize(data, criteria, algorithm, metric, suppression, maxCheckCount, false, true);
+                    			}
 
-                            // Write results incrementally
-                            BENCHMARK.getResults().write(new File("results/results.csv"));
-                        }
+                    			// Write results incrementally
+                    			BENCHMARK.getResults().write(new File("results/results.csv"));
+
+                        	}
+                    	}
                     }
                 }
             }

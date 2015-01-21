@@ -37,7 +37,15 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  */
 public class BenchmarkSetup {
 
-	protected static final Integer HEUR_MAX_NUMBER_OF_CHECKS = 5000;
+
+
+    /**
+     * Returns all variants of maximum iterations
+     * @return
+     */
+    public static Integer[] getHeuraklesCheckCountConfigurations() {
+        return new Integer[] { 200, 500, 1000, 10000 };
+    }
 	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = null;
 	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = false;
 	protected static final boolean HEUR_TRY_TO_PRUNE = true;
@@ -129,7 +137,7 @@ public class BenchmarkSetup {
      */
     public static BenchmarkAlgorithm[] getAlgorithms() {
         return new BenchmarkAlgorithm[] {
-                BenchmarkAlgorithm.FLASH,
+//                BenchmarkAlgorithm.FLASH,
                 BenchmarkAlgorithm.HEURAKLES
         };
     }
