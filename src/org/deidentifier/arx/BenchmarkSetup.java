@@ -37,9 +37,10 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  */
 public class BenchmarkSetup {
 
-	protected static final Integer HEUR_MAX_NUMBER_OF_CHECKS = null;
+	protected static final Integer HEUR_MAX_NUMBER_OF_CHECKS = 5000;
 	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = null;
-	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = true;
+	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = false;
+	protected static final boolean HEUR_TRY_TO_PRUNE = true;
 
     public static enum BenchmarkAlgorithm {
         FLASH {
@@ -177,7 +178,9 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 0.05d };    }
+//        return new double[] { 0d, 0.05d };    
+        return new double[] { 0d };    
+    }
 
     /**
      * Returns all metrics
@@ -186,11 +189,19 @@ public class BenchmarkSetup {
     @SuppressWarnings("rawtypes")
     public static Metric[] getMetrics() {
         return new Metric[] {
+        		// use non-monotonic version of supporting metrics
+//                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
+//                Metric.createEntropyMetric(),
+//                Metric.createPrecisionMetric(),
+//                Metric.createAECSMetric(),
+//                Metric.createDiscernabilityMetric()
+                
+        		// use monotonic version of supporting metrics
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(),
-                Metric.createPrecisionMetric(),
+                Metric.createEntropyMetric(true),
+                Metric.createPrecisionMetric(true),
                 Metric.createAECSMetric(),
-                Metric.createDiscernabilityMetric()
+                Metric.createDiscernabilityMetric(true)
         };
     }
 

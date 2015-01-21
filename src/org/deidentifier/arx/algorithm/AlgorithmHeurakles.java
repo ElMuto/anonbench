@@ -40,14 +40,15 @@ import org.deidentifier.arx.framework.lattice.Node;
 public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     public static final int PROPERTY_COMPLETED = 1 << 20;
+
+    private static StopCriteria stopCriteria;
+    private static boolean tryToPrune;
     
     public enum StopCriteriaType {
     	STOP_AFTER_FIRST_ANONYMOUS,
     	STOP_AFTER_NUM_SECONDS,
     	STOP_AFTER_NUM_CHECKS
     }
-    
-    private static StopCriteria stopCriteria;
 
     /**
      * Auxiliary class for comparing nodes based on their information loss
@@ -164,13 +165,17 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * 
      * @param lattice The lattice
      * @param checker The checker
+     * @param tryToPrune try to prune upwards. This is only possible, if we have monotonic metric.
+     *  In this case, only descendent trees will be traversed, whose information loss is not bigger than the global optimum
+     * 
      */
-    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker) {
+    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker, final boolean tryToPrune) {
         super(lattice, checker);
         // Set strategy
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         
         stopCriteria = new StopCriteria();
+        AlgorithmHeurakles.tryToPrune = tryToPrune;
     }
     
     
@@ -277,7 +282,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             while ((next = queue.peek()) != null) {
             	if (stopCriteria.activeStopCriteriaAreFulfilled())
             		break;
-                if (!next.hasProperty(PROPERTY_COMPLETED)) {
+            	
+            	// we only actually prune, if we have a monotonic metric
+            	boolean doPruning = tryToPrune && checker.getMetric().isMonotonic();
+            	// we only want to traverse descendants whose information loss isn't bigger than the global optimum
+            	boolean ilIsSmaller = getGlobalOptimum() == null || (next.getInformationLoss().compareTo(getGlobalOptimum().getInformationLoss()) <= 0);
+                
+            	if (!next.hasProperty(PROPERTY_COMPLETED) && (!doPruning || ilIsSmaller)) {
                     traverse(next);
                 }
                 queue.poll();

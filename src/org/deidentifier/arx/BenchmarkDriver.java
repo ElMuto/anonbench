@@ -209,7 +209,7 @@ public class BenchmarkDriver {
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
-            implementation = new AlgorithmHeurakles(lattice, checker);
+            implementation = new AlgorithmHeurakles(lattice, checker, BenchmarkSetup.HEUR_TRY_TO_PRUNE);
             if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS != null)
             	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_CHECKS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_CHECKS);
             if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS != null)
