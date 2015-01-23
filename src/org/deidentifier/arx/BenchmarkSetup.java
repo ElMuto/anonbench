@@ -44,7 +44,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static Integer[] getHeuraklesCheckCountConfigurations() {
-        return new Integer[] { 200, 500, 1000, 10000 };
+        return new Integer[] { 200, 500, 1000, 5000, 10000, 50000 };
     }
 	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = null;
 	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = false;
@@ -137,7 +137,7 @@ public class BenchmarkSetup {
      */
     public static BenchmarkAlgorithm[] getAlgorithms() {
         return new BenchmarkAlgorithm[] {
-//                BenchmarkAlgorithm.FLASH,
+                BenchmarkAlgorithm.FLASH,
                 BenchmarkAlgorithm.HEURAKLES
         };
     }
@@ -206,10 +206,10 @@ public class BenchmarkSetup {
                 
         		// use monotonic version of supporting metrics
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(true),
-                Metric.createPrecisionMetric(true),
-                Metric.createAECSMetric(),
-                Metric.createDiscernabilityMetric(true)
+//                Metric.createEntropyMetric(true),
+//                Metric.createPrecisionMetric(true),
+//                Metric.createAECSMetric(),
+//                Metric.createDiscernabilityMetric(true)
         };
     }
 
