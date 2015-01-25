@@ -257,6 +257,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
         if (getGlobalOptimum() == null) traverse(bottom);
+        System.out.println(lattice);
         stopCriteria.shutDownScheduler();
     }
 
