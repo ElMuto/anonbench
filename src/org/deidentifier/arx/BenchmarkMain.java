@@ -43,8 +43,6 @@ public class BenchmarkMain {
 
     /** Repetitions */
     private static final int         REPETITIONS         = 3;
-    /** Minimal number of QIs to use for the QI count scaling benchmark */
-    private static final int         QI_COUNT_MIN        = 10;
     /** The benchmark instance */
     protected static final Benchmark BENCHMARK           = new Benchmark(new String[] {
                                                          "Algorithm",
@@ -109,7 +107,7 @@ public class BenchmarkMain {
                         // For each QI scaling benchmark dataset
                         for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
 
-                            for (int qiCount = QI_COUNT_MIN; qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
+                            for (int qiCount = BenchmarkSetup.getMinQICount(algorithm, data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
 
                                 runBenchmark(driver,
                                              algorithm,

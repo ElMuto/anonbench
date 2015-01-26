@@ -186,20 +186,20 @@ public class BenchmarkAnalysis {
 
         CSVFile file = new CSVFile(new File("results/results.csv"));
 
-        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+        for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
+            List<PlotGroup> groups = new ArrayList<PlotGroup>();
 
-        // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+            // for each metric
+            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
 
-            // For each combination of criteria
-            for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-                String scriteria = Arrays.toString(criteria);
+                // For each combination of criteria
+                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                    String scriteria = Arrays.toString(criteria);
 
-                // for each suppression
-                for (double suppr : BenchmarkSetup.getSuppression()) {
-                    String suppression = String.valueOf(suppr);
+                    // for each suppression
+                    for (double suppr : BenchmarkSetup.getSuppression()) {
+                        String suppression = String.valueOf(suppr);
 
-                    for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
                         groups.add(getGroup(file,
                                             VARIABLES.EXECUTION_TIME,
                                             Analyzer.ARITHMETIC_MEAN,
@@ -208,13 +208,14 @@ public class BenchmarkAnalysis {
                                             suppression,
                                             new BenchmarkDataset[] { dataset },
                                             metric));
+
                     }
                 }
             }
-        }
 
-        if (!groups.isEmpty()) {
-            LaTeX.plot(groups, "results/results_QI_count_scaling");
+            if (!groups.isEmpty()) {
+                LaTeX.plot(groups, "results/results_QI_count_scaling_" + dataset.toString(), true);
+            }
         }
     }
 
@@ -460,7 +461,7 @@ public class BenchmarkAnalysis {
         String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " +
                          suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
         if (focus.equals("QI count") && datasets.length == 1) {
-            caption += " for dataset \"" + datasets[0] + "\"";
+            caption += " for dataset \"" + datasets[0].toString().replace("_", "\\_") + "\"";
         }
 
         return new PlotGroup(caption, plots, params, 1.0d);

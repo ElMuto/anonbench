@@ -121,10 +121,16 @@ public class BenchmarkSetup {
                 return "Ihis";
             }
         },
-        SS13PMA {
+        SS13PMA_TWO_LEVEL {
             @Override
             public String toString() {
-                return "SS13PMA";
+                return "SS13PMA_TWO_LEVEL";
+            }
+        },
+        SS13PMA_FIVE_LEVEL {
+            @Override
+            public String toString() {
+                return "SS13PMA_FIVE_LEVEL";
             }
         }
     }
@@ -256,7 +262,8 @@ public class BenchmarkSetup {
             return "data/fars.csv";
         case IHIS:
             return "data/ihis.csv";
-        case SS13PMA:
+        case SS13PMA_TWO_LEVEL:
+        case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
         default:
             throw new RuntimeException("Invalid dataset");
@@ -298,11 +305,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-//                BenchmarkDataset.ADULT,
-//                BenchmarkDataset.CUP,
-//                BenchmarkDataset.FARS,
-//                BenchmarkDataset.ATUS,
-//                BenchmarkDataset.IHIS
+                BenchmarkDataset.ADULT,
+                BenchmarkDataset.CUP,
+                BenchmarkDataset.FARS,
+                BenchmarkDataset.ATUS,
+                BenchmarkDataset.IHIS
         };
     }
     
@@ -312,7 +319,8 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getQICountScalingDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.SS13PMA
+                BenchmarkDataset.SS13PMA_TWO_LEVEL,
+                BenchmarkDataset.SS13PMA_FIVE_LEVEL
         };
     }
     
@@ -335,8 +343,10 @@ public class BenchmarkSetup {
             return Hierarchy.create("hierarchies/fars_hierarchy_" + attribute + ".csv", ';');
         case IHIS:
             return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
-        default:
-            return createTwoLevelHierarchy(dataset, attribute);
+        case SS13PMA_FIVE_LEVEL:
+            return Hierarchy.create("hierarchies/ss13pma_hierarchy_pwgtp.csv", ';');
+            default:
+                return createTwoLevelHierarchy(dataset, attribute);
         }
     }
     
@@ -432,7 +442,8 @@ public class BenchmarkSetup {
                     "REGION",
                     "SEX",
                     "YEAR" };
-        case SS13PMA:
+        case SS13PMA_TWO_LEVEL:
+        case SS13PMA_FIVE_LEVEL:
             return new String[] { "pwgtp1",
                     "pwgtp2",
                     "pwgtp3",
@@ -462,31 +473,23 @@ public class BenchmarkSetup {
                     "pwgtp27",
                     "pwgtp28",
                     "pwgtp29",
-                    "pwgtp30",
-//                    "pwgtp31",
-//                    "pwgtp32",
-//                    "pwgtp33",
-//                    "pwgtp34",
-//                    "pwgtp35",
-//                    "pwgtp36",
-//                    "pwgtp37",
-//                    "pwgtp38",
-//                    "pwgtp39",
-//                    "pwgtp40",
-//                    "pwgtp41",
-//                    "pwgtp42",
-//                    "pwgtp43",
-//                    "pwgtp44",
-//                    "pwgtp45",
-//                    "pwgtp46",
-//                    "pwgtp47",
-//                    "pwgtp48",
-//                    "pwgtp49",
-//                    "pwgtp50"
+                    "pwgtp30"
                     };
         default:
             throw new RuntimeException("Invalid dataset");
         }
+    }
+    
+    /**
+     * Returns the minimal number of QIs to use for a given algorithm and dataset
+     * @param algorithm
+     * @param dataset
+     * @return
+     */
+    public static int getMinQICount(BenchmarkAlgorithm algorithm, BenchmarkDataset dataset) {
+        if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL)
+            return 5;
+        return 10;
     }
     
     /**
@@ -496,8 +499,15 @@ public class BenchmarkSetup {
      * @return
      */
     public static int getMaxQICount(BenchmarkAlgorithm algorithm, BenchmarkDataset dataset) {
-        if (algorithm == BenchmarkAlgorithm.FLASH && dataset == BenchmarkDataset.SS13PMA)
-            return 23;
+        if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
+            if (algorithm == BenchmarkAlgorithm.FLASH)
+                return 23;
+        } else if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
+            if (algorithm == BenchmarkAlgorithm.FLASH)
+                return 10;
+            else if (algorithm == BenchmarkAlgorithm.HEURAKLES)
+                return 16;
+        }
         return getQuasiIdentifyingAttributes(dataset).length;
     }
 
