@@ -44,8 +44,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static Integer[] getHeuraklesCheckCountConfigurations() {
-//        return new Integer[] { 200, 500, 1000, 5000, 10000, 50000 };
-        return new Integer[] { 5000 };
+        return new Integer[] { 200, 500, 1000, 5000, 10000, 15000 };
     }
 	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = null;
 	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = false;
@@ -206,10 +205,9 @@ public class BenchmarkSetup {
 //                Metric.createDiscernabilityMetric()
                 
         		// use monotonic version of supporting metrics
-                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-//                Metric.createEntropyMetric(true),
-//                Metric.createPrecisionMetric(true),
-//                Metric.createAECSMetric(),
+                Metric.createEntropyMetric(true),
+                Metric.createPrecisionMetric(true),
+                Metric.createAECSMetric(),
 //                Metric.createDiscernabilityMetric(true)
         };
     }
@@ -305,10 +303,10 @@ public class BenchmarkSetup {
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
                 BenchmarkDataset.ADULT,
-//                BenchmarkDataset.CUP,
-//                BenchmarkDataset.FARS,
-//                BenchmarkDataset.ATUS,
-//                BenchmarkDataset.IHIS
+                BenchmarkDataset.CUP,
+                BenchmarkDataset.FARS,
+                BenchmarkDataset.ATUS,
+                BenchmarkDataset.IHIS
         };
     }
 

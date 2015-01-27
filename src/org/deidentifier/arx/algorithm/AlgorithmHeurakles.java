@@ -257,7 +257,6 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
         if (getGlobalOptimum() == null) traverse(bottom);
-        System.out.println(lattice);
         stopCriteria.shutDownScheduler();
     }
 
@@ -284,11 +283,11 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             	if (stopCriteria.activeStopCriteriaAreFulfilled())
             		break;
             	
-            	// we only actually prune, if we have a monotonic metric
-            	boolean doPruning = tryToPrune && checker.getMetric().isMonotonic();
+            	// we only actually prune, if we have a monotonic metric and suppression is off
+            	boolean doPruning = tryToPrune && checker.getMetric().isMonotonic() && checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
             	// we only want to traverse descendants whose information loss isn't bigger than the global optimum
             	boolean ilIsSmaller = getGlobalOptimum() == null || (next.getInformationLoss().compareTo(getGlobalOptimum().getInformationLoss()) <= 0);
-                
+            	
             	if (!next.hasProperty(PROPERTY_COMPLETED) && (!doPruning || ilIsSmaller)) {
                     traverse(next);
                 }
