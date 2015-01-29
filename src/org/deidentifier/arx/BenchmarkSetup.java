@@ -411,4 +411,16 @@ public class BenchmarkSetup {
             throw new RuntimeException("Invalid dataset");
         }
     }
+
+    /**
+     * Specify, whether relative information loss shall be calculated. This includes
+     * running a DFS algorithm over the whole lattice determining minimum and maximum
+     * information loss values.
+     * 
+     * @return true if relative information loss shall be included in the results file,
+     *         false otherwise
+     */
+    public static boolean includeRelativeInformationLoss() {
+        return true;
+    }
 }

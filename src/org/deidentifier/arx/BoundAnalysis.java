@@ -3,10 +3,8 @@ package org.deidentifier.arx;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
@@ -16,12 +14,9 @@ import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
 import de.linearbits.subframe.Benchmark;
-import de.linearbits.subframe.analyzer.Analyzer;
 import de.linearbits.subframe.analyzer.ValueBuffer;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
-import de.linearbits.subframe.render.LaTeX;
-import de.linearbits.subframe.render.PlotGroup;
 
 public class BoundAnalysis {
 
@@ -47,48 +42,48 @@ public class BoundAnalysis {
 
     public static void main(String[] args) throws IOException, ParseException {
 
-        // int numRuns = BenchmarkSetup.getDatasets().length * BenchmarkSetup.getMetrics().length * BenchmarkSetup.getSuppression().length *
-        // BenchmarkSetup.getCriteria().length;
-        // int counter = 1;
-        //
-        // BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
-        // BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS;
-        //
-        // // For each dataset
-        // for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
-        //
-        // // For each metric
-        // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-        //
-        // // For each suppression factor
-        // for (double suppression : BenchmarkSetup.getSuppression()) {
-        //
-        // // For each combination of criteria
-        // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-        //
-        // // Print status info
-        // System.out.println("Running: (" + counter + "/" + numRuns + ") " + algorithm.toString() + " / " + data.toString() +
-        // " / " +
-        // metric.getName() +
-        // " / " + suppression + " / " +
-        // Arrays.toString(criteria));
-        //
-        // // Benchmark
-        // BENCHMARK.addRun(algorithm.toString(),
-        // data.toString(),
-        // Arrays.toString(criteria),
-        // metric.getName(),
-        // String.valueOf(suppression));
-        //
-        // driver.anonymize(data, criteria, algorithm, metric, suppression, false, false);
-        //
-        // // Write results incrementally
-        // BENCHMARK.getResults().write(new File("results/informationLossBounds.csv"));
-        // counter++;
-        // }
-        // }
-        // }
-        // }
+        int numRuns = BenchmarkSetup.getDatasets().length * BenchmarkSetup.getMetrics().length * BenchmarkSetup.getSuppression().length *
+                      BenchmarkSetup.getCriteria().length;
+        int counter = 1;
+
+        BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
+        BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS;
+
+        // For each dataset
+        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+
+            // For each metric
+            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+
+                // For each suppression factor
+                for (double suppression : BenchmarkSetup.getSuppression()) {
+
+                    // For each combination of criteria
+                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+
+                        // Print status info
+                        System.out.println("Running: (" + counter + "/" + numRuns + ") " + algorithm.toString() + " / " + data.toString() +
+                                           " / " +
+                                           metric.getName() +
+                                           " / " + suppression + " / " +
+                                           Arrays.toString(criteria));
+
+                        // Benchmark
+                        BENCHMARK.addRun(algorithm.toString(),
+                                         data.toString(),
+                                         Arrays.toString(criteria),
+                                         metric.getName(),
+                                         String.valueOf(suppression));
+
+                        driver.anonymize(data, criteria, algorithm, metric, suppression, false, false);
+
+                        // Write results incrementally
+                        BENCHMARK.getResults().write(new File("results/informationLossBounds.csv"));
+                        counter++;
+                    }
+                }
+            }
+        }
 
         computeDiff();
 
@@ -201,6 +196,6 @@ public class BoundAnalysis {
             }
         }
 
-        results.write(new File("results/resultsComplete.csv"));
+        results.write(new File("results/results.csv"));
     }
 }

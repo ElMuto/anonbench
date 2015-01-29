@@ -22,6 +22,7 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
@@ -50,6 +51,7 @@ public class BenchmarkMain {
                                                                      "Criteria",
                                                                      "Metric",
                                                                      "Suppression" });
+
     /** Label for execution times */
     public static final int          EXECUTION_TIME                  = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.EXECUTION_TIME.val);
     /** Label for number of checks */
@@ -63,7 +65,7 @@ public class BenchmarkMain {
     /** Label for information loss */
     public static final int          INFORMATION_LOSS                = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
     /** Label for information loss transformation */
-    public static final int         INFORMATION_LOSS_TRANSFORMATION = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_TRANSFORMATION.val);
+    public static final int          INFORMATION_LOSS_TRANSFORMATION = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_TRANSFORMATION.val);
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
@@ -127,6 +129,14 @@ public class BenchmarkMain {
                         }
                     }
                 }
+            }
+        }
+
+        if (BenchmarkSetup.includeRelativeInformationLoss()) {
+            try {
+                BoundAnalysis.main(new String[] {});
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
     }
