@@ -69,7 +69,7 @@ public class BoundAnalysis {
                                          metric.getName(),
                                          String.valueOf(suppression));
 
-                        driver.anonymize(data, criteria, algorithm, metric, suppression, false, false);
+                        driver.anonymize(data, criteria, algorithm, metric, suppression, 0, false, false);
 
                         // Write results incrementally
                         BENCHMARK.getResults().write(new File("results/informationLossBounds.csv"));

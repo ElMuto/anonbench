@@ -87,10 +87,10 @@ public class BenchmarkDriver {
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
-                          Metric<?> metric, double suppression, boolean warmup, boolean benchmarkRun) throws IOException {
+                          Metric<?> metric, double suppression, int qiCount, boolean warmup, boolean benchmarkRun) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, qiCount);
 
         // for real benchmark run
         if (benchmarkRun) {
@@ -130,10 +130,10 @@ public class BenchmarkDriver {
      */
     public TestConfiguration test(BenchmarkDataset dataset,
                                   BenchmarkCriterion[] criteria,
-                                  BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
+                                  BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression, int qiCount) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, qiCount);
 
         // Execute
         implementation.traverse();
@@ -158,10 +158,10 @@ public class BenchmarkDriver {
     private AbstractBenchmarkAlgorithm
             getImplementation(BenchmarkDataset dataset,
                               BenchmarkCriterion[] criteria,
-                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
+                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression, int qiCount) throws IOException {
         // Prepare
-        Data data = BenchmarkSetup.getData(dataset, criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, criteria);
+        Data data = BenchmarkSetup.getData(dataset, criteria, qiCount);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, qiCount, criteria);
         DataHandle handle = data.getHandle();
 
         // Encode

@@ -72,7 +72,7 @@ public class InformationLossTest {
         for (BenchmarkDataset data : datasets) {
             for (BenchmarkAlgorithm algorithm : algorithms) {
                 // Warmup run
-                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, true, true);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, true, true);
 
                 // Benchmark
                 BENCHMARK.addRun(algorithm.toString(),
@@ -81,7 +81,7 @@ public class InformationLossTest {
                                  lossMetric.getName(),
                                  String.valueOf(suppression));
 
-                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, false, true);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, false, true);
 
                 // Write results incrementally
                 BENCHMARK.getResults().write(new File(file));
@@ -90,7 +90,7 @@ public class InformationLossTest {
 
         // Runs for Non-monotonic non-uniform entropy
         // Warmup run
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, true, true);
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, 0, true, true);
 
         // Benchmark
         BENCHMARK.addRun(BenchmarkAlgorithm.FLASH,
@@ -99,7 +99,7 @@ public class InformationLossTest {
                          entropyMetric.getName(),
                          String.valueOf(suppression));
 
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, false, true);
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, 0, false, true);
 
         // Write results incrementally
         BENCHMARK.getResults().write(new File(file));

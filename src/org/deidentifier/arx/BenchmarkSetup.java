@@ -20,7 +20,13 @@
 
 package org.deidentifier.arx;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.criteria.DPresence;
@@ -29,7 +35,6 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
-
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -120,6 +125,18 @@ public class BenchmarkSetup {
                 return "Ihis";
             }
         },
+        SS13PMA_TWO_LEVEL {
+            @Override
+            public String toString() {
+                return "SS13PMA_TWO_LEVEL";
+            }
+        },
+        SS13PMA_FIVE_LEVEL {
+            @Override
+            public String toString() {
+                return "SS13PMA_FIVE_LEVEL";
+            }
+        }
     }
 
     /**
@@ -145,6 +162,7 @@ public class BenchmarkSetup {
     public static ARXConfiguration getConfiguration(BenchmarkDataset dataset,
                                                     Metric<?> metric,
                                                     double suppression,
+                                                    int qiCount,
                                                     BenchmarkCriterion... criteria) throws IOException {
         ARXConfiguration config = ARXConfiguration.create();
         config.setMetric(metric);
@@ -152,7 +170,7 @@ public class BenchmarkSetup {
         for (BenchmarkCriterion c : criteria) {
             switch (c) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, getResearchSubset(dataset)));
+                config.addCriterion(new DPresence(0.05d, 0.15d, getResearchSubset(dataset, qiCount)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(5));
@@ -177,7 +195,8 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 0.05d };    }
+        return new double[] { 0d, 0.05d };
+    }
 
     /**
      * Returns all metrics
@@ -226,8 +245,33 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static Data getData(BenchmarkDataset dataset) throws IOException {
-        return getData(dataset, null);
+    public static Data getData(BenchmarkDataset dataset, int qiCount) throws IOException {
+        return getData(dataset, null, qiCount);
+    }
+    
+    /**
+     * Returns the path to the file containing a dataset
+     * @param dataset
+     * @return
+     */
+    public static String getFilePath(BenchmarkDataset dataset) {
+        switch (dataset) {
+        case ADULT:
+            return "data/adult.csv";
+        case ATUS:
+            return "data/atus.csv";
+        case CUP:
+            return "data/cup.csv";
+        case FARS:
+            return "data/fars.csv";
+        case IHIS:
+            return "data/ihis.csv";
+        case SS13PMA_TWO_LEVEL:
+        case SS13PMA_FIVE_LEVEL:
+            return "data/ss13pma_clean.csv";
+        default:
+            throw new RuntimeException("Invalid dataset");
+        }
     }
 
     /**
@@ -238,30 +282,11 @@ public class BenchmarkSetup {
      * @throws IOException
      */
     @SuppressWarnings("incomplete-switch")
-    public static Data getData(BenchmarkDataset dataset, BenchmarkCriterion[] criteria) throws IOException {
-        Data data = null;
-        switch (dataset) {
-        case ADULT:
-            data = Data.create("data/adult.csv", ';');
-            break;
-        case ATUS:
-            data = Data.create("data/atus.csv", ';');
-            break;
-        case CUP:
-            data = Data.create("data/cup.csv", ';');
-            break;
-        case FARS:
-            data = Data.create("data/fars.csv", ';');
-            break;
-        case IHIS:
-            data = Data.create("data/ihis.csv", ';');
-            break;
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
+    public static Data getData(BenchmarkDataset dataset, BenchmarkCriterion[] criteria, int qiCount) throws IOException {
+        Data data = Data.create(getFilePath(dataset), ';');
 
         if (criteria != null) {
-            for (String qi : getQuasiIdentifyingAttributes(dataset)) {
+            for (String qi : Arrays.copyOf(getQuasiIdentifyingAttributes(dataset), qiCount)) {
                 data.getDefinition().setAttributeType(qi, getHierarchy(dataset, qi));
             }
             for (BenchmarkCriterion c : criteria) {
@@ -279,7 +304,7 @@ public class BenchmarkSetup {
     }
 
     /**
-     * Returns all datasets
+     * Returns all datasets for the conventional benchmark
      * @return
      */
     public static BenchmarkDataset[] getDatasets() {
@@ -291,7 +316,18 @@ public class BenchmarkSetup {
                 BenchmarkDataset.IHIS
         };
     }
-
+    
+    /**
+     * Returns all datasets for the QI count scaling benchmark
+     * @return
+     */
+    public static BenchmarkDataset[] getQICountScalingDatasets() {
+        return new BenchmarkDataset[] {
+                BenchmarkDataset.SS13PMA_TWO_LEVEL,
+                BenchmarkDataset.SS13PMA_FIVE_LEVEL
+        };
+    }
+    
     /**
      * Returns the generalization hierarchy for the dataset and attribute
      * @param dataset
@@ -311,13 +347,57 @@ public class BenchmarkSetup {
             return Hierarchy.create("hierarchies/fars_hierarchy_" + attribute + ".csv", ';');
         case IHIS:
             return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
-        default:
-            throw new RuntimeException("Invalid dataset");
+        case SS13PMA_FIVE_LEVEL:
+            return Hierarchy.create("hierarchies/ss13pma_hierarchy_pwgtp.csv", ';');
+            default:
+                return createTwoLevelHierarchy(dataset, attribute);
         }
+    }
+    
+    /**
+     * Returns a dynamically created two level hierarchy
+     * @param dataset
+     * @param attribute
+     * @return
+     * @throws IOException
+     */
+    public static Hierarchy createTwoLevelHierarchy(BenchmarkDataset dataset, String attribute) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(getFilePath(dataset)));
+        
+        String[] headerLine = reader.readLine().split(";");
+        int colIdx = 0;
+        for (; colIdx < headerLine.length; ++colIdx) {
+            if (headerLine[colIdx].equals(attribute)) {
+                break;
+            }
+        }
+        if (colIdx == headerLine.length) {
+            reader.close();
+            throw new RuntimeException("Invalid attribute");
+        }
+        
+        Set<String> attributeDomain = new HashSet<String>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String value = (line.split(";"))[colIdx];
+            attributeDomain.add(value);
+        }
+        
+        reader.close();
+        
+        final String[][] hierarchy = new String[attributeDomain.size()][];
+        Iterator<String> iter = attributeDomain.iterator();
+        for (int i = 0; i < hierarchy.length; ++i) {
+            hierarchy[i] = new String[2];
+            hierarchy[i][0] = iter.next();
+            hierarchy[i][1] = "*";
+        }
+
+        return Hierarchy.create(hierarchy);
     }
 
     /**
-     * Returns the quasi-identifiers for the dataset
+     * Returns the quasi-identifiers for the dataset.
      * @param dataset
      * @return
      */
@@ -366,9 +446,73 @@ public class BenchmarkSetup {
                     "REGION",
                     "SEX",
                     "YEAR" };
+        case SS13PMA_TWO_LEVEL:
+        case SS13PMA_FIVE_LEVEL:
+            return new String[] { "pwgtp1",
+                    "pwgtp2",
+                    "pwgtp3",
+                    "pwgtp4",
+                    "pwgtp5",
+                    "pwgtp6",
+                    "pwgtp7",
+                    "pwgtp8",
+                    "pwgtp9",
+                    "pwgtp10",
+                    "pwgtp11",
+                    "pwgtp12",
+                    "pwgtp13",
+                    "pwgtp14",
+                    "pwgtp15",
+                    "pwgtp16",
+                    "pwgtp17",
+                    "pwgtp18",
+                    "pwgtp19",
+                    "pwgtp20",
+                    "pwgtp21",
+                    "pwgtp22",
+                    "pwgtp23",
+                    "pwgtp24",
+                    "pwgtp25",
+                    "pwgtp26",
+                    "pwgtp27",
+                    "pwgtp28",
+                    "pwgtp29",
+                    "pwgtp30"
+                    };
         default:
             throw new RuntimeException("Invalid dataset");
         }
+    }
+    
+    /**
+     * Returns the minimal number of QIs to use for a given algorithm and dataset
+     * @param algorithm
+     * @param dataset
+     * @return
+     */
+    public static int getMinQICount(BenchmarkAlgorithm algorithm, BenchmarkDataset dataset) {
+        if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL)
+            return 5;
+        return 10;
+    }
+    
+    /**
+     * Returns the maximal number of QIs to use for a given algorithm and dataset
+     * @param algorithm
+     * @param dataset
+     * @return
+     */
+    public static int getMaxQICount(BenchmarkAlgorithm algorithm, BenchmarkDataset dataset) {
+        if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
+            if (algorithm == BenchmarkAlgorithm.FLASH)
+                return 23;
+        } else if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
+            if (algorithm == BenchmarkAlgorithm.FLASH)
+                return 10;
+            else if (algorithm == BenchmarkAlgorithm.HEURAKLES)
+                return 16;
+        }
+        return getQuasiIdentifyingAttributes(dataset).length;
     }
 
     /**
@@ -377,18 +521,18 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static DataSubset getResearchSubset(BenchmarkDataset dataset) throws IOException {
+    public static DataSubset getResearchSubset(BenchmarkDataset dataset, int qiCount) throws IOException {
         switch (dataset) {
         case ADULT:
-            return DataSubset.create(getData(dataset), Data.create("data/adult_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/adult_subset.csv", ';'));
         case ATUS:
-            return DataSubset.create(getData(dataset), Data.create("data/atus_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/atus_subset.csv", ';'));
         case CUP:
-            return DataSubset.create(getData(dataset), Data.create("data/cup_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/cup_subset.csv", ';'));
         case FARS:
-            return DataSubset.create(getData(dataset), Data.create("data/fars_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/fars_subset.csv", ';'));
         case IHIS:
-            return DataSubset.create(getData(dataset), Data.create("data/ihis_subset.csv", ';'));
+            return DataSubset.create(getData(dataset, qiCount), Data.create("data/ihis_subset.csv", ';'));
         default:
             throw new RuntimeException("Invalid dataset");
         }

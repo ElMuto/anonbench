@@ -33,9 +33,11 @@ import java.util.Map;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
+import de.linearbits.objectselector.SelectorBuilder;
 import de.linearbits.subframe.analyzer.Analyzer;
 import de.linearbits.subframe.analyzer.buffered.BufferedGeometricMeanAnalyzer;
 import de.linearbits.subframe.graph.Field;
@@ -43,6 +45,7 @@ import de.linearbits.subframe.graph.Function;
 import de.linearbits.subframe.graph.Labels;
 import de.linearbits.subframe.graph.Plot;
 import de.linearbits.subframe.graph.PlotHistogramClustered;
+import de.linearbits.subframe.graph.PlotLinesClustered;
 import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Point3D;
 import de.linearbits.subframe.graph.Series2D;
@@ -98,6 +101,7 @@ public class BenchmarkAnalysis {
 
         generateTables();
         generatePlots();
+        generateQICountScalingPlots();
     }
 
     /**
@@ -120,21 +124,98 @@ public class BenchmarkAnalysis {
                 // for each suppression
                 for (double suppr : BenchmarkSetup.getSuppression()) {
                     String suppression = String.valueOf(suppr);
+                    BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
 
-                    groups.add(getGroup(file,
-                                        VARIABLES.EXECUTION_TIME,
-                                        Analyzer.ARITHMETIC_MEAN,
-                                        "Dataset",
-                                        scriteria,
-                                        suppression,
-                                        metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    if (datasets.length > 0) {
+                        groups.add(getGroup(file,
+                                            VARIABLES.EXECUTION_TIME,
+                                            Analyzer.ARITHMETIC_MEAN,
+                                            "Dataset",
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.NUMBER_OF_CHECKS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.NUMBER_OF_ROLLUPS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.NUMBER_OF_SNAPSHOTS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.INFORMATION_LOSS,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
+                    }
                 }
             }
-            LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
+
+            if (!groups.isEmpty()) {
+                LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
+            }
+        }
+    }
+
+    /**
+     * Generate the plots for the QI count scaling benchmark
+     * @throws IOException
+     * @throws ParseException
+     */
+    private static void generateQICountScalingPlots() throws IOException, ParseException {
+
+        CSVFile file = new CSVFile(new File("results/results.csv"));
+
+        for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
+            List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
+            // for each metric
+            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+
+                // For each combination of criteria
+                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                    String scriteria = Arrays.toString(criteria);
+
+                    // for each suppression
+                    for (double suppr : BenchmarkSetup.getSuppression()) {
+                        String suppression = String.valueOf(suppr);
+
+                        groups.add(getGroup(file,
+                                            VARIABLES.EXECUTION_TIME,
+                                            Analyzer.ARITHMETIC_MEAN,
+                                            "QI count",
+                                            scriteria,
+                                            suppression,
+                                            new BenchmarkDataset[] { dataset },
+                                            metric));
+
+                    }
+                }
+            }
+
+            if (!groups.isEmpty()) {
+                LaTeX.plot(groups, "results/results_QI_count_scaling_" + dataset.toString(), true);
+            }
         }
     }
 
@@ -288,6 +369,7 @@ public class BenchmarkAnalysis {
                                       String focus,
                                       String scriteria,
                                       String suppression,
+                                      BenchmarkDataset[] datasets,
                                       Metric<?> metric) throws ParseException {
 
         // Prepare
@@ -297,18 +379,28 @@ public class BenchmarkAnalysis {
         // Collect data for all algorithms
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
-            Series3D _series = getSeries(file, algorithm.toString(), variable.val, measure, focus, scriteria, suppression, metric);
+            Series3D _series = getSeries(file,
+                                         algorithm.toString(),
+                                         variable.val,
+                                         measure,
+                                         focus,
+                                         scriteria,
+                                         suppression,
+                                         datasets,
+                                         metric);
             if (series == null) series = _series;
             else series.append(_series);
         }
 
         // Make sure labels are printed correctly
-        series.transform(new Function<Point3D>() {
-            @Override
-            public Point3D apply(Point3D t) {
-                return new Point3D("\"" + t.x + "\"", t.y, t.z);
-            }
-        });
+        if (!focus.equals("QI count")) {
+            series.transform(new Function<Point3D>() {
+                @Override
+                public Point3D apply(Point3D t) {
+                    return new Point3D("\"" + t.x + "\"", t.y, t.z);
+                }
+            });
+        }
 
         // Transform execution times from nanos to seconds
         if (VARIABLES.EXECUTION_TIME == variable) {
@@ -321,9 +413,15 @@ public class BenchmarkAnalysis {
         }
 
         // Create plot
-        plots.add(new PlotHistogramClustered("",
+        if (focus.equals("QI count")) {
+            plots.add(new PlotLinesClustered("",
                                              new Labels(focus, variable.val),
                                              series));
+        } else {
+            plots.add(new PlotHistogramClustered("",
+                                                 new Labels(focus, variable.val),
+                                                 series));
+        }
 
         // Define params
         GnuPlotParams params = new GnuPlotParams();
@@ -351,8 +449,10 @@ public class BenchmarkAnalysis {
 
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
+        } else if (focus.equals("QI count")) {
+            params.keypos = KeyPos.AT(10, params.maxY * 1.1d, "horiz bot center");
         } else {
-            params.keypos = KeyPos.AT(2, params.maxY * 1.1d, "horiz bot center");
+            params.keypos = KeyPos.AT(0.5, params.maxY * 1.1d, "horiz bot center");
         }
 
         params.ratio = 0.2d;
@@ -360,9 +460,13 @@ public class BenchmarkAnalysis {
         // Return
         String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " +
                          suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
+        if (focus.equals("QI count") && datasets.length == 1) {
+            caption += " for dataset \"" + datasets[0].toString().replace("_", "\\_") + "\"";
+        }
+
         return new PlotGroup(caption, plots, params, 1.0d);
     }
-    
+
     /**
      * Returns a maximum for the given series
      * @param series
@@ -401,14 +505,25 @@ public class BenchmarkAnalysis {
                       String focus,
                       String scriteria,
                       String suppression,
+                      BenchmarkDataset[] datasets,
                       Metric<?> metric) throws ParseException {
 
-        // Select data for the given algorithm
-        Selector<String[]> selector = file.getSelectorBuilder().field("Algorithm").equals(algorithm).and()
-                                          .field("Suppression").equals(suppression).and()
-                                          .field("Metric").equals(metric.getName()).and()
-                                          .field("Criteria").equals(scriteria)
-                                          .build();
+        // Select data for the given parameters
+
+        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field("Algorithm").equals(algorithm).and()
+                                                        .field("Suppression").equals(suppression).and()
+                                                        .field("Metric").equals(metric.getName()).and()
+                                                        .field("Criteria").equals(scriteria).and()
+                                                        .begin();
+
+        for (int i = 0; i < datasets.length; ++i) {
+            selectorBuilder.field("Dataset").equals(datasets[i].toString());
+            if (i < datasets.length - 1) {
+                selectorBuilder.or();
+            }
+        }
+
+        Selector<String[]> selector = selectorBuilder.end().build();
 
         // Create series.
         // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
