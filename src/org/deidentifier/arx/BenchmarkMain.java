@@ -24,10 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
-import org.deidentifier.arx.algorithm.HeuraklesConfiguration;
+import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.subframe.Benchmark;
@@ -85,7 +84,7 @@ public class BenchmarkMain {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
 
         // For each algorithm
-        for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
             // For each dataset
             for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
@@ -98,31 +97,13 @@ public class BenchmarkMain {
 
                         // For each combination of criteria
                     	for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-                    		
-                        	// for each checkCount-setting. Since this is only relevant for the Heurakles algorithm
-                    		// we make sure that the loop is only executed once for the other algorithms
-                    		Integer [] runTimeLimits = algorithm.equals(BenchmarkAlgorithm.HEURAKLES) ? BenchmarkSetup.runTimeLimits.clone() : new Integer [] { null };
-                    		for (Integer runTimeLimit : runTimeLimits) {
-
-                    		    HeuraklesConfiguration heuraklesConfiguration = null;
-                    		    if (runTimeLimit != null) {
-                    		        if (data.equals(BenchmarkSetup.BenchmarkDataset.IHIS)) { runTimeLimit *= 2; }
-                    		        heuraklesConfiguration = new HeuraklesConfiguration(BenchmarkSetup.limit, runTimeLimit);
-                    		    }
 
                     			// Warmup run
-                    			driver.anonymize(data, criteria, algorithm, metric, suppression, heuraklesConfiguration, true, true);
+                    			driver.anonymize(data, criteria, algorithm, metric, suppression, true, true);
 
                     			// Print status info
-                    			String statusString = "Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
-                    					" / " + suppression + " / " +
-                    					Arrays.toString(criteria);
-                    			statusString += algorithm.equals(BenchmarkAlgorithm.HEURAKLES) ?
-                    			            " / " + runTimeLimit + (BenchmarkSetup.limit == HeuraklesConfiguration.Limit.CHECKS ?
-                    			                    " checks" :
-                    			                    " milliseconds") :
-                    			            "";
-                    			System.out.println(statusString);
+                    			System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
+                    					" / " + suppression + " / " + Arrays.toString(criteria) + algorithm.getStatusSuffix());
 
                     			// Benchmark
                     			BENCHMARK.addRun(algorithm.toString(),
@@ -133,7 +114,7 @@ public class BenchmarkMain {
 
                     			// Repeat
                     			for (int i = 0; i < REPETITIONS; i++) {
-                    				driver.anonymize(data, criteria, algorithm, metric, suppression, heuraklesConfiguration, false, true);
+                    				driver.anonymize(data, criteria, algorithm, metric, suppression, false, true);
                     			}
 
                     			// Write results incrementally
@@ -146,4 +127,3 @@ public class BenchmarkMain {
             }
         }
     }
-}

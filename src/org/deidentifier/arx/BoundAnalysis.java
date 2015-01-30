@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
+import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.metric.Metric;
@@ -41,7 +41,7 @@ public class BoundAnalysis {
         int counter = 1;
 
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
-        BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS;
+        BenchmarkSetup.Algorithm algorithm = new BenchmarkSetup.Algorithm(AlgorithmType.INFORMATION_LOSS_BOUNDS, null);
 
         // For each dataset
         for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
