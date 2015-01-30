@@ -28,8 +28,8 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
-import org.deidentifier.arx.algorithm.AlgorithmHeurakles.StopCriteriaType;
 import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
+import org.deidentifier.arx.algorithm.HeuraklesConfiguration;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
@@ -90,7 +90,7 @@ public class BenchmarkDriver {
                           BenchmarkAlgorithm algorithm,
                           Metric<?> metric, double suppression, boolean warmup, boolean benchmarkRun) throws IOException {
     	
-    	anonymize(dataset, criteria, algorithm, metric, suppression, -1, warmup, benchmarkRun);
+    	anonymize(dataset, criteria, algorithm, metric, suppression, null, warmup, benchmarkRun);
     }
 
     /**
@@ -101,7 +101,7 @@ public class BenchmarkDriver {
      * @param algorithm
      * @param suppression
      * @param metric
-     * @param maxCheckCount the number of checks, after which Heurakles should terminate. This parameter is ignored by the other algorithms
+     * @param runTimeLimit the number of checks, after which Heurakles should terminate. This parameter is ignored by the other algorithms
      * @param warmup
      * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
      * @throws IOException
@@ -109,10 +109,10 @@ public class BenchmarkDriver {
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
-                          Metric<?> metric, double suppression, Integer maxCheckCount, boolean warmup, boolean benchmarkRun) throws IOException {
+                          Metric<?> metric, double suppression, HeuraklesConfiguration heuraklesConfiguration, boolean warmup, boolean benchmarkRun) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, maxCheckCount);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, heuraklesConfiguration);
 
         // for real benchmark run
         if (benchmarkRun) {
@@ -197,7 +197,7 @@ public class BenchmarkDriver {
     private AbstractBenchmarkAlgorithm
             getImplementation(BenchmarkDataset dataset,
                               BenchmarkCriterion[] criteria,
-                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression, Integer maxCheckCount) throws IOException {
+                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression, HeuraklesConfiguration heuraklesConfiguration) throws IOException {
         // Prepare
         Data data = BenchmarkSetup.getData(dataset, criteria);
         ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, criteria);
@@ -248,13 +248,7 @@ public class BenchmarkDriver {
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
-            implementation = new AlgorithmHeurakles(lattice, checker, BenchmarkSetup.HEUR_TRY_TO_PRUNE);
-            if (maxCheckCount != null)
-            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_CHECKS, maxCheckCount);
-            if (BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS != null)
-            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_NUM_SECONDS, BenchmarkSetup.HEUR_MAX_NUMBER_OF_SECONDS);
-            if (BenchmarkSetup.HEUR_STOP_AFTER_FIRST_ANONYMOUS)
-            	((AlgorithmHeurakles) implementation).defineAndActivateStopCriterion(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
+                implementation = new AlgorithmHeurakles(lattice, checker, heuraklesConfiguration);
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);

@@ -22,9 +22,6 @@ package org.deidentifier.arx.algorithm;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
@@ -39,213 +36,44 @@ import org.deidentifier.arx.framework.lattice.Node;
  */
 public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
-    public static final int PROPERTY_COMPLETED = 1 << 20;
+    private class StopCriterion {
+        private final HeuraklesConfiguration config;
+        private final long                   timestamp = System.currentTimeMillis();
 
-    private static StopCriteria stopCriteria;
-    private static boolean tryToPrune;
-    
-    public enum StopCriteriaType {
-    	STOP_AFTER_FIRST_ANONYMOUS,
-    	STOP_AFTER_NUM_SECONDS,
-    	STOP_AFTER_NUM_CHECKS
-    }
-
-    /**
-     * Auxiliary class for comparing nodes based on their information loss
-     * 
-     * @author Raffael Bild
-     * 
-     */
-    public class InformationLossComparator implements Comparator<Node>
-    {
-        @Override
-        public int compare(Node x, Node y)
-        {
-            return x.getInformationLoss().compareTo(y.getInformationLoss());
+        public StopCriterion(HeuraklesConfiguration config) {
+            this.config = config;
+        }
+        
+        public boolean isFulfilled (){
+            if (config.getMilliseconds() != -1) {
+                return System.currentTimeMillis() - timestamp >= config.getMilliseconds();
+            } else if (config.getChecks() != -1) {
+                return AlgorithmHeurakles.this.checks >= config.getChecks();
+            } else {
+                return getGlobalOptimum() != null;
+            }
         }
     }
 
-    
-    /**
-     * This inner class defines 3 stop criteria for an algorithm:
-     * it can either stop after a certain number or after the first anonymous node
-     * has been found. If more than one criterion is set, then the
-     * algorithm stops after the first condition is true.
-     * 
-     * @author Helmut Spengler
-     * 
-     */
-    private class StopCriteria {
-    	private Boolean stopAfterFirstAnonymous = null;
-    	private boolean firstAnonymousFulfilled = false;
-    	
-    	private Integer stopAfterNumChecks = null;
-    	private boolean numChecksFulfilled = false;
-    	
-    	private Integer stopAfterNumSeconds = null;
-    	private boolean numSecondsFulfilled = false;
-    	
-    	private ScheduledExecutorService scheduler = null;
-    	
-    	public StopCriteria() {
-    		scheduler = Executors.newScheduledThreadPool(1);
-    	}
-    	
-    	/**
-    	 * @return information, if the <B>activated</B> stop criteria are fulfilled
-    	 */
-    	public boolean activeStopCriteriaAreFulfilled() {    		
-    		if (stopAfterNumChecks != null && checks >= stopAfterNumChecks)
-    			numChecksFulfilled = true;    		
-
-    		final boolean printFulfillmentStatus = false;
-    		if (printFulfillmentStatus) {
-    			if (stopAfterFirstAnonymous != null && firstAnonymousFulfilled)
-    				System.out.println("FIRST_ANONYMOUS stop criterion is fulfilled");
-
-    			if (stopAfterNumChecks != null && numChecksFulfilled)
-    				System.out.println("NUM_CHECKS stop criterion (n = " + checks + ") is fulfilled");
-
-    			if (stopAfterNumSeconds != null && numSecondsFulfilled)
-    				System.out.println("NUM_SECONDS stop criterion is fulfilled");
-    		}
-    		
-    		boolean fulfilled = 
-    				(stopAfterFirstAnonymous != null ? firstAnonymousFulfilled : false) || 
-    				(stopAfterNumChecks != null ? numChecksFulfilled : false) ||
-    				(stopAfterNumSeconds != null ? numSecondsFulfilled : false);
-    		
-    		return fulfilled;
-    	}
-    	
-    	public void setFulfilled(StopCriteriaType stopCriteriaType) {
-    		switch (stopCriteriaType) {
-			case STOP_AFTER_FIRST_ANONYMOUS:
-				if (stopAfterFirstAnonymous != null)
-					firstAnonymousFulfilled = true;
-				break;
-			case STOP_AFTER_NUM_CHECKS:
-				if (stopAfterNumChecks != null)
-					numChecksFulfilled = true;
-				break;
-			case STOP_AFTER_NUM_SECONDS:
-				if (stopAfterNumSeconds != null)
-					numSecondsFulfilled = true;
-				break;
-			default:
-				break;    			
-    		}
-    	}
-    	
-    	/**
-    	 * Tell the timer to start counting for the configured number of seconds
-    	 */
-    	public void startConfiguredScheduler() {
-    		if (stopAfterNumSeconds != null) {
-
-    		scheduler.schedule(
-    				new Runnable() {
-    					public void run() {
-    						setFulfilled(StopCriteriaType.STOP_AFTER_NUM_SECONDS);
-    					}
-    				},
-    				stopAfterNumSeconds,
-    				TimeUnit.SECONDS);
-    		}
-    	}
-    	
-    	public void shutDownScheduler() {
-    		scheduler.shutdownNow();
-    	}
-    }
-    
+    public static final int      NODE_PROPERTY_COMPLETED = 1 << 20;
+    private static final boolean PRUNE                   = true;
+    private final StopCriterion  stopCriterion;
 
     /**
      * Creates a new instance of the heurakles algorithm.
      * 
      * @param lattice The lattice
      * @param checker The checker
-     * @param tryToPrune try to prune upwards. This is only possible, if we have monotonic metric.
-     *  In this case, only descendent trees will be traversed, whose information loss is not bigger than the global optimum
+     * @param config The config
      * 
      */
-    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker, final boolean tryToPrune) {
+    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, HeuraklesConfiguration config) {
         super(lattice, checker);
-        // Set strategy
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
-        
-        stopCriteria = new StopCriteria();
-        AlgorithmHeurakles.tryToPrune = tryToPrune;
+        stopCriterion = new StopCriterion(config);
     }
     
     
-    /**
-     * Define and activate the stop criterion STOP_AFTER_FIRST_ANONYMOUS. After this method is
-     * called with this parameter, the algorithm will stop, after the first anonymous node has been found.
-     * 
-     * @param stopCriteriaType STOP_AFTER_FIRST_ANONYMOUS is the only allowed criterion for this method.
-     * @return the algorithm object itself for supporting chained method calls
-     */
-    public AlgorithmHeurakles defineAndActivateStopCriterion (StopCriteriaType stopCriteriaType) {
-    	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS))
-    		throw new IllegalArgumentException("Need to supply the number of checks/seconds as a second parameter");
-    	
-    	stopCriteria.stopAfterFirstAnonymous = true;    	
-    	return this;
-    }
-    
-    /**
-     * Define and activate a stop criterion that depends on the reaching of a positive
-     * integer threshold. If this method is is called, the algorithm will stop, after
-     * this threshold has been reached.
-     * 
-     * @param stopCriteriaType currently only STOP_AFTER_NUM_CHECKS is supported. STOP_AFTER_NUM_SECONDS will follow shortly.
-     * @param num positive Integer defining the threshold
-     * @return the algorithm object itself for supporting chained method calls
-     */
-    public AlgorithmHeurakles defineAndActivateStopCriterion (StopCriteriaType stopCriteriaType, int num) {
-    	if (!stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_CHECKS) && !stopCriteriaType.equals(StopCriteriaType.STOP_AFTER_NUM_SECONDS))
-    		throw new IllegalArgumentException("only STOP_AFTER_NUM_CHECKS and STOP_AFTER_NUM_SECONDS ares supported for this method");
-    	if (num < 0)
-    		throw new IllegalArgumentException("num must be greater than 0");
-    	
-    	switch (stopCriteriaType) {
-		case STOP_AFTER_NUM_CHECKS:
-			stopCriteria.stopAfterNumChecks = num;    	
-			break;
-		case STOP_AFTER_NUM_SECONDS:
-			stopCriteria.stopAfterNumSeconds = num;    	
-			break;
-		default:
-			break;
-    	}
-    	return this;
-    }
-    
-    /**
-     * Unsets and deactivates a given stop criterion, so that the algorithm continues, even if this 
-     * particular stop criterion is fulfilled
-     * 
-     * @param stopCriteriaType one of the criteria defined in enum StopCriteriaType
-     * @return the algorithm object itself for supporting chained method calls
-     */
-    public AlgorithmHeurakles unsetAndDeactivateStopCriterion(StopCriteriaType stopCriteriaType) {
-    	switch (stopCriteriaType) {
-		case STOP_AFTER_FIRST_ANONYMOUS:
-			stopCriteria.stopAfterFirstAnonymous = false;
-			break;
-		case STOP_AFTER_NUM_CHECKS:
-			stopCriteria.stopAfterNumChecks = null;
-			break;
-		case STOP_AFTER_NUM_SECONDS:
-			stopCriteria.stopAfterNumSeconds = null;
-			break;
-		default:
-			break;
-    	}
-    	return this;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -253,56 +81,59 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      */
     @Override
     public void traverse() {
-    	stopCriteria.startConfiguredScheduler();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
-        if (getGlobalOptimum() == null) traverse(bottom);
-        stopCriteria.shutDownScheduler();
+        if (!stopCriterion.isFulfilled()) {
+            traverse(bottom);
+        }
     }
 
     private void traverse(final Node node) {
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
             // Build a PriorityQueue based on information loss containing the successors
-            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new InformationLossComparator());
+            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new Comparator<Node>(){
+                @Override
+                public int compare(Node arg0, Node arg1) {
+                    return arg0.getInformationLoss().compareTo(arg1.getInformationLoss());
+                }
+            });
             for (Node successor : successors) {
-            	if (stopCriteria.activeStopCriteriaAreFulfilled())
-            		break;
-                if (!successor.hasProperty(PROPERTY_COMPLETED)) {
+            	if (stopCriterion.isFulfilled()) {
+            		return;
+            	}
+                if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
                     assureChecked(successor);
                     queue.add(successor);
                 }
             }
             
-            // Process the successors
-            if (getGlobalOptimum() != null)
-            	stopCriteria.setFulfilled(StopCriteriaType.STOP_AFTER_FIRST_ANONYMOUS);
-
             Node next;
-            while ((next = queue.peek()) != null) {
-            	if (stopCriteria.activeStopCriteriaAreFulfilled())
-            		break;
-            	
-            	// we only actually prune, if we have a monotonic metric and suppression is off
-            	boolean doPruning = tryToPrune && checker.getMetric().isMonotonic() && checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
-            	// we only want to traverse descendants whose information loss isn't bigger than the global optimum
-            	boolean ilIsSmaller = getGlobalOptimum() == null || (next.getInformationLoss().compareTo(getGlobalOptimum().getInformationLoss()) <= 0);
-            	
-            	if (!next.hasProperty(PROPERTY_COMPLETED) && (!doPruning || ilIsSmaller)) {
-                    traverse(next);
+            while ((next = queue.poll()) != null) {
+                
+                if (stopCriterion.isFulfilled()) {
+                    return;
                 }
-                queue.poll();
+                
+                if (!next.hasProperty(NODE_PROPERTY_COMPLETED)) {
+                    boolean traverse = false;
+                    boolean metricMonotonic =  PRUNE && 
+                                               checker.getMetric().isMonotonic() && 
+                                               checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
+                    traverse = getGlobalOptimum() == null || 
+                               (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) <= 0;
+                    
+                    if (traverse) traverse(next);
+                }
             }
         }
 
-        lattice.setProperty(node, PROPERTY_COMPLETED);
+        lattice.setProperty(node, NODE_PROPERTY_COMPLETED);
     }
 
     private void assureChecked(final Node node) {
         if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
         	check(node);
-//            lattice.setChecked(node, checker.check(node, true));
-//            trackOptimum(node);
         }
     }
 

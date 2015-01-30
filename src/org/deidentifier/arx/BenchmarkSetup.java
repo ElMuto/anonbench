@@ -23,6 +23,7 @@ package org.deidentifier.arx;
 import java.io.IOException;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
+import org.deidentifier.arx.algorithm.HeuraklesConfiguration;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -36,19 +37,10 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  * @author Fabian Prasser
  */
 public class BenchmarkSetup {
-
-
-
-    /**
-     * Returns all variants of maximum iterations
-     * @return
-     */
-    public static Integer[] getHeuraklesCheckCountConfigurations() {
-        return new Integer[] { 200, 500, 1000, 5000, 10000, 15000 };
-    }
-	protected static final Integer HEUR_MAX_NUMBER_OF_SECONDS = null;
-	protected static final boolean HEUR_STOP_AFTER_FIRST_ANONYMOUS = false;
-	protected static final boolean HEUR_TRY_TO_PRUNE = true;
+    
+    public static final HeuraklesConfiguration.Limit limit = HeuraklesConfiguration.Limit.TIME;
+    public static Integer[] runTimeLimits = new Integer[] { 2000, 5000, 10000, 20000 };
+    
 
     public static enum BenchmarkAlgorithm {
         FLASH {
@@ -186,8 +178,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-//        return new double[] { 0d, 0.05d };    
-        return new double[] { 0d };    
+        return new double[] { 0d, 1d };    
     }
 
     /**
@@ -205,10 +196,11 @@ public class BenchmarkSetup {
 //                Metric.createDiscernabilityMetric()
                 
         		// use monotonic version of supporting metrics
+                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
                 Metric.createEntropyMetric(true),
                 Metric.createPrecisionMetric(true),
                 Metric.createAECSMetric(),
-//                Metric.createDiscernabilityMetric(true)
+                Metric.createDiscernabilityMetric(true)
         };
     }
 
@@ -302,11 +294,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
+                BenchmarkDataset.IHIS,
                 BenchmarkDataset.ADULT,
                 BenchmarkDataset.CUP,
                 BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS,
-                BenchmarkDataset.IHIS
+                BenchmarkDataset.ATUS
         };
     }
 
