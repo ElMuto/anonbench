@@ -22,14 +22,15 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
+import org.deidentifier.arx.BenchmarkSetup.Algorithm;
+import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
 import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
-import org.deidentifier.arx.algorithm.HeuraklesConfiguration;
+import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
@@ -80,27 +81,6 @@ public class BenchmarkDriver {
      * @param algorithm
      * @param suppression
      * @param metric
-     * @param maxCheckCount the number of checks, after which Heurakles should terminate. This parameter is ignored by the other algorithms
-     * @param warmup
-     * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
-     * @throws IOException
-     */
-    public void anonymize(BenchmarkDataset dataset,
-                          BenchmarkCriterion[] criteria,
-                          BenchmarkAlgorithm algorithm,
-                          Metric<?> metric, double suppression, boolean warmup, boolean benchmarkRun) throws IOException {
-    	
-    	anonymize(dataset, criteria, algorithm, metric, suppression, null, warmup, benchmarkRun);
-    }
-
-    /**
-     * Performs data anonymization
-     * 
-     * @param dataset
-     * @param criteria
-     * @param algorithm
-     * @param suppression
-     * @param metric
      * @param runTimeLimit the number of checks, after which Heurakles should terminate. This parameter is ignored by the other algorithms
      * @param warmup
      * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
@@ -108,11 +88,11 @@ public class BenchmarkDriver {
      */
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
-                          BenchmarkAlgorithm algorithm,
-                          Metric<?> metric, double suppression, HeuraklesConfiguration heuraklesConfiguration, boolean warmup, boolean benchmarkRun) throws IOException {
+                          Algorithm algorithm,
+                          Metric<?> metric, double suppression, boolean warmup, boolean benchmarkRun) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, heuraklesConfiguration);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
 
         // for real benchmark run
         if (benchmarkRun) {
@@ -124,9 +104,9 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
             if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
-            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum()
-                                                                                          .getInformationLoss()
-                                                                                          .toString());
+            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
+            		implementation.getGlobalOptimum().getInformationLoss().toString() :
+            		-1);
         }
         // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
         else {
@@ -152,7 +132,7 @@ public class BenchmarkDriver {
      */
     public TestConfiguration test(BenchmarkDataset dataset,
                                   BenchmarkCriterion[] criteria,
-                                  BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
+                                  Algorithm algorithm, Metric<?> metric, double suppression) throws IOException {
 
         // Build implementation
         AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression);
@@ -180,24 +160,7 @@ public class BenchmarkDriver {
     private AbstractBenchmarkAlgorithm
             getImplementation(BenchmarkDataset dataset,
                               BenchmarkCriterion[] criteria,
-                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression) throws IOException {
-    	return getImplementation(dataset, criteria, algorithm, metric, suppression, null);
-    }
-
-    /**
-     * @param dataset
-     * @param criteria
-     * @param algorithm
-     * @param metric
-     * @param suppression
-     * @param maxCheckCount the number of checks, after which heurakles should terminate. This parameter is ignored by the other algorithms
-     * @return
-     * @throws IOException
-     */
-    private AbstractBenchmarkAlgorithm
-            getImplementation(BenchmarkDataset dataset,
-                              BenchmarkCriterion[] criteria,
-                              BenchmarkAlgorithm algorithm, Metric<?> metric, double suppression, HeuraklesConfiguration heuraklesConfiguration) throws IOException {
+                              Algorithm algorithm, Metric<?> metric, double suppression) throws IOException {
         // Prepare
         Data data = BenchmarkSetup.getData(dataset, criteria);
         ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, criteria);
@@ -219,7 +182,7 @@ public class BenchmarkDriver {
         // Build or clean the lattice
         AbstractLattice lattice;
         // Heurakles does not need materialized lattice
-        if (BenchmarkAlgorithm.HEURAKLES == algorithm) {
+        if (AlgorithmType.HEURAKLES == algorithm.getType()) {
             lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
         }
         else {
@@ -243,12 +206,12 @@ public class BenchmarkDriver {
 
         // Create an algorithm instance
         AbstractBenchmarkAlgorithm implementation;
-        switch (algorithm) {
+        switch (algorithm.getType()) {
         case FLASH:
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
-                implementation = new AlgorithmHeurakles(lattice, checker, heuraklesConfiguration);
+                implementation = new AlgorithmHeurakles(lattice, checker, algorithm.getTerminationConfig());
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);

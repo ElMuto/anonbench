@@ -21,9 +21,11 @@
 package org.deidentifier.arx;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
-import org.deidentifier.arx.algorithm.HeuraklesConfiguration;
+import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -38,11 +40,12 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  */
 public class BenchmarkSetup {
     
-    public static final HeuraklesConfiguration.Limit limit = HeuraklesConfiguration.Limit.TIME;
-    public static Integer[] runTimeLimits = new Integer[] { 2000, 5000, 10000, 20000 };
+    public static final TerminationConfiguration.Type TERMINATION_TYPE = TerminationConfiguration.Type.TIME;
+    public static Integer[] TERMINATION_LIMITS = new Integer[] { 2000, 5000, 10000, 20000 };
+    public static final boolean INCLUDE_FLASH = true;
     
 
-    public static enum BenchmarkAlgorithm {
+    public static enum AlgorithmType {
         FLASH {
             @Override
             public String toString() {
@@ -61,6 +64,51 @@ public class BenchmarkSetup {
                 return "InformationLossBounds";
             }
         },
+    }
+    
+    public static class Algorithm {
+    	private AlgorithmType type;
+    	private TerminationConfiguration terminationConfig;
+    	
+    	public Algorithm (AlgorithmType type, TerminationConfiguration terminationConfig) {
+    		this.type = type;
+    		this.terminationConfig = terminationConfig;
+    	}
+    	
+    	@Override
+    	public String toString() {
+    		String baseString = type.toString();    		
+    		String suffix = "";
+    		if (terminationConfig != null) {
+    			switch (terminationConfig.getType()) {
+				case CHECKS:
+					suffix += "_c";
+					break;
+				case TIME:
+					suffix += "_t";
+					break;
+    			}
+    			suffix += terminationConfig.getValue();
+    		}
+    		return baseString + suffix;
+    	}
+    	
+    	public TerminationConfiguration getTerminationConfig() {
+    		return terminationConfig.clone();
+    	}
+    	
+    	public AlgorithmType getType() {
+    		return type;
+    	}
+
+		public String getStatusSuffix() {
+			String suffix = type.equals(AlgorithmType.HEURAKLES) ?
+            " / " + terminationConfig.getValue() + (BenchmarkSetup.TERMINATION_TYPE == TerminationConfiguration.Type.CHECKS ?
+                    " checks" :
+                    " milliseconds") :
+            "";
+			return suffix;
+		}
     }
 
     public static enum BenchmarkCriterion {
@@ -127,11 +175,15 @@ public class BenchmarkSetup {
      * Returns all algorithms
      * @return
      */
-    public static BenchmarkAlgorithm[] getAlgorithms() {
-        return new BenchmarkAlgorithm[] {
-                BenchmarkAlgorithm.FLASH,
-                BenchmarkAlgorithm.HEURAKLES
-        };
+    public static List<Algorithm> getAlgorithms() {
+    	List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>(TERMINATION_LIMITS.length + (INCLUDE_FLASH ? 1 : 0));
+    	
+    	if (INCLUDE_FLASH) benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
+    	for (Integer tLimit : TERMINATION_LIMITS) {
+    		benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
+    	}
+    	
+    	return benchmarkAlgorithmList;
     }
 
     /**

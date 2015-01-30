@@ -37,22 +37,22 @@ import org.deidentifier.arx.framework.lattice.Node;
 public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
-        private final HeuraklesConfiguration config;
-        private long                   timestamp = System.currentTimeMillis();
+        private final TerminationConfiguration config;
+        private long  timestamp = System.currentTimeMillis();
 
-        public StopCriterion(HeuraklesConfiguration config) {
+        public StopCriterion(TerminationConfiguration config) {
             this.config = config;
         }
         
         public boolean isFulfilled (){
-            // TODO consider use of enum and use of last else conditional
-            if (config.getMilliseconds() != -1) {
-                return System.currentTimeMillis() - timestamp >= config.getMilliseconds();
-            } else if (config.getChecks() != -1) {
-                return AlgorithmHeurakles.this.checks >= config.getChecks();
-            } else {
-                return getGlobalOptimum() != null;
-            }
+        	switch (config.getType()) {
+			case TIME:
+				return System.currentTimeMillis() - timestamp >= config.getValue();
+			case CHECKS:
+				return AlgorithmHeurakles.this.checks >= config.getValue();
+			default:
+				return getGlobalOptimum() != null;
+        	}
         }
         
         public void resetTimer() {
@@ -72,7 +72,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @param config The config
      * 
      */
-    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, HeuraklesConfiguration config) {
+    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, TerminationConfiguration config) {
         super(lattice, checker);
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         stopCriterion = new StopCriterion(config);

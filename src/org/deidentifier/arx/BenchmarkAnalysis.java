@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
+import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.metric.Metric;
 
@@ -295,7 +295,7 @@ public class BenchmarkAnalysis {
         Series3D series = null;
 
         // Collect data for all algorithms
-        for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
             Series3D _series = getSeries(file, algorithm.toString(), variable.val, measure, focus, scriteria, suppression, metric);
             if (series == null) series = _series;
