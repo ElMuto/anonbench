@@ -38,13 +38,14 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
         private final HeuraklesConfiguration config;
-        private final long                   timestamp = System.currentTimeMillis();
+        private long                   timestamp = System.currentTimeMillis();
 
         public StopCriterion(HeuraklesConfiguration config) {
             this.config = config;
         }
         
         public boolean isFulfilled (){
+            // TODO consider use of enum and use of last else conditional
             if (config.getMilliseconds() != -1) {
                 return System.currentTimeMillis() - timestamp >= config.getMilliseconds();
             } else if (config.getChecks() != -1) {
@@ -52,6 +53,10 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             } else {
                 return getGlobalOptimum() != null;
             }
+        }
+        
+        public void resetTimer() {
+            this.timestamp = System.currentTimeMillis();
         }
     }
 
@@ -81,6 +86,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      */
     @Override
     public void traverse() {
+        stopCriterion.resetTimer();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
         if (!stopCriterion.isFulfilled()) {
@@ -116,14 +122,17 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                 }
                 
                 if (!next.hasProperty(NODE_PROPERTY_COMPLETED)) {
-                    boolean traverse = false;
+                    // A node (and it's direct and indirect successors, respectively) can be pruned iff
+                    // the information loss metric is monotonic and the nodes's IL is greater or equal than the IL of the
+                    // global maximum (regardless of the anonymity criterion's monotonicity)
                     boolean metricMonotonic =  PRUNE && 
                                                checker.getMetric().isMonotonic() && 
                                                checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
-                    traverse = getGlobalOptimum() == null || 
-                               (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) <= 0;
+                    boolean prune = getGlobalOptimum() != null && 
+                               // depending on monotony of metric we choose to compare either IL of Monotonous Subset with the global Optimum
+                               (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
                     
-                    if (traverse) traverse(next);
+                    if (!prune) traverse(next);
                 }
             }
         }

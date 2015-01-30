@@ -7,8 +7,7 @@ public class HeuraklesConfiguration {
 
     public static enum Limit {
         TIME,
-        CHECKS,
-        RESULT
+        CHECKS
     }
 
     public HeuraklesConfiguration(Limit limit, int value) {
