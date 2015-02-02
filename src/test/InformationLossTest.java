@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkDriver;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
+import org.deidentifier.arx.BenchmarkSetup.Algorithm;
+import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
+import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
 import org.deidentifier.arx.metric.v2.AbstractILMultiDimensional;
@@ -61,7 +63,10 @@ public class InformationLossTest {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
         String file = "results/resultsTest.csv";
 
-        BenchmarkAlgorithm[] algorithms = { BenchmarkAlgorithm.FLASH, BenchmarkAlgorithm.HEURAKLES };
+        Algorithm[] algorithms = {
+        		new Algorithm(AlgorithmType.FLASH, null),
+        		new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TerminationConfiguration.Type.TIME, 10000))
+        };
         BenchmarkDataset[] datasets = { BenchmarkDataset.ADULT, BenchmarkDataset.CUP };
         BenchmarkCriterion[] criteria = { BenchmarkCriterion.K_ANONYMITY };
         Metric<AbstractILMultiDimensional> lossMetric = Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN);
@@ -70,7 +75,7 @@ public class InformationLossTest {
 
         // Runs for loss metric
         for (BenchmarkDataset data : datasets) {
-            for (BenchmarkAlgorithm algorithm : algorithms) {
+            for (Algorithm algorithm : algorithms) {
                 // Warmup run
                 driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, true, true);
 
@@ -90,16 +95,16 @@ public class InformationLossTest {
 
         // Runs for Non-monotonic non-uniform entropy
         // Warmup run
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, 0, true, true);
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, new Algorithm(AlgorithmType.FLASH, null), entropyMetric, suppression, 0, true, true);
 
         // Benchmark
-        BENCHMARK.addRun(BenchmarkAlgorithm.FLASH,
+        BENCHMARK.addRun(AlgorithmType.FLASH,
                          BenchmarkDataset.ADULT.toString(),
                          Arrays.toString(criteria),
                          entropyMetric.getName(),
                          String.valueOf(suppression));
 
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, BenchmarkAlgorithm.FLASH, entropyMetric, suppression, 0, false, true);
+        driver.anonymize(BenchmarkDataset.ADULT, criteria, new Algorithm(AlgorithmType.FLASH, null), entropyMetric, suppression, 0, false, true);
 
         // Write results incrementally
         BENCHMARK.getResults().write(new File(file));

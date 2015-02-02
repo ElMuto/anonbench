@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
+import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.subframe.Benchmark;
@@ -85,7 +85,7 @@ public class BenchmarkMain {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
 
         // For each algorithm
-        for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
             // For each metric
             for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
@@ -107,7 +107,7 @@ public class BenchmarkMain {
                         // For each QI scaling benchmark dataset
                         for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
 
-                            for (int qiCount = BenchmarkSetup.getMinQICount(algorithm, data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
+                            for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
 
                                 runBenchmark(driver,
                                              algorithm,
@@ -126,7 +126,7 @@ public class BenchmarkMain {
     }
 
     public static void runBenchmark(BenchmarkDriver driver,
-                                    BenchmarkAlgorithm algorithm,
+                                    Algorithm algorithm,
                                     BenchmarkDataset data,
                                     BenchmarkCriterion[] criteria,
                                     Metric<?> metric,
@@ -136,7 +136,7 @@ public class BenchmarkMain {
         driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, true, true);
 
         // Print status info
-        System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + metric.getName() +
+        System.out.println("Running: " + algorithm.toString() + " with "  + algorithm.getStatusSuffix() + " / " + data.toString() + " / " + metric.getName() +
                            " / " + suppression + " / " + Arrays.toString(criteria) + " / " + qiCount + " QIs");
 
         // Benchmark
