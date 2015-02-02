@@ -63,6 +63,9 @@ public class BenchmarkDriver {
 
     /** The benchmark instance */
     private final Benchmark benchmark;
+    
+    /** the integer value used for the information loss metric in case no solution has been found **/
+    public static final int NO_SOLUTION_FOUND = -1;
 
     /**
      * Creates a new benchmark driver
@@ -106,7 +109,7 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
             		implementation.getGlobalOptimum().getInformationLoss().toString() :
-            		-1);
+            		NO_SOLUTION_FOUND);
         }
         // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
         else {
