@@ -125,10 +125,9 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                     // A node (and it's direct and indirect successors, respectively) can be pruned iff
                     // the information loss metric is monotonic and the nodes's IL is greater or equal than the IL of the
                     // global maximum (regardless of the anonymity criterion's monotonicity)
-                    boolean metricMonotonic =  PRUNE && 
-                                               checker.getMetric().isMonotonic() && 
+                    boolean metricMonotonic =  checker.getMetric().isMonotonic() && 
                                                checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
-                    boolean prune = getGlobalOptimum() != null && 
+                    boolean prune = PRUNE && getGlobalOptimum() != null && 
                                // depending on monotony of metric we choose to compare either IL of Monotonous Subset with the global Optimum
                                (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
                     
