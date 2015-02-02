@@ -94,7 +94,7 @@ public class BenchmarkSetup {
     	}
     	
     	public TerminationConfiguration getTerminationConfig() {
-    		return terminationConfig != null ? terminationConfig.clone() : null;
+    		return terminationConfig;
     	}
     	
     	public AlgorithmType getType() {

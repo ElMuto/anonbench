@@ -22,9 +22,4 @@ public class TerminationConfiguration {
     public int getValue() {
     	return value;
     }
-    
-    @Override
-    public TerminationConfiguration clone() {
-    	return new TerminationConfiguration(type, value);
-    }
 }
