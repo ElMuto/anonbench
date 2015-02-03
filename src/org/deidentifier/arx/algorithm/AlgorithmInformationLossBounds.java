@@ -41,9 +41,7 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
      */
     @Override
     public void traverse() {
-        Node bottom = lattice.getBottom();
-        lattice.setChecked(bottom, checker.check(bottom, true));
-        traverse(bottom);
+        traverse(lattice.getBottom());
     }
 
     /**
@@ -51,11 +49,13 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
      * @param node
      */
     private void traverse(final Node node) {
+
+        check(node);
+
         Node[] successors = node.getSuccessors(true);
         for (int i = 0; i < successors.length; i++) {
             Node successor = successors[i];
             if (!successor.hasProperty(Node.PROPERTY_CHECKED)) {
-                check(successor);
                 traverse(successor);
             }
         }
@@ -75,8 +75,7 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
     private void trackMaximum(Node node) {
         if (node.hasProperty(Node.PROPERTY_ANONYMOUS) &&
             ((globalMaximum == null) ||
-             (node.getInformationLoss().compareTo(globalMaximum.getInformationLoss()) > 0) ||
-            ((node.getInformationLoss().compareTo(globalMaximum.getInformationLoss()) == 0) && (node.getLevel() > globalMaximum.getLevel())))) {
+            (node.getInformationLoss().compareTo(globalMaximum.getInformationLoss()) > 0))) {
             globalMaximum = node;
         }
 
@@ -89,8 +88,7 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
     private void trackMinimum(Node node) {
         if (node.hasProperty(Node.PROPERTY_ANONYMOUS) &&
             ((globalMinimum == null) ||
-             (node.getInformationLoss().compareTo(globalMinimum.getInformationLoss()) < 0) ||
-            ((node.getInformationLoss().compareTo(globalMinimum.getInformationLoss()) == 0) && (node.getLevel() < globalMinimum.getLevel())))) {
+            (node.getInformationLoss().compareTo(globalMinimum.getInformationLoss()) < 0))) {
             globalMinimum = node;
         }
 

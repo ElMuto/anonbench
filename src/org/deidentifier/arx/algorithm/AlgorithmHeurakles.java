@@ -36,33 +36,46 @@ import org.deidentifier.arx.framework.lattice.Node;
  */
 public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
-    public static final int PROPERTY_COMPLETED = 1 << 20;
+    private class StopCriterion {
+        private final TerminationConfiguration config;
+        private long                           timestamp = System.currentTimeMillis();
 
-    /**
-     * Auxiliary class for comparing nodes based on their information loss
-     * 
-     * @author Raffael Bild
-     * 
-     */
-    public class InformationLossComparator implements Comparator<Node>
-    {
-        @Override
-        public int compare(Node x, Node y)
-        {
-            return x.getInformationLoss().compareTo(y.getInformationLoss());
+        public StopCriterion(TerminationConfiguration config) {
+            this.config = config;
+        }
+
+        public boolean isFulfilled() {
+            switch (config.getType()) {
+            case TIME:
+                return System.currentTimeMillis() - timestamp >= config.getValue();
+            case CHECKS:
+                return AlgorithmHeurakles.this.checks >= config.getValue();
+            default:
+                return getGlobalOptimum() != null;
+            }
+        }
+
+        public void resetTimer() {
+            this.timestamp = System.currentTimeMillis();
         }
     }
+
+    public static final int      NODE_PROPERTY_COMPLETED = 1 << 20;
+    private static final boolean PRUNE                   = true;
+    private final StopCriterion  stopCriterion;
 
     /**
      * Creates a new instance of the heurakles algorithm.
      * 
      * @param lattice The lattice
      * @param checker The checker
+     * @param config The config
+     * 
      */
-    public AlgorithmHeurakles(final AbstractLattice lattice, final INodeChecker checker) {
+    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, TerminationConfiguration config) {
         super(lattice, checker);
-        // Set strategy
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
+        stopCriterion = new StopCriterion(config);
     }
 
     /*
@@ -72,40 +85,62 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      */
     @Override
     public void traverse() {
+        stopCriterion.resetTimer();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
-        if (getGlobalOptimum() == null) traverse(bottom);
+        if (!stopCriterion.isFulfilled()) {
+            traverse(bottom);
+        }
     }
 
     private void traverse(final Node node) {
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
             // Build a PriorityQueue based on information loss containing the successors
-            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new InformationLossComparator());
+            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new Comparator<Node>() {
+                @Override
+                public int compare(Node arg0, Node arg1) {
+                    return arg0.getInformationLoss().compareTo(arg1.getInformationLoss());
+                }
+            });
             for (Node successor : successors) {
-                if (!successor.hasProperty(PROPERTY_COMPLETED)) {
+                if (stopCriterion.isFulfilled()) {
+                    return;
+                }
+                if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
                     assureChecked(successor);
                     queue.add(successor);
                 }
             }
-            // Process the successors
+
             Node next;
-            while (getGlobalOptimum() == null && (next = queue.peek()) != null) {
-                if (!next.hasProperty(PROPERTY_COMPLETED)) {
-                    traverse(next);
+            while ((next = queue.poll()) != null) {
+
+                if (stopCriterion.isFulfilled()) {
+                    return;
                 }
-                queue.poll();
+
+                if (!next.hasProperty(NODE_PROPERTY_COMPLETED)) {
+                    // A node (and it's direct and indirect successors, respectively) can be pruned iff
+                    // the information loss metric is monotonic and the nodes's IL is greater or equal than the IL of the
+                    // global maximum (regardless of the anonymity criterion's monotonicity)
+                    boolean metricMonotonic = checker.getMetric().isMonotonic() &&
+                                              checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
+                    boolean prune = PRUNE && getGlobalOptimum() != null &&
+                                    // depending on monotony of metric we choose to compare either IL of Monotonous Subset with the global Optimum
+                                    (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+
+                    if (!prune) traverse(next);
+                }
             }
         }
 
-        lattice.setProperty(node, PROPERTY_COMPLETED);
+        lattice.setProperty(node, NODE_PROPERTY_COMPLETED);
     }
 
     private void assureChecked(final Node node) {
         if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
-        	check(node);
-//            lattice.setChecked(node, checker.check(node, true));
-//            trackOptimum(node);
+            check(node);
         }
     }
 
@@ -116,7 +151,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     public boolean isMaterializedLatticeRequired() {
         return false;
     }
-    
+
     /**
      * Returns whether information loss measure should be forced or not
      * @return

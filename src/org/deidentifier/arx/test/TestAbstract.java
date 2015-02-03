@@ -27,7 +27,6 @@ import junit.framework.TestCase;
 
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.metric.Metric;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,14 +64,15 @@ public abstract class TestAbstract extends TestCase {
         BenchmarkDriver driver = new BenchmarkDriver(null);
 
         // For each algorithm
-        for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (BenchmarkSetup.Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
 
             // Collect
             TestConfiguration result = driver.test(config.dataset,
                                                    config.criteria,
                                                    algorithm,
                                                    Metric.createEntropyMetric(),
-                                                   0d);
+                                                   0d,
+                                                   0);
             // Check
             assertEquals(algorithm + ": Information loss doesn't match", config.informationLoss, result.informationLoss);
             assertTrue(algorithm + ": Transformation doesn't match", Arrays.equals(result.transformation, config.transformation));
