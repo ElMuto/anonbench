@@ -267,10 +267,8 @@ public class BenchmarkSetup {
                 
         		// use monotonic version of supporting metrics
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(true),
-                Metric.createPrecisionMetric(true),
-                Metric.createAECSMetric(),
-                Metric.createDiscernabilityMetric(true)
+                Metric.createEntropyMetric(false),
+                Metric.createDiscernabilityMetric(false)
         };
     }
 
