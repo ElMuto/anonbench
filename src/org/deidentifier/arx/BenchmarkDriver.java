@@ -30,7 +30,6 @@ import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
 import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
-import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
@@ -63,9 +62,9 @@ public class BenchmarkDriver {
 
     /** The benchmark instance */
     private final Benchmark benchmark;
-    
+
     /** the integer value used for the information loss metric in case no solution has been found **/
-    public static final int NO_SOLUTION_FOUND = -1;
+    public static final int NO_SOLUTION_FOUND    = -1;
 
     /**
      * Creates a new benchmark driver
@@ -108,18 +107,20 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
             if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
-            		implementation.getGlobalOptimum().getInformationLoss().toString() :
-            		NO_SOLUTION_FOUND);
+                    implementation.getGlobalOptimum().getInformationLoss().toString() :
+                    NO_SOLUTION_FOUND);
+            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION,
+                                            Arrays.toString(implementation.getGlobalOptimum().getTransformation()));
         }
         // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
         else {
             AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
             algo.traverse();
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
                                (Arrays.toString(algo.getGlobalMinimum().getTransformation())));
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MAXIMUM, (algo.getGlobalMaximum().getInformationLoss()));
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION,
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM, (algo.getGlobalMaximum().getInformationLoss()));
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION,
                                (Arrays.toString(algo.getGlobalMaximum().getTransformation())));
         }
     }
@@ -214,7 +215,7 @@ public class BenchmarkDriver {
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
-                implementation = new AlgorithmHeurakles(lattice, checker, algorithm.getTerminationConfig());
+            implementation = new AlgorithmHeurakles(lattice, checker, algorithm.getTerminationConfig());
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);

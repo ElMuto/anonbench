@@ -1,0 +1,7 @@
+;;;;;;Execution time;Execution time;Number of checks;Number of rollups;Number of snapshots;Size of lattice;Information loss;Information loss (Transformation)
+Algorithm;Dataset;Criteria;Metric;Suppression;QI count;Arithmetic Mean;Standard Deviation;Value;Value;Value;Value;Value;Value
+Flash;Ihis;[k];Loss;0.0;8;4.2716061743333335E9;2.0156004606578675E8;219.0;81.0;178.0;12960.0;0.30259109865708345;[1, 0, 0, 3, 0, 2, 0, 1]
+Flash;Adult;[k];Loss;0.0;8;5.3127687666666664E7;1826149.6594239841;115.0;59.0;102.0;4320.0;0.542210825407941;[0, 4, 1, 2, 3, 2, 0, 0]
+Flash;Cup;[k];Loss;0.0;7;6.5200995E7;1.1954056490664957E7;33.0;21.0;28.0;9000.0;0.7480258231683719;[5, 2, 1, 1, 1, 4, 4]
+Flash;Fars;[k];Loss;0.0;7;1.2302947233333333E8;2.4256802832365487E7;82.0;46.0;69.0;5184.0;0.640670712015275;[5, 2, 0, 0, 1, 2, 2]
+Flash;Atus;[k];Loss;0.0;8;4.65924143E8;7.981765445561959E7;237.0;94.0;237.0;8748.0;0.36971453484577976;[1, 5, 0, 2, 1, 0, 2, 1]

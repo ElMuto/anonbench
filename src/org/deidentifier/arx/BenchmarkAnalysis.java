@@ -71,7 +71,10 @@ public class BenchmarkAnalysis {
         INFORMATION_LOSS_MINIMUM("Information loss minimum"),
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
-        INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)");
+        INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)"),
+        INFORMATION_LOSS_PERCENTAGE("Relative information loss"),
+        INFORMATION_LOSS_TRANSFORMATION("Information loss (Transformation)"),
+        QI_COUNT("QI count");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
@@ -167,6 +170,14 @@ public class BenchmarkAnalysis {
                                             suppression,
                                             datasets,
                                             metric));
+                        groups.add(getGroup(file,
+                                            VARIABLES.INFORMATION_LOSS_PERCENTAGE,
+                                            Analyzer.VALUE,
+                                            "Dataset",
+                                            scriteria,
+                                            suppression,
+                                            datasets,
+                                            metric));
                     }
                 }
             }
@@ -203,7 +214,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.EXECUTION_TIME,
                                             Analyzer.ARITHMETIC_MEAN,
-                                            "QI count",
+                                            VARIABLES.QI_COUNT.val,
                                             scriteria,
                                             suppression,
                                             new BenchmarkDataset[] { dataset },
@@ -413,7 +424,7 @@ public class BenchmarkAnalysis {
         }
 
         // Create plot
-        if (focus.equals("QI count")) {
+        if (focus.equals(VARIABLES.QI_COUNT.val)) {
             plots.add(new PlotLinesClustered("",
                                              new Labels(focus, variable.val),
                                              series));
@@ -430,8 +441,14 @@ public class BenchmarkAnalysis {
         params.size = 1.5;
         params.logY = false;
 
-        double max = getMax(series);
-        double padding = max * 0.3d;
+        double max = 0d;
+        double padding = 0d;
+        if (VARIABLES.INFORMATION_LOSS_PERCENTAGE != variable) {
+            max = getMax(series);
+            padding = max * 0.3d;
+        } else {
+            max = 100d;
+        }
 
         params.minY = 0d;
         params.printValuesFormatString = "%.0f";
@@ -449,7 +466,7 @@ public class BenchmarkAnalysis {
 
         if (focus.equals("Criteria")) {
             params.keypos = KeyPos.AT(5, params.maxY * 1.1d, "horiz bot center");
-        } else if (focus.equals("QI count")) {
+        } else if (focus.equals(VARIABLES.QI_COUNT.val)) {
             params.keypos = KeyPos.AT(10, params.maxY * 1.1d, "horiz bot center");
         } else {
             params.keypos = KeyPos.AT(0.5, params.maxY * 1.1d, "horiz bot center");
@@ -460,7 +477,7 @@ public class BenchmarkAnalysis {
         // Return
         String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" + metric.getName() + "\" with " +
                          suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"";
-        if (focus.equals("QI count") && datasets.length == 1) {
+        if (focus.equals(VARIABLES.QI_COUNT.val) && datasets.length == 1) {
             caption += " for dataset \"" + datasets[0].toString().replace("_", "\\_") + "\"";
         }
 

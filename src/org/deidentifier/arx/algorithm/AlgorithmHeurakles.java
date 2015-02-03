@@ -38,23 +38,23 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
         private final TerminationConfiguration config;
-        private long  timestamp = System.currentTimeMillis();
+        private long                           timestamp = System.currentTimeMillis();
 
         public StopCriterion(TerminationConfiguration config) {
             this.config = config;
         }
-        
-        public boolean isFulfilled (){
-        	switch (config.getType()) {
-			case TIME:
-				return System.currentTimeMillis() - timestamp >= config.getValue();
-			case CHECKS:
-				return AlgorithmHeurakles.this.checks >= config.getValue();
-			default:
-				return getGlobalOptimum() != null;
-        	}
+
+        public boolean isFulfilled() {
+            switch (config.getType()) {
+            case TIME:
+                return System.currentTimeMillis() - timestamp >= config.getValue();
+            case CHECKS:
+                return AlgorithmHeurakles.this.checks >= config.getValue();
+            default:
+                return getGlobalOptimum() != null;
+            }
         }
-        
+
         public void resetTimer() {
             this.timestamp = System.currentTimeMillis();
         }
@@ -77,8 +77,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         stopCriterion = new StopCriterion(config);
     }
-    
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -98,39 +97,39 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
             // Build a PriorityQueue based on information loss containing the successors
-            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new Comparator<Node>(){
+            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new Comparator<Node>() {
                 @Override
                 public int compare(Node arg0, Node arg1) {
                     return arg0.getInformationLoss().compareTo(arg1.getInformationLoss());
                 }
             });
             for (Node successor : successors) {
-            	if (stopCriterion.isFulfilled()) {
-            		return;
-            	}
+                if (stopCriterion.isFulfilled()) {
+                    return;
+                }
                 if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
                     assureChecked(successor);
                     queue.add(successor);
                 }
             }
-            
+
             Node next;
             while ((next = queue.poll()) != null) {
-                
+
                 if (stopCriterion.isFulfilled()) {
                     return;
                 }
-                
+
                 if (!next.hasProperty(NODE_PROPERTY_COMPLETED)) {
                     // A node (and it's direct and indirect successors, respectively) can be pruned iff
                     // the information loss metric is monotonic and the nodes's IL is greater or equal than the IL of the
                     // global maximum (regardless of the anonymity criterion's monotonicity)
-                    boolean metricMonotonic =  checker.getMetric().isMonotonic() && 
-                                               checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
-                    boolean prune = PRUNE && getGlobalOptimum() != null && 
-                               // depending on monotony of metric we choose to compare either IL of Monotonous Subset with the global Optimum
-                               (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
-                    
+                    boolean metricMonotonic = checker.getMetric().isMonotonic() &&
+                                              checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
+                    boolean prune = PRUNE && getGlobalOptimum() != null &&
+                                    // depending on monotony of metric we choose to compare either IL of Monotonous Subset with the global Optimum
+                                    (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+
                     if (!prune) traverse(next);
                 }
             }
@@ -141,7 +140,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private void assureChecked(final Node node) {
         if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
-        	check(node);
+            check(node);
         }
     }
 
@@ -152,13 +151,13 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     public boolean isMaterializedLatticeRequired() {
         return false;
     }
-    
+
     /**
      * Returns whether information loss measure should be forced or not
      * @return
      */
     @Override
     protected boolean isForceMeasureInfoLossRequired() {
-    	return true;
+        return true;
     }
 }
