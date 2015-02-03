@@ -111,11 +111,11 @@ public class BenchmarkDriver {
         else {
             AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
             algo.traverse();
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
                                (Arrays.toString(algo.getGlobalMinimum().getTransformation())));
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MAXIMUM, (algo.getGlobalMaximum().getInformationLoss()));
-            benchmark.addValue(BoundAnalysis.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION,
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM, (algo.getGlobalMaximum().getInformationLoss()));
+            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION,
                                (Arrays.toString(algo.getGlobalMaximum().getTransformation())));
         }
     }
