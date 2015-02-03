@@ -18,7 +18,7 @@ import de.linearbits.subframe.analyzer.ValueBuffer;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
 
-public class BoundAnalysis {
+public class BenchmarkILBounds {
 
     /** The benchmark instance */
     protected static final Benchmark BENCHMARK                               = new Benchmark(new String[] {
@@ -42,10 +42,6 @@ public class BoundAnalysis {
 
     public static void main(String[] args) throws IOException, ParseException {
 
-        int numRuns = BenchmarkSetup.getDatasets().length * BenchmarkSetup.getMetrics().length * BenchmarkSetup.getSuppression().length *
-                      BenchmarkSetup.getCriteria().length;
-        int counter = 1;
-
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
         BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS;
 
@@ -62,7 +58,7 @@ public class BoundAnalysis {
                     for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
                         // Print status info
-                        System.out.println("Running: (" + counter + "/" + numRuns + ") " + algorithm.toString() + " / " + data.toString() +
+                        System.out.println("Running: " + algorithm.toString() + " / " + data.toString() +
                                            " / " +
                                            metric.getName() +
                                            " / " + suppression + " / " +
@@ -79,18 +75,21 @@ public class BoundAnalysis {
 
                         // Write results incrementally
                         BENCHMARK.getResults().write(new File("results/informationLossBounds.csv"));
-                        counter++;
                     }
                 }
             }
         }
 
-        computeDiff();
+        writeInformationLossBoundsToResults();
 
     }
 
-    // TODO handle exceptions properly
-    private static void computeDiff() throws IOException, ParseException {
+    /**
+     * This method reads the information loss bounds from informationLossBounds.csv and adds the data as new columns into results.csv.
+     * @throws IOException
+     * @throws ParseException
+     */
+    private static void writeInformationLossBoundsToResults() throws IOException, ParseException {
         CSVFile results = new CSVFile(new File("results/results.csv"));
 
         // add header column information loss minimum

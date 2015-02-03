@@ -84,8 +84,9 @@ public class BenchmarkMain {
      * 
      * @param args
      * @throws IOException
+     * @throws ParseException
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
 
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
 
@@ -132,12 +133,9 @@ public class BenchmarkMain {
             }
         }
 
+        // Determine min/max IL via DFS traversal over the whole lattice and add data to results.csv
         if (BenchmarkSetup.includeRelativeInformationLoss()) {
-            try {
-                BoundAnalysis.main(new String[] {});
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            BenchmarkILBounds.main(new String[] {});
         }
     }
 }

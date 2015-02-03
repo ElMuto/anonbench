@@ -98,7 +98,7 @@ public class BenchmarkAnalysis {
      */
     public static void main(String[] args) throws IOException, ParseException {
 
-        // generateTables();
+        generateTables();
         generatePlots();
     }
 
@@ -109,7 +109,7 @@ public class BenchmarkAnalysis {
      */
     private static void generatePlots() throws IOException, ParseException {
 
-        CSVFile file = new CSVFile(new File("results/resultsComplete.csv"));
+        CSVFile file = new CSVFile(new File("results/results.csv"));
 
         // for each metric
         for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
@@ -123,17 +123,17 @@ public class BenchmarkAnalysis {
                 for (double suppr : BenchmarkSetup.getSuppression()) {
                     String suppression = String.valueOf(suppr);
 
-                    // groups.add(getGroup(file,
-                    // VARIABLES.EXECUTION_TIME,
-                    // Analyzer.ARITHMETIC_MEAN,
-                    // "Dataset",
-                    // scriteria,
-                    // suppression,
-                    // metric));
-                    // groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    // groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-                    // groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
-//                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file,
+                                        VARIABLES.EXECUTION_TIME,
+                                        Analyzer.ARITHMETIC_MEAN,
+                                        "Dataset",
+                                        scriteria,
+                                        suppression,
+                                        metric));
+                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
+                    groups.add(getGroup(file, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, "Dataset", scriteria, suppression, metric));
                     groups.add(getGroup(file,
                                         VARIABLES.INFORMATION_LOSS_PERCENTAGE,
                                         Analyzer.VALUE,
