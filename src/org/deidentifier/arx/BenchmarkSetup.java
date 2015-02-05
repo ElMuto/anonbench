@@ -184,6 +184,12 @@ public class BenchmarkSetup {
             public String toString() {
                 return "SS13PMA_FIVE_LEVEL";
             }
+        },
+        SS13ACS_SEMANTIC {
+            @Override
+            public String toString() {
+                return "SS13PMA_SEMANTIC";
+            }
         }
     }
 
@@ -341,6 +347,8 @@ public class BenchmarkSetup {
         case SS13PMA_TWO_LEVEL:
         case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
+        case SS13ACS_SEMANTIC:
+            return "data/ss13pma_clean.csv";
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -421,6 +429,9 @@ public class BenchmarkSetup {
             return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
         case SS13PMA_FIVE_LEVEL:
             return Hierarchy.create("hierarchies/ss13pma_hierarchy_pwgtp.csv", ';');
+        case SS13ACS_SEMANTIC: {
+            return Hierarchy.create("hierarchies/ss13acs_hierarchy_" + attribute + ".csv", ';');
+        }
         default:
             return createTwoLevelHierarchy(dataset, attribute);
         }
@@ -466,6 +477,62 @@ public class BenchmarkSetup {
         }
 
         return Hierarchy.create(hierarchy);
+    }
+    
+    private enum SS13PMA_SEMANTIC_QI {PWGTP,
+        AGEP,
+        CIT,
+        COW,
+        DDRS,
+        DEAR,
+        DEYE,
+        DOUT,
+        DPHY,
+        DRAT,
+        DRATX,
+        DREM,
+        ENG,
+        FER,
+        GCL,
+        GCM,
+        GCR,
+        HINS1,
+        HINS2,
+        HINS3,
+        HINS4,
+        HINS5,
+        HINS6,
+        HINS7,
+        INTP,
+        JWMNP,
+        JWRIP,
+        JWTR,
+        LANX,
+        MAR,
+        MARHD,
+        MARHM,
+        MARHT,
+        MARHW,
+        MARHYP,
+        MIG,
+        MIL,
+        NWAB,
+        NWAV,
+        NWLA,
+        NWLK,
+        NWRE,
+        RELP,
+        RETP,
+        SCH,
+        SCHG,
+        SCHL,
+        SEMP,
+        SEX,
+        SSP,
+        WAGP,
+        WKHP,
+        WKL,
+        WKW,
     }
 
     /**
@@ -551,6 +618,12 @@ public class BenchmarkSetup {
                     "pwgtp29",
                     "pwgtp30"
             };
+        case SS13ACS_SEMANTIC:
+            ArrayList<String> al = new ArrayList<>();
+            for (SS13PMA_SEMANTIC_QI qi : SS13PMA_SEMANTIC_QI.values()) {
+                al.add(qi.toString());
+            }
+            return (String[]) al.toArray();
         default:
             throw new RuntimeException("Invalid dataset");
         }
