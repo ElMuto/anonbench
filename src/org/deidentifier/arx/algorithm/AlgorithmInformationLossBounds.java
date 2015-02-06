@@ -32,23 +32,26 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
     private Node globalMinimum;
     private Node globalMaximum;
 
-    private int  counter = 0;
-
     public AlgorithmInformationLossBounds(final MaterializedLattice lattice, final INodeChecker checker) {
         super(lattice, checker);
     }
 
+    /**
+     * Entry point into the algorithm.
+     */
     @Override
     public void traverse() {
-        System.out.println("Lattice Size: " + getLatticeSize());
         traverse(lattice.getBottom());
-        System.out.println("Done with " + counter + "/" + getLatticeSize());
     }
 
+    /**
+     * Traversing over the whole search space, i.e. each node, in order to check the node and determine whether its information loss provides either an upper or a lower bound. This is done recursively until each node has been visited and is checked.
+     * @param node
+     */
     private void traverse(final Node node) {
-        
+
         check(node);
-        
+
         Node[] successors = node.getSuccessors(true);
         for (int i = 0; i < successors.length; i++) {
             Node successor = successors[i];
@@ -60,28 +63,32 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
 
     @Override
     protected void check(Node node) {
-        counter++;
-        if (counter % 1000 == 0 || counter == getLatticeSize()) {
-            System.out.println("Done with " + counter + "/" + getLatticeSize());
-        }
         lattice.setChecked(node, checker.check(node, true));
         trackMinimum(node);
         trackMaximum(node);
     }
 
+    /**
+     * In case the node is anonymous, determine whether the information loss of this node is a global maximum.
+     * @param node
+     */
     private void trackMaximum(Node node) {
         if (node.hasProperty(Node.PROPERTY_ANONYMOUS) &&
             ((globalMaximum == null) ||
-             (node.getInformationLoss().compareTo(globalMaximum.getInformationLoss()) > 0))) {
+            (node.getInformationLoss().compareTo(globalMaximum.getInformationLoss()) > 0))) {
             globalMaximum = node;
         }
 
     }
 
+    /**
+     * In case the node is anonymous, determine whether the information loss of this node is a global minimum.
+     * @param node
+     */
     private void trackMinimum(Node node) {
         if (node.hasProperty(Node.PROPERTY_ANONYMOUS) &&
             ((globalMinimum == null) ||
-             (node.getInformationLoss().compareTo(globalMinimum.getInformationLoss()) < 0))) {
+            (node.getInformationLoss().compareTo(globalMinimum.getInformationLoss()) < 0))) {
             globalMinimum = node;
         }
 

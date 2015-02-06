@@ -22,6 +22,7 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -42,27 +43,29 @@ import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyze
 public class BenchmarkMain {
 
     /** Repetitions */
-    private static final int         REPETITIONS         = 3;
+    private static final int         REPETITIONS                     = 3;
     /** The benchmark instance */
-    protected static final Benchmark BENCHMARK           = new Benchmark(new String[] {
-                                                         "Algorithm",
-                                                         "Dataset",
-                                                         "Criteria",
-                                                         "Metric",
-                                                         "Suppression",
-                                                         "QI count" });
+    protected static final Benchmark BENCHMARK                       = new Benchmark(new String[] {
+                                                                     "Algorithm",
+                                                                     "Dataset",
+                                                                     "Criteria",
+                                                                     "Metric",
+                                                                     "Suppression",
+                                                                     "QI count" });
     /** Label for execution times */
-    public static final int          EXECUTION_TIME      = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.EXECUTION_TIME.val);
+    public static final int          EXECUTION_TIME                  = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.EXECUTION_TIME.val);
     /** Label for number of checks */
-    public static final int          NUMBER_OF_CHECKS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_CHECKS.val);
+    public static final int          NUMBER_OF_CHECKS                = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_CHECKS.val);
     /** Label for number of roll-ups */
-    public static final int          NUMBER_OF_ROLLUPS   = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_ROLLUPS.val);
+    public static final int          NUMBER_OF_ROLLUPS               = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_ROLLUPS.val);
     /** Label for number of roll-ups */
-    public static final int          NUMBER_OF_SNAPSHOTS = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
+    public static final int          NUMBER_OF_SNAPSHOTS             = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
     /** Label for size of lattice */
-    public static final int          LATTICE_SIZE        = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
+    public static final int          LATTICE_SIZE                    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
     /** Label for information loss */
-    public static final int          INFORMATION_LOSS    = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
+    public static final int          INFORMATION_LOSS                = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
+    /** Label for information loss transformation */
+    public static final int          INFORMATION_LOSS_TRANSFORMATION = BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_TRANSFORMATION.val);
 
     static {
         BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
@@ -72,6 +75,7 @@ public class BenchmarkMain {
         BENCHMARK.addAnalyzer(NUMBER_OF_SNAPSHOTS, new ValueBuffer());
         BENCHMARK.addAnalyzer(LATTICE_SIZE, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer());
+        BENCHMARK.addAnalyzer(INFORMATION_LOSS_TRANSFORMATION, new ValueBuffer());
     }
 
     /**
@@ -79,8 +83,9 @@ public class BenchmarkMain {
      * 
      * @param args
      * @throws IOException
+     * @throws ParseException
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
 
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
 
@@ -123,6 +128,11 @@ public class BenchmarkMain {
                 }
             }
         }
+
+        // Determine min/max IL via DFS traversal over the whole lattice and add data to results.csv
+        if (BenchmarkSetup.includeRelativeInformationLoss()) {
+            BenchmarkILBounds.main(new String[] {});
+        }
     }
 
     public static void runBenchmark(BenchmarkDriver driver,
@@ -136,7 +146,8 @@ public class BenchmarkMain {
         driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, true, true);
 
         // Print status info
-        System.out.println("Running: " + algorithm.toString() + " with "  + algorithm.getStatusSuffix() + " / " + data.toString() + " / " + metric.getName() +
+        System.out.println("Running: " + algorithm.toString() + " with " + algorithm.getStatusSuffix() + " / " + data.toString() + " / " +
+                           metric.getName() +
                            " / " + suppression + " / " + Arrays.toString(criteria) + " / " + qiCount + " QIs");
 
         // Benchmark

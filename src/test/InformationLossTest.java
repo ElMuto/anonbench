@@ -64,8 +64,8 @@ public class InformationLossTest {
         String file = "results/resultsTest.csv";
 
         Algorithm[] algorithms = {
-        		new Algorithm(AlgorithmType.FLASH, null),
-        		new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TerminationConfiguration.Type.TIME, 10000))
+                new Algorithm(AlgorithmType.FLASH, null),
+                new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TerminationConfiguration.Type.TIME, 10000))
         };
         BenchmarkDataset[] datasets = { BenchmarkDataset.ADULT, BenchmarkDataset.CUP };
         BenchmarkCriterion[] criteria = { BenchmarkCriterion.K_ANONYMITY };
@@ -95,7 +95,14 @@ public class InformationLossTest {
 
         // Runs for Non-monotonic non-uniform entropy
         // Warmup run
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, new Algorithm(AlgorithmType.FLASH, null), entropyMetric, suppression, 0, true, true);
+        driver.anonymize(BenchmarkDataset.ADULT,
+                         criteria,
+                         new Algorithm(AlgorithmType.FLASH, null),
+                         entropyMetric,
+                         suppression,
+                         0,
+                         true,
+                         true);
 
         // Benchmark
         BENCHMARK.addRun(AlgorithmType.FLASH,
@@ -104,7 +111,14 @@ public class InformationLossTest {
                          entropyMetric.getName(),
                          String.valueOf(suppression));
 
-        driver.anonymize(BenchmarkDataset.ADULT, criteria, new Algorithm(AlgorithmType.FLASH, null), entropyMetric, suppression, 0, false, true);
+        driver.anonymize(BenchmarkDataset.ADULT,
+                         criteria,
+                         new Algorithm(AlgorithmType.FLASH, null),
+                         entropyMetric,
+                         suppression,
+                         0,
+                         false,
+                         true);
 
         // Write results incrementally
         BENCHMARK.getResults().write(new File(file));

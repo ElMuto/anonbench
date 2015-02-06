@@ -44,11 +44,10 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  * @author Fabian Prasser
  */
 public class BenchmarkSetup {
-    
-    public static final TerminationConfiguration.Type TERMINATION_TYPE = TerminationConfiguration.Type.TIME;
-    public static Integer[] TERMINATION_LIMITS = new Integer[] { 2000, 5000, 10000, 20000 };
-    public static final boolean INCLUDE_FLASH = true;
-    
+
+    protected static final TerminationConfiguration.Type TERMINATION_TYPE   = TerminationConfiguration.Type.TIME;
+    private static Integer[]                             TERMINATION_LIMITS = new Integer[] { 2000, 5000, 10000, 20000 };
+    private static final boolean                         INCLUDE_FLASH      = true;
 
     public static enum AlgorithmType {
         FLASH {
@@ -70,50 +69,50 @@ public class BenchmarkSetup {
             }
         },
     }
-    
-    public static class Algorithm {
-    	private AlgorithmType type;
-    	private TerminationConfiguration terminationConfig;
-    	
-    	public Algorithm (AlgorithmType type, TerminationConfiguration terminationConfig) {
-    		this.type = type;
-    		this.terminationConfig = terminationConfig;
-    	}
-    	
-    	@Override
-    	public String toString() {
-    		String baseString = type.toString();    		
-    		String suffix = "";
-    		if (terminationConfig != null) {
-    			switch (terminationConfig.getType()) {
-				case CHECKS:
-					suffix += "_c";
-					break;
-				case TIME:
-					suffix += "_t";
-					break;
-    			}
-    			suffix += terminationConfig.getValue();
-    		}
-    		return baseString + suffix;
-    	}
-    	
-    	public TerminationConfiguration getTerminationConfig() {
-    		return terminationConfig;
-    	}
-    	
-    	public AlgorithmType getType() {
-    		return type;
-    	}
 
-		public String getStatusSuffix() {
-			String suffix = type.equals(AlgorithmType.HEURAKLES) ?
-                terminationConfig.getValue() + (BenchmarkSetup.TERMINATION_TYPE == TerminationConfiguration.Type.CHECKS ?
-                    "checks" :
-                    "milliseconds") :
-            "no termination limits";
-			return suffix;
-		}
+    public static class Algorithm {
+        private AlgorithmType            type;
+        private TerminationConfiguration terminationConfig;
+
+        public Algorithm(AlgorithmType type, TerminationConfiguration terminationConfig) {
+            this.type = type;
+            this.terminationConfig = terminationConfig;
+        }
+
+        @Override
+        public String toString() {
+            String baseString = type.toString();
+            String suffix = "";
+            if (terminationConfig != null) {
+                switch (terminationConfig.getType()) {
+                case CHECKS:
+                    suffix += "_c";
+                    break;
+                case TIME:
+                    suffix += "_t";
+                    break;
+                }
+                suffix += terminationConfig.getValue();
+            }
+            return baseString + suffix;
+        }
+
+        public TerminationConfiguration getTerminationConfig() {
+            return terminationConfig;
+        }
+
+        public AlgorithmType getType() {
+            return type;
+        }
+
+        public String getStatusSuffix() {
+            String suffix = type.equals(AlgorithmType.HEURAKLES) ?
+                    terminationConfig.getValue() + (BenchmarkSetup.TERMINATION_TYPE == TerminationConfiguration.Type.CHECKS ?
+                            "checks" :
+                            "milliseconds") :
+                    "no termination limits";
+            return suffix;
+        }
     }
 
     public static enum BenchmarkCriterion {
@@ -199,14 +198,28 @@ public class BenchmarkSetup {
      * @return
      */
     public static List<Algorithm> getAlgorithms() {
-    	List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>(TERMINATION_LIMITS.length + (INCLUDE_FLASH ? 1 : 0));
-    	
-    	if (INCLUDE_FLASH) benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
-    	for (Integer tLimit : TERMINATION_LIMITS) {
-    		benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
-    	}
-    	
-    	return benchmarkAlgorithmList;
+        List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>(TERMINATION_LIMITS.length + (INCLUDE_FLASH ? 1 : 0));
+
+        if (INCLUDE_FLASH) benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
+        for (Integer tLimit : TERMINATION_LIMITS) {
+            benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
+        }
+
+        return benchmarkAlgorithmList;
+    }
+
+    /**
+     * Return algorithm for this type.
+     * @param algorithmType
+     * @return
+     */
+    public static Algorithm getAlgorithmByType(AlgorithmType algorithmType) {
+        for (Algorithm algorithm : getAlgorithms()) {
+            if (algorithm.getType() == algorithmType) {
+                return algorithm;
+            }
+        }
+        throw new RuntimeException("Algorithm with type: " + algorithmType + " not found.");
     }
 
     /**
@@ -264,14 +277,14 @@ public class BenchmarkSetup {
     @SuppressWarnings("rawtypes")
     public static Metric[] getMetrics() {
         return new Metric[] {
-        		// use non-monotonic version of supporting metrics
-//                Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-//                Metric.createEntropyMetric(),
-//                Metric.createPrecisionMetric(),
-//                Metric.createAECSMetric(),
-//                Metric.createDiscernabilityMetric()
-                
-        		// use monotonic version of supporting metrics
+                // use non-monotonic version of supporting metrics
+                // Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
+                // Metric.createEntropyMetric(),
+                // Metric.createPrecisionMetric(),
+                // Metric.createAECSMetric(),
+                // Metric.createDiscernabilityMetric()
+
+                // use monotonic version of supporting metrics
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
                 Metric.createEntropyMetric(false),
                 Metric.createDiscernabilityMetric(false)
@@ -313,7 +326,7 @@ public class BenchmarkSetup {
     public static Data getData(BenchmarkDataset dataset, int qiCount) throws IOException {
         return getData(dataset, null, qiCount);
     }
-    
+
     /**
      * Returns the path to the file containing a dataset
      * @param dataset
@@ -383,7 +396,7 @@ public class BenchmarkSetup {
                 BenchmarkDataset.ATUS
         };
     }
-    
+
     /**
      * Returns all datasets for the QI count scaling benchmark
      * @return
@@ -394,7 +407,7 @@ public class BenchmarkSetup {
                 BenchmarkDataset.SS13PMA_FIVE_LEVEL
         };
     }
-    
+
     /**
      * Returns the generalization hierarchy for the dataset and attribute
      * @param dataset
@@ -419,11 +432,11 @@ public class BenchmarkSetup {
         case SS13ACS_SEMANTIC: {
             return Hierarchy.create("hierarchies/ss13acs_hierarchy_" + attribute + ".csv", ';');
         }
-            default:
-                return createTwoLevelHierarchy(dataset, attribute);
+        default:
+            return createTwoLevelHierarchy(dataset, attribute);
         }
     }
-    
+
     /**
      * Returns a dynamically created two level hierarchy
      * @param dataset
@@ -433,7 +446,7 @@ public class BenchmarkSetup {
      */
     public static Hierarchy createTwoLevelHierarchy(BenchmarkDataset dataset, String attribute) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(getFilePath(dataset)));
-        
+
         String[] headerLine = reader.readLine().split(";");
         int colIdx = 0;
         for (; colIdx < headerLine.length; ++colIdx) {
@@ -445,16 +458,16 @@ public class BenchmarkSetup {
             reader.close();
             throw new RuntimeException("Invalid attribute");
         }
-        
+
         Set<String> attributeDomain = new HashSet<String>();
         String line;
         while ((line = reader.readLine()) != null) {
             String value = (line.split(";"))[colIdx];
             attributeDomain.add(value);
         }
-        
+
         reader.close();
-        
+
         final String[][] hierarchy = new String[attributeDomain.size()][];
         Iterator<String> iter = attributeDomain.iterator();
         for (int i = 0; i < hierarchy.length; ++i) {
@@ -605,7 +618,7 @@ public class BenchmarkSetup {
                     "pwgtp28",
                     "pwgtp29",
                     "pwgtp30"
-                    };
+            };
         case SS13ACS_SEMANTIC:
             ArrayList<String> al = new ArrayList<>();
             for (SS13PMA_SEMANTIC_QI qi : SS13PMA_SEMANTIC_QI.values()) {
@@ -616,18 +629,17 @@ public class BenchmarkSetup {
             throw new RuntimeException("Invalid dataset");
         }
     }
-    
+
     /**
      * Returns the minimal number of QIs to use for a given algorithm and dataset
      * @param dataset
      * @return
      */
     public static int getMinQICount(BenchmarkDataset dataset) {
-        if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL)
-            return 5;
+        if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) return 5;
         return 10;
     }
-    
+
     /**
      * Returns the maximal number of QIs to use for a given algorithm and dataset
      * @param algorithm
@@ -636,13 +648,10 @@ public class BenchmarkSetup {
      */
     public static int getMaxQICount(Algorithm algorithm, BenchmarkDataset dataset) {
         if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
-            if (algorithm.getType() == AlgorithmType.FLASH)
-                return 23;
+            if (algorithm.getType() == AlgorithmType.FLASH) return 23;
         } else if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
-            if (algorithm.getType() == AlgorithmType.FLASH)
-                return 10;
-            else if (algorithm.getType() == AlgorithmType.HEURAKLES)
-                return 16;
+            if (algorithm.getType() == AlgorithmType.FLASH) return 10;
+            else if (algorithm.getType() == AlgorithmType.HEURAKLES) return 16;
         }
         return getQuasiIdentifyingAttributes(dataset).length;
     }
@@ -690,5 +699,17 @@ public class BenchmarkSetup {
         default:
             throw new RuntimeException("Invalid dataset");
         }
+    }
+
+    /**
+     * Specify, whether relative information loss shall be calculated. This includes
+     * running a DFS algorithm over the whole lattice determining minimum and maximum
+     * information loss values.
+     * 
+     * @return true if relative information loss shall be included in the results file,
+     *         false otherwise
+     */
+    public static boolean includeRelativeInformationLoss() {
+        return true;
     }
 }
