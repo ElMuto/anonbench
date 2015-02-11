@@ -110,13 +110,15 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
                     implementation.getGlobalOptimum().getInformationLoss().toString() :
                     NO_SOLUTION_FOUND);
-            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION,
-                                            Arrays.toString(implementation.getGlobalOptimum().getTransformation()));
+            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION, implementation.getGlobalOptimum() != null ?
+                    Arrays.toString(implementation.getGlobalOptimum().getTransformation()) :
+                    Arrays.toString(new int[0]));
         }
         // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
         else {
             AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
             algo.traverse();
+            // TODO handle the case that no solution exists at all
             benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
             benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
                                (Arrays.toString(algo.getGlobalMinimum().getTransformation())));

@@ -6,4 +6,8 @@ test -e /sys/devices/system/cpu/$f/cpufreq/scaling_governor && echo performance 
 done
 
 #run benchmark
+<<<<<<< HEAD
 java -Xmx5G -jar heurakles-bench.jar
+=======
+java -Xmx5G -jar heurakles-bench.jar
+>>>>>>> branch 'master' of https://github.com/ElMuto/anonbench.git
