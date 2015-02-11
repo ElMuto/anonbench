@@ -7,4 +7,3 @@ done
 
 #run benchmark
 java -Xmx5G -jar heurakles-bench.jar
-done

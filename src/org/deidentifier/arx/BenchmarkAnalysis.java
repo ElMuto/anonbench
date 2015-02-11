@@ -388,7 +388,7 @@ public class BenchmarkAnalysis {
         Series3D series = null;
 
         // Collect data for all algorithms
-        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(true)) {
 
             Series3D _series = getSeries(file,
                                          algorithm.toString(),

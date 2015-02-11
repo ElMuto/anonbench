@@ -20,6 +20,7 @@
 
 package org.deidentifier.arx;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
@@ -224,5 +225,94 @@ public class BenchmarkDriver {
             throw new RuntimeException("Invalid algorithm");
         }
         return implementation;
+    }
+
+    public static void
+            runIterations(Benchmark BENCHMARK, BenchmarkDriver driver, int REPETITIONS, String outputFileName, boolean benchmarkRun) throws IOException {
+        // For each algorithm
+        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(benchmarkRun)) {
+
+            // For each metric
+            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+
+                // For each suppression factor
+                for (double suppression : BenchmarkSetup.getSuppression()) {
+
+                    // For each combination of criteria
+                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+
+                        // For each dataset
+                        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+
+                            int qiCount = BenchmarkSetup.getQuasiIdentifyingAttributes(data).length;
+                            runBenchmark(BENCHMARK,
+                                         REPETITIONS,
+                                         driver,
+                                         outputFileName,
+                                         benchmarkRun,
+                                         algorithm,
+                                         data,
+                                         criteria,
+                                         metric,
+                                         suppression,
+                                         qiCount);
+
+                        }
+
+                        // For each QI scaling benchmark dataset
+                        for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
+
+                            for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
+
+                                runBenchmark(BENCHMARK, REPETITIONS, driver, outputFileName, benchmarkRun,
+                                             algorithm,
+                                             data,
+                                             criteria,
+                                             metric,
+                                             suppression,
+                                             qiCount);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void runBenchmark(Benchmark BENCHMARK,
+                                     int REPETITIONS,
+                                     BenchmarkDriver driver,
+                                     String outputFileName,
+                                     boolean benchmarkRun,
+                                     Algorithm algorithm,
+                                     BenchmarkDataset data,
+                                     BenchmarkCriterion[] criteria,
+                                     Metric<?> metric,
+                                     double suppression,
+                                     int qiCount) throws IOException {
+        // Warmup run
+        driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, true, benchmarkRun);
+
+        // Print status info
+        System.out.println("Running: " + algorithm.toString() + " with " + algorithm.getStatusSuffix() + " / " + data.toString() + " / " +
+                           metric.getName() +
+                           " / " + suppression + " / " + Arrays.toString(criteria) + " / " + qiCount + " QIs");
+
+        // Benchmark
+        BENCHMARK.addRun(algorithm.toString(),
+                         data.toString(),
+                         Arrays.toString(criteria),
+                         metric.getName(),
+                         String.valueOf(suppression),
+                         qiCount);
+
+        // Repeat
+        for (int i = 0; i < REPETITIONS; i++) {
+            driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, false, benchmarkRun);
+        }
+
+        // Write results incrementally
+        BENCHMARK.getResults().write(new File(outputFileName));
     }
 }

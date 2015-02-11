@@ -23,12 +23,12 @@ package org.deidentifier.arx;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
@@ -191,29 +191,22 @@ public class BenchmarkSetup {
      * Returns all algorithms
      * @return
      */
-    public static List<Algorithm> getAlgorithms() {
-        List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>(TERMINATION_LIMITS.length + (INCLUDE_FLASH ? 1 : 0));
+    public static List<Algorithm> getAlgorithms(boolean benchmarkRun) {
+        List<Algorithm> benchmarkAlgorithmList = null;
 
-        if (INCLUDE_FLASH) benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
-        for (Integer tLimit : TERMINATION_LIMITS) {
-            benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
-        }
+        if (benchmarkRun) {
+            benchmarkAlgorithmList = new ArrayList<Algorithm>(TERMINATION_LIMITS.length + (INCLUDE_FLASH ? 1 : 0));
 
-        return benchmarkAlgorithmList;
-    }
-
-    /**
-     * Return algorithm for this type.
-     * @param algorithmType
-     * @return
-     */
-    public static Algorithm getAlgorithmByType(AlgorithmType algorithmType) {
-        for (Algorithm algorithm : getAlgorithms()) {
-            if (algorithm.getType() == algorithmType) {
-                return algorithm;
+            if (INCLUDE_FLASH) benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
+            for (Integer tLimit : TERMINATION_LIMITS) {
+                benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
             }
         }
-        throw new RuntimeException("Algorithm with type: " + algorithmType + " not found.");
+        else {
+            benchmarkAlgorithmList = new ArrayList<BenchmarkSetup.Algorithm>(1);
+            benchmarkAlgorithmList.add(new BenchmarkSetup.Algorithm(AlgorithmType.INFORMATION_LOSS_BOUNDS, null));
+        }
+        return benchmarkAlgorithmList;
     }
 
     /**
@@ -262,6 +255,7 @@ public class BenchmarkSetup {
      */
     public static double[] getSuppression() {
         return new double[] { 0d, 1d };
+        // return new double[] { 1d };
     }
 
     /**
@@ -382,10 +376,10 @@ public class BenchmarkSetup {
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
                 BenchmarkDataset.IHIS,
-                BenchmarkDataset.ADULT,
-                BenchmarkDataset.CUP,
-                BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS
+        // BenchmarkDataset.ADULT,
+        // BenchmarkDataset.CUP,
+        // BenchmarkDataset.FARS,
+        // BenchmarkDataset.ATUS
         };
     }
 
@@ -396,7 +390,7 @@ public class BenchmarkSetup {
     public static BenchmarkDataset[] getQICountScalingDatasets() {
         return new BenchmarkDataset[] {
                 BenchmarkDataset.SS13PMA_TWO_LEVEL,
-                BenchmarkDataset.SS13PMA_FIVE_LEVEL
+        // BenchmarkDataset.SS13PMA_FIVE_LEVEL
         };
     }
 
@@ -563,7 +557,7 @@ public class BenchmarkSetup {
      */
     public static int getMinQICount(BenchmarkDataset dataset) {
         if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) return 5;
-        return 10;
+        return 1;
     }
 
     /**
@@ -574,7 +568,7 @@ public class BenchmarkSetup {
      */
     public static int getMaxQICount(Algorithm algorithm, BenchmarkDataset dataset) {
         if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
-            if (algorithm.getType() == AlgorithmType.FLASH) return 23;
+            if (algorithm.getType() == AlgorithmType.FLASH) return 2;
         } else if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
             if (algorithm.getType() == AlgorithmType.FLASH) return 10;
             else if (algorithm.getType() == AlgorithmType.HEURAKLES) return 16;

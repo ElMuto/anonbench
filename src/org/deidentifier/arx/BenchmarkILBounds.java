@@ -20,6 +20,9 @@ import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
 
 public class BenchmarkILBounds {
+    
+    /** Repetitions */
+    private static final int         REPETITIONS                     = 1;
 
     /** The benchmark instance */
     protected static final Benchmark BENCHMARK                               = new Benchmark(new String[] {
@@ -44,50 +47,55 @@ public class BenchmarkILBounds {
     public static void main(String[] args) throws IOException, ParseException {
 
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
-        Algorithm algorithm = BenchmarkSetup.getAlgorithmByType(AlgorithmType.INFORMATION_LOSS_BOUNDS);
-        String algoName = algorithm.getType().toString();
-
-        // For each dataset
-        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
-
-            // For each metric
-            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-                // For each suppression factor
-                for (double suppression : BenchmarkSetup.getSuppression()) {
-
-                    // For each combination of criteria
-                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-
-                        // Print status info
-                        System.out.println("Running: " + algoName + " / " + data.toString() +
-                                           " / " +
-                                           metric.getName() +
-                                           " / " + suppression + " / " +
-                                           Arrays.toString(criteria));
-
-                        // Benchmark
-                        BENCHMARK.addRun(algoName,
-                                         data.toString(),
-                                         Arrays.toString(criteria),
-                                         metric.getName(),
-                                         String.valueOf(suppression));
-
-                        driver.anonymize(data,
-                                         criteria,
-                                         algorithm,
-                                         metric,
-                                         suppression,
-                                         BenchmarkSetup.getQuasiIdentifyingAttributes(data).length,
-                                         false,
-                                         false);
-
-                        // Write results incrementally
-                        BENCHMARK.getResults().write(new File("results/informationLossBounds.csv"));
-                    }
-                }
-            }
-        }
+        String outputFileName = "results/informationLossBounds.csv";
+        boolean benchmarkRun = false;
+        
+        BenchmarkDriver.runIterations(BENCHMARK, driver, REPETITIONS, outputFileName, benchmarkRun);
+        
+//        Algorithm algorithm = BenchmarkSetup.getAlgorithmByType(AlgorithmType.INFORMATION_LOSS_BOUNDS);
+//        String algoName = algorithm.getType().toString();
+//
+//        // For each dataset
+//        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+//
+//            // For each metric
+//            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+//
+//                // For each suppression factor
+//                for (double suppression : BenchmarkSetup.getSuppression()) {
+//
+//                    // For each combination of criteria
+//                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+//
+//                        // Print status info
+//                        System.out.println("Running: " + algoName + " / " + data.toString() +
+//                                           " / " +
+//                                           metric.getName() +
+//                                           " / " + suppression + " / " +
+//                                           Arrays.toString(criteria));
+//
+//                        // Benchmark
+//                        BENCHMARK.addRun(algoName,
+//                                         data.toString(),
+//                                         Arrays.toString(criteria),
+//                                         metric.getName(),
+//                                         String.valueOf(suppression));
+//
+//                        driver.anonymize(data,
+//                                         criteria,
+//                                         algorithm,
+//                                         metric,
+//                                         suppression,
+//                                         BenchmarkSetup.getQuasiIdentifyingAttributes(data).length,
+//                                         false,
+//                                         false);
+//
+//                        // Write results incrementally
+//                        BENCHMARK.getResults().write(new File("results/informationLossBounds.csv"));
+//                    }
+//                }
+//            }
+//        }
 
         writeInformationLossBoundsToResults();
 
@@ -162,7 +170,7 @@ public class BenchmarkILBounds {
                             }
                         }
 
-                        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+                        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(true)) {
 
                             // Select data point acc to the variables
                             selector = results.getSelectorBuilder()
