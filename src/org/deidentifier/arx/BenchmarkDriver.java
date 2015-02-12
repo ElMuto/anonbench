@@ -40,6 +40,7 @@ import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.MaterializedLattice;
 import org.deidentifier.arx.framework.lattice.Node;
 import org.deidentifier.arx.framework.lattice.VirtualLattice;
+import org.deidentifier.arx.metric.InformationLoss;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.test.TestConfiguration;
 
@@ -116,15 +117,19 @@ public class BenchmarkDriver {
         }
         // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
         else {
-            AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
-            algo.traverse();
-            // TODO handle the case that no solution exists at all
-            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM, (algo.getGlobalMinimum().getInformationLoss()));
-            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
-                               (Arrays.toString(algo.getGlobalMinimum().getTransformation())));
-            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM, (algo.getGlobalMaximum().getInformationLoss()));
-            benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION,
-                               (Arrays.toString(algo.getGlobalMaximum().getTransformation())));
+            if (!warmup) {
+                AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
+                algo.traverse();
+                // TODO handle the case that no solution exists at all
+                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM,
+                                   (null != algo.getGlobalMinimum() ? algo.getGlobalMinimum().getInformationLoss() : NO_SOLUTION_FOUND));
+                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
+                                   null != algo.getGlobalMinimum() ? (Arrays.toString(algo.getGlobalMinimum().getTransformation())) : Arrays.toString(new int[0]));
+                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM,
+                                   null != algo.getGlobalMaximum() ? algo.getGlobalMaximum().getInformationLoss() : NO_SOLUTION_FOUND);
+                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION, null != algo.getGlobalMaximum() ?
+                        (Arrays.toString(algo.getGlobalMaximum().getTransformation())) : Arrays.toString(new int[0]));
+            }
         }
     }
 
@@ -230,28 +235,28 @@ public class BenchmarkDriver {
     }
 
     public static void
-            runIterations(Benchmark BENCHMARK, BenchmarkDriver driver, int REPETITIONS, String outputFileName, boolean benchmarkRun) throws IOException {
-        // For each algorithm
-        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(benchmarkRun)) {
+            runIterations(Benchmark BENCHMARK,
+                          BenchmarkDriver driver,
+                          int REPETITIONS,
+                          String outputFileName,
+                          boolean benchmarkRun,
+                          Algorithm algorithm) throws IOException {
 
-            // For each metric
-            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+        // For each metric
+        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
 
-                // For each suppression factor
-                for (double suppression : BenchmarkSetup.getSuppression()) {
+            // For each suppression factor
+            for (double suppression : BenchmarkSetup.getSuppression()) {
 
-                    // For each combination of criteria
-                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                // For each combination of criteria
+                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
-                        // For each dataset
-                        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+                    // For each dataset
+                    for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
-                            int qiCount = BenchmarkSetup.getQuasiIdentifyingAttributes(data).length;
-                            runBenchmark(BENCHMARK,
-                                         REPETITIONS,
-                                         driver,
-                                         outputFileName,
-                                         benchmarkRun,
+                        for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
+
+                            runBenchmark(BENCHMARK, REPETITIONS, driver, outputFileName, benchmarkRun,
                                          algorithm,
                                          data,
                                          criteria,
@@ -260,26 +265,11 @@ public class BenchmarkDriver {
                                          qiCount);
 
                         }
-
-                        // For each QI scaling benchmark dataset
-                        for (BenchmarkDataset data : BenchmarkSetup.getQICountScalingDatasets()) {
-
-                            for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
-
-                                runBenchmark(BENCHMARK, REPETITIONS, driver, outputFileName, benchmarkRun,
-                                             algorithm,
-                                             data,
-                                             criteria,
-                                             metric,
-                                             suppression,
-                                             qiCount);
-
-                            }
-                        }
                     }
                 }
             }
         }
+
     }
 
     private static void runBenchmark(Benchmark BENCHMARK,
