@@ -1,6 +1,0 @@
-;;;;;;Execution time;Execution time;Number of checks;Number of rollups;Number of snapshots;Size of lattice;Information loss;Information loss (Transformation);Information loss minimum;Information loss minimum (Transformation);Information loss maximum;Information loss maximum (Transformation);Relative information loss;Information loss minimum;Information loss minimum (Transformation);Information loss maximum;Information loss maximum (Transformation);Relative information loss
-Algorithm;Dataset;Criteria;Metric;Suppression;QI count;Arithmetic Mean;Standard Deviation;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value;Value
-Flash;SS13PMA_TWO_LEVEL;[k];Loss;0.0;1;3112401.6666666665;1019439.0009237106;2.0;1.0;1.0;2.0;1.0;[1];1.0;[1];1.0;[1];NaN
-Flash;SS13PMA_TWO_LEVEL;[k];Loss;1.0;1;2939383.6666666665;512031.6591308914;2.0;1.0;1.0;2.0;0.0076682428999999;[0];0.0076682428999999;[0];1.0;[1];0.0
-Heurakles_t5000;SS13PMA_TWO_LEVEL;[k];Loss;0.0;1;3169503.6666666665;964310.874882853;2.0;1.0;1.0;2.0;1.0;[1];1.0;[1];1.0;[1];NaN
-Heurakles_t5000;SS13PMA_TWO_LEVEL;[k];Loss;1.0;1;4048923.6666666665;2379523.751942883;2.0;1.0;1.0;2.0;0.0076682428999999;[0];0.0076682428999999;[0];1.0;[1];0.0
