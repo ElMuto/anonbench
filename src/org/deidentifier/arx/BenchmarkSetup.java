@@ -31,6 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
+import org.deidentifier.arx.aggregates.HierarchyBuilder;
+import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
@@ -46,8 +50,9 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
 public class BenchmarkSetup {
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE   = TerminationConfiguration.Type.TIME;
-    private static Integer[]                             TERMINATION_LIMITS = new Integer[] { 2000, 5000, 10000, 20000 };
-    private static final boolean                         INCLUDE_FLASH      = true;
+    private static Integer[]                             TERMINATION_LIMITS = new Integer[] { 2000 };
+//    private static Integer[]                             TERMINATION_LIMITS = new Integer[] { 2000, 5000, 10000, 20000 };
+    private static final boolean                         INCLUDE_FLASH      = false;
 
     public static enum AlgorithmType {
         FLASH {
@@ -188,7 +193,7 @@ public class BenchmarkSetup {
         SS13ACS_SEMANTIC {
             @Override
             public String toString() {
-                return "SS13PMA_SEMANTIC";
+                return "SS13ACS_SEMANTIC";
             }
         }
     }
@@ -267,7 +272,8 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 1d };
+//        return new double[] { 0d, 1d };
+        return new double[] { 1d };
     }
 
     /**
@@ -286,8 +292,8 @@ public class BenchmarkSetup {
 
                 // use monotonic version of supporting metrics
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(false),
-                Metric.createDiscernabilityMetric(false)
+//                Metric.createEntropyMetric(false),
+//                Metric.createDiscernabilityMetric(false)
         };
     }
 
@@ -348,7 +354,7 @@ public class BenchmarkSetup {
         case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
         case SS13ACS_SEMANTIC:
-            return "data/ss13pma_clean.csv";
+            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -389,11 +395,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.IHIS,
-                BenchmarkDataset.ADULT,
-                BenchmarkDataset.CUP,
-                BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS
+//                BenchmarkDataset.IHIS,
+//                BenchmarkDataset.ADULT,
+//                BenchmarkDataset.CUP,
+//                BenchmarkDataset.FARS,
+//                BenchmarkDataset.ATUS
         };
     }
 
@@ -403,8 +409,9 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getQICountScalingDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.SS13PMA_TWO_LEVEL,
-                BenchmarkDataset.SS13PMA_FIVE_LEVEL
+//                BenchmarkDataset.SS13PMA_TWO_LEVEL,
+//                BenchmarkDataset.SS13PMA_FIVE_LEVEL,
+                BenchmarkDataset.SS13ACS_SEMANTIC
         };
     }
 
@@ -430,7 +437,24 @@ public class BenchmarkSetup {
         case SS13PMA_FIVE_LEVEL:
             return Hierarchy.create("hierarchies/ss13pma_hierarchy_pwgtp.csv", ';');
         case SS13ACS_SEMANTIC: {
-            return Hierarchy.create("hierarchies/ss13acs_hierarchy_" + attribute + ".csv", ';');
+//            return Hierarchy.create("hierarchies/ss13acs_hierarchy_" + attribute + ".ahs", ';');
+            HierarchyBuilder<?> loaded = HierarchyBuilder.create("hierarchies/ss13acs_hierarchy_" + SS13PMA_SEMANTIC_QI.valueOf(attribute).fileBaseName() + ".ahs");
+            if (loaded.getType() == Type.INTERVAL_BASED) {
+                HierarchyBuilderIntervalBased<?> builder = (HierarchyBuilderIntervalBased<?>)loaded;
+                Data data = Data.create(getFilePath(dataset), ';');
+                int index = data
+                        .getHandle()
+                        .getColumnIndexOf(attribute);
+                String[] dataArray = data
+                        .getHandle()
+                        .getStatistics()
+                        .getDistinctValues(index);
+                System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(dataArray)));
+                return builder.build();
+            } else {
+                // TODO: implement support ordering based hierarchies
+                throw new RuntimeException("Only INTERVAL_BASED hierarchies supported so far");
+            }
         }
         default:
             return createTwoLevelHierarchy(dataset, attribute);
@@ -480,60 +504,77 @@ public class BenchmarkSetup {
     }
     
     private enum SS13PMA_SEMANTIC_QI {
-        i_PWGTP,
-        i_AGEP,
-        i_INTP,
-        i_JWMNP,
-        i_MARHYP,
-        i_RETP,
-        i_SEMP,
-        i_SSP,
-        i_WAGP,
-        i_WKHP,
-        e02_DDRS,
-        e02_DEAR,
-        e02_DEYE,
-        e02_DOUT,
-        e02_DPHY,
-        e02_DRATX,
-        e02_DREM,
-        e02_FER,
-        e02_GCL,
-        e02_GCR,
-        e02_HINS1,
-        e02_HINS2,
-        e02_HINS3,
-        e02_HINS4,
-        e02_HINS5,
-        e02_HINS6,
-        e02_HINS7,
-        e02_LANX,
-        e02_MARHD,
-        e02_MARHM,
-        e02_MARHW,
-        e02_SEX,
-        e03_MARHT,
-        e03_MIG,
-        e03_NWAB,
-        e03_NWLA,
-        e03_NWLK,
-        e03_NWRE,
-        e03_SCH,
-        e03_WKL,
-        e04_ENG,
-        e04_MIL,
-        e05_CIT,
-        e05_GCM,
-        e05_MAR,
-        e05_NWAV,
-        e06_DRAT,
-        e06_WKW,
-        e09_COW,
-        e10_JWRIP,
-        e12_JWTR,
-        e16_SCHG,
-        e17_RELP,
-        e24_SCHL,
+        PWGTP (HIERARCHY_TYPE.i),
+        AGEP  (HIERARCHY_TYPE.i),
+        INTP  (HIERARCHY_TYPE.i),
+//        i_JWMNP,
+//        i_MARHYP,
+//        i_RETP,
+//        i_SEMP,
+//        i_SSP,
+//        i_WAGP,
+//        i_WKHP,
+//        e02_DDRS,
+//        e02_DEAR,
+//        e02_DEYE,
+//        e02_DOUT,
+//        e02_DPHY,
+//        e02_DRATX,
+//        e02_DREM,
+//        e02_FER,
+//        e02_GCL,
+//        e02_GCR,
+//        e02_HINS1,
+//        e02_HINS2,
+//        e02_HINS3,
+//        e02_HINS4,
+//        e02_HINS5,
+//        e02_HINS6,
+//        e02_HINS7,
+//        e02_LANX,
+//        e02_MARHD,
+//        e02_MARHM,
+//        e02_MARHW,
+//        e02_SEX,
+//        e03_MARHT,
+//        e03_MIG,
+//        e03_NWAB,
+//        e03_NWLA,
+//        e03_NWLK,
+//        e03_NWRE,
+//        e03_SCH,
+//        e03_WKL,
+//        e04_ENG,
+//        e04_MIL,
+//        e05_CIT,
+//        e05_GCM,
+//        e05_MAR,
+//        e05_NWAV,
+//        e06_DRAT,
+//        e06_WKW,
+//        e09_COW,
+//        e10_JWRIP,
+//        e12_JWTR,
+//        e16_SCHG,
+//        e17_RELP,
+//        e24_SCHL,
+        ;
+        
+        private enum HIERARCHY_TYPE {
+            i,  // interval based
+            o   // order based
+        }
+        private final HIERARCHY_TYPE ht;
+        
+        // constructor
+        SS13PMA_SEMANTIC_QI (HIERARCHY_TYPE ht) {
+            this.ht = ht;
+        }
+        
+        // needed for file name generation
+        public String fileBaseName() {
+            return (ht.name() + "_" + this.name());
+        }
     }
 
     /**
@@ -624,7 +665,9 @@ public class BenchmarkSetup {
             for (SS13PMA_SEMANTIC_QI qi : SS13PMA_SEMANTIC_QI.values()) {
                 al.add(qi.toString());
             }
-            return (String[]) al.toArray();
+            String[] qiArr = new String[al.size()];
+            qiArr = al.toArray(qiArr);
+            return qiArr;
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -636,7 +679,11 @@ public class BenchmarkSetup {
      * @return
      */
     public static int getMinQICount(BenchmarkDataset dataset) {
-        if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) return 5;
+        if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
+            return 5;
+        } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
+            return 1;
+        }
         return 10;
     }
 
@@ -652,7 +699,7 @@ public class BenchmarkSetup {
         } else if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
             if (algorithm.getType() == AlgorithmType.FLASH) return 10;
             else if (algorithm.getType() == AlgorithmType.HEURAKLES) return 16;
-        }
+        } 
         return getQuasiIdentifyingAttributes(dataset).length;
     }
 
@@ -710,6 +757,6 @@ public class BenchmarkSetup {
      *         false otherwise
      */
     public static boolean includeRelativeInformationLoss() {
-        return true;
+        return false;
     }
 }
