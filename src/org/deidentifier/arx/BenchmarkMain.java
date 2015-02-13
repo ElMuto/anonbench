@@ -20,15 +20,10 @@
 
 package org.deidentifier.arx;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Arrays;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
-import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.ValueBuffer;

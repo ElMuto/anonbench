@@ -357,16 +357,37 @@ public class BenchmarkSetup {
      * Returns all datasets for the conventional benchmark
      * @return
      */
-    public static BenchmarkDataset[] getDatasets() {
+    public static BenchmarkDataset[] getConventionalDatasets() {
         return new BenchmarkDataset[] {
                 BenchmarkDataset.IHIS,
                 BenchmarkDataset.ADULT,
                 BenchmarkDataset.CUP,
                 BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS,
+                BenchmarkDataset.ATUS
+        };
+    }
+
+    /**
+     * Returns all datasets for the QI count scaling benchmark
+     * @return
+     */
+    public static BenchmarkDataset[] getQICountScalingDatasets() {
+        return new BenchmarkDataset[] {
                 BenchmarkDataset.SS13PMA_TWO_LEVEL,
                 BenchmarkDataset.SS13PMA_FIVE_LEVEL
         };
+    }
+
+    /**
+     * Returns all datasets
+     * @return
+     */
+    public static BenchmarkDataset[] getDatasets() {
+        BenchmarkDataset[] conventional = getConventionalDatasets();
+        BenchmarkDataset[] scaling = getQICountScalingDatasets();
+        BenchmarkDataset[] result = (BenchmarkDataset[]) Arrays.copyOf(conventional, conventional.length + scaling.length);
+        System.arraycopy(scaling, 0, result, conventional.length, scaling.length);
+        return result;
     }
 
     /**

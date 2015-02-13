@@ -47,7 +47,7 @@ public class BenchmarkILBounds {
 
         Algorithm algorithm = new BenchmarkSetup.Algorithm(AlgorithmType.INFORMATION_LOSS_BOUNDS, null);
 
-//        BenchmarkDriver.runIterations(BENCHMARK, driver, REPETITIONS, outputFileName, benchmarkRun, algorithm);
+        BenchmarkDriver.runIterations(BENCHMARK, driver, REPETITIONS, outputFileName, benchmarkRun, algorithm);
 
         writeInformationLossBoundsToResults(algorithm);
     }
