@@ -354,7 +354,8 @@ public class BenchmarkSetup {
         case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
         case SS13ACS_SEMANTIC:
-            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
+//            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
+            return "data/ss13acs_10619Recs_RhodeIsland_edited.csv";
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -582,7 +583,7 @@ public class BenchmarkSetup {
         
         // needed for file name generation
         public String fileBaseName() {
-            return (ht.name() + "_" + this.name());
+            return ((ht.equals(HierarchyType.INTERVAL) ? "i" : "o")  + "_" + this.name());
         }
         
         public HierarchyType getType() {
