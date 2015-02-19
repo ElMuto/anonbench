@@ -437,23 +437,32 @@ public class BenchmarkSetup {
         case SS13PMA_FIVE_LEVEL:
             return Hierarchy.create("hierarchies/ss13pma_hierarchy_pwgtp.csv", ';');
         case SS13ACS_SEMANTIC: {
-//            return Hierarchy.create("hierarchies/ss13acs_hierarchy_" + attribute + ".ahs", ';');
-            HierarchyBuilder<?> loaded = HierarchyBuilder.create("hierarchies/ss13acs_hierarchy_" + SS13PMA_SEMANTIC_QI.valueOf(attribute).fileBaseName() + ".ahs");
-            if (loaded.getType() == Type.INTERVAL_BASED) {
-                HierarchyBuilderIntervalBased<?> builder = (HierarchyBuilderIntervalBased<?>)loaded;
-                Data data = Data.create(getFilePath(dataset), ';');
-                int index = data
-                        .getHandle()
-                        .getColumnIndexOf(attribute);
-                String[] dataArray = data
-                        .getHandle()
-                        .getStatistics()
-                        .getDistinctValues(index);
-                System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(dataArray)));
-                return builder.build();
-            } else {
-                // TODO: implement support ordering based hierarchies
-                throw new RuntimeException("Only INTERVAL_BASED hierarchies supported so far");
+            String filePath = "hierarchies/ss13acs_hierarchy_" + SS13PMA_SEMANTIC_QI.valueOf(attribute).fileBaseName();
+            switch (SS13PMA_SEMANTIC_QI.valueOf(attribute).getType()) {
+            case INTERVAL:
+                filePath += ".ahs";
+                HierarchyBuilder<?> loaded = HierarchyBuilder.create(filePath);
+                if (loaded.getType() == Type.INTERVAL_BASED) {
+                    HierarchyBuilderIntervalBased<?> builder = (HierarchyBuilderIntervalBased<?>)loaded;
+                    Data data = Data.create(getFilePath(dataset), ';');
+                    int index = data
+                            .getHandle()
+                            .getColumnIndexOf(attribute);
+                    String[] dataArray = data
+                            .getHandle()
+                            .getStatistics()
+                            .getDistinctValues(index);
+                    builder.prepare(dataArray);
+                    return builder.build();
+                } else {
+                    throw new RuntimeException("Inconsistent Hierarchy types: expected: interval-based, found: " + loaded.getType());
+                }
+            case ORDER:
+                filePath += ".csv";
+                return Hierarchy.create(filePath, ';');
+            default:
+                break;
+            
             }
         }
         default:
@@ -504,9 +513,9 @@ public class BenchmarkSetup {
     }
     
     private enum SS13PMA_SEMANTIC_QI {
-        PWGTP (HIERARCHY_TYPE.i),
-        AGEP  (HIERARCHY_TYPE.i),
-        INTP  (HIERARCHY_TYPE.i),
+        PWGTP (HierarchyType.INTERVAL),
+        AGEP  (HierarchyType.INTERVAL),
+        INTP  (HierarchyType.INTERVAL),
 //        i_JWMNP,
 //        i_MARHYP,
 //        i_RETP,
@@ -546,13 +555,13 @@ public class BenchmarkSetup {
 //        e03_WKL,
 //        e04_ENG,
 //        e04_MIL,
-//        e05_CIT,
+          CIT(HierarchyType.ORDER),
 //        e05_GCM,
 //        e05_MAR,
 //        e05_NWAV,
 //        e06_DRAT,
 //        e06_WKW,
-//        e09_COW,
+          COW(HierarchyType.ORDER),
 //        e10_JWRIP,
 //        e12_JWTR,
 //        e16_SCHG,
@@ -560,20 +569,24 @@ public class BenchmarkSetup {
 //        e24_SCHL,
         ;
         
-        private enum HIERARCHY_TYPE {
-            i,  // interval based
-            o   // order based
+        private enum HierarchyType {
+            INTERVAL,  // interval based
+            ORDER   // order based
         }
-        private final HIERARCHY_TYPE ht;
+        private final HierarchyType ht;
         
         // constructor
-        SS13PMA_SEMANTIC_QI (HIERARCHY_TYPE ht) {
+        SS13PMA_SEMANTIC_QI (HierarchyType ht) {
             this.ht = ht;
         }
         
         // needed for file name generation
         public String fileBaseName() {
             return (ht.name() + "_" + this.name());
+        }
+        
+        public HierarchyType getType() {
+            return ht;
         }
     }
 
