@@ -576,7 +576,7 @@ public class BenchmarkSetup {
             if (algorithm.getType() == AlgorithmType.FLASH) {
                 return 10;
             }
-            else if (algorithm.getType() == AlgorithmType.HEURAKLES) {
+            else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
                 return 16;
             }
         }
