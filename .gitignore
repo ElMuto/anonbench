@@ -12,3 +12,4 @@ results/img/*.pdf
 results/img/*.dat
 results/img/*.eps
 results/img/*.gp
+/results
