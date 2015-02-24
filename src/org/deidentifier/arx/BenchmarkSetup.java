@@ -27,10 +27,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
+import org.deidentifier.arx.aggregates.HierarchyBuilder;
+import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.criteria.DPresence;
@@ -199,6 +204,12 @@ public class BenchmarkSetup {
             public String toString() {
                 return "SS13PMA_FIVE_LEVEL";
             }
+        },
+        SS13ACS_SEMANTIC {
+            @Override
+            public String toString() {
+                return "SS13ACS_SEMANTIC";
+            }
         }
     }
 
@@ -319,6 +330,11 @@ public class BenchmarkSetup {
         case SS13PMA_TWO_LEVEL:
         case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
+        case SS13ACS_SEMANTIC:
+            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
+//            return "data/ss13acs_10619Recs_RhodeIsland_edited.csv";
+//            return "data/ss13acs_68726Recs_Massachusetts_edited.csv";
+            
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -373,8 +389,9 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getQICountScalingDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.SS13PMA_TWO_LEVEL,
-                BenchmarkDataset.SS13PMA_FIVE_LEVEL
+//                BenchmarkDataset.SS13PMA_TWO_LEVEL,
+//                BenchmarkDataset.SS13PMA_FIVE_LEVEL,
+                BenchmarkDataset.SS13ACS_SEMANTIC
         };
     }
 
@@ -411,6 +428,35 @@ public class BenchmarkSetup {
             return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
         case SS13PMA_FIVE_LEVEL:
             return Hierarchy.create("hierarchies/ss13pma_hierarchy_pwgtp.csv", ';');
+        case SS13ACS_SEMANTIC: {
+            String filePath = "hierarchies/ss13acs_hierarchy_" + SS13PMA_SEMANTIC_QI.valueOf(attribute).fileBaseName();
+            switch (SS13PMA_SEMANTIC_QI.valueOf(attribute).getType()) {
+            case INTERVAL:
+                filePath += ".ahs";
+                HierarchyBuilder<?> loaded = HierarchyBuilder.create(filePath);
+                if (loaded.getType() == Type.INTERVAL_BASED) {
+                    HierarchyBuilderIntervalBased<?> builder = (HierarchyBuilderIntervalBased<?>)loaded;
+                    Data data = Data.create(getFilePath(dataset), ';');
+                    int index = data
+                            .getHandle()
+                            .getColumnIndexOf(attribute);
+                    String[] dataArray = data
+                            .getHandle()
+                            .getStatistics()
+                            .getDistinctValues(index);
+                    builder.prepare(dataArray);
+                    return builder.build();
+                } else {
+                    throw new RuntimeException("Inconsistent Hierarchy types: expected: interval-based, found: " + loaded.getType());
+                }
+            case ORDER:
+                filePath += ".csv";
+                return Hierarchy.create(filePath, ';');
+            default:
+                break;
+            
+            }
+        }
         default:
             return createTwoLevelHierarchy(dataset, attribute);
         }
@@ -456,6 +502,53 @@ public class BenchmarkSetup {
         }
 
         return Hierarchy.create(hierarchy);
+    }
+    
+    private enum SS13PMA_SEMANTIC_QI {
+        INTP (HierarchyType.INTERVAL),
+        MIL  (HierarchyType.ORDER),
+        SCHG (HierarchyType.ORDER),
+        SCHL (HierarchyType.ORDER),
+        SEX  (HierarchyType.ORDER),
+        RELP (HierarchyType.ORDER),
+        CIT  (HierarchyType.ORDER),
+        COW  (HierarchyType.ORDER),
+        PWGTP(HierarchyType.INTERVAL),
+        AGEP (HierarchyType.INTERVAL),
+        FER  (HierarchyType.ORDER),
+        ;
+        
+        private enum HierarchyType {
+            INTERVAL, // interval based
+            ORDER     // order based
+        }
+        private final HierarchyType ht;
+        private final String distinctionLetter;
+        
+        // constructor
+        SS13PMA_SEMANTIC_QI (HierarchyType ht) {
+            this.ht = ht;
+            
+            switch (ht) {
+            case INTERVAL:
+                distinctionLetter = "i";
+                break;
+            case ORDER:
+                distinctionLetter = "o";
+                break;
+            default:
+                distinctionLetter = "x";
+            }
+        }
+        
+        // needed for file name generation
+        public String fileBaseName() {
+            return (distinctionLetter  + "_" + this.name());
+        }
+        
+        public HierarchyType getType() {
+            return ht;
+        }
     }
 
     /**
@@ -541,6 +634,14 @@ public class BenchmarkSetup {
                     "pwgtp29",
                     "pwgtp30"
             };
+        case SS13ACS_SEMANTIC:
+            ArrayList<String> al = new ArrayList<>();
+            for (SS13PMA_SEMANTIC_QI qi : SS13PMA_SEMANTIC_QI.values()) {
+                al.add(qi.toString());
+            }
+            String[] qiArr = new String[al.size()];
+            qiArr = al.toArray(qiArr);
+            return qiArr;
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -554,8 +655,9 @@ public class BenchmarkSetup {
     public static int getMinQICount(BenchmarkDataset dataset) {
         if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
             return 5;
-        }
-        else if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
+        } else if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
+            return 1;
+        } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
             return 1;
         }
         else return getQuasiIdentifyingAttributes(dataset).length;
@@ -579,7 +681,7 @@ public class BenchmarkSetup {
             else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
                 return 16;
             }
-        }
+        } 
         return getQuasiIdentifyingAttributes(dataset).length;
     }
 
