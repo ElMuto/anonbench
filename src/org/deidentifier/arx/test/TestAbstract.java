@@ -64,7 +64,7 @@ public abstract class TestAbstract extends TestCase {
         BenchmarkDriver driver = new BenchmarkDriver(null);
 
         // For each algorithm
-        for (BenchmarkSetup.Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (BenchmarkSetup.Algorithm algorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
 
             // Collect
             TestConfiguration result = driver.test(config.dataset,

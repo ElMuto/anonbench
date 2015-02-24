@@ -23,6 +23,7 @@ package org.deidentifier.arx;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
+import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
@@ -49,10 +51,23 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  */
 public class BenchmarkSetup {
 
-    protected static final TerminationConfiguration.Type TERMINATION_TYPE   = TerminationConfiguration.Type.TIME;
-    private static Integer[]                             TERMINATION_LIMITS = new Integer[] { 2000 };
-//    private static Integer[]                             TERMINATION_LIMITS = new Integer[] { 2000, 5000, 10000, 20000 };
-    private static final boolean                         INCLUDE_FLASH      = false;
+    protected static final TerminationConfiguration.Type TERMINATION_TYPE                  = TerminationConfiguration.Type.TIME;
+    private static Integer[]                             TERMINATION_LIMITS                = new Integer[] { 2000, 5000, 10000, 20000 };
+    private static final boolean                         INCLUDE_FLASH                     = true;
+    public static final boolean                          INCLUDE_RELATIVE_INFORMATION_LOSS = true;
+
+    public static final String                           RESULTS_FILE                      = "results/results.csv";
+    public static final String                           INFORMATION_LOSS_FILE             = "results/informationLossBounds.csv";
+
+    public static String[] getHeader() {
+        return new String[] {
+                VARIABLES.ALGORITHM.val,
+                VARIABLES.DATASET.val,
+                VARIABLES.CRITERIA.val,
+                VARIABLES.METRIC.val,
+                VARIABLES.SUPPRESSION.val,
+                VARIABLES.QI_COUNT.val };
+    }
 
     public static enum AlgorithmType {
         FLASH {
@@ -113,8 +128,8 @@ public class BenchmarkSetup {
         public String getStatusSuffix() {
             String suffix = type.equals(AlgorithmType.HEURAKLES) ?
                     terminationConfig.getValue() + (BenchmarkSetup.TERMINATION_TYPE == TerminationConfiguration.Type.CHECKS ?
-                            "checks" :
-                            "milliseconds") :
+                            " checks" :
+                            " milliseconds") :
                     "no termination limits";
             return suffix;
         }
@@ -202,7 +217,7 @@ public class BenchmarkSetup {
      * Returns all algorithms
      * @return
      */
-    public static List<Algorithm> getAlgorithms() {
+    public static List<Algorithm> getBenchmarkAlgorithms() {
         List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>(TERMINATION_LIMITS.length + (INCLUDE_FLASH ? 1 : 0));
 
         if (INCLUDE_FLASH) benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
@@ -211,20 +226,6 @@ public class BenchmarkSetup {
         }
 
         return benchmarkAlgorithmList;
-    }
-
-    /**
-     * Return algorithm for this type.
-     * @param algorithmType
-     * @return
-     */
-    public static Algorithm getAlgorithmByType(AlgorithmType algorithmType) {
-        for (Algorithm algorithm : getAlgorithms()) {
-            if (algorithm.getType() == algorithmType) {
-                return algorithm;
-            }
-        }
-        throw new RuntimeException("Algorithm with type: " + algorithmType + " not found.");
     }
 
     /**
@@ -272,8 +273,8 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-//        return new double[] { 0d, 1d };
-        return new double[] { 1d };
+        return new double[] { 0d, 1d };
+        // return new double[] { 1d };
     }
 
     /**
@@ -283,17 +284,9 @@ public class BenchmarkSetup {
     @SuppressWarnings("rawtypes")
     public static Metric[] getMetrics() {
         return new Metric[] {
-                // use non-monotonic version of supporting metrics
-                // Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                // Metric.createEntropyMetric(),
-                // Metric.createPrecisionMetric(),
-                // Metric.createAECSMetric(),
-                // Metric.createDiscernabilityMetric()
-
-                // use monotonic version of supporting metrics
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-//                Metric.createEntropyMetric(false),
-//                Metric.createDiscernabilityMetric(false)
+                Metric.createEntropyMetric(false),
+                Metric.createDiscernabilityMetric(false)
         };
     }
 
@@ -304,22 +297,6 @@ public class BenchmarkSetup {
     public static BenchmarkCriterion[][] getCriteria() {
         BenchmarkCriterion[][] result = new BenchmarkCriterion[1][];
         result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-        // result[1] = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY };
-        // result[2] = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
-        // result[3] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE };
-        // result[4] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY };
-        // result[5] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS };
-        // result[6] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE };
-        // result[7] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY };
-        // result[8] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS };
-        // result[9] = new BenchmarkCriterion[] {
-        // BenchmarkCriterion.K_ANONYMITY,
-        // BenchmarkCriterion.D_PRESENCE,
-        // BenchmarkCriterion.L_DIVERSITY };
-        // result[10] = new BenchmarkCriterion[] {
-        // BenchmarkCriterion.K_ANONYMITY,
-        // BenchmarkCriterion.D_PRESENCE,
-        // BenchmarkCriterion.T_CLOSENESS };
         return result;
     }
 
@@ -396,13 +373,13 @@ public class BenchmarkSetup {
      * Returns all datasets for the conventional benchmark
      * @return
      */
-    public static BenchmarkDataset[] getDatasets() {
+    public static BenchmarkDataset[] getConventionalDatasets() {
         return new BenchmarkDataset[] {
-//                BenchmarkDataset.IHIS,
-//                BenchmarkDataset.ADULT,
-//                BenchmarkDataset.CUP,
-//                BenchmarkDataset.FARS,
-//                BenchmarkDataset.ATUS
+                BenchmarkDataset.IHIS,
+                BenchmarkDataset.ADULT,
+                BenchmarkDataset.CUP,
+                BenchmarkDataset.FARS,
+                BenchmarkDataset.ATUS
         };
     }
 
@@ -416,6 +393,18 @@ public class BenchmarkSetup {
 //                BenchmarkDataset.SS13PMA_FIVE_LEVEL,
                 BenchmarkDataset.SS13ACS_SEMANTIC
         };
+    }
+
+    /**
+     * Returns all datasets
+     * @return
+     */
+    public static BenchmarkDataset[] getDatasets() {
+        BenchmarkDataset[] conventional = getConventionalDatasets();
+        BenchmarkDataset[] scaling = getQICountScalingDatasets();
+        BenchmarkDataset[] result = (BenchmarkDataset[]) Arrays.copyOf(conventional, conventional.length + scaling.length);
+        System.arraycopy(scaling, 0, result, conventional.length, scaling.length);
+        return result;
     }
 
     /**
@@ -666,10 +655,12 @@ public class BenchmarkSetup {
     public static int getMinQICount(BenchmarkDataset dataset) {
         if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
             return 5;
+        } else if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
+            return 1;
         } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
             return 1;
         }
-        return 10;
+        else return getQuasiIdentifyingAttributes(dataset).length;
     }
 
     /**
@@ -680,10 +671,16 @@ public class BenchmarkSetup {
      */
     public static int getMaxQICount(Algorithm algorithm, BenchmarkDataset dataset) {
         if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
-            if (algorithm.getType() == AlgorithmType.FLASH) return 23;
+            if (algorithm.getType() == AlgorithmType.FLASH) {
+                return 23;
+            }
         } else if (dataset == BenchmarkDataset.SS13PMA_FIVE_LEVEL) {
-            if (algorithm.getType() == AlgorithmType.FLASH) return 10;
-            else if (algorithm.getType() == AlgorithmType.HEURAKLES) return 16;
+            if (algorithm.getType() == AlgorithmType.FLASH) {
+                return 10;
+            }
+            else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
+                return 16;
+            }
         } 
         return getQuasiIdentifyingAttributes(dataset).length;
     }
@@ -731,17 +728,5 @@ public class BenchmarkSetup {
         default:
             throw new RuntimeException("Invalid dataset");
         }
-    }
-
-    /**
-     * Specify, whether relative information loss shall be calculated. This includes
-     * running a DFS algorithm over the whole lattice determining minimum and maximum
-     * information loss values.
-     * 
-     * @return true if relative information loss shall be included in the results file,
-     *         false otherwise
-     */
-    public static boolean includeRelativeInformationLoss() {
-        return false;
     }
 }

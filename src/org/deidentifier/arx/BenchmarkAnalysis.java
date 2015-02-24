@@ -74,7 +74,12 @@ public class BenchmarkAnalysis {
         INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)"),
         INFORMATION_LOSS_PERCENTAGE("Relative information loss"),
         INFORMATION_LOSS_TRANSFORMATION("Information loss (Transformation)"),
-        QI_COUNT("QI count");
+        QI_COUNT("QI count"),
+        ALGORITHM("Algorithm"),
+        DATASET("Dataset"),
+        CRITERIA("Criteria"),
+        METRIC("Metric"),
+        SUPPRESSION("Suppression");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
@@ -114,7 +119,7 @@ public class BenchmarkAnalysis {
      */
     private static void generatePlots() throws IOException, ParseException {
 
-        CSVFile file = new CSVFile(new File("results/results.csv"));
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
         // for each metric
         for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
@@ -133,7 +138,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.EXECUTION_TIME,
                                             Analyzer.ARITHMETIC_MEAN,
-                                            "Dataset",
+                                            VARIABLES.DATASET.val,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -141,7 +146,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.NUMBER_OF_CHECKS,
                                             Analyzer.VALUE,
-                                            "Dataset",
+                                            VARIABLES.DATASET.val,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -149,7 +154,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.NUMBER_OF_ROLLUPS,
                                             Analyzer.VALUE,
-                                            "Dataset",
+                                            VARIABLES.DATASET.val,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -157,7 +162,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.NUMBER_OF_SNAPSHOTS,
                                             Analyzer.VALUE,
-                                            "Dataset",
+                                            VARIABLES.DATASET.val,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -165,7 +170,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.INFORMATION_LOSS,
                                             Analyzer.VALUE,
-                                            "Dataset",
+                                            VARIABLES.DATASET.val,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -173,7 +178,7 @@ public class BenchmarkAnalysis {
                         groups.add(getGroup(file,
                                             VARIABLES.INFORMATION_LOSS_PERCENTAGE,
                                             Analyzer.VALUE,
-                                            "Dataset",
+                                            VARIABLES.DATASET.val,
                                             scriteria,
                                             suppression,
                                             datasets,
@@ -195,7 +200,7 @@ public class BenchmarkAnalysis {
      */
     private static void generateQICountScalingPlots() throws IOException, ParseException {
 
-        CSVFile file = new CSVFile(new File("results/results.csv"));
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
         for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
             List<PlotGroup> groups = new ArrayList<PlotGroup>();
@@ -281,15 +286,22 @@ public class BenchmarkAnalysis {
 
                 // Select data for the given data point
                 Selector<String[]> selector = file.getSelectorBuilder()
-                                                  .field("Criteria").equals(scriteria).and()
-                                                  .field("Dataset").equals(dataset).and()
-                                                  .field("Suppression").equals(suppression).and()
-                                                  .field("Metric").equals(metric.getName())
+                                                  .field(VARIABLES.DATASET.val)
+                                                  .equals(dataset)
+                                                  .and()
+                                                  .field(VARIABLES.CRITERIA.val)
+                                                  .equals(scriteria)
+                                                  .and()
+                                                  .field(VARIABLES.METRIC.val)
+                                                  .equals(metric.getName())
+                                                  .and()
+                                                  .field(VARIABLES.SUPPRESSION.val)
+                                                  .equals(suppression)
                                                   .build();
 
                 // Create series
                 Series2D series = new Series2D(file, selector,
-                                               new Field("Algorithm"),
+                                               new Field(VARIABLES.ALGORITHM.val),
                                                new Field(variable.val, measure));
 
                 // Select from series
@@ -344,7 +356,7 @@ public class BenchmarkAnalysis {
      */
     private static void generateTables() throws IOException, ParseException {
 
-        CSVFile file = new CSVFile(new File("results/results.csv"));
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
         // for each metric
         for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
@@ -388,7 +400,7 @@ public class BenchmarkAnalysis {
         Series3D series = null;
 
         // Collect data for all algorithms
-        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        for (Algorithm algorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
 
             Series3D _series = getSeries(file,
                                          algorithm.toString(),
@@ -404,7 +416,7 @@ public class BenchmarkAnalysis {
         }
 
         // Make sure labels are printed correctly
-        if (!focus.equals("QI count")) {
+        if (!focus.equals(VARIABLES.QI_COUNT.val)) {
             series.transform(new Function<Point3D>() {
                 @Override
                 public Point3D apply(Point3D t) {
@@ -527,14 +539,14 @@ public class BenchmarkAnalysis {
 
         // Select data for the given parameters
 
-        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field("Algorithm").equals(algorithm).and()
-                                                        .field("Suppression").equals(suppression).and()
-                                                        .field("Metric").equals(metric.getName()).and()
-                                                        .field("Criteria").equals(scriteria).and()
+        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field(VARIABLES.ALGORITHM.val).equals(algorithm).and()
+                                                        .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                        .field(VARIABLES.SUPPRESSION.val).equals(metric.getName()).and()
+                                                        .field(VARIABLES.CRITERIA.val).equals(scriteria).and()
                                                         .begin();
 
         for (int i = 0; i < datasets.length; ++i) {
-            selectorBuilder.field("Dataset").equals(datasets[i].toString());
+            selectorBuilder.field(VARIABLES.DATASET.val).equals(datasets[i].toString());
             if (i < datasets.length - 1) {
                 selectorBuilder.or();
             }
@@ -548,7 +560,7 @@ public class BenchmarkAnalysis {
         // and thus only one z coordinate is being encountered.
         Series3D series = new Series3D(file, selector,
                                        new Field(focus),
-                                       new Field("Algorithm"),
+                                       new Field(VARIABLES.ALGORITHM.val),
                                        new Field(variable, measure),
                                        new BufferedGeometricMeanAnalyzer());
 
