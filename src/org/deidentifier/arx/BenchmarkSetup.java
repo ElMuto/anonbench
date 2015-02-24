@@ -354,8 +354,10 @@ public class BenchmarkSetup {
         case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
         case SS13ACS_SEMANTIC:
-//            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
-            return "data/ss13acs_10619Recs_RhodeIsland_edited.csv";
+            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
+//            return "data/ss13acs_10619Recs_RhodeIsland_edited.csv";
+//            return "data/ss13acs_68726Recs_Massachusetts_edited.csv";
+            
         default:
             throw new RuntimeException("Invalid dataset");
         }
@@ -514,76 +516,45 @@ public class BenchmarkSetup {
     }
     
     private enum SS13PMA_SEMANTIC_QI {
-        PWGTP (HierarchyType.INTERVAL),
-        AGEP  (HierarchyType.INTERVAL),
-        INTP  (HierarchyType.INTERVAL),
-//        i_JWMNP,
-//        i_MARHYP,
-//        i_RETP,
-//        i_SEMP,
-//        i_SSP,
-//        i_WAGP,
-//        i_WKHP,
-//        e02_DDRS,
-//        e02_DEAR,
-//        e02_DEYE,
-//        e02_DOUT,
-//        e02_DPHY,
-//        e02_DRATX,
-//        e02_DREM,
-//        e02_FER,
-//        e02_GCL,
-//        e02_GCR,
-//        e02_HINS1,
-//        e02_HINS2,
-//        e02_HINS3,
-//        e02_HINS4,
-//        e02_HINS5,
-//        e02_HINS6,
-//        e02_HINS7,
-//        e02_LANX,
-//        e02_MARHD,
-//        e02_MARHM,
-//        e02_MARHW,
-//        e02_SEX,
-//        e03_MARHT,
-//        e03_MIG,
-//        e03_NWAB,
-//        e03_NWLA,
-//        e03_NWLK,
-//        e03_NWRE,
-//        e03_SCH,
-//        e03_WKL,
-//        e04_ENG,
-//        e04_MIL,
-          CIT(HierarchyType.ORDER),
-//        e05_GCM,
-//        e05_MAR,
-//        e05_NWAV,
-//        e06_DRAT,
-//        e06_WKW,
-          COW(HierarchyType.ORDER),
-//        e10_JWRIP,
-//        e12_JWTR,
-//        e16_SCHG,
-//        e17_RELP,
-//        e24_SCHL,
+        INTP (HierarchyType.INTERVAL),
+        MIL  (HierarchyType.ORDER),
+        SCHG (HierarchyType.ORDER),
+        SCHL (HierarchyType.ORDER),
+        SEX  (HierarchyType.ORDER),
+        RELP (HierarchyType.ORDER),
+        CIT  (HierarchyType.ORDER),
+        COW  (HierarchyType.ORDER),
+        PWGTP(HierarchyType.INTERVAL),
+        AGEP (HierarchyType.INTERVAL),
+        FER  (HierarchyType.ORDER),
         ;
         
         private enum HierarchyType {
-            INTERVAL,  // interval based
-            ORDER   // order based
+            INTERVAL, // interval based
+            ORDER     // order based
         }
         private final HierarchyType ht;
+        private final String distinctionLetter;
         
         // constructor
         SS13PMA_SEMANTIC_QI (HierarchyType ht) {
             this.ht = ht;
+            
+            switch (ht) {
+            case INTERVAL:
+                distinctionLetter = "i";
+                break;
+            case ORDER:
+                distinctionLetter = "o";
+                break;
+            default:
+                distinctionLetter = "x";
+            }
         }
         
         // needed for file name generation
         public String fileBaseName() {
-            return ((ht.equals(HierarchyType.INTERVAL) ? "i" : "o")  + "_" + this.name());
+            return (distinctionLetter  + "_" + this.name());
         }
         
         public HierarchyType getType() {
