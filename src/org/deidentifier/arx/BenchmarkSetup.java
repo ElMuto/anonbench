@@ -331,9 +331,9 @@ public class BenchmarkSetup {
         case SS13PMA_FIVE_LEVEL:
             return "data/ss13pma_clean.csv";
         case SS13ACS_SEMANTIC:
-            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
+//            return "data/ss13acs_05829Recs_Wyoming_edited.csv";
 //            return "data/ss13acs_10619Recs_RhodeIsland_edited.csv";
-//            return "data/ss13acs_68726Recs_Massachusetts_edited.csv";
+            return "data/ss13acs_68726Recs_Massachusetts_edited.csv";
             
         default:
             throw new RuntimeException("Invalid dataset");
@@ -505,17 +505,17 @@ public class BenchmarkSetup {
     }
     
     private enum SS13PMA_SEMANTIC_QI {
-        INTP (HierarchyType.INTERVAL),
-        MIL  (HierarchyType.ORDER),
-        SCHG (HierarchyType.ORDER),
-        SCHL (HierarchyType.ORDER),
-        SEX  (HierarchyType.ORDER),
-        RELP (HierarchyType.ORDER),
-        CIT  (HierarchyType.ORDER),
-        COW  (HierarchyType.ORDER),
-        PWGTP(HierarchyType.INTERVAL),
-        AGEP (HierarchyType.INTERVAL),
-        FER  (HierarchyType.ORDER),
+        INTP (HierarchyType.INTERVAL),  // height 10
+        AGEP (HierarchyType.INTERVAL),  // height 06
+        PWGTP(HierarchyType.INTERVAL),  // height 06
+        SCHG (HierarchyType.ORDER),     // height 05
+        SCHL (HierarchyType.ORDER),     // height 05
+        RELP (HierarchyType.ORDER),     // height 05
+        MIL  (HierarchyType.ORDER),     // height 04
+        COW  (HierarchyType.ORDER),     // height 04
+        CIT  (HierarchyType.ORDER),     // height 03
+        SEX  (HierarchyType.ORDER),     // height 02
+        FER  (HierarchyType.ORDER),     // height 02
         ;
         
         private enum HierarchyType {
@@ -658,7 +658,7 @@ public class BenchmarkSetup {
         } else if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
             return 1;
         } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
-            return 1;
+            return 10;
         }
         else return getQuasiIdentifyingAttributes(dataset).length;
     }
@@ -681,7 +681,14 @@ public class BenchmarkSetup {
             else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
                 return 16;
             }
-        } 
+        }  else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
+            if (algorithm.getType() == AlgorithmType.FLASH) {
+                return 10;
+            }
+            else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
+                return 11;
+            }
+        }
         return getQuasiIdentifyingAttributes(dataset).length;
     }
 
