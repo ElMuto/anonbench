@@ -168,7 +168,12 @@ public class BenchmarkILBounds {
                                         double value = Double.parseDouble(csvLine.get(VARIABLES.INFORMATION_LOSS.val, "Value"));
 
                                         // compute relative percentage
-                                        value = ((value - min) / (max - min)) * 100.0;
+                                        if (max == min && min == value) {
+                                            value = 0d;
+                                        } else if (value != BenchmarkDriver.NO_SOLUTION_FOUND) {
+                                            value = ((value - min) / (max - min)) * 100.0;
+                                        }
+                                        
                                         // add the value to the line
                                         csvLine.addColumn(String.valueOf(min));
                                         csvLine.addColumn(minTransformation);

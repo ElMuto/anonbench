@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
+import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.metric.Metric;
@@ -108,8 +109,8 @@ public class BenchmarkAnalysis {
     public static void main(String[] args) throws IOException, ParseException {
 
         generateTables();
-        generatePlots();
-        generateQICountScalingPlots();
+        // generatePlots();
+        // generateQICountScalingPlots();
     }
 
     /**
@@ -251,13 +252,24 @@ public class BenchmarkAnalysis {
                                                                                                                                         IOException {
 
         // Create csv header
-        String[] header1 = new String[BenchmarkSetup.getDatasets().length + 1];
-        Arrays.fill(header1, "");
-        String[] header2 = new String[header1.length];
-        header2[0] = "";
-        for (int i = 1; i < header2.length; i++) {
-            header2[i] = BenchmarkSetup.getDatasets()[i - 1].toString();
+        ArrayList<String> header = new ArrayList<String>();
+        header.add("");
+        for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+            int minQI = BenchmarkSetup.getMinQICount(dataset);
+            int maxQI = minQI;
+            for (Algorithm algorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
+                maxQI = Math.max(BenchmarkSetup.getMaxQICount(algorithm, dataset), maxQI);
+            }
+
+            for (int numQI = minQI; numQI <= maxQI; ++numQI) {
+                header.add(dataset.toString() + " " + numQI + " QIs");
+            }
         }
+
+        String[] header2 = new String[header.size()];
+        header.toArray(header2);
+        String[] header1 = new String[header.size()];
+        Arrays.fill(header1, "");
 
         // Create csv
         CSVFile csv = new CSVFile(header1, header2);
@@ -265,82 +277,111 @@ public class BenchmarkAnalysis {
         // For each criterion
         for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
-            // The current line
-            String scriteria = Arrays.toString(criteria);
-            String[] line = new String[header1.length];
-            line[0] = scriteria;
+            // For each algorithm of type heurakles
+            for (Algorithm heurakles : BenchmarkSetup.getBenchmarkAlgorithms()) {
+                if (heurakles.getType() != AlgorithmType.HEURAKLES) continue;
 
-            // For each dataset
-            for (int i = 1; i < header1.length; i++) {
+                // The current line
+                String scriteria = Arrays.toString(criteria);
+                ArrayList<String> line = new ArrayList<String>();
+                line.add(scriteria);
 
-                // Init
-                String dataset = BenchmarkSetup.getDatasets()[i - 1].toString();
-                String firstAlgorithm = null;
-                String secondAlgorithm = null;
-                double firstValue = Double.MAX_VALUE;
-                double secondValue = Double.MAX_VALUE;
-                if (!lowerIsBetter) {
-                    firstValue = Double.MIN_VALUE;
-                    secondValue = Double.MIN_VALUE;
-                }
+                // For each dataset and QI count combination
+                for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+                    int minQI = BenchmarkSetup.getMinQICount(dataset);
+                    int maxQI = minQI;
+                    for (Algorithm algorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
+                        maxQI = Math.max(BenchmarkSetup.getMaxQICount(algorithm, dataset), maxQI);
+                    }
 
-                // Select data for the given data point
-                Selector<String[]> selector = file.getSelectorBuilder()
-                                                  .field(VARIABLES.DATASET.val)
-                                                  .equals(dataset)
-                                                  .and()
-                                                  .field(VARIABLES.CRITERIA.val)
-                                                  .equals(scriteria)
-                                                  .and()
-                                                  .field(VARIABLES.METRIC.val)
-                                                  .equals(metric.getName())
-                                                  .and()
-                                                  .field(VARIABLES.SUPPRESSION.val)
-                                                  .equals(suppression)
-                                                  .build();
+                    for (int numQI = minQI; numQI <= maxQI; ++numQI) {
 
-                // Create series
-                Series2D series = new Series2D(file, selector,
-                                               new Field(VARIABLES.ALGORITHM.val),
-                                               new Field(variable.val, measure));
+                        // Init
+                        String firstAlgorithm = null;
+                        String secondAlgorithm = null;
+                        double firstValue = Double.MAX_VALUE;
+                        double secondValue = Double.MAX_VALUE;
+                        if (!lowerIsBetter) {
+                            firstValue = Double.MIN_VALUE;
+                            secondValue = Double.MIN_VALUE;
+                        }
 
-                // Select from series
-                for (Point2D point : series.getData()) {
+                        // Select data for the given data point
+                        Selector<String[]> selector = file.getSelectorBuilder()
+                                                          .field(VARIABLES.DATASET.val)
+                                                          .equals(dataset.toString())
+                                                          .and()              
+                                                          .field(VARIABLES.QI_COUNT.val)
+                                                          .equals(String.valueOf(numQI))
+                                                          .and()
+                                                          .field(VARIABLES.CRITERIA.val)
+                                                          .equals(scriteria)
+                                                          .and()
+                                                          .field(VARIABLES.METRIC.val)
+                                                          .equals(metric.getName())
+                                                          .and()
+                                                          .field(VARIABLES.SUPPRESSION.val)
+                                                          .equals(suppression)
+                                                          .and()
+                                                              .begin()
+                                                              .field(VARIABLES.ALGORITHM.val)
+                                                              .equals(heurakles.toString())
+                                                              .or()
+                                                              .field(VARIABLES.ALGORITHM.val)
+                                                              .equals(AlgorithmType.FLASH.toString())
+                                                              .end()
+                                                          .build();
 
-                    // Read
-                    double value = Double.valueOf(point.y);
-                    String algorithm = point.x;
+                        // Create series
+                        Series2D series = new Series2D(file, selector,
+                                                       new Field(VARIABLES.ALGORITHM.val),
+                                                       new Field(variable.val, measure));
 
-                    // Check
-                    if ((lowerIsBetter && value < firstValue) ||
-                        (!lowerIsBetter && value > firstValue)) {
+                        boolean noSolutionFound = false;
+                        
+                        // Select from series
+                        for (Point2D point : series.getData()) {
 
-                        secondValue = firstValue;
-                        secondAlgorithm = firstAlgorithm;
+                            // Read
+                            double value = Double.valueOf(point.y);
+                            if (variable == VARIABLES.INFORMATION_LOSS && value == (double)BenchmarkDriver.NO_SOLUTION_FOUND) noSolutionFound = true;
+                            String algorithm = point.x;
 
-                        firstValue = value;
-                        firstAlgorithm = algorithm;
+                            // Check
+                            if ((lowerIsBetter && value < firstValue) ||
+                                (!lowerIsBetter && value > firstValue)) {
 
-                    } else if ((lowerIsBetter && value < secondValue) ||
-                               (!lowerIsBetter && value > secondValue)) {
+                                secondValue = firstValue;
+                                secondAlgorithm = firstAlgorithm;
 
-                        secondValue = value;
-                        secondAlgorithm = algorithm;
+                                firstValue = value;
+                                firstAlgorithm = algorithm;
+
+                            } else if ((lowerIsBetter && value < secondValue) ||
+                                       (!lowerIsBetter && value > secondValue)) {
+
+                                secondValue = value;
+                                secondAlgorithm = algorithm;
+                            }
+                        }
+
+                        // Compute difference
+                        double difference = 0;
+                        if (lowerIsBetter) difference = (1d - (firstValue / secondValue)) * 100d;
+                        else difference = (1d - (secondValue / firstValue)) * 100d;
+
+                        // Render and store
+                        final NumberFormat df = new DecimalFormat("#");
+                        line.add(noSolutionFound ? "No solution found" : firstAlgorithm + " (" + df.format(difference) + "%) " + secondAlgorithm);
                     }
                 }
 
-                // Compute difference
-                double difference = 0;
-                if (lowerIsBetter) difference = (1d - (firstValue / secondValue)) * 100d;
-                else difference = (1d - (secondValue / firstValue)) * 100d;
-
-                // Render and store
-                final NumberFormat df = new DecimalFormat("#");
-                line[i] = firstAlgorithm + " (" + df.format(difference) + "%) " + secondAlgorithm;
+                // Add line
+                String[] lineArr = new String[line.size()];
+                line.toArray(lineArr);
+                csv.addLine(lineArr);
             }
 
-            // Add line
-            csv.addLine(line);
         }
 
         // Write to file

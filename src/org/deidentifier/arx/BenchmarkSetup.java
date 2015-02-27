@@ -28,13 +28,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.aggregates.HierarchyBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased;
-import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
@@ -274,7 +272,6 @@ public class BenchmarkSetup {
      */
     public static double[] getSuppression() {
         return new double[] { 0d, 1d };
-        // return new double[] { 1d };
     }
 
     /**
