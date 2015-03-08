@@ -50,9 +50,9 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
 public class BenchmarkSetup {
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE                  = TerminationConfiguration.Type.TIME;
-    private static Integer[]                             TERMINATION_LIMITS                = new Integer[] { 2000, 5000, 10000, 20000 };
-    private static final boolean                         INCLUDE_FLASH                     = true;
-    public static final boolean                          INCLUDE_RELATIVE_INFORMATION_LOSS = true;
+    private static Integer[]                             TERMINATION_LIMITS                = new Integer[] { 100, 200 };
+    private static final boolean                         INCLUDE_FLASH                     = false;
+    public static final boolean                          INCLUDE_RELATIVE_INFORMATION_LOSS = false;
 
     public static final String                           RESULTS_FILE                      = "results/results.csv";
     public static final String                           INFORMATION_LOSS_FILE             = "results/informationLossBounds.csv";
@@ -271,7 +271,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 1d };
+        return new double[] { 0d };
     }
 
     /**
@@ -282,8 +282,8 @@ public class BenchmarkSetup {
     public static Metric[] getMetrics() {
         return new Metric[] {
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(false),
-                Metric.createDiscernabilityMetric(false)
+//                Metric.createEntropyMetric(false),
+//                Metric.createDiscernabilityMetric(false)
         };
     }
 
@@ -372,11 +372,11 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDataset[] getConventionalDatasets() {
         return new BenchmarkDataset[] {
-                BenchmarkDataset.IHIS,
-                BenchmarkDataset.ADULT,
-                BenchmarkDataset.CUP,
-                BenchmarkDataset.FARS,
-                BenchmarkDataset.ATUS
+//                BenchmarkDataset.IHIS,
+//                BenchmarkDataset.ADULT,
+//                BenchmarkDataset.CUP,
+//                BenchmarkDataset.FARS,
+//                BenchmarkDataset.ATUS
         };
     }
 
@@ -502,17 +502,36 @@ public class BenchmarkSetup {
     }
     
     private enum SS13PMA_SEMANTIC_QI {
-        INTP (HierarchyType.INTERVAL),  // height 10
-        AGEP (HierarchyType.INTERVAL),  // height 06
-        PWGTP(HierarchyType.INTERVAL),  // height 06
-        SCHG (HierarchyType.ORDER),     // height 05
-        SCHL (HierarchyType.ORDER),     // height 05
-        RELP (HierarchyType.ORDER),     // height 05
-        MIL  (HierarchyType.ORDER),     // height 04
-        COW  (HierarchyType.ORDER),     // height 04
-        CIT  (HierarchyType.ORDER),     // height 03
-        SEX  (HierarchyType.ORDER),     // height 02
-        FER  (HierarchyType.ORDER),     // height 02
+        INTP  (HierarchyType.INTERVAL),// height 10
+        AGEP  (HierarchyType.INTERVAL),// height 06
+        PWGTP (HierarchyType.INTERVAL),// height 06
+        SCHG  (HierarchyType.ORDER),   // height 05
+        SCHL  (HierarchyType.ORDER),   // height 05
+        RELP  (HierarchyType.ORDER),   // height 05
+        MIL   (HierarchyType.ORDER),   // height 04
+        COW   (HierarchyType.ORDER),   // height 04
+        CIT   (HierarchyType.ORDER),   // height 03
+        SEX   (HierarchyType.ORDER),   // height 02
+        FER   (HierarchyType.ORDER),   // height 02
+        DDRS  (HierarchyType.ORDER),   // height 02
+        DEAR  (HierarchyType.ORDER),   // height 02
+        DEYE  (HierarchyType.ORDER),   // height 02
+        DOUT  (HierarchyType.ORDER),   // height 02
+        DPHY  (HierarchyType.ORDER),   // height 02
+        DREM  (HierarchyType.ORDER),   // height 02
+        GCL   (HierarchyType.ORDER),   // height 02
+        HINS1 (HierarchyType.ORDER),   // height 02
+        HINS2 (HierarchyType.ORDER),   // height 02
+        HINS3 (HierarchyType.ORDER),   // height 02
+        HINS4 (HierarchyType.ORDER),   // height 02
+        HINS5 (HierarchyType.ORDER),   // height 02
+        HINS6 (HierarchyType.ORDER),   // height 02
+        HINS7 (HierarchyType.ORDER),   // height 02
+        MAR   (HierarchyType.ORDER),   // height 03
+        MIG   (HierarchyType.ORDER),   // height 04
+        MARHD (HierarchyType.ORDER),   // height 02
+        MARHM (HierarchyType.ORDER),   // height 02
+        MARHW (HierarchyType.ORDER),   // height 02
         ;
         
         private enum HierarchyType {
@@ -655,7 +674,7 @@ public class BenchmarkSetup {
         } else if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
             return 1;
         } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
-            return 10;
+            return 30;
         }
         else return getQuasiIdentifyingAttributes(dataset).length;
     }
@@ -683,7 +702,7 @@ public class BenchmarkSetup {
                 return 10;
             }
             else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
-                return 11;
+                return 30;
             }
         }
         return getQuasiIdentifyingAttributes(dataset).length;
