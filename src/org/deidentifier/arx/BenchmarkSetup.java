@@ -502,17 +502,36 @@ public class BenchmarkSetup {
     }
     
     private enum SS13PMA_SEMANTIC_QI {
-        INTP (HierarchyType.INTERVAL),  // height 10
-        AGEP (HierarchyType.INTERVAL),  // height 06
-        PWGTP(HierarchyType.INTERVAL),  // height 06
-        SCHG (HierarchyType.ORDER),     // height 05
-        SCHL (HierarchyType.ORDER),     // height 05
-        RELP (HierarchyType.ORDER),     // height 05
-        MIL  (HierarchyType.ORDER),     // height 04
-        COW  (HierarchyType.ORDER),     // height 04
-        CIT  (HierarchyType.ORDER),     // height 03
-        SEX  (HierarchyType.ORDER),     // height 02
-        FER  (HierarchyType.ORDER),     // height 02
+        INTP  (HierarchyType.INTERVAL),// height 10
+        AGEP  (HierarchyType.INTERVAL),// height 06
+        PWGTP (HierarchyType.INTERVAL),// height 06
+        SCHG  (HierarchyType.ORDER),   // height 05
+        SCHL  (HierarchyType.ORDER),   // height 05
+        RELP  (HierarchyType.ORDER),   // height 05
+        MIL   (HierarchyType.ORDER),   // height 04
+        COW   (HierarchyType.ORDER),   // height 04
+        CIT   (HierarchyType.ORDER),   // height 03
+        SEX   (HierarchyType.ORDER),   // height 02
+        FER   (HierarchyType.ORDER),   // height 02
+        DDRS  (HierarchyType.ORDER),   // height 02
+        DEAR  (HierarchyType.ORDER),   // height 02
+        DEYE  (HierarchyType.ORDER),   // height 02
+        DOUT  (HierarchyType.ORDER),   // height 02
+        DPHY  (HierarchyType.ORDER),   // height 02
+        DREM  (HierarchyType.ORDER),   // height 02
+        GCL   (HierarchyType.ORDER),   // height 02
+        HINS1 (HierarchyType.ORDER),   // height 02
+        HINS2 (HierarchyType.ORDER),   // height 02
+        HINS3 (HierarchyType.ORDER),   // height 02
+        HINS4 (HierarchyType.ORDER),   // height 02
+        HINS5 (HierarchyType.ORDER),   // height 02
+        HINS6 (HierarchyType.ORDER),   // height 02
+        HINS7 (HierarchyType.ORDER),   // height 02
+        MAR   (HierarchyType.ORDER),   // height 03
+        MIG   (HierarchyType.ORDER),   // height 04
+        MARHD (HierarchyType.ORDER),   // height 02
+        MARHM (HierarchyType.ORDER),   // height 02
+        MARHW (HierarchyType.ORDER),   // height 02
         ;
         
         private enum HierarchyType {
