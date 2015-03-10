@@ -50,7 +50,7 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
 public class BenchmarkSetup {
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE                  = TerminationConfiguration.Type.TIME;
-    private static Integer[]                             TERMINATION_LIMITS                = new Integer[] { 100, 200 };
+    private static Integer[]                             TERMINATION_LIMITS                = new Integer[] { 30000, 60000, 300000, 600000 };
     private static final boolean                         INCLUDE_FLASH                     = false;
     public static final boolean                          INCLUDE_RELATIVE_INFORMATION_LOSS = false;
 
@@ -271,7 +271,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d };
+        return new double[] { 0d, 1d };
     }
 
     /**
@@ -282,8 +282,8 @@ public class BenchmarkSetup {
     public static Metric[] getMetrics() {
         return new Metric[] {
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-//                Metric.createEntropyMetric(false),
-//                Metric.createDiscernabilityMetric(false)
+                Metric.createEntropyMetric(false),
+                Metric.createDiscernabilityMetric(false)
         };
     }
 
@@ -674,7 +674,7 @@ public class BenchmarkSetup {
         } else if (dataset == BenchmarkDataset.SS13PMA_TWO_LEVEL) {
             return 1;
         } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
-            return 30;
+            return 15;
         }
         else return getQuasiIdentifyingAttributes(dataset).length;
     }
@@ -702,7 +702,7 @@ public class BenchmarkSetup {
                 return 10;
             }
             else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
-                return 30;
+                return 15;
             }
         }
         return getQuasiIdentifyingAttributes(dataset).length;
