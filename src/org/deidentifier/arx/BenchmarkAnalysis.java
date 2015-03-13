@@ -80,7 +80,8 @@ public class BenchmarkAnalysis {
         DATASET("Dataset"),
         CRITERIA("Criteria"),
         METRIC("Metric"),
-        SUPPRESSION("Suppression");
+        SUPPRESSION("Suppression"),
+        TERMINATION_LIMIT("Termination Limit");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();

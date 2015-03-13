@@ -77,7 +77,7 @@ public class InformationLossTest {
         for (BenchmarkDataset data : datasets) {
             for (Algorithm algorithm : algorithms) {
                 // Warmup run
-                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, true, true);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, true);
 
                 // Benchmark
                 BENCHMARK.addRun(algorithm.toString(),
@@ -86,7 +86,7 @@ public class InformationLossTest {
                                  lossMetric.getName(),
                                  String.valueOf(suppression));
 
-                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, false, true);
+                driver.anonymize(data, criteria, algorithm, lossMetric, suppression, 0, false);
 
                 // Write results incrementally
                 BENCHMARK.getResults().write(new File(file));
@@ -101,7 +101,6 @@ public class InformationLossTest {
                          entropyMetric,
                          suppression,
                          0,
-                         true,
                          true);
 
         // Benchmark
@@ -117,8 +116,7 @@ public class InformationLossTest {
                          entropyMetric,
                          suppression,
                          0,
-                         false,
-                         true);
+                         false);
 
         // Write results incrementally
         BENCHMARK.getResults().write(new File(file));

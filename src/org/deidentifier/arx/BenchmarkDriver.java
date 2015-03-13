@@ -20,7 +20,6 @@
 
 package org.deidentifier.arx;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
@@ -92,13 +91,33 @@ public class BenchmarkDriver {
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           Algorithm algorithm,
-                          Metric<?> metric, double suppression, int qiCount, boolean warmup, boolean benchmarkRun) throws IOException {
+                          Metric<?> metric, double suppression, int qiCount, boolean warmup) {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, qiCount);
+        AbstractBenchmarkAlgorithm implementation = null;
+        try {
+            implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, qiCount);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        // for real benchmark run
-        if (benchmarkRun) {
+        if (AlgorithmType.INFORMATION_LOSS_BOUNDS == algorithm.getType()) {
+            // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
+            AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
+            algo.traverse();
+            // TODO handle the case that no solution exists at all
+            benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_MINIMUM,
+                               (null != algo.getGlobalMinimum() ? algo.getGlobalMinimum().getInformationLoss() : NO_SOLUTION_FOUND));
+            benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
+                               null != algo.getGlobalMinimum() ? (Arrays.toString(algo.getGlobalMinimum().getTransformation())) : Arrays.toString(new int[0]));
+            benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_MAXIMUM,
+                               null != algo.getGlobalMaximum() ? algo.getGlobalMaximum().getInformationLoss() : NO_SOLUTION_FOUND);
+            benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION, null != algo.getGlobalMaximum() ?
+                    (Arrays.toString(algo.getGlobalMaximum().getTransformation())) : Arrays.toString(new int[0]));
+        }
+        // for Flash, Heurakles
+        else {
+
             // Execute
             if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
             implementation.traverse();
@@ -114,22 +133,7 @@ public class BenchmarkDriver {
                     Arrays.toString(implementation.getGlobalOptimum().getTransformation()) :
                     Arrays.toString(new int[0]));
         }
-        // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
-        else {
-            if (!warmup) {
-                AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
-                algo.traverse();
-                // TODO handle the case that no solution exists at all
-                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM,
-                                   (null != algo.getGlobalMinimum() ? algo.getGlobalMinimum().getInformationLoss() : NO_SOLUTION_FOUND));
-                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MINIMUM_TRANSFORMATION,
-                                   null != algo.getGlobalMinimum() ? (Arrays.toString(algo.getGlobalMinimum().getTransformation())) : Arrays.toString(new int[0]));
-                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM,
-                                   null != algo.getGlobalMaximum() ? algo.getGlobalMaximum().getInformationLoss() : NO_SOLUTION_FOUND);
-                benchmark.addValue(BenchmarkILBounds.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION, null != algo.getGlobalMaximum() ?
-                        (Arrays.toString(algo.getGlobalMaximum().getTransformation())) : Arrays.toString(new int[0]));
-            }
-        }
+
     }
 
     /**
@@ -233,77 +237,4 @@ public class BenchmarkDriver {
         return implementation;
     }
 
-    public static void
-            runIterations(Benchmark BENCHMARK,
-                          BenchmarkDriver driver,
-                          int REPETITIONS,
-                          String outputFileName,
-                          boolean benchmarkRun,
-                          Algorithm algorithm) throws IOException {
-
-        // For each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-            // For each suppression factor
-            for (double suppression : BenchmarkSetup.getSuppression()) {
-
-                // For each combination of criteria
-                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-
-                    // For each dataset
-                    for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
-
-                        for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
-
-                            runBenchmark(BENCHMARK, REPETITIONS, driver, outputFileName, benchmarkRun,
-                                         algorithm,
-                                         data,
-                                         criteria,
-                                         metric,
-                                         suppression,
-                                         qiCount);
-
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    private static void runBenchmark(Benchmark BENCHMARK,
-                                     int REPETITIONS,
-                                     BenchmarkDriver driver,
-                                     String outputFileName,
-                                     boolean benchmarkRun,
-                                     Algorithm algorithm,
-                                     BenchmarkDataset data,
-                                     BenchmarkCriterion[] criteria,
-                                     Metric<?> metric,
-                                     double suppression,
-                                     int qiCount) throws IOException {
-        // Warmup run
-        driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, true, benchmarkRun);
-
-        // Print status info
-        System.out.println("Running: " + algorithm.toString() + " with " + algorithm.getStatusSuffix() + " / " + data.toString() + " / " +
-                           metric.getName() +
-                           " / " + suppression + " / " + Arrays.toString(criteria) + " / " + qiCount + " QIs");
-
-        // Benchmark
-        BENCHMARK.addRun(algorithm.toString(),
-                         data.toString(),
-                         Arrays.toString(criteria),
-                         metric.getName(),
-                         String.valueOf(suppression),
-                         qiCount);
-
-        // Repeat
-        for (int i = 0; i < REPETITIONS; i++) {
-            driver.anonymize(data, criteria, algorithm, metric, suppression, qiCount, false, benchmarkRun);
-        }
-
-        // Write results incrementally
-        BENCHMARK.getResults().write(new File(outputFileName));
-    }
 }
