@@ -1,0 +1,5 @@
+cd heurakles-bench/
+rm -rf jars/*.jar
+rm -rf *.csv
+rm -rf run.sh
+rm -rf *.log
