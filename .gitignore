@@ -6,10 +6,3 @@
 .settings
 data/*.csv
 hierarchies/*.csv
-results/*.csv
-results/*.pdf
-results/img/*.pdf
-results/img/*.dat
-results/img/*.eps
-results/img/*.gp
-/results
