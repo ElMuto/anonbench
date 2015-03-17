@@ -1,8 +1,7 @@
 /bin
 /.classpath
-
 /.project
-
 .settings
 data/*.csv
 hierarchies/*.csv
+*.jar
