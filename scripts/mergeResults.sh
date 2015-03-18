@@ -9,5 +9,6 @@ cp results1.csv ${MERGED_FILENAME}
 for nodeNum in {2..4}
 do
 	FILENAME=results${nodeNum}.csv
-	grep -v 'Execution time' ${FILENAME} | grep -v 'Standard Deviation' >> ${MERGED_FILENAME}
+	sed -i -e '1,2d' ${FILENAME}
+	cat ${FILENAME} >> ${MERGED_FILENAME}
 done
