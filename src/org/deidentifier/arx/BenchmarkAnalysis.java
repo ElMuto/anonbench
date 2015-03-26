@@ -99,7 +99,8 @@ public class BenchmarkAnalysis {
         METRIC("Metric"),
         SUPPRESSION("Suppression"),
         TERMINATION_LIMIT("Termination Limit"),
-        SOLUTION_DISCOVERY_TIME("Solution discovery time");
+        SOLUTION_DISCOVERY_TIME("Solution discovery time"),
+        EXHAUSTIVE_SEARCH_TIME("Exhaustive search time");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
@@ -129,7 +130,7 @@ public class BenchmarkAnalysis {
 //        generateTables();
 //        generateConventionalPlots();
 //        generateQICountScalingPlots();
-//        generateFlashComparisonPlots();
+        generateFlashComparisonPlots();
 //        generateHeuraklesSelfComparisonPlots();
     }
 
@@ -240,8 +241,8 @@ public class BenchmarkAnalysis {
 
                     boolean xGroupPercent = false;
                     PlotGroupData data = getGroupData(file,
-                                                      new VARIABLES[] { VARIABLES.EXECUTION_TIME, VARIABLES.SOLUTION_DISCOVERY_TIME },
-                                                      new String[] { Analyzer.ARITHMETIC_MEAN, Analyzer.ARITHMETIC_MEAN },
+                                                      new VARIABLES[] { VARIABLES.EXHAUSTIVE_SEARCH_TIME, VARIABLES.EXECUTION_TIME, VARIABLES.SOLUTION_DISCOVERY_TIME },
+                                                      new String[] { Analyzer.ARITHMETIC_MEAN, Analyzer.ARITHMETIC_MEAN, Analyzer.ARITHMETIC_MEAN },
                                                       VARIABLES.INFORMATION_LOSS_PERCENTAGE,
                                                       Analyzer.VALUE,
                                                       focus,
@@ -257,9 +258,9 @@ public class BenchmarkAnalysis {
                     Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
                     List<Plot<?>> plots = new ArrayList<Plot<?>>();
                     plots.add(new PlotHistogramClustered("", labels, data.series));
-                    String caption = "Execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
+                    String caption = "Exhaustive search time, execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
                                      " using information loss metric \"" + metric.getName() +
-                                     "\" with " + Double.valueOf(suppression)*100d + "\\%" + " suppression " + " listed by \"" + focus + "\"." +
+                                     "\" with " + Double.valueOf(suppression)*100d + "\\%" + " suppression " + "listed by \"" + focus + "\"." +
                                      " The execution time limits correspond to the total runtime of Flash for each configuration." +
                                      " The QI Count used for the dataset " +
                                      BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
@@ -681,7 +682,7 @@ public class BenchmarkAnalysis {
             if (variables[i] != VARIABLES.INFORMATION_LOSS_PERCENTAGE) {
                 allVariablesRelative = false;
             }
-            if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME) {
+            if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME && variables[i] != VARIABLES.EXHAUSTIVE_SEARCH_TIME) {
                 allVariablesTimes = false;
             }
         }
@@ -866,7 +867,7 @@ public class BenchmarkAnalysis {
                         return new Point3D(t.x, t.y, String.valueOf(Double.valueOf(t.z) * maxConst / 100d));
                     }
                 });
-            } else if (VARIABLES.EXECUTION_TIME == variable || VARIABLES.SOLUTION_DISCOVERY_TIME == variable) {
+            } else if (VARIABLES.EXECUTION_TIME == variable || VARIABLES.SOLUTION_DISCOVERY_TIME == variable || VARIABLES.EXHAUSTIVE_SEARCH_TIME == variable) {
                 // Transform times from nanos to seconds
                 _series.transform(new Function<Point3D>() {
                     @Override

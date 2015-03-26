@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.deidentifier.arx.ARXPopulationModel.Region;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
@@ -42,6 +43,7 @@ import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
+import org.deidentifier.arx.criteria.PopulationUniqueness;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
@@ -116,7 +118,8 @@ public class BenchmarkSetup {
         D_PRESENCE("d"),
         K_ANONYMITY("k"),
         L_DIVERSITY("l"),
-        T_CLOSENESS("t");
+        T_CLOSENESS("t"),
+        RISK_BASED("r");
 
         public static BenchmarkCriterion fromLabel(String label) {
             if (label != null) {
@@ -440,6 +443,8 @@ public class BenchmarkSetup {
                 sensitive = getSensitiveAttribute(dataset);
                 config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, 0.2d, getHierarchy(dataset, sensitive)));
                 break;
+            case RISK_BASED:
+                config.addCriterion(new PopulationUniqueness(0.01d, ARXPopulationModel.create(Region.USA)));
             default:
                 throw new RuntimeException("Invalid criterion");
             }
@@ -700,8 +705,8 @@ public class BenchmarkSetup {
     public static Metric[] getMetrics() {
         return new Metric[] {
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
-                Metric.createEntropyMetric(false),
-                Metric.createDiscernabilityMetric(false)
+//                Metric.createEntropyMetric(false),
+//                Metric.createDiscernabilityMetric(false)
         };
     }
 
@@ -880,10 +885,10 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 1d };
+        return new double[] { 0d, 0.02d, 0.05d, 0.1d, 1.0d };
     }
 
     public static Integer[] getTerminationLimits() {
-        return new Integer[] { 2000, 5000, 10000, 20000 };
+        return new Integer[] { /*2000, 5000, 10000, 20000*/ };
     }
 }

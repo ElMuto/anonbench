@@ -366,8 +366,8 @@ public class BenchmarkMain {
                     for (double suppr : BenchmarkSetup.getSuppression()) {
                         String suppression = String.valueOf(suppr);
 
-                        for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm,
-                                                                                                                       data); qiCount++) {
+//                        for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm,
+//                                                                                                                       data); qiCount++) {
 
                             // Select data point acc to the variables
                             selector = bounds.getSelectorBuilder()
@@ -382,9 +382,9 @@ public class BenchmarkMain {
                                              .and()
                                              .field(VARIABLES.SUPPRESSION.val)
                                              .equals(suppression)
-                                             .and()
-                                             .field(VARIABLES.QI_COUNT.val)
-                                             .equals(String.valueOf(qiCount))
+//                                             .and()
+//                                             .field(VARIABLES.QI_COUNT.val)
+//                                             .equals(String.valueOf(qiCount))
                                              .build();
 
                             Iterator<CSVLine> iter = bounds.iterator();
@@ -400,7 +400,7 @@ public class BenchmarkMain {
                                     break;
                                 }
                             }
-                            for (Algorithm benchmarkAlgorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
+                            for (Algorithm benchmarkAlgorithm : new Algorithm[] { new Algorithm(AlgorithmType.HEURAKLES, null) }) {
 
                                 if (AlgorithmType.HEURAKLES == benchmarkAlgorithm.getType()) {
                                     // Select data point acc to the variables
@@ -419,12 +419,12 @@ public class BenchmarkMain {
                                                       .and()
                                                       .field(VARIABLES.SUPPRESSION.val)
                                                       .equals(suppression)
-                                                      .and()
-                                                      .field(VARIABLES.QI_COUNT.val)
-                                                      .equals(String.valueOf(qiCount))
-                                                      .and()
-                                                      .field(VARIABLES.TERMINATION_LIMIT.val)
-                                                      .equals(String.valueOf(benchmarkAlgorithm.getTerminationConfig().getValue()))
+//                                                      .and()
+//                                                      .field(VARIABLES.QI_COUNT.val)
+//                                                      .equals(String.valueOf(qiCount))
+//                                                      .and()
+//                                                      .field(VARIABLES.TERMINATION_LIMIT.val)
+//                                                      .equals(String.valueOf(benchmarkAlgorithm.getTerminationConfig().getValue()))
                                                       .build();
                                 } else {
                                     // Select data point acc to the variables
@@ -443,9 +443,9 @@ public class BenchmarkMain {
                                                       .and()
                                                       .field(VARIABLES.SUPPRESSION.val)
                                                       .equals(suppression)
-                                                      .and()
-                                                      .field(VARIABLES.QI_COUNT.val)
-                                                      .equals(String.valueOf(qiCount))
+//                                                      .and()
+//                                                      .field(VARIABLES.QI_COUNT.val)
+//                                                      .equals(String.valueOf(qiCount))
                                                       .build();
                                 }
 
@@ -474,7 +474,7 @@ public class BenchmarkMain {
                                     }
                                 }
 
-                            }
+//                            }
                         }
                     }
                 }
