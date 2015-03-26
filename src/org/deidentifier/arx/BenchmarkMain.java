@@ -77,6 +77,8 @@ public class BenchmarkMain {
     public static int                INFORMATION_LOSS_MAXIMUM;
     /** Label for information loss maximum transformation */
     public static int                INFORMATION_LOSS_MAXIMUM_TRANSFORMATION;
+    /** Label for information loss maximum transformation */
+    public static int                SOLUTION_DISCOVERY_TIME;
 
     private static void initMeasures() {
 
@@ -87,6 +89,7 @@ public class BenchmarkMain {
         LATTICE_SIZE = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
         INFORMATION_LOSS = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
         INFORMATION_LOSS_TRANSFORMATION = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_TRANSFORMATION.val);
+        SOLUTION_DISCOVERY_TIME = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.SOLUTION_DISCOVERY_TIME.val);
 
         // InformationLossBounds
         INFORMATION_LOSS_MINIMUM = SUPPORTING_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_MINIMUM.val);
@@ -105,6 +108,7 @@ public class BenchmarkMain {
         MAIN_BENCHMARK.addAnalyzer(LATTICE_SIZE, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(INFORMATION_LOSS_TRANSFORMATION, new ValueBuffer());
+        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME, new BufferedArithmeticMeanAnalyzer(repetitions));
 
         // InformationLossBounds
         SUPPORTING_BENCHMARK.addAnalyzer(INFORMATION_LOSS_MINIMUM, new ValueBuffer());

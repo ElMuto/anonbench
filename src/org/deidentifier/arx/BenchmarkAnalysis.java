@@ -30,9 +30,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
@@ -96,7 +98,8 @@ public class BenchmarkAnalysis {
         CRITERIA("Criteria"),
         METRIC("Metric"),
         SUPPRESSION("Suppression"),
-        TERMINATION_LIMIT("Termination Limit");
+        TERMINATION_LIMIT("Termination Limit"),
+        SOLUTION_DISCOVERY_TIME("Solution discovery time");
 
         protected final String                val;
         private static Map<String, VARIABLES> value2Enum = new HashMap<String, VARIABLES>();
@@ -171,8 +174,8 @@ public class BenchmarkAnalysis {
                         String measure = (variable == VARIABLES.EXECUTION_TIME) ? Analyzer.ARITHMETIC_MEAN : Analyzer.VALUE;
                         boolean xGroupPercent = false;
                         PlotGroupData data = getGroupData(file,
-                                                          variable,
-                                                          measure,
+                                                          new VARIABLES[] { variable },
+                                                          new String[] { measure },
                                                           null,
                                                           null,
                                                           focus,
@@ -213,7 +216,8 @@ public class BenchmarkAnalysis {
         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
         String focus = VARIABLES.DATASET.val;
-        List<Algorithm> algorithms = BenchmarkSetup.getBenchmarkAlgorithms();
+        List<Algorithm> algorithms = new ArrayList<Algorithm>();
+        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
         BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
 
         if (datasets.length == 0 || algorithms.size() == 0) {
@@ -236,8 +240,8 @@ public class BenchmarkAnalysis {
 
                     boolean xGroupPercent = false;
                     PlotGroupData data = getGroupData(file,
-                                                      VARIABLES.EXECUTION_TIME,
-                                                      Analyzer.ARITHMETIC_MEAN,
+                                                      new VARIABLES[] { VARIABLES.EXECUTION_TIME, VARIABLES.SOLUTION_DISCOVERY_TIME },
+                                                      new String[] { Analyzer.ARITHMETIC_MEAN, Analyzer.ARITHMETIC_MEAN },
                                                       VARIABLES.INFORMATION_LOSS_PERCENTAGE,
                                                       Analyzer.VALUE,
                                                       focus,
@@ -246,16 +250,16 @@ public class BenchmarkAnalysis {
                                                       datasets,
                                                       algorithms,
                                                       metric,
-                                                      1.5,
+                                                      2.0d,
                                                       xGroupPercent,
                                                       null);
 
-                    Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, VARIABLES.INFORMATION_LOSS_PERCENTAGE.val, "");
+                    Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
                     List<Plot<?>> plots = new ArrayList<Plot<?>>();
                     plots.add(new PlotHistogramClustered("", labels, data.series));
-                    String caption = "Execution time and relative information loss of Heurakles for criteria " + scriteria +
+                    String caption = "Execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
                                      " using information loss metric \"" + metric.getName() +
-                                     "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\"." +
+                                     "\" with " + Double.valueOf(suppression)*100d + "\\%" + " suppression " + " listed by \"" + focus + "\"." +
                                      " The execution time limits correspond to the total runtime of Flash for each configuration." +
                                      " The QI Count used for the dataset " +
                                      BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
@@ -309,8 +313,8 @@ public class BenchmarkAnalysis {
 
                     boolean xGroupPercent = true;
                     PlotGroupData data = getGroupData(file,
-                                                      VARIABLES.INFORMATION_LOSS,
-                                                      Analyzer.VALUE,
+                                                      new VARIABLES[] { VARIABLES.INFORMATION_LOSS },
+                                                      new String[] { Analyzer.VALUE },
                                                       null,
                                                       null,
                                                       focus,
@@ -386,8 +390,8 @@ public class BenchmarkAnalysis {
 
                             boolean xGroupPercent = false;
                             PlotGroupData data = getGroupData(file,
-                                                              VARIABLES.EXECUTION_TIME,
-                                                              Analyzer.ARITHMETIC_MEAN,
+                                                              new VARIABLES[] { VARIABLES.EXECUTION_TIME },
+                                                              new String[] { Analyzer.ARITHMETIC_MEAN },
                                                               null,
                                                               null,
                                                               focus,
@@ -602,8 +606,10 @@ public class BenchmarkAnalysis {
     /**
      * Returns a plot group
      * @param file
-     * @param variable
-     * @param measure
+     * @param variable1
+     * @param measure1
+     * @param variable2
+     * @param measure2
      * @param focus
      * @param scriteria
      * @param suppression TODO
@@ -612,8 +618,8 @@ public class BenchmarkAnalysis {
      * @throws ParseException
      */
     private static PlotGroupData getGroupData(CSVFile file,
-                                              VARIABLES variableY1,
-                                              String measureY1,
+                                              VARIABLES[] variables,
+                                              String[] measures,
                                               VARIABLES variableY2,
                                               String measureY2,
                                               String focus,
@@ -625,45 +631,66 @@ public class BenchmarkAnalysis {
                                               double keyPosX,
                                               boolean xGroupPercent,
                                               Double missingAlgorithmDummyValue) throws ParseException {
+        // Sanity check
+        if (variables.length != measures.length) {
+            throw new RuntimeException("For each variable, exactly one measure is required");
+        }
 
         // Prepare
         Series3D series = null;
-
-        // Collect data for all algorithms and the first variable
-        boolean includeVariableInYCoordinates = variableY2 != null;
-        series = collectData(file,
-                             variableY1,
-                             measureY1,
-                             focus,
-                             scriteria,
-                             suppression,
-                             datasets,
-                             algorithms,
-                             metric,
-                             includeVariableInYCoordinates,
-                             null);
-
-        // Define params based on the first variable
+        
         GnuPlotParams params = new GnuPlotParams();
         params.rotateXTicks = 0;
         params.printValues = true;
         params.size = 1.5;
         params.logY = false;
         params.enhance = false;
-
+        params.ratio = 0.2d;
+        params.minY = 0d;
+        params.printValuesFormatString = "%.0f";
+        
         double max = 0d;
         double padding = 0d;
-        if (VARIABLES.INFORMATION_LOSS_PERCENTAGE != variableY1) {
-            max = getMax(series.getData());
+        
+        boolean allVariablesRelative = true;
+        boolean allVariablesTimes = true;
+
+        // Collect data for all algorithms and the variables array
+        boolean includeVariableInYCoordinates = variables.length > 1 || variableY2 != null;
+        for (int i = 0; i < variables.length; ++i) {
+            Series3D _series = collectData(file,
+                                           variables[i],
+                                           measures[i],
+                                           focus,
+                                           scriteria,
+                                           suppression,
+                                           datasets,
+                                           algorithms,
+                                           metric,
+                                           includeVariableInYCoordinates,
+                                           null);
+            if (series == null) {
+                series = _series;
+            } else {
+                series.append(_series);
+            }
+            
+            max = Math.max(getMax(series.getData()),max);
             padding = max * 0.3d;
-        } else {
+            
+            if (variables[i] != VARIABLES.INFORMATION_LOSS_PERCENTAGE) {
+                allVariablesRelative = false;
+            }
+            if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME) {
+                allVariablesTimes = false;
+            }
+        }
+
+        if (allVariablesRelative) {
             max = 100d;
         }
 
-        params.minY = 0d;
-        params.printValuesFormatString = "%.0f";
-
-        if (VARIABLES.EXECUTION_TIME == variableY1 || max < 10d) {
+        if (allVariablesTimes || max < 10d) {
             params.printValuesFormatString = "%.2f";
         }
 
@@ -673,12 +700,9 @@ public class BenchmarkAnalysis {
         }
 
         params.maxY = max + padding;
-
         params.keypos = KeyPos.AT(keyPosX, params.maxY * 1.1d, "horiz bot center");
 
-        params.ratio = 0.2d;
-
-        // Collect data for all algorithms and the second variable, if any
+        // Collect data for all algorithms and variableY2, if any
         if (variableY2 != null) {
             Double relativeScalingMax = new Double(max);
 
@@ -842,8 +866,8 @@ public class BenchmarkAnalysis {
                         return new Point3D(t.x, t.y, String.valueOf(Double.valueOf(t.z) * maxConst / 100d));
                     }
                 });
-            } else if (VARIABLES.EXECUTION_TIME == variable) {
-                // Transform execution times from nanos to seconds
+            } else if (VARIABLES.EXECUTION_TIME == variable || VARIABLES.SOLUTION_DISCOVERY_TIME == variable) {
+                // Transform times from nanos to seconds
                 _series.transform(new Function<Point3D>() {
                     @Override
                     public Point3D apply(Point3D t) {

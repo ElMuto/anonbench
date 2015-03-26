@@ -120,6 +120,7 @@ public class BenchmarkDriver {
 
             // Execute
             if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
+            long startTimestamp = System.nanoTime();
             implementation.traverse();
             if (!warmup) benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
@@ -132,6 +133,9 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION, implementation.getGlobalOptimum() != null ?
                     Arrays.toString(implementation.getGlobalOptimum().getTransformation()) :
                     Arrays.toString(new int[0]));
+            if (!warmup) benchmark.addValue(BenchmarkMain.SOLUTION_DISCOVERY_TIME, implementation.getOptimumTrackedTimestamp() != Long.MIN_VALUE ?
+                    implementation.getOptimumTrackedTimestamp() - startTimestamp :
+                    NO_SOLUTION_FOUND);
         }
 
     }
