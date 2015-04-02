@@ -241,50 +241,35 @@ public class BenchmarkMain {
         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
 
             // Print status info
-            System.out.println("Warm Up: " + c.getAlgorithm().toString() + " with " + c.getAlgorithm().getStatusSuffix() + " / " +
-                               c.getDataset().toString() + " / " +
-                               c.getMetric().getName() +
-                               " / " + c.getSuppression() + " / " + Arrays.toString(c.getBenchmarkCriteria()) + " / " + c.getQICount() +
-                               " QIs / " + c.getTerminationLimit());
+            System.out.println("Warm Up: " + c.toString());
 
             // Warmup run
-            driver.anonymize(c.getDataset(),
-                             c.getBenchmarkCriteria(),
-                             c.getAlgorithm(),
-                             c.getMetric(),
-                             c.getSuppression(),
-                             c.getQICount(),
-                             true);
+            driver.anonymize(c, true);
         }
 
         // Print status info
-        System.out.println("Running: " + c.getAlgorithm().toString() + " with " + c.getAlgorithm().getStatusSuffix() + " / " +
-                           c.getDataset().toString() + " / " +
-                           c.getMetric().getName() +
-                           " / " + c.getSuppression() + " / " + Arrays.toString(c.getBenchmarkCriteria()) + " / " + c.getQICount() +
-                           " QIs / " + c.getTerminationLimit());
+        System.out.println("Running: " + c.toString());
 
         // init analyzers and measures for this run
         initMeasures();
         initAnalyzers(repetitions);
 
+        // for ImprovedGreedy and DataFly, use metric as algorithm name
+        String algo = (c.getDecisionMetric().getName().equals("ImprovedGreedy") || c.getDecisionMetric().getName().equals("DataFly")) ? c.getDecisionMetric()
+                                                                                                                                         .getName() : c.getAlgorithm()
+                                                                                                                                                       .toString();
+
         // Benchmark
-        benchmark.addRun(c.getAlgorithm().toString(),
+        benchmark.addRun(algo,
                          c.getDataset().toString(),
-                         Arrays.toString(c.getBenchmarkCriteria()),
-                         c.getMetric().getName(),
+                         Arrays.toString(c.getCriteria()),
+                         c.getILMetric().getName(),
                          String.valueOf(c.getSuppression()),
-                         c.getQICount(), c.getTerminationLimit());
+                         c.getQICount(), c.getAlgorithm().getTerminationConfig().getValue());
 
         // Repeat
         for (int i = 0; i < repetitions; i++) {
-            driver.anonymize(c.getDataset(),
-                             c.getBenchmarkCriteria(),
-                             c.getAlgorithm(),
-                             c.getMetric(),
-                             c.getSuppression(),
-                             c.getQICount(),
-                             false);
+            driver.anonymize(c, false);
 
             // do only one iteration for informationLossBounds
             if (AlgorithmType.INFORMATION_LOSS_BOUNDS == c.getAlgorithm().getType()) {
@@ -366,115 +351,115 @@ public class BenchmarkMain {
                     for (double suppr : BenchmarkSetup.getSuppression()) {
                         String suppression = String.valueOf(suppr);
 
-//                        for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm,
-//                                                                                                                       data); qiCount++) {
+                        // for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm,
+                        // data); qiCount++) {
 
-                            // Select data point acc to the variables
-                            selector = bounds.getSelectorBuilder()
-                                             .field(VARIABLES.DATASET.val)
-                                             .equals(data.toString())
-                                             .and()
-                                             .field(VARIABLES.CRITERIA.val)
-                                             .equals(scriteria)
-                                             .and()
-                                             .field(VARIABLES.METRIC.val)
-                                             .equals(metric.getName())
-                                             .and()
-                                             .field(VARIABLES.SUPPRESSION.val)
-                                             .equals(suppression)
-//                                             .and()
-//                                             .field(VARIABLES.QI_COUNT.val)
-//                                             .equals(String.valueOf(qiCount))
-                                             .build();
+                        // Select data point acc to the variables
+                        selector = bounds.getSelectorBuilder()
+                                         .field(VARIABLES.DATASET.val)
+                                         .equals(data.toString())
+                                         .and()
+                                         .field(VARIABLES.CRITERIA.val)
+                                         .equals(scriteria)
+                                         .and()
+                                         .field(VARIABLES.METRIC.val)
+                                         .equals(metric.getName())
+                                         .and()
+                                         .field(VARIABLES.SUPPRESSION.val)
+                                         .equals(suppression)
+                                         // .and()
+                                         // .field(VARIABLES.QI_COUNT.val)
+                                         // .equals(String.valueOf(qiCount))
+                                         .build();
 
-                            Iterator<CSVLine> iter = bounds.iterator();
+                        Iterator<CSVLine> iter = bounds.iterator();
+                        while (iter.hasNext()) {
+                            CSVLine csvline = iter.next();
+                            String[] line = csvline.getData();
+                            if (selector.isSelected(line)) {
+                                // save min and max information loss
+                                min = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_MINIMUM.val, "Value"));
+                                minTransformation = csvline.get(VARIABLES.INFORMATION_LOSS_MINIMUM_TRANSFORMATION.val, "Value");
+                                max = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_MAXIMUM.val, "Value"));
+                                maxTransformation = csvline.get(VARIABLES.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION.val, "Value");
+                                break;
+                            }
+                        }
+                        for (Algorithm benchmarkAlgorithm : new Algorithm[] { new Algorithm(AlgorithmType.HEURAKLES, null) }) {
+
+                            if (AlgorithmType.HEURAKLES == benchmarkAlgorithm.getType()) {
+                                // Select data point acc to the variables
+                                selector = results.getSelectorBuilder()
+                                                  .field(VARIABLES.ALGORITHM.val)
+                                                  .equals(benchmarkAlgorithm.toString())
+                                                  .and()
+                                                  .field(VARIABLES.DATASET.val)
+                                                  .equals(data.toString())
+                                                  .and()
+                                                  .field(VARIABLES.CRITERIA.val)
+                                                  .equals(scriteria)
+                                                  .and()
+                                                  .field(VARIABLES.METRIC.val)
+                                                  .equals(metric.getName())
+                                                  .and()
+                                                  .field(VARIABLES.SUPPRESSION.val)
+                                                  .equals(suppression)
+                                                  // .and()
+                                                  // .field(VARIABLES.QI_COUNT.val)
+                                                  // .equals(String.valueOf(qiCount))
+                                                  // .and()
+                                                  // .field(VARIABLES.TERMINATION_LIMIT.val)
+                                                  // .equals(String.valueOf(benchmarkAlgorithm.getTerminationConfig().getValue()))
+                                                  .build();
+                            } else {
+                                // Select data point acc to the variables
+                                selector = results.getSelectorBuilder()
+                                                  .field(VARIABLES.ALGORITHM.val)
+                                                  .equals(benchmarkAlgorithm.toString())
+                                                  .and()
+                                                  .field(VARIABLES.DATASET.val)
+                                                  .equals(data.toString())
+                                                  .and()
+                                                  .field(VARIABLES.CRITERIA.val)
+                                                  .equals(scriteria)
+                                                  .and()
+                                                  .field(VARIABLES.METRIC.val)
+                                                  .equals(metric.getName())
+                                                  .and()
+                                                  .field(VARIABLES.SUPPRESSION.val)
+                                                  .equals(suppression)
+                                                  // .and()
+                                                  // .field(VARIABLES.QI_COUNT.val)
+                                                  // .equals(String.valueOf(qiCount))
+                                                  .build();
+                            }
+
+                            iter = results.iterator();
                             while (iter.hasNext()) {
-                                CSVLine csvline = iter.next();
-                                String[] line = csvline.getData();
+                                CSVLine csvLine = iter.next();
+                                String[] line = csvLine.getData();
                                 if (selector.isSelected(line)) {
-                                    // save min and max information loss
-                                    min = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_MINIMUM.val, "Value"));
-                                    minTransformation = csvline.get(VARIABLES.INFORMATION_LOSS_MINIMUM_TRANSFORMATION.val, "Value");
-                                    max = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_MAXIMUM.val, "Value"));
-                                    maxTransformation = csvline.get(VARIABLES.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION.val, "Value");
+                                    // get information loss value
+                                    double value = Double.parseDouble(csvLine.get(VARIABLES.INFORMATION_LOSS.val, "Value"));
+
+                                    // compute relative percentage
+                                    if (max == min && min == value) {
+                                        value = 0d;
+                                    } else if (value != BenchmarkDriver.NO_SOLUTION_FOUND) {
+                                        value = ((value - min) / (max - min)) * 100.0;
+                                    }
+
+                                    // add the value to the line
+                                    csvLine.addColumn(String.valueOf(min));
+                                    csvLine.addColumn(minTransformation);
+                                    csvLine.addColumn(String.valueOf(max));
+                                    csvLine.addColumn(maxTransformation);
+                                    csvLine.addColumn(String.valueOf(value));
                                     break;
                                 }
                             }
-                            for (Algorithm benchmarkAlgorithm : new Algorithm[] { new Algorithm(AlgorithmType.HEURAKLES, null) }) {
 
-                                if (AlgorithmType.HEURAKLES == benchmarkAlgorithm.getType()) {
-                                    // Select data point acc to the variables
-                                    selector = results.getSelectorBuilder()
-                                                      .field(VARIABLES.ALGORITHM.val)
-                                                      .equals(benchmarkAlgorithm.toString())
-                                                      .and()
-                                                      .field(VARIABLES.DATASET.val)
-                                                      .equals(data.toString())
-                                                      .and()
-                                                      .field(VARIABLES.CRITERIA.val)
-                                                      .equals(scriteria)
-                                                      .and()
-                                                      .field(VARIABLES.METRIC.val)
-                                                      .equals(metric.getName())
-                                                      .and()
-                                                      .field(VARIABLES.SUPPRESSION.val)
-                                                      .equals(suppression)
-//                                                      .and()
-//                                                      .field(VARIABLES.QI_COUNT.val)
-//                                                      .equals(String.valueOf(qiCount))
-//                                                      .and()
-//                                                      .field(VARIABLES.TERMINATION_LIMIT.val)
-//                                                      .equals(String.valueOf(benchmarkAlgorithm.getTerminationConfig().getValue()))
-                                                      .build();
-                                } else {
-                                    // Select data point acc to the variables
-                                    selector = results.getSelectorBuilder()
-                                                      .field(VARIABLES.ALGORITHM.val)
-                                                      .equals(benchmarkAlgorithm.toString())
-                                                      .and()
-                                                      .field(VARIABLES.DATASET.val)
-                                                      .equals(data.toString())
-                                                      .and()
-                                                      .field(VARIABLES.CRITERIA.val)
-                                                      .equals(scriteria)
-                                                      .and()
-                                                      .field(VARIABLES.METRIC.val)
-                                                      .equals(metric.getName())
-                                                      .and()
-                                                      .field(VARIABLES.SUPPRESSION.val)
-                                                      .equals(suppression)
-//                                                      .and()
-//                                                      .field(VARIABLES.QI_COUNT.val)
-//                                                      .equals(String.valueOf(qiCount))
-                                                      .build();
-                                }
-
-                                iter = results.iterator();
-                                while (iter.hasNext()) {
-                                    CSVLine csvLine = iter.next();
-                                    String[] line = csvLine.getData();
-                                    if (selector.isSelected(line)) {
-                                        // get information loss value
-                                        double value = Double.parseDouble(csvLine.get(VARIABLES.INFORMATION_LOSS.val, "Value"));
-
-                                        // compute relative percentage
-                                        if (max == min && min == value) {
-                                            value = 0d;
-                                        } else if (value != BenchmarkDriver.NO_SOLUTION_FOUND) {
-                                            value = ((value - min) / (max - min)) * 100.0;
-                                        }
-
-                                        // add the value to the line
-                                        csvLine.addColumn(String.valueOf(min));
-                                        csvLine.addColumn(minTransformation);
-                                        csvLine.addColumn(String.valueOf(max));
-                                        csvLine.addColumn(maxTransformation);
-                                        csvLine.addColumn(String.valueOf(value));
-                                        break;
-                                    }
-                                }
-
-//                            }
+                            // }
                         }
                     }
                 }

@@ -30,11 +30,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
@@ -127,11 +125,60 @@ public class BenchmarkAnalysis {
      * @throws ParseException
      */
     public static void main(String[] args) throws IOException, ParseException {
-//        generateTables();
-//        generateConventionalPlots();
-//        generateQICountScalingPlots();
-        generateFlashComparisonPlots();
-//        generateHeuraklesSelfComparisonPlots();
+        // generateTables();
+        // generateConventionalPlots();
+        generatePlotsForMetricComparison();
+        // generateQICountScalingPlots();
+        // generateFlashComparisonPlots();
+        // generateHeuraklesSelfComparisonPlots();
+    }
+
+    private static void generatePlotsForMetricComparison() throws IOException, ParseException {
+
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+
+        BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+        try {
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String focus = VARIABLES.DATASET.val;
+        VARIABLES variable = VARIABLES.INFORMATION_LOSS;
+
+        // create one file with several plots
+        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
+        for (BenchmarkCriterion[] criterion : benchmarkConfiguration.getCriteria()) {
+            String scriteria = Arrays.toString(criterion);
+
+            for (double suppr : benchmarkConfiguration.getSuppression()) {
+                String suppression = String.valueOf(suppr);
+
+                PlotGroupData data = getGroupData(file,
+                                                  variable,
+                                                  Analyzer.VALUE,
+                                                  focus,
+                                                  scriteria,
+                                                  suppression,
+                                                  benchmarkConfiguration.getDatasets(),
+                                                  benchmarkConfiguration.getMetrics(),
+                                                  1.5);
+
+                Labels labels = new Labels(focus, variable.val);
+                List<Plot<?>> plots = new ArrayList<Plot<?>>();
+                plots.add(new PlotHistogramClustered("", labels, data.series));
+                String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"Loss\" with " +
+                                 suppression + "\\%" + " suppression " + " listed by \"" + focus + "\".";
+
+                groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+            }
+        }
+
+        if (!groups.isEmpty()) {
+            LaTeX.plot(groups, BenchmarkSetup.RESULTS_FILE);
+        }
     }
 
     /**
@@ -241,8 +288,14 @@ public class BenchmarkAnalysis {
 
                     boolean xGroupPercent = false;
                     PlotGroupData data = getGroupData(file,
-                                                      new VARIABLES[] { VARIABLES.EXHAUSTIVE_SEARCH_TIME, VARIABLES.EXECUTION_TIME, VARIABLES.SOLUTION_DISCOVERY_TIME },
-                                                      new String[] { Analyzer.ARITHMETIC_MEAN, Analyzer.ARITHMETIC_MEAN, Analyzer.ARITHMETIC_MEAN },
+                                                      new VARIABLES[] {
+                                                              VARIABLES.EXHAUSTIVE_SEARCH_TIME,
+                                                              VARIABLES.EXECUTION_TIME,
+                                                              VARIABLES.SOLUTION_DISCOVERY_TIME },
+                                                      new String[] {
+                                                              Analyzer.ARITHMETIC_MEAN,
+                                                              Analyzer.ARITHMETIC_MEAN,
+                                                              Analyzer.ARITHMETIC_MEAN },
                                                       VARIABLES.INFORMATION_LOSS_PERCENTAGE,
                                                       Analyzer.VALUE,
                                                       focus,
@@ -259,8 +312,16 @@ public class BenchmarkAnalysis {
                     List<Plot<?>> plots = new ArrayList<Plot<?>>();
                     plots.add(new PlotHistogramClustered("", labels, data.series));
                     String caption = "Exhaustive search time, execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
-                                     " using information loss metric \"" + metric.getName() +
-                                     "\" with " + Double.valueOf(suppression)*100d + "\\%" + " suppression " + "listed by \"" + focus + "\"." +
+                                     " using information loss metric \"" +
+                                     metric.getName() +
+                                     "\" with " +
+                                     Double.valueOf(suppression) *
+                                     100d +
+                                     "\\%" +
+                                     " suppression " +
+                                     "listed by \"" +
+                                     focus +
+                                     "\"." +
                                      " The execution time limits correspond to the total runtime of Flash for each configuration." +
                                      " The QI Count used for the dataset " +
                                      BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
@@ -604,6 +665,74 @@ public class BenchmarkAnalysis {
         }
     }
 
+    private static PlotGroupData getGroupData(CSVFile file,
+                                              VARIABLES variable,
+                                              String measure,
+                                              String focus,
+                                              String scriteria,
+                                              String suppression,
+                                              BenchmarkDataset[] datasets,
+                                              Metric<?>[] metrics,
+                                              double keyPosX) throws ParseException {
+
+        GnuPlotParams params = new GnuPlotParams();
+        params.rotateXTicks = 0;
+        params.printValues = true;
+        params.size = 1.5;
+        params.logY = false;
+        params.enhance = false;
+        params.ratio = 0.2d;
+        params.minY = 0d;
+        params.printValuesFormatString = "%.0f";
+
+        // Prepare
+        Series3D series = null;
+
+        // Collect data for all metrics and the first variable
+        for (int i = 0; i < metrics.length; i++) {
+
+            Series3D _series = getSeries(file,
+                                         variable.val,
+                                         measure,
+                                         focus,
+                                         scriteria,
+                                         suppression,
+                                         datasets,
+                                         metrics[i]);
+
+            if (series == null) series = _series;
+            else series.append(_series);
+
+        }
+
+        double max = Math.max(getMax(series.getData()), 0d);
+        double padding = max * 0.3d;
+
+        if (max < 10d) {
+            params.printValuesFormatString = "%.2f";
+        }
+
+        if (max >= 10000d) {
+            padding = max * 0.7d;
+            params.printValuesFormatString = "%.2e";
+        }
+
+        params.maxY = max + padding;
+        params.keypos = KeyPos.AT(keyPosX, params.maxY * 1.1d, "horiz bot center");
+
+        // Make sure labels are printed correctly
+        if (!focus.equals(VARIABLES.QI_COUNT.val)) {
+            series.transform(new Function<Point3D>() {
+                @Override
+                public Point3D apply(Point3D t) {
+                    return new Point3D("\"" + t.x + "\"", t.y, t.z);
+                }
+            });
+        }
+
+        return new PlotGroupData(series, params);
+    }
+
     /**
      * Returns a plot group
      * @param file
@@ -639,7 +768,7 @@ public class BenchmarkAnalysis {
 
         // Prepare
         Series3D series = null;
-        
+
         GnuPlotParams params = new GnuPlotParams();
         params.rotateXTicks = 0;
         params.printValues = true;
@@ -649,10 +778,10 @@ public class BenchmarkAnalysis {
         params.ratio = 0.2d;
         params.minY = 0d;
         params.printValuesFormatString = "%.0f";
-        
+
         double max = 0d;
         double padding = 0d;
-        
+
         boolean allVariablesRelative = true;
         boolean allVariablesTimes = true;
 
@@ -675,14 +804,15 @@ public class BenchmarkAnalysis {
             } else {
                 series.append(_series);
             }
-            
-            max = Math.max(getMax(series.getData()),max);
+
+            max = Math.max(getMax(series.getData()), max);
             padding = max * 0.3d;
-            
+
             if (variables[i] != VARIABLES.INFORMATION_LOSS_PERCENTAGE) {
                 allVariablesRelative = false;
             }
-            if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME && variables[i] != VARIABLES.EXHAUSTIVE_SEARCH_TIME) {
+            if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME &&
+                variables[i] != VARIABLES.EXHAUSTIVE_SEARCH_TIME) {
                 allVariablesTimes = false;
             }
         }
@@ -867,7 +997,8 @@ public class BenchmarkAnalysis {
                         return new Point3D(t.x, t.y, String.valueOf(Double.valueOf(t.z) * maxConst / 100d));
                     }
                 });
-            } else if (VARIABLES.EXECUTION_TIME == variable || VARIABLES.SOLUTION_DISCOVERY_TIME == variable || VARIABLES.EXHAUSTIVE_SEARCH_TIME == variable) {
+            } else if (VARIABLES.EXECUTION_TIME == variable || VARIABLES.SOLUTION_DISCOVERY_TIME == variable ||
+                       VARIABLES.EXHAUSTIVE_SEARCH_TIME == variable) {
                 // Transform times from nanos to seconds
                 _series.transform(new Function<Point3D>() {
                     @Override
@@ -965,6 +1096,45 @@ public class BenchmarkAnalysis {
         Series3D series = new Series3D(file, selector,
                                        new Field(focus),
                                        new Field(VARIABLES.ALGORITHM.val),
+                                       new Field(variable, measure),
+                                       new BufferedGeometricMeanAnalyzer());
+
+        return series;
+    }
+
+    private static Series3D
+            getSeries(CSVFile file,
+                      String variable,
+                      String measure,
+                      String focus,
+                      String scriteria,
+                      String suppression,
+                      BenchmarkDataset[] datasets,
+                      Metric<?> metric) throws ParseException {
+
+        // Select data for the given parameters
+
+        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                        .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
+                                                        .field(VARIABLES.CRITERIA.val).equals(scriteria).and()
+                                                        .begin();
+
+        for (int i = 0; i < datasets.length; ++i) {
+            selectorBuilder.field(VARIABLES.DATASET.val).equals(datasets[i].toString());
+            if (i < datasets.length - 1) {
+                selectorBuilder.or();
+            }
+        }
+
+        Selector<String[]> selector = selectorBuilder.end().build();
+
+        // Create series.
+        // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
+        // because by definition of selector each combination of x and y coordinates is unique
+        // and thus only one z coordinate is being encountered.
+        Series3D series = new Series3D(file, selector,
+                                       new Field(focus),
+                                       new Field(VARIABLES.METRIC.val),
                                        new Field(variable, measure),
                                        new BufferedGeometricMeanAnalyzer());
 

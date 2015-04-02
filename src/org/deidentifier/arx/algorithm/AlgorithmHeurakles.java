@@ -23,7 +23,9 @@ package org.deidentifier.arx.algorithm;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
 import org.deidentifier.arx.framework.check.INodeChecker;
+import org.deidentifier.arx.framework.check.INodeChecker.Result;
 import org.deidentifier.arx.framework.check.history.History;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
@@ -44,12 +46,14 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             this.config = config;
         }
 
-        public boolean isFulfilled() {
+        public boolean isFulfilled(Node node) {
             switch (config.getType()) {
             case TIME:
                 return System.currentTimeMillis() - timestamp >= config.getValue();
             case CHECKS:
                 return AlgorithmHeurakles.this.checks >= config.getValue();
+            case ANONYMITY:
+                return node.hasProperty(Node.PROPERTY_ANONYMOUS);
             default:
                 return getGlobalOptimum() != null;
             }
@@ -60,9 +64,10 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         }
     }
 
-    public static final int      NODE_PROPERTY_COMPLETED = 1 << 20;
-    private static final boolean PRUNE                   = true;
-    private final StopCriterion  stopCriterion;
+    public static final int         NODE_PROPERTY_COMPLETED = 1 << 20;
+    private static final boolean    PRUNE                   = false;
+    private final StopCriterion     stopCriterion;
+    private final AnonConfiguration config;
 
     /**
      * Creates a new instance of the heurakles algorithm.
@@ -72,10 +77,34 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @param config The config
      * 
      */
-    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, TerminationConfiguration config) {
+    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, AnonConfiguration config) {
         super(lattice, checker);
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
-        stopCriterion = new StopCriterion(config);
+        this.config = config;
+        stopCriterion = new StopCriterion(this.config.getAlgorithm().getTerminationConfig());
+    }
+
+    private void assureChecked(final Node node) {
+        if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
+            check(node);
+        }
+    }
+
+    /**
+     * Returns whether information loss measure should be forced or not
+     * @return
+     */
+    @Override
+    protected boolean isForceMeasureInfoLossRequired() {
+        return true;
+    }
+
+    /**
+     * Returns whether this algorithm requires a materialized lattice.
+     * @return
+     */
+    public boolean isMaterializedLatticeRequired() {
+        return false;
     }
 
     /*
@@ -88,8 +117,19 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         stopCriterion.resetTimer();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
-        if (!stopCriterion.isFulfilled()) {
+        if (!stopCriterion.isFulfilled(bottom)) {
             traverse(bottom);
+        }
+        adjustInfoLoss();
+    }
+
+    /**
+     * In case of metrics 'DataFly' and 'ImprovedGreedy' the information loss for the global optimum must be calculated based on the metric used by Heurakles, e.g. Loss.
+     */
+    private void adjustInfoLoss() {
+        if (null != getGlobalOptimum() && !config.getDecisionMetric().equals(config.getILMetric())) {
+            Result result = checker.check(getGlobalOptimum(), config.getILMetric());
+            lattice.updateInformationLoss(getGlobalOptimum(), result.informationLoss);
         }
     }
 
@@ -104,7 +144,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                 }
             });
             for (Node successor : successors) {
-                if (stopCriterion.isFulfilled()) {
+                if (stopCriterion.isFulfilled(successor)) {
                     return;
                 }
                 if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
@@ -116,7 +156,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             Node next;
             while ((next = queue.poll()) != null) {
 
-                if (stopCriterion.isFulfilled()) {
+                if (stopCriterion.isFulfilled(next)) {
                     return;
                 }
 
@@ -136,28 +176,5 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         }
 
         lattice.setProperty(node, NODE_PROPERTY_COMPLETED);
-    }
-
-    private void assureChecked(final Node node) {
-        if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
-            check(node);
-        }
-    }
-
-    /**
-     * Returns whether this algorithm requires a materialized lattice.
-     * @return
-     */
-    public boolean isMaterializedLatticeRequired() {
-        return false;
-    }
-
-    /**
-     * Returns whether information loss measure should be forced or not
-     * @return
-     */
-    @Override
-    protected boolean isForceMeasureInfoLossRequired() {
-        return true;
     }
 }

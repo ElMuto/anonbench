@@ -21,13 +21,9 @@
 package org.deidentifier.arx.test;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import org.deidentifier.arx.BenchmarkDriver;
-import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.metric.Metric;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,22 +56,5 @@ public abstract class TestAbstract extends TestCase {
     @Test
     public void test() throws IOException {
 
-        // Initialize
-        BenchmarkDriver driver = new BenchmarkDriver(null);
-
-        // For each algorithm
-        for (BenchmarkSetup.Algorithm algorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
-
-            // Collect
-            TestConfiguration result = driver.test(config.dataset,
-                                                   config.criteria,
-                                                   algorithm,
-                                                   Metric.createEntropyMetric(),
-                                                   0d,
-                                                   0);
-            // Check
-            assertEquals(algorithm + ": Information loss doesn't match", config.informationLoss, result.informationLoss);
-            assertTrue(algorithm + ": Transformation doesn't match", Arrays.equals(result.transformation, config.transformation));
-        }
     }
 }

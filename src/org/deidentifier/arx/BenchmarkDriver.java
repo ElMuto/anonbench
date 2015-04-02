@@ -22,10 +22,8 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 
-import org.deidentifier.arx.BenchmarkSetup.Algorithm;
+import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
@@ -37,10 +35,7 @@ import org.deidentifier.arx.framework.data.Dictionary;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.MaterializedLattice;
-import org.deidentifier.arx.framework.lattice.Node;
 import org.deidentifier.arx.framework.lattice.VirtualLattice;
-import org.deidentifier.arx.metric.Metric;
-import org.deidentifier.arx.test.TestConfiguration;
 
 import cern.colt.Arrays;
 import de.linearbits.subframe.Benchmark;
@@ -51,20 +46,20 @@ import de.linearbits.subframe.Benchmark;
  */
 public class BenchmarkDriver {
 
+    /** the integer value used for the information loss metric in case no solution has been found **/
+    public static final int NO_SOLUTION_FOUND    = -1;
+
+    /** The benchmark instance */
+    private final Benchmark benchmark;
+
+    /** History size. */
+    private final int       historySize          = 200;
+
     /** Snapshot size. */
     private final double    snapshotSizeDataset  = 0.2d;
 
     /** Snapshot size snapshot */
     private final double    snapshotSizeSnapshot = 0.8d;
-
-    /** History size. */
-    private final int       historySize          = 200;
-
-    /** The benchmark instance */
-    private final Benchmark benchmark;
-
-    /** the integer value used for the information loss metric in case no solution has been found **/
-    public static final int NO_SOLUTION_FOUND    = -1;
 
     /**
      * Creates a new benchmark driver
@@ -88,20 +83,17 @@ public class BenchmarkDriver {
      * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
      * @throws IOException
      */
-    public void anonymize(BenchmarkDataset dataset,
-                          BenchmarkCriterion[] criteria,
-                          Algorithm algorithm,
-                          Metric<?> metric, double suppression, int qiCount, boolean warmup) {
+    public void anonymize(AnonConfiguration c, boolean warmup) {
 
         // Build implementation
         AbstractBenchmarkAlgorithm implementation = null;
         try {
-            implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, qiCount);
+            implementation = getImplementation(c);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (AlgorithmType.INFORMATION_LOSS_BOUNDS == algorithm.getType()) {
+        if (AlgorithmType.INFORMATION_LOSS_BOUNDS == c.getAlgorithm().getType()) {
             // run for DFS over whole lattice in order to determine the minimal and maximal values in regards to information loss
             AlgorithmInformationLossBounds algo = (AlgorithmInformationLossBounds) implementation;
             algo.traverse();
@@ -133,38 +125,12 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION, implementation.getGlobalOptimum() != null ?
                     Arrays.toString(implementation.getGlobalOptimum().getTransformation()) :
                     Arrays.toString(new int[0]));
-            if (!warmup) benchmark.addValue(BenchmarkMain.SOLUTION_DISCOVERY_TIME, implementation.getOptimumTrackedTimestamp() != Long.MIN_VALUE ?
-                    implementation.getOptimumTrackedTimestamp() - startTimestamp :
-                    NO_SOLUTION_FOUND);
+            if (!warmup) benchmark.addValue(BenchmarkMain.SOLUTION_DISCOVERY_TIME,
+                                            implementation.getOptimumTrackedTimestamp() != Long.MIN_VALUE ?
+                                                    implementation.getOptimumTrackedTimestamp() - startTimestamp :
+                                                    NO_SOLUTION_FOUND);
         }
 
-    }
-
-    /**
-     * Performs data anonymization and returns a TestConfiguration
-     * 
-     * @param dataset
-     * @param criteria
-     * @param algorithm
-     * @param warmup
-     * @throws IOException
-     */
-    public TestConfiguration test(BenchmarkDataset dataset,
-                                  BenchmarkCriterion[] criteria,
-                                  Algorithm algorithm, Metric<?> metric, double suppression, int qiCount) throws IOException {
-
-        // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, metric, suppression, qiCount);
-
-        // Execute
-        implementation.traverse();
-
-        // Collect
-        Node optimum = implementation.getGlobalOptimum();
-        String loss = String.valueOf(optimum.getInformationLoss().getValue());
-        int[] transformation = optimum.getTransformation();
-
-        return new TestConfiguration(dataset, criteria, loss, transformation);
     }
 
     /**
@@ -177,12 +143,14 @@ public class BenchmarkDriver {
      * @throws IOException
      */
     private AbstractBenchmarkAlgorithm
-            getImplementation(BenchmarkDataset dataset,
-                              BenchmarkCriterion[] criteria,
-                              Algorithm algorithm, Metric<?> metric, double suppression, int qiCount) throws IOException {
+            getImplementation(AnonConfiguration c) throws IOException {
         // Prepare
-        Data data = BenchmarkSetup.getData(dataset, criteria, qiCount);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, metric, suppression, qiCount, criteria);
+        Data data = BenchmarkSetup.getData(c.getDataset(), c.getCriteria(), c.getQICount());
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(c.getDataset(),
+                                                                  c.getDecisionMetric(),
+                                                                  c.getSuppression(),
+                                                                  c.getQICount(),
+                                                                  c.getCriteria());
         DataHandle handle = data.getHandle();
 
         // Encode
@@ -201,7 +169,7 @@ public class BenchmarkDriver {
         // Build or clean the lattice
         AbstractLattice lattice;
         // Heurakles does not need materialized lattice
-        if (AlgorithmType.HEURAKLES == algorithm.getType()) {
+        if (AlgorithmType.HEURAKLES == c.getAlgorithm().getType()) {
             lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
         }
         else {
@@ -223,14 +191,18 @@ public class BenchmarkDriver {
                                       manager.getHierarchies(),
                                       config);
 
+        if (!c.getDecisionMetric().equals(c.getILMetric())) {
+            c.getILMetric().initialize(handle.getDefinition(), manager.getDataQI(), manager.getHierarchies(), config);
+        }
+
         // Create an algorithm instance
         AbstractBenchmarkAlgorithm implementation;
-        switch (algorithm.getType()) {
+        switch (c.getAlgorithm().getType()) {
         case FLASH:
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
-            implementation = new AlgorithmHeurakles(lattice, checker, algorithm.getTerminationConfig());
+            implementation = new AlgorithmHeurakles(lattice, checker, c);
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);
@@ -240,5 +212,4 @@ public class BenchmarkDriver {
         }
         return implementation;
     }
-
 }
