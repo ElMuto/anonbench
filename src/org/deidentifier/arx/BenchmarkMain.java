@@ -241,26 +241,21 @@ public class BenchmarkMain {
         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
 
             // Print status info
-            System.out.println("Warm Up: " + c.toString());
+            System.out.println("Warm Up: " + c.getStatusLine());
 
             // Warmup run
             driver.anonymize(c, true);
         }
 
         // Print status info
-        System.out.println("Running: " + c.toString());
+        System.out.println("Running: " + c.getStatusLine());
 
         // init analyzers and measures for this run
         initMeasures();
         initAnalyzers(repetitions);
 
-        // for ImprovedGreedy and DataFly, use metric as algorithm name
-        String algo = (c.getDecisionMetric().getName().equals("ImprovedGreedy") || c.getDecisionMetric().getName().equals("DataFly")) ? c.getDecisionMetric()
-                                                                                                                                         .getName() : c.getAlgorithm()
-                                                                                                                                                       .toString();
-
         // Benchmark
-        benchmark.addRun(algo,
+        benchmark.addRun(c.getAlgorithm().toString(),
                          c.getDataset().toString(),
                          Arrays.toString(c.getCriteria()),
                          c.getILMetric().getName(),

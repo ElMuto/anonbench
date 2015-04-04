@@ -40,20 +40,21 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
         private final TerminationConfiguration config;
-        private long                           timestamp = System.currentTimeMillis();
+        private long                           timestamp  = System.currentTimeMillis();
+        public boolean                         kAnonymous = false;
 
         public StopCriterion(TerminationConfiguration config) {
             this.config = config;
         }
 
-        public boolean isFulfilled(Node node) {
+        public boolean isFulfilled() {
             switch (config.getType()) {
             case TIME:
                 return System.currentTimeMillis() - timestamp >= config.getValue();
             case CHECKS:
                 return AlgorithmHeurakles.this.checks >= config.getValue();
             case ANONYMITY:
-                return node.hasProperty(Node.PROPERTY_ANONYMOUS);
+                return kAnonymous;
             default:
                 return getGlobalOptimum() != null;
             }
@@ -87,6 +88,9 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     private void assureChecked(final Node node) {
         if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
             check(node);
+            if (!stopCriterion.kAnonymous) {
+                stopCriterion.kAnonymous = node.hasProperty(Node.PROPERTY_ANONYMOUS);
+            }
         }
     }
 
@@ -117,7 +121,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         stopCriterion.resetTimer();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
-        if (!stopCriterion.isFulfilled(bottom)) {
+        if (!stopCriterion.isFulfilled()) {
             traverse(bottom);
         }
         adjustInfoLoss();
@@ -144,7 +148,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                 }
             });
             for (Node successor : successors) {
-                if (stopCriterion.isFulfilled(successor)) {
+                if (stopCriterion.isFulfilled()) {
                     return;
                 }
                 if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
@@ -156,7 +160,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             Node next;
             while ((next = queue.poll()) != null) {
 
-                if (stopCriterion.isFulfilled(next)) {
+                if (stopCriterion.isFulfilled()) {
                     return;
                 }
 

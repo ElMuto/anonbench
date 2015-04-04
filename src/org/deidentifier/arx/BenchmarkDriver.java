@@ -169,7 +169,8 @@ public class BenchmarkDriver {
         // Build or clean the lattice
         AbstractLattice lattice;
         // Heurakles does not need materialized lattice
-        if (AlgorithmType.HEURAKLES == c.getAlgorithm().getType()) {
+        if (AlgorithmType.HEURAKLES == c.getAlgorithm().getType() || AlgorithmType.DATAFLY == c.getAlgorithm().getType() ||
+            AlgorithmType.IMPROVED_GREEDY == c.getAlgorithm().getType()) {
             lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
         }
         else {
@@ -202,6 +203,8 @@ public class BenchmarkDriver {
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
         case HEURAKLES:
+        case DATAFLY:
+        case IMPROVED_GREEDY:
             implementation = new AlgorithmHeurakles(lattice, checker, c);
             break;
         case INFORMATION_LOSS_BOUNDS:

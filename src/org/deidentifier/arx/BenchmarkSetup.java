@@ -94,9 +94,11 @@ public class BenchmarkSetup {
     }
 
     public static enum AlgorithmType {
-        FLASH("Flash"),
-        HEURAKLES("Heurakles"),
-        INFORMATION_LOSS_BOUNDS("InformationLossBounds");
+        FLASH("Flash", 1),
+        HEURAKLES("Heurakles", 2),
+        INFORMATION_LOSS_BOUNDS("InformationLossBounds", 0),
+        DATAFLY("DataFly", 3),
+        IMPROVED_GREEDY("ImprovedGreedy", 4);
 
         public static AlgorithmType fromLabel(String label) {
             if (label != null) {
@@ -111,10 +113,16 @@ public class BenchmarkSetup {
             return null;
         }
 
-        private String label;
+        private String  label;
+        private Integer position;
 
-        private AlgorithmType(String label) {
+        private AlgorithmType(String label, Integer position) {
             this.label = label;
+            this.position = position;
+        }
+
+        public Integer getPosition() {
+            return this.position;
         }
 
         public String toString() {
@@ -256,9 +264,9 @@ public class BenchmarkSetup {
         }
     }
 
-    public static final String                           DEFAULT_CONFIGURAITON_FILE = "results/defaultConfiguration.csv";
+    public static final String                           DEFAULT_CONFIGURAITON_FILE = "cluster-worklists/defaultConfiguration.csv";
 
-    public static final String                           INFORMATION_LOSS_FILE      = "results/informationLossBounds.csv";
+    public static final String                           INFORMATION_LOSS_FILE      = "cluster-results/informationLossBounds.csv";
 
     private static Map<String, Algorithm>                name2Algorithm;
 
@@ -266,7 +274,7 @@ public class BenchmarkSetup {
 
     private static Map<String, Metric<?>>                name2Metric;
 
-    public static final String                           RESULTS_FILE               = "results/results.csv";
+    public static final String                           RESULTS_FILE               = "cluster-results/results.csv";
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE           = TerminationConfiguration.Type.ANONYMITY;
 
@@ -277,54 +285,48 @@ public class BenchmarkSetup {
     public static void createAndSaveDefaultBenchmarkConfiguration(String configurationFile) {
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
 
-        // For each algorithm
-        for (Algorithm algorithm : BenchmarkSetup.getBenchmarkAlgorithms()) {
+        // For each algorithm (flash, ilbounds, heurakles, datafly, improvedGreedy)
+        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(true, true)) {
             // For each metric
             for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+                Metric<?> decisionMetric = null;
+                Metric<?> iLMetric = null;
+
+                switch (algorithm.getType()) {
+                case FLASH:
+                case HEURAKLES:
+                case INFORMATION_LOSS_BOUNDS:
+                    decisionMetric = iLMetric = metric;
+                    break;
+                case DATAFLY:
+                    decisionMetric = BenchmarkSetup.getMetricByName("DataFly");
+                    iLMetric = metric;
+                    break;
+                case IMPROVED_GREEDY:
+                    decisionMetric = BenchmarkSetup.getMetricByName("ImprovedGreedy");
+                    iLMetric = metric;
+                default:
+                    break;
+                }
+
                 // For each suppression factor
                 for (double suppression : BenchmarkSetup.getSuppression()) {
                     // For each combination of criteria
                     for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
                         // For each dataset
-                        for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+                        BenchmarkDataset[] datasets = (algorithm.getType() == AlgorithmType.DATAFLY || algorithm.getType() == AlgorithmType.IMPROVED_GREEDY) ? BenchmarkSetup.getConventionalDatasets() : BenchmarkSetup.getDatasets();
+                        for (BenchmarkDataset data : datasets) {
                             // For each qiCount
                             for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
 
-                                if (AlgorithmType.FLASH == algorithm.getType()) {
-                                    AnonConfiguration c = benchmarkConfiguration.new AnonConfiguration(algorithm,
-                                                                                                       metric,
-                                                                                                       metric,
-                                                                                                       suppression,
-                                                                                                       criteria,
-                                                                                                       data,
-                                                                                                       qiCount);
-                                    benchmarkConfiguration.addAnonConfiguration(c);
-                                    c = benchmarkConfiguration.new AnonConfiguration(BenchmarkSetup.getAlgorithmByName(AlgorithmType.INFORMATION_LOSS_BOUNDS.toString(),
-                                                                                                                       null,
-                                                                                                                       null),
-                                                                                     metric,
-                                                                                     metric,
-                                                                                     suppression,
-                                                                                     criteria,
-                                                                                     data,
-                                                                                     qiCount
-                                            );
-                                    benchmarkConfiguration.addAnonConfiguration(c);
-                                }
-                                else {
-
-                                    // Termination Limit
-                                    for (Integer limit : getTerminationLimits()) {
-                                        AnonConfiguration c = benchmarkConfiguration.new AnonConfiguration(algorithm,
-                                                                                                           metric,
-                                                                                                           metric,
-                                                                                                           suppression,
-                                                                                                           criteria,
-                                                                                                           data,
-                                                                                                           qiCount);
-                                        benchmarkConfiguration.addAnonConfiguration(c);
-                                    }
-                                }
+                                AnonConfiguration c = benchmarkConfiguration.new AnonConfiguration(algorithm,
+                                                                                                   decisionMetric,
+                                                                                                   iLMetric,
+                                                                                                   suppression,
+                                                                                                   criteria,
+                                                                                                   data,
+                                                                                                   qiCount);
+                                benchmarkConfiguration.addAnonConfiguration(c);
                             }
                         }
                     }
@@ -392,7 +394,7 @@ public class BenchmarkSetup {
         AlgorithmType algorithmType = AlgorithmType.fromLabel(name);
         TerminationConfiguration terminationConfiguration = null;
 
-        if (AlgorithmType.HEURAKLES != algorithmType && (!_terminationLimitType.isEmpty() || !_terminationLimitValue.isEmpty())) {
+        if (AlgorithmType.FLASH == algorithmType && (!_terminationLimitType.isEmpty() || !_terminationLimitValue.isEmpty())) {
             System.out.println("Algorithm " + name + " cannot be used with termination limits. Parameters [" + _terminationLimitType + ";" +
                                _terminationLimitValue + " ] will be ignored.");
         }
@@ -424,14 +426,40 @@ public class BenchmarkSetup {
     }
 
     /**
-     * Returns all algorithms
-     * @return
+     * Returns all algorithms used in the benchmark
+     * @param includeILBounds true if the {@link AlgorithmType#INFORMATION_LOSS_BOUNDS} algorithm shall be included, false otherwise
+     * @param includeHeuristics true if the {@link AlgorithmType#DATAFLY} and {@link AlgorithmType#IMPROVED_GREEDY} shall be included, false otherwise
+     * @return list of all used algorithms
      */
-    public static List<Algorithm> getBenchmarkAlgorithms() {
-        List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>(getTerminationLimits().length + 1);
-        benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
-        for (Integer tLimit : getTerminationLimits()) {
-            benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES, new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
+    public static List<Algorithm> getAlgorithms(boolean includeILBounds, boolean includeHeuristics) {
+
+        List<Algorithm> benchmarkAlgorithmList = new ArrayList<Algorithm>();
+        for (AlgorithmType aT : AlgorithmType.values()) {
+            switch (aT) {
+            case FLASH:
+                benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.FLASH, null));
+                break;
+            case INFORMATION_LOSS_BOUNDS:
+                if (includeILBounds) {
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.INFORMATION_LOSS_BOUNDS, null));
+                }
+                break;
+            case HEURAKLES:
+                for (Integer tLimit : getTerminationLimits()) {
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES,
+                                                             new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
+                }
+                break;
+            case DATAFLY:
+            case IMPROVED_GREEDY:
+                if (includeHeuristics) {
+                    TerminationConfiguration tC = new TerminationConfiguration(TERMINATION_TYPE.ANONYMITY, 0);
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.DATAFLY, tC));
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.IMPROVED_GREEDY, tC));
+                }
+            default:
+                break;
+            }
         }
         return benchmarkAlgorithmList;
     }
@@ -752,7 +780,8 @@ public class BenchmarkSetup {
         return new Metric[] {
                 Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN),
         // Metric.createEntropyMetric(false),
-        // Metric.createDiscernabilityMetric(false)
+        // Metric.createDiscernabilityMetric(false),
+        // Metric.createAECSMetric(),
         };
     }
 
@@ -931,10 +960,10 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d, 0.02d, 0.05d, 0.1d, 1.0d };
+        return new double[] { 0d /* , 0.02d, 0.05d, 0.1d, 1.0d */};
     }
 
     public static Integer[] getTerminationLimits() {
-        return new Integer[] { /* 2000, 5000, 10000, 20000 */};
+        return new Integer[] { 2000 /* , 5000, 10000, 20000 */};
     }
 }

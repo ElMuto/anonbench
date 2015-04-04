@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -81,7 +80,7 @@ public class BenchmarkConfiguration {
             return suppression;
         }
 
-        public String toString() {
+        public String getStatusLine() {
             return algorithm.toString() +
                    " / " +
                    decisionMetric.getName() +
@@ -102,6 +101,16 @@ public class BenchmarkConfiguration {
                                                                                              " (" +
                                                                                              getAlgorithm().getTerminationConfig()
                                                                                                            .getValue() + ")");
+
+        }
+
+        public String getConfigurationLine() {
+            return algorithm.toString() + ";" + decisionMetric.getName() + ";" + iLMetric.getName() + ";" + String.valueOf(suppression) +
+                   ";" + Arrays.toString(criteria) +
+                   ";" + dataset.toString() + ";" + String.valueOf(qiCount) + ";" +
+                   (null == getAlgorithm().getTerminationConfig() ? ";;" : (getAlgorithm().getTerminationConfig().getType().toString()) +
+                                                                           ";" + getAlgorithm().getTerminationConfig().getValue());
+
         }
 
     }
@@ -132,7 +141,14 @@ public class BenchmarkConfiguration {
      * @return algorithms used for this benchmark
      */
     public List<Algorithm> getAlgorithms() {
-        return new ArrayList<BenchmarkSetup.Algorithm>(this.algorithms);
+        List<Algorithm> list = new ArrayList<BenchmarkSetup.Algorithm>(this.algorithms);
+        Collections.sort(list, new Comparator<Algorithm>() {
+            @Override
+            public int compare(Algorithm o1, Algorithm o2) {
+                return o1.getType().getPosition().compareTo(o2.getType().getPosition());
+            }
+        });
+        return list;
     }
 
     public AnonConfiguration getAnonConfigurationFromLine(String line) {
@@ -160,9 +176,9 @@ public class BenchmarkConfiguration {
 
         // decisionMetric
         Metric<?> decisionMetric = BenchmarkSetup.getMetricByName(_decisionMetric);
-        metrics.add(decisionMetric);
         // iLMetric
         Metric<?> ilMetric = BenchmarkSetup.getMetricByName(_ilMetric);
+        metrics.add(ilMetric);
 
         // suppression
         Double suppression = null;
@@ -230,7 +246,9 @@ public class BenchmarkConfiguration {
      * @return datasets used for this benchmark
      */
     public BenchmarkDataset[] getDatasets() {
-        return datasets.toArray(new BenchmarkDataset[datasets.size()]);
+        List<BenchmarkDataset> list = new ArrayList<BenchmarkDataset>(datasets);
+        Collections.sort(list);
+        return list.toArray(new BenchmarkDataset[list.size()]);
     }
 
     /**
@@ -250,13 +268,10 @@ public class BenchmarkConfiguration {
     /**
      * @return suppression used for this benchmark
      */
-    public double[] getSuppression() {
-        double[] suppr = new double[suppressionSet.size()];
-        Iterator<Double> iter = suppressionSet.iterator();
-        for (int i = 0; i < suppressionSet.size(); i++) {
-            suppr[i] = iter.next();
-        }
-        return suppr;
+    public Double[] getSuppression() {
+        List<Double> list = new ArrayList<Double>(suppressionSet);
+        Collections.sort(list);
+        return list.toArray(new Double[list.size()]);
     }
 
     /**
@@ -303,7 +318,7 @@ public class BenchmarkConfiguration {
         final BufferedWriter bw = new BufferedWriter(new FileWriter(benchmarkConfigurationFile));
         try {
             for (final AnonConfiguration configuration : anonConfigurationList) {
-                bw.write(configuration.toString());
+                bw.write(configuration.getConfigurationLine());
                 bw.write(System.lineSeparator());
             }
         } finally {
