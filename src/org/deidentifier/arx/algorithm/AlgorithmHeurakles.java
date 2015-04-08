@@ -24,8 +24,8 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
+import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.framework.check.INodeChecker;
-import org.deidentifier.arx.framework.check.INodeChecker.Result;
 import org.deidentifier.arx.framework.check.history.History;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
@@ -40,8 +40,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
         private final TerminationConfiguration config;
-        private long                           timestamp  = System.currentTimeMillis();
-        public boolean                         kAnonymous = false;
+        private long                           timestamp = System.currentTimeMillis();
 
         public StopCriterion(TerminationConfiguration config) {
             this.config = config;
@@ -54,9 +53,9 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             case CHECKS:
                 return AlgorithmHeurakles.this.checks >= config.getValue();
             case ANONYMITY:
-                return kAnonymous;
-            default:
                 return getGlobalOptimum() != null;
+            default:
+                throw new IllegalStateException("Unknown termination condition");
             }
         }
 
@@ -66,7 +65,6 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     }
 
     public static final int         NODE_PROPERTY_COMPLETED = 1 << 20;
-    private static final boolean    PRUNE                   = false;
     private final StopCriterion     stopCriterion;
     private final AnonConfiguration config;
 
@@ -82,15 +80,16 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         super(lattice, checker);
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         this.config = config;
-        stopCriterion = new StopCriterion(this.config.getAlgorithm().getTerminationConfig());
+        this.stopCriterion = new StopCriterion(this.config.getAlgorithm().getTerminationConfig());
     }
 
+    /**
+     * Makes sure that the given node has been checked
+     * @param node
+     */
     private void assureChecked(final Node node) {
         if (!node.hasProperty(Node.PROPERTY_CHECKED)) {
             check(node);
-            if (!stopCriterion.kAnonymous) {
-                stopCriterion.kAnonymous = node.hasProperty(Node.PROPERTY_ANONYMOUS);
-            }
         }
     }
 
@@ -111,11 +110,6 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.deidentifier.arx.algorithm.AbstractAlgorithm#traverse()
-     */
     @Override
     public void traverse() {
         stopCriterion.resetTimer();
@@ -124,19 +118,12 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         if (!stopCriterion.isFulfilled()) {
             traverse(bottom);
         }
-        adjustInfoLoss();
     }
 
     /**
-     * In case of metrics 'DataFly' and 'ImprovedGreedy' the information loss for the global optimum must be calculated based on the metric used by Heurakles, e.g. Loss.
+     * Traverse
+     * @param node
      */
-    private void adjustInfoLoss() {
-        if (null != getGlobalOptimum() && !config.getDecisionMetric().equals(config.getILMetric())) {
-            Result result = checker.check(getGlobalOptimum(), config.getILMetric());
-            lattice.updateInformationLoss(getGlobalOptimum(), result.informationLoss);
-        }
-    }
-
     private void traverse(final Node node) {
         Node[] successors = node.getSuccessors(true);
         if (successors.length > 0) {
@@ -148,32 +135,37 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                 }
             });
             for (Node successor : successors) {
-                if (stopCriterion.isFulfilled()) {
-                    return;
-                }
                 if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
                     assureChecked(successor);
                     queue.add(successor);
+                }
+                // FIXME is this correct?
+                if (AlgorithmType.IMPROVED_GREEDY != this.config.getAlgorithm().getType()) {
+                    if (stopCriterion.isFulfilled()) {
+                        return;
+                    }
                 }
             }
 
             Node next;
             while ((next = queue.poll()) != null) {
 
-                if (stopCriterion.isFulfilled()) {
-                    return;
-                }
-
                 if (!next.hasProperty(NODE_PROPERTY_COMPLETED)) {
+
+                    if (stopCriterion.isFulfilled()) {
+                        return;
+                    }
+
                     // A node (and it's direct and indirect successors, respectively) can be pruned iff
-                    // the information loss metric is monotonic and the nodes's IL is greater or equal than the IL of the
+                    // the information loss is monotonic and the nodes's IL is greater or equal than the IL of the
                     // global maximum (regardless of the anonymity criterion's monotonicity)
-                    boolean metricMonotonic = checker.getMetric().isMonotonic() &&
-                                              checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
-                    boolean prune = PRUNE && getGlobalOptimum() != null &&
-                                    // depending on monotony of metric we choose to compare either IL of Monotonous Subset with the global Optimum
+                    boolean metricMonotonic = checker.getMetric().isMonotonic() || checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
+
+                    // Depending on monotony of metric we choose to compare either IL of monotonic subset with the global optimum
+                    boolean prune = getGlobalOptimum() != null &&
                                     (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
 
+                    // Next
                     if (!prune) traverse(next);
                 }
             }
