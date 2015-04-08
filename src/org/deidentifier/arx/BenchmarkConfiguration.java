@@ -13,11 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
+import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.metric.Metric;
-
-import cern.colt.Arrays;
 
 /**
  * This class represents a BenchmarkConfiguration. Therefore, it holds a list of {@link AnonConfiguration} which each represents
@@ -28,19 +26,20 @@ public class BenchmarkConfiguration {
 
     public class AnonConfiguration {
 
-        private Algorithm            algorithm;
-        private BenchmarkCriterion[] criteria;
-        private BenchmarkDataset     dataset;
-        private Metric<?>            decisionMetric;
-        private Metric<?>            iLMetric;
-        private int                  qiCount;
-        private double               suppression;
+        private Algorithm              algorithm;
+        private String                 criteria;
+        private List<PrivacyCriterion> privacyCriteria;
+        private BenchmarkDataset       dataset;
+        private Metric<?>              decisionMetric;
+        private Metric<?>              iLMetric;
+        private int                    qiCount;
+        private double                 suppression;
 
         public AnonConfiguration(Algorithm algorithm,
                                  Metric<?> decisionMetric,
                                  Metric<?> iLMetric,
                                  double suppression,
-                                 BenchmarkCriterion[] criteria,
+                                 String criteria, List<PrivacyCriterion> privacyCriteria,
                                  BenchmarkDataset dataset,
                                  int qiCount) {
             this.algorithm = algorithm;
@@ -48,6 +47,7 @@ public class BenchmarkConfiguration {
             this.iLMetric = iLMetric;
             this.suppression = suppression;
             this.criteria = criteria;
+            this.privacyCriteria = privacyCriteria;
             this.dataset = dataset;
             this.qiCount = qiCount;
         }
@@ -56,7 +56,7 @@ public class BenchmarkConfiguration {
             return algorithm;
         }
 
-        public BenchmarkCriterion[] getCriteria() {
+        public String getCriteria() {
             return criteria;
         }
 
@@ -85,11 +85,11 @@ public class BenchmarkConfiguration {
                    " / " +
                    decisionMetric.getName() +
                    "(DM) / " +
-                   iLMetric.toString() +
-                   "(ILM) / " +
+                   (null != iLMetric ? iLMetric.toString() +
+                                       "(ILM) / " : "") +
                    String.valueOf(suppression) +
                    " / " +
-                   Arrays.toString(criteria) +
+                   criteria +
                    " / " +
                    dataset.toString() +
                    " / " +
@@ -105,30 +105,33 @@ public class BenchmarkConfiguration {
         }
 
         public String getConfigurationLine() {
-            return algorithm.toString() + ";" + decisionMetric.getName() + ";" + iLMetric.getName() + ";" + String.valueOf(suppression) +
-                   ";" + Arrays.toString(criteria) +
+            return algorithm.toString() + ";" + decisionMetric.getName() + ";" +
+                   (null == iLMetric ? decisionMetric.getName() : iLMetric.getName()) + ";" + String.valueOf(suppression) +
+                   ";" + criteria +
                    ";" + dataset.toString() + ";" + String.valueOf(qiCount) + ";" +
                    (null == getAlgorithm().getTerminationConfig() ? ";;" : (getAlgorithm().getTerminationConfig().getType().toString()) +
                                                                            ";" + getAlgorithm().getTerminationConfig().getValue());
 
         }
 
+        public List<PrivacyCriterion> getPrivacyCriteria() {
+            return privacyCriteria;
+        }
+
     }
 
-    private Set<Algorithm>             algorithms;
-    private List<AnonConfiguration>    anonConfigurations;
-    private List<BenchmarkCriterion[]> criteriaList;
-    private Set<String>                criteriaNames;
-    private Set<BenchmarkDataset>      datasets;
-    private Set<Metric<?>>             metrics;
-    private Set<Double>                suppressionSet;
+    private Set<Algorithm>          algorithms;
+    private List<AnonConfiguration> anonConfigurations;
+    private Set<String>             criteria;
+    private Set<BenchmarkDataset>   datasets;
+    private Set<Metric<?>>          metrics;
+    private Set<Double>             suppressionSet;
 
     public BenchmarkConfiguration() {
         anonConfigurations = new ArrayList<BenchmarkConfiguration.AnonConfiguration>();
         algorithms = new HashSet<BenchmarkSetup.Algorithm>();
         datasets = new HashSet<BenchmarkDataset>();
-        criteriaNames = new HashSet<String>();
-        criteriaList = new ArrayList<BenchmarkCriterion[]>();
+        criteria = new HashSet<String>();
         metrics = new HashSet<Metric<?>>();
         suppressionSet = new HashSet<Double>();
     }
@@ -151,7 +154,7 @@ public class BenchmarkConfiguration {
         return list;
     }
 
-    public AnonConfiguration getAnonConfigurationFromLine(String line) {
+    public AnonConfiguration getAnonConfigurationFromLine(String line) throws IOException {
         String[] param = line.split(";", -1);
 
         if (param.length != 9) {
@@ -177,8 +180,14 @@ public class BenchmarkConfiguration {
         // decisionMetric
         Metric<?> decisionMetric = BenchmarkSetup.getMetricByName(_decisionMetric);
         // iLMetric
-        Metric<?> ilMetric = BenchmarkSetup.getMetricByName(_ilMetric);
-        metrics.add(ilMetric);
+        Metric<?> ilMetric = null;
+        if (!_ilMetric.isEmpty()) {
+            ilMetric = BenchmarkSetup.getMetricByName(_ilMetric);
+        }
+
+        if (null == ilMetric) {
+            metrics.add(decisionMetric);
+        }
 
         // suppression
         Double suppression = null;
@@ -190,13 +199,6 @@ public class BenchmarkConfiguration {
         } catch (NumberFormatException e) {
             System.out.println("Wrong format: Suppression needs to be a Double. Found: " + _suppression);
             System.exit(0);
-        }
-
-        // criteria
-        BenchmarkCriterion[] criteria = BenchmarkSetup.getCriteriaFromString(_criteria);
-        if (!criteriaNames.contains(criteria.toString())) {
-            criteriaNames.add(criteria.toString());
-            criteriaList.add(criteria);
         }
 
         // dataset
@@ -218,11 +220,15 @@ public class BenchmarkConfiguration {
             }
         }
 
+        // criteria
+        criteria.add(_criteria);
+        List<PrivacyCriterion> privacyCriteria = BenchmarkSetup.getPrivacyCriteria(_criteria, dataset, qiCount);
+
         return new AnonConfiguration(algorithm,
                                      decisionMetric,
                                      ilMetric,
                                      suppression,
-                                     criteria,
+                                     _criteria, privacyCriteria,
                                      dataset,
                                      qiCount);
     }
@@ -234,12 +240,8 @@ public class BenchmarkConfiguration {
     /**
      * @return criteria used for this benchmark
      */
-    public BenchmarkCriterion[][] getCriteria() {
-        BenchmarkCriterion[][] result = new BenchmarkCriterion[criteriaList.size()][];
-        for (int i = 0; i < criteriaList.size(); i++) {
-            result[i] = criteriaList.get(i);
-        }
-        return result;
+    public List<String> getCriteria() {
+        return new ArrayList<String>(criteria);
     }
 
     /**

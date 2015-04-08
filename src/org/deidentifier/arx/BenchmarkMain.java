@@ -149,7 +149,7 @@ public class BenchmarkMain {
      * @throws IOException
      * @throws ParseException
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         checkArgsLength(args);
 
@@ -184,8 +184,9 @@ public class BenchmarkMain {
      * Executes the algorithms based on the configuration provided by the run argument.
      * @param args
      * @param mode indicating which algorithms shall be executed
+     * @throws IOException
      */
-    private static void executeAlgorithms(String[] args, int mode) {
+    private static void executeAlgorithms(String[] args, int mode) throws IOException {
 
         // CONFIGURATION LIST
         String configurationListFile = "";
@@ -236,16 +237,16 @@ public class BenchmarkMain {
     }
 
     private static void runBenchmark(BenchmarkDriver driver, int repetitions,
-                                     AnonConfiguration c, Benchmark benchmark) {
+                                     AnonConfiguration c, Benchmark benchmark) throws IOException {
 
-        if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
-
-            // Print status info
-            System.out.println("Warm Up: " + c.getStatusLine());
-
-            // Warmup run
-            driver.anonymize(c, true);
-        }
+        // if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
+        //
+        // // Print status info
+        // System.out.println("Warm Up: " + c.getStatusLine());
+        //
+        // // Warmup run
+        // driver.anonymize(c, true);
+        // }
 
         // Print status info
         System.out.println("Running: " + c.getStatusLine());
@@ -257,10 +258,12 @@ public class BenchmarkMain {
         // Benchmark
         benchmark.addRun(c.getAlgorithm().toString(),
                          c.getDataset().toString(),
-                         Arrays.toString(c.getCriteria()),
-                         c.getILMetric().getName(),
+                         c.getCriteria(), null == c.getILMetric() ? c.getDecisionMetric().getName() :
+                                 c.getILMetric().getName(),
                          String.valueOf(c.getSuppression()),
-                         c.getQICount(), c.getAlgorithm().getTerminationConfig().getValue());
+                         c.getQICount(), null != c.getAlgorithm().getTerminationConfig() ? c.getAlgorithm()
+                                                                                            .getTerminationConfig()
+                                                                                            .getValue() : "");
 
         // Repeat
         for (int i = 0; i < repetitions; i++) {

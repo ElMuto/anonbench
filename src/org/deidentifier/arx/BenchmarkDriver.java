@@ -83,12 +83,12 @@ public class BenchmarkDriver {
      * @param benchmarkRun true if a regular benchmark run shall be executed, false for a DFS search over the whole lattice in order to determine minmal/maximal information loss
      * @throws IOException
      */
-    public void anonymize(AnonConfiguration c, boolean warmup) {
+    public void anonymize(AnonConfiguration c, boolean warmup) throws IOException {
 
         // Build implementation
         AbstractBenchmarkAlgorithm implementation = null;
         try {
-            implementation = getImplementation(c);
+            implementation = getImplementation(c, false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -119,9 +119,7 @@ public class BenchmarkDriver {
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
             if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
             if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
-            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
-                    implementation.getGlobalOptimum().getInformationLoss().toString() :
-                    NO_SOLUTION_FOUND);
+            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, getInformationLoss(implementation, c));
             if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION, implementation.getGlobalOptimum() != null ?
                     Arrays.toString(implementation.getGlobalOptimum().getTransformation()) :
                     Arrays.toString(new int[0]));
@@ -134,6 +132,25 @@ public class BenchmarkDriver {
     }
 
     /**
+     * Returns and potentially converts IL
+     * @param implementation
+     * @param c
+     * @param globalOptimum
+     * @return
+     * @throws IOException
+     */
+    private String getInformationLoss(AbstractBenchmarkAlgorithm implementation, AnonConfiguration c) throws IOException {
+        if (implementation.getGlobalOptimum() == null) {
+            return String.valueOf(NO_SOLUTION_FOUND);
+        } else if (c.getILMetric() == null) {
+            return implementation.getGlobalOptimum().getInformationLoss().toString();
+        } else {
+            AbstractBenchmarkAlgorithm algorithm = getImplementation(c, true);
+            return algorithm.getInformationLoss(implementation.getGlobalOptimum()).toString();
+        }
+    }
+
+    /**
      * @param dataset
      * @param criteria
      * @param algorithm
@@ -143,14 +160,15 @@ public class BenchmarkDriver {
      * @throws IOException
      */
     private AbstractBenchmarkAlgorithm
-            getImplementation(AnonConfiguration c) throws IOException {
+            getImplementation(AnonConfiguration c, boolean useILMetric) throws IOException {
         // Prepare
-        Data data = BenchmarkSetup.getData(c.getDataset(), c.getCriteria(), c.getQICount());
+        Data data = BenchmarkSetup.getData(c.getDataset(), c.getPrivacyCriteria(), c.getQICount());
         ARXConfiguration config = BenchmarkSetup.getConfiguration(c.getDataset(),
-                                                                  c.getDecisionMetric(),
+                                                                  useILMetric ? c.getILMetric() : c.getDecisionMetric(),
                                                                   c.getSuppression(),
                                                                   c.getQICount(),
-                                                                  c.getCriteria());
+                                                                  c.getPrivacyCriteria());
+
         DataHandle handle = data.getHandle();
 
         // Encode
@@ -191,10 +209,6 @@ public class BenchmarkDriver {
                                       manager.getDataQI(),
                                       manager.getHierarchies(),
                                       config);
-
-        if (!c.getDecisionMetric().equals(c.getILMetric())) {
-            c.getILMetric().initialize(handle.getDefinition(), manager.getDataQI(), manager.getHierarchies(), config);
-        }
 
         // Create an algorithm instance
         AbstractBenchmarkAlgorithm implementation;

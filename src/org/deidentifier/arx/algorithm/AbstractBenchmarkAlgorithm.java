@@ -24,6 +24,7 @@ import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.StateMachine.TransitionType;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
 import org.deidentifier.arx.framework.lattice.Node;
+import org.deidentifier.arx.metric.InformationLoss;
 
 /**
  * Abstract base class for algorithms used in the benchmark
@@ -236,5 +237,15 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
      */
     protected boolean isForceMeasureInfoLossRequired() {
         return false;
+    }
+
+    /**
+     * Returns the information loss of the given node
+     * @param node
+     * @return
+     */
+    public InformationLoss<?> getInformationLoss(Node node) {
+        node.setData(null);
+        return checker.check(node, true).informationLoss;
     }
 }

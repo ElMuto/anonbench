@@ -18,6 +18,7 @@
 
 package org.deidentifier.arx.algorithm;
 
+import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.lattice.MaterializedLattice;
 import org.deidentifier.arx.framework.lattice.Node;
@@ -55,7 +56,7 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
         Node[] successors = node.getSuccessors(true);
         for (int i = 0; i < successors.length; i++) {
             Node successor = successors[i];
-            if (!successor.hasProperty(Node.PROPERTY_CHECKED)) {
+            if (!successor.hasProperty(Node.PROPERTY_CHECKED) && !successor.hasProperty(Node.PROPERTY_NOT_ANONYMOUS)) {
                 traverse(successor);
             }
         }
@@ -64,8 +65,15 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
     @Override
     protected void check(Node node) {
         lattice.setChecked(node, checker.check(node, true));
-        trackMinimum(node);
-        trackMaximum(node);
+        if (!node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+            // We may tag, if we *only* enforce k-anonymity
+            if (checker.getConfiguration().getCriteria().size() == 1 && checker.getConfiguration().getCriterion(KAnonymity.class) != null) {
+                lattice.setPropertyDownwards(node, true, Node.PROPERTY_NOT_ANONYMOUS);
+            }
+        } else {
+            trackMinimum(node);
+            trackMaximum(node);
+        }
     }
 
     /**
