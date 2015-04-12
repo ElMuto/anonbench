@@ -282,8 +282,9 @@ public class BenchmarkSetup {
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.
      * @param configurationFile
+     * @throws IOException
      */
-    public static void createAndSaveDefaultBenchmarkConfiguration(String configurationFile) {
+    public static void createAndSaveDefaultBenchmarkConfiguration(String configurationFile) throws IOException {
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
 
         // For each algorithm (flash, ilbounds, heurakles, datafly, improvedGreedy)
@@ -325,7 +326,7 @@ public class BenchmarkSetup {
                                                                                                    iLMetric,
                                                                                                    suppression,
                                                                                                    criteria,
-                                                                                                   getDefaultPrivacyCriteria(),
+                                                                                                   getDefaultPrivacyCriteria(data, qiCount),
                                                                                                    data,
                                                                                                    qiCount);
                                 benchmarkConfiguration.addAnonConfiguration(c);
@@ -343,10 +344,14 @@ public class BenchmarkSetup {
         }
     }
 
-    private static List<PrivacyCriterion> getDefaultPrivacyCriteria() {
+    private static List<PrivacyCriterion> getDefaultPrivacyCriteria(final BenchmarkDataset dataset, final int qiCount) throws IOException {
         return new ArrayList<PrivacyCriterion>() {
             {
                 add(new KAnonymity(5));
+                // add(new DPresence(0.05d, 0.15d, getResearchSubset(dataset, qiCount)));
+                // add(new RecursiveCLDiversity(getSensitiveAttribute(dataset), 4, 3));
+                // add(new HierarchicalDistanceTCloseness(getSensitiveAttribute(dataset), 0.2d, getHierarchy(dataset, getSensitiveAttribute(dataset))));
+                // add(new PopulationUniqueness(0.01d, ARXPopulationModel.create(Region.USA)));
             }
         };
     }
@@ -355,6 +360,10 @@ public class BenchmarkSetup {
         return new ArrayList<String>() {
             {
                 add("k,5");
+                // add("d,0.05d,0.15d");
+                // add("l,4,3");
+                // add("t,0.2d");
+                // add("r,0.01d");
             }
         };
     }
@@ -697,8 +706,7 @@ public class BenchmarkSetup {
     public static String getFilePath(BenchmarkDataset dataset) {
         switch (dataset) {
         case ADULT:
-            // return "data/adult.csv";
-            return "data/adult-original-3.csv";
+            return "data/adult.csv";
         case ATUS:
             return "data/atus.csv";
         case CUP:

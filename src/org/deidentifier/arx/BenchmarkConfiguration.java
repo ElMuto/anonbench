@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.metric.Metric;
@@ -159,7 +160,7 @@ public class BenchmarkConfiguration {
 
         if (param.length != 9) {
             System.out.println("Wrong number of params.");
-            System.out.println("Required: 'Algorithm; DecisionMetric; ILMetric; Suppression; Criteria; Dataset; [QICount]; TerminationLimitType; [TerminationLimit]'");
+            System.out.println("Required: 'Algorithm; DecisionMetric; [ILMetric]; Suppression; Criteria(type,param,param.../type...); Dataset; [QICount]; TerminationLimitType; [TerminationLimit]'");
             System.out.println("Actual  : " + line);
             System.exit(0);
         }
@@ -235,6 +236,25 @@ public class BenchmarkConfiguration {
 
     public List<AnonConfiguration> getAnonConfigurations() {
         return anonConfigurations;
+    }
+
+    public String getReadableCriteria(String _criteria) {
+        String[] criteria = _criteria.split(",");
+        BenchmarkCriterion type = BenchmarkCriterion.fromLabel(criteria[0]);
+        switch (type) {
+        case D_PRESENCE:
+            return "(" + criteria[1] + "," + criteria[2] + ")-Presence";
+        case K_ANONYMITY:
+            return criteria[1] + "-Anonymity";
+        case L_DIVERSITY:
+            return "(" + criteria[1] + "," + criteria[2] + ")-Diversity";
+        case RISK_BASED:
+            return "Risk-Based (" + criteria[1] + ")";
+        case T_CLOSENESS:
+            return criteria[1] + "-Closeness";
+        default:
+            throw new RuntimeException("Invalid criterion");
+        }
     }
 
     /**

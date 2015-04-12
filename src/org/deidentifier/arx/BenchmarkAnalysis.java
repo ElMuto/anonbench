@@ -147,7 +147,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
-        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS /* , VARIABLES.NUMBER_OF_CHECKS */};
+        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS, VARIABLES.INFORMATION_LOSS_PERCENTAGE };
 
         if (datasets.length == 0 || algorithms.size() == 0) {
             return;
@@ -158,11 +158,11 @@ public class BenchmarkAnalysis {
         // for each metric
         for (Metric<?> metric : benchmarkConfiguration.getMetrics()) {
 
-            // create one file with several plots
-            List<PlotGroup> groups = new ArrayList<PlotGroup>();
-
             // For each combination of criteria
             for (String criteria : benchmarkConfiguration.getCriteria()) {
+
+                // create one file with several plots
+                List<PlotGroup> groups = new ArrayList<PlotGroup>();
                 // for each suppression
                 for (double suppr : benchmarkConfiguration.getSuppression()) {
                     String suppression = String.valueOf(suppr);
@@ -187,7 +187,8 @@ public class BenchmarkAnalysis {
                         Labels labels = new Labels(focus, variable.val);
                         List<Plot<?>> plots = new ArrayList<Plot<?>>();
                         plots.add(new PlotHistogramClustered("", labels, data.series));
-                        String caption = variable.val + " for criteria " + criteria + " using information loss metric \"" +
+                        String caption = variable.val + " for criteria " + benchmarkConfiguration.getReadableCriteria(criteria) +
+                                         " using information loss metric \"" +
                                          metric.getName() +
                                          "\" with " + suppression + "\\%" + " suppression" +
                                          getTerminationLimitCaption(benchmarkConfiguration.getAlgorithms().get(0).getTerminationConfig()) +
@@ -196,11 +197,12 @@ public class BenchmarkAnalysis {
                         groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
                     }
                 }
+                if (!groups.isEmpty()) {
+                    LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
+                                       benchmarkConfiguration.getReadableCriteria(criteria));
+                }
             }
 
-            if (!groups.isEmpty()) {
-                LaTeX.plot(groups, "cluster-results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
-            }
         }
     }
 
