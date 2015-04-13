@@ -24,18 +24,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
-import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
-import org.deidentifier.arx.metric.Metric;
 
-import cern.colt.Arrays;
 import de.linearbits.objectselector.Selector;
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.ValueBuffer;
@@ -329,8 +323,12 @@ public class BenchmarkMain {
         results.addHeader1Column(VARIABLES.INFORMATION_LOSS_MAXIMUM_TRANSFORMATION.val);
         results.addHeader2Column("Value");
 
-        // add header column information loss percentage
-        results.addHeader1Column(VARIABLES.INFORMATION_LOSS_PERCENTAGE.val);
+        // add header column information loss additional
+        results.addHeader1Column(VARIABLES.INFORMATION_LOSS_ADDITIONAL.val);
+        results.addHeader2Column("Value");
+
+        // add header column information loss relative
+        results.addHeader1Column(VARIABLES.INFORMATION_LOSS_RELATIVE.val);
         results.addHeader2Column("Value");
 
         Selector<String[]> selector;

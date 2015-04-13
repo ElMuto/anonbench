@@ -89,7 +89,8 @@ public class BenchmarkAnalysis {
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
         INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)"),
-        INFORMATION_LOSS_PERCENTAGE("Additional information loss"),
+        INFORMATION_LOSS_ADDITIONAL("Additional information loss"),
+        INFORMATION_LOSS_RELATIVE("Relative information loss"),
         INFORMATION_LOSS_TRANSFORMATION("Information loss (Transformation)"),
         QI_COUNT("QI count"),
         ALGORITHM("Algorithm"),
@@ -147,7 +148,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
-        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS, VARIABLES.INFORMATION_LOSS_PERCENTAGE };
+        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS, VARIABLES.INFORMATION_LOSS_RELATIVE };
 
         if (datasets.length == 0 || algorithms.size() == 0) {
             return;
@@ -410,7 +411,7 @@ public class BenchmarkAnalysis {
                                                               Analyzer.ARITHMETIC_MEAN,
                                                               Analyzer.ARITHMETIC_MEAN,
                                                               Analyzer.ARITHMETIC_MEAN },
-                                                      VARIABLES.INFORMATION_LOSS_PERCENTAGE,
+                                                      VARIABLES.INFORMATION_LOSS_ADDITIONAL,
                                                       Analyzer.VALUE,
                                                       focus,
                                                       scriteria,
@@ -861,7 +862,7 @@ public class BenchmarkAnalysis {
             max = Math.max(getMax(series.getData()), max);
             padding = max * 0.3d;
 
-            if (variables[i] != VARIABLES.INFORMATION_LOSS_PERCENTAGE) {
+            if (variables[i] != VARIABLES.INFORMATION_LOSS_ADDITIONAL) {
                 allVariablesRelative = false;
             }
             if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME &&

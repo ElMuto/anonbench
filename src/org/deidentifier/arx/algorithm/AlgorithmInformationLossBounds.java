@@ -42,7 +42,11 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
      */
     @Override
     public void traverse() {
-        traverse(lattice.getBottom());
+        for (Node[] level : lattice.getLevels()) {
+            for (Node node : level){ 
+                traverse(node);
+            }
+        }
     }
 
     /**
@@ -64,8 +68,13 @@ public class AlgorithmInformationLossBounds extends AbstractBenchmarkAlgorithm {
 
     @Override
     protected void check(Node node) {
+        
+        if (node.hasProperty(Node.PROPERTY_CHECKED) || node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS) || node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+            return;
+        }
+        
         lattice.setChecked(node, checker.check(node, true));
-        if (!node.hasProperty(Node.PROPERTY_ANONYMOUS)) {
+        if (node.hasProperty(Node.PROPERTY_NOT_ANONYMOUS)) {
             // We may tag, if we *only* enforce k-anonymity
             if (checker.getConfiguration().getCriteria().size() == 1 && checker.getConfiguration().getCriterion(KAnonymity.class) != null) {
                 lattice.setPropertyDownwards(node, true, Node.PROPERTY_NOT_ANONYMOUS);
