@@ -425,6 +425,9 @@ public class BenchmarkMain {
                     csvLine.addColumn(minTransformation);
                     csvLine.addColumn(String.valueOf(max));
                     csvLine.addColumn(maxTransformation);
+                    // additional iL
+                    csvLine.addColumn(String.valueOf(value));
+                    // relative IL
                     csvLine.addColumn(String.valueOf(value));
                     break;
                 }

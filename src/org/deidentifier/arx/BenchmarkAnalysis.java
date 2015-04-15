@@ -148,7 +148,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
-        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS, VARIABLES.INFORMATION_LOSS_RELATIVE };
+        VARIABLES[] variables = new VARIABLES[] {  VARIABLES.INFORMATION_LOSS_RELATIVE };
 
         if (datasets.length == 0 || algorithms.size() == 0) {
             return;
@@ -879,7 +879,7 @@ public class BenchmarkAnalysis {
             params.printValuesFormatString = "%.2f";
         }
 
-        if (max >= 10000d) {
+        if (max >= 10000d || variables[0] == VARIABLES.INFORMATION_LOSS_RELATIVE) {
             padding = max * 0.7d;
             params.printValuesFormatString = "%.2e";
         }
