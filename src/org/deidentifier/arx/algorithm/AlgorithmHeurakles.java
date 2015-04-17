@@ -118,6 +118,9 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         if (!stopCriterion.isFulfilled()) {
             traverse(bottom);
         }
+        if(stopCriterion.isFulfilled()) {
+            latticeCompleted = false;
+        }
     }
 
     /**

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="heurakles-bech" default="release" basedir=".">
 
-  <property name="arx" value="C:\IDE\eclipse_luna\workspace\arx_fork" />
-  <property name="subframe" value="C:\IDE\eclipse_luna\workspace\subframe_fork" />
+  <property name="arx" value="C:\IDE\eclipse_kepler\arx\arx-fork" />
+  <property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" />
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">
@@ -22,6 +22,7 @@
       <filename name="**/junit-4.11.jar" />
       <filename name="**/hppc-0.6.0.jar" />
       <filename name="**/objectselector-0.1-lib.jar" />
+      <filename name="**/univocity-parsers-1.3.1.jar" />
     </or>
   </fileset>
 

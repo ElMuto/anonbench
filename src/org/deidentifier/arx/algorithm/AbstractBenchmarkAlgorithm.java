@@ -20,6 +20,10 @@
 
 package org.deidentifier.arx.algorithm;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.StateMachine.TransitionType;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
@@ -41,6 +45,12 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     protected Node  previous;
     /** The hierarchy heights for each QI. */
     protected int[] hierarchyHeights;
+    /** The information losses of the optima which have been found. */
+    protected List<String> optimaInformationLosses = new ArrayList<String>();
+    /** The timestamps indicating when an optimum has been found in nanoseconds. */
+    protected List<Long> optimumCheckedTimestamps = new ArrayList<Long>();
+    /** Flag indicating if the complete lattice has been processed. */
+    boolean latticeCompleted = true;
 
     /**
      * Constructor
@@ -78,17 +88,69 @@ public abstract class AbstractBenchmarkAlgorithm extends AbstractAlgorithm {
     public int getNumSnapshots() {
         return snapshots;
     }
+    
+    /**
+     * Returns the information losses of the optima which have been found
+     *
+     * @return
+     */
+    public List<String> getOptimaInformationLosses() {
+        return optimaInformationLosses;
+    }
+    
+    /**
+     * Returns the timestamps indicating when the optima have been found in  nanoseconds
+     *
+     * @return
+     */
+    public List<Long> getOptimumCheckedTimestamps() {
+        return optimumCheckedTimestamps;
+    }
+    
+    /**
+     * Returns the total size of the lattice
+     * @return
+     */
+    public long getTotalLatticeSize() {
+        long size = 1;
+        for (int height: hierarchyHeights)
+            size *= height;
+        return size;
+    }
+    
+    /**
+     * Returns if the complete lattice has been processed
+     * @return
+     */
+    public boolean getLatticeCompleted() {
+        return latticeCompleted;
+    }
 
     /**
      * Performs a check and keeps track of potential rollups
      * @param node
      */
+    @SuppressWarnings("unused")
     protected void check(Node node) {
 
         // Check
         boolean forceMeasureInfoLoss = isForceMeasureInfoLossRequired();
         lattice.setChecked(node, checker.check(node, forceMeasureInfoLoss));
+        
+        Node oldGlobalOptimum = getGlobalOptimum();
         trackOptimum(node);
+        Node newGlobalOptimum = getGlobalOptimum();
+        
+        if (oldGlobalOptimum != newGlobalOptimum) {
+            if (BenchmarkSetup.RECORD_ALL_OPTIMA || optimaInformationLosses.size() == 0)   {
+                optimaInformationLosses.add(newGlobalOptimum.getInformationLoss().toString());
+                optimumCheckedTimestamps.add(System.nanoTime());
+            } else {
+                optimaInformationLosses.set(0, newGlobalOptimum.getInformationLoss().toString());
+                optimumCheckedTimestamps.set(0,System.nanoTime());
+            }
+        }
+        
         checks++;
         snapshots += (checker.getTransitionType() == TransitionType.SNAPSHOT) ? 1 : 0;
 

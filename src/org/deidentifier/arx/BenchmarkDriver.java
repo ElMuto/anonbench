@@ -21,6 +21,8 @@
 package org.deidentifier.arx;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
@@ -108,29 +110,40 @@ public class BenchmarkDriver {
                     (Arrays.toString(algo.getGlobalMaximum().getTransformation())) : Arrays.toString(new int[0]));
         }
         // for Flash, Heurakles
-        else {
-
+        else if (!warmup) {
             // Execute
-            if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
+            benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
             long startTimestamp = System.nanoTime();
             implementation.traverse();
-            if (!warmup) benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
-            if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
-            if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
-            if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
-            if (!warmup) benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
-            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
-                    implementation.getGlobalOptimum().getInformationLoss().toString() :
-                    NO_SOLUTION_FOUND);
-            if (!warmup) benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION, implementation.getGlobalOptimum() != null ?
+
+            // Add values
+            benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
+            benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
+            benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
+            benchmark.addValue(BenchmarkMain.NUMBER_OF_SNAPSHOTS, implementation.getNumSnapshots());
+            benchmark.addValue(BenchmarkMain.LATTICE_SIZE, implementation.getLatticeSize());
+            benchmark.addValue(BenchmarkMain.TOTAL_LATTICE_SIZE, implementation.getTotalLatticeSize());
+            benchmark.addValue(BenchmarkMain.LATTICE_COMPLETED, implementation.getLatticeCompleted());
+            benchmark.addValue(BenchmarkMain.INFORMATION_LOSS_TRANSFORMATION, implementation.getGlobalOptimum() != null ?
                     Arrays.toString(implementation.getGlobalOptimum().getTransformation()) :
                     Arrays.toString(new int[0]));
-            if (!warmup) benchmark.addValue(BenchmarkMain.SOLUTION_DISCOVERY_TIME,
-                                            implementation.getOptimumTrackedTimestamp() != Long.MIN_VALUE ?
-                                                    implementation.getOptimumTrackedTimestamp() - startTimestamp :
-                                                    NO_SOLUTION_FOUND);
-        }
 
+            if (BenchmarkSetup.RECORD_ALL_OPTIMA) {
+                List<Long> discoveryTimes = new ArrayList<Long>();
+                for (Long timestamp : implementation.getOptimumCheckedTimestamps())
+                    discoveryTimes.add(timestamp - startTimestamp);
+                benchmark.addValue(BenchmarkMain.SOLUTION_DISCOVERY_TIME, discoveryTimes.toString());
+                benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getOptimaInformationLosses().toString());
+            } else {
+                benchmark.addValue(BenchmarkMain.INFORMATION_LOSS, implementation.getGlobalOptimum() != null ?
+                        implementation.getGlobalOptimum().getInformationLoss().toString() :
+                        NO_SOLUTION_FOUND);
+                int size = implementation.getOptimumCheckedTimestamps().size();
+                benchmark.addValue(BenchmarkMain.SOLUTION_DISCOVERY_TIME, size > 0 ?
+                        implementation.getOptimumCheckedTimestamps().get(size - 1) - startTimestamp :
+                        NO_SOLUTION_FOUND);
+            }
+        }
     }
 
     /**

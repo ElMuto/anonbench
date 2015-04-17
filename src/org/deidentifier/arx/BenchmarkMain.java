@@ -79,17 +79,22 @@ public class BenchmarkMain {
     public static int                INFORMATION_LOSS_MAXIMUM_TRANSFORMATION;
     /** Label for information loss maximum transformation */
     public static int                SOLUTION_DISCOVERY_TIME;
+    /** Label for exhausted */
+    public static int                LATTICE_COMPLETED;
+    /** Label for total lattice size */
+    public static int                TOTAL_LATTICE_SIZE;
 
     private static void initMeasures() {
-
         EXECUTION_TIME = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.EXECUTION_TIME.val);
         NUMBER_OF_CHECKS = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_CHECKS.val);
         NUMBER_OF_ROLLUPS = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_ROLLUPS.val);
         NUMBER_OF_SNAPSHOTS = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.NUMBER_OF_SNAPSHOTS.val);
         LATTICE_SIZE = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_SIZE.val);
+        TOTAL_LATTICE_SIZE = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.TOTAL_LATTICE_SIZE.val);
         INFORMATION_LOSS = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS.val);
         INFORMATION_LOSS_TRANSFORMATION = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_TRANSFORMATION.val);
         SOLUTION_DISCOVERY_TIME = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.SOLUTION_DISCOVERY_TIME.val);
+        LATTICE_COMPLETED = MAIN_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.LATTICE_COMPLETED.val);
 
         // InformationLossBounds
         INFORMATION_LOSS_MINIMUM = SUPPORTING_BENCHMARK.addMeasure(BenchmarkAnalysis.VARIABLES.INFORMATION_LOSS_MINIMUM.val);
@@ -99,16 +104,18 @@ public class BenchmarkMain {
     }
 
     private static void initAnalyzers(int repetitions) {
-
         MAIN_BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(repetitions));
         MAIN_BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(repetitions));
         MAIN_BENCHMARK.addAnalyzer(NUMBER_OF_CHECKS, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(NUMBER_OF_SNAPSHOTS, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(LATTICE_SIZE, new ValueBuffer());
+        MAIN_BENCHMARK.addAnalyzer(TOTAL_LATTICE_SIZE, new ValueBuffer());
+        MAIN_BENCHMARK.addAnalyzer(LATTICE_COMPLETED, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(INFORMATION_LOSS_TRANSFORMATION, new ValueBuffer());
-        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME, new BufferedArithmeticMeanAnalyzer(repetitions));
+//        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME, new BufferedArithmeticMeanAnalyzer(repetitions));
+        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME, new ValueBuffer());
 
         // InformationLossBounds
         SUPPORTING_BENCHMARK.addAnalyzer(INFORMATION_LOSS_MINIMUM, new ValueBuffer());
@@ -241,10 +248,10 @@ public class BenchmarkMain {
         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
 
             // Print status info
-            System.out.println("Warm Up: " + c.getStatusLine());
+//            System.out.println("Warm Up: " + c.getStatusLine());
 
             // Warmup run
-            driver.anonymize(c, true);
+//            driver.anonymize(c, true);
         }
 
         // Print status info

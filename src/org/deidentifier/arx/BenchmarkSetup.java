@@ -264,9 +264,9 @@ public class BenchmarkSetup {
         }
     }
 
-    public static final String                           DEFAULT_CONFIGURAITON_FILE = "cluster-worklists/defaultConfiguration.csv";
+    public static final String                           DEFAULT_CONFIGURAITON_FILE = "results/defaultConfiguration.csv";
 
-    public static final String                           INFORMATION_LOSS_FILE      = "cluster-results/informationLossBounds.csv";
+    public static final String                           INFORMATION_LOSS_FILE      = "results/informationLossBounds.csv";
 
     private static Map<String, Algorithm>                name2Algorithm;
 
@@ -274,9 +274,15 @@ public class BenchmarkSetup {
 
     private static Map<String, Metric<?>>                name2Metric;
 
-    public static final String                           RESULTS_FILE               = "cluster-results/results.csv";
+    public static final String                           RESULTS_FILE               = "results/results.csv";
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE           = TerminationConfiguration.Type.ANONYMITY;
+
+    /**
+     * Flag indicating if the discovery time and information loss
+     * of all discovered optima or only the last one should be recorded
+     */
+    public static final boolean                          RECORD_ALL_OPTIMA          = false;
 
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.
@@ -960,10 +966,11 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { 0d /* , 0.02d, 0.05d, 0.1d, 1.0d */};
+        return new double[] { /* 0.0d , 0.02d, 0.05d, 0.1d, */1.0d };
     }
 
     public static Integer[] getTerminationLimits() {
-        return new Integer[] { 2000 /* , 5000, 10000, 20000 */};
+        // return new Integer[] { 60, 90, 125, 175, 210, 250, 500, 1000, 2000, 3000, 7500, 10000, 15000, 30000, 60000, 300000, 600000};
+        return new Integer[] { 90, 125, 175, 250, 500, 1000, 2000, 3000, 7500, 10000, 15000 };
     }
 }
