@@ -482,9 +482,10 @@ public class BenchmarkAnalysis {
             params.maxY = 100d;
             params.keypos = KeyPos.TOP_RIGHT;
             params.colorize = true;
+            params.lineStyle = GnuPlotParams.Style.STEPS;
 
             // for each suppression
-            for (double suppr : new double[] { 0d, 0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d, 1d }) {
+            for (double suppr : new double[] { 0d, 0.1d, 1d }) {
                 String suppression = String.valueOf(suppr);
 
                 Selector<String[]> selector = file.getSelectorBuilder()
