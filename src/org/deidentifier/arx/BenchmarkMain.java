@@ -108,8 +108,8 @@ public class BenchmarkMain {
         MAIN_BENCHMARK.addAnalyzer(LATTICE_COMPLETED, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(INFORMATION_LOSS, new ValueBuffer());
         MAIN_BENCHMARK.addAnalyzer(INFORMATION_LOSS_TRANSFORMATION, new ValueBuffer());
-//        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME, new BufferedArithmeticMeanAnalyzer(repetitions));
-        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME, BenchmarkSetup.RECORD_ALL_OPTIMA ? new ValueBuffer() : new BufferedArithmeticMeanAnalyzer(repetitions));
+        MAIN_BENCHMARK.addAnalyzer(SOLUTION_DISCOVERY_TIME,
+                                   BenchmarkSetup.RECORD_ALL_OPTIMA ? new ValueBuffer() : new BufferedArithmeticMeanAnalyzer(repetitions));
 
         // InformationLossBounds
         SUPPORTING_BENCHMARK.addAnalyzer(INFORMATION_LOSS_MINIMUM, new ValueBuffer());

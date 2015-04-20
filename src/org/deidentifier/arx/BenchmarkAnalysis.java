@@ -155,7 +155,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
-        VARIABLES[] variables = new VARIABLES[] {  VARIABLES.INFORMATION_LOSS_RELATIVE };
+        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS_RELATIVE };
 
         if (datasets.length == 0 || algorithms.size() == 0) {
             return;
@@ -235,73 +235,73 @@ public class BenchmarkAnalysis {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateConventionalPlots() throws IOException, ParseException {
-
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-
-        BenchmarkDataset[] datasets = BenchmarkSetup.getConventionalDatasets();
-        List<Algorithm> algorithms = BenchmarkSetup.getAlgorithms(false, false);
-
-        if (datasets.length == 0 || algorithms.size() == 0) {
-            return;
-        }
-
-        String focus = VARIABLES.DATASET.val;
-
-        // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-            // create one file with several plots
-            List<PlotGroup> groups = new ArrayList<PlotGroup>();
-
-            // For each combination of criteria
-            for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-                String scriteria = Arrays.toString(criteria);
-
-                // for each suppression
-                for (double suppr : BenchmarkSetup.getSuppression()) {
-                    String suppression = String.valueOf(suppr);
-
-                    for (VARIABLES variable : new VARIABLES[] {
-                            VARIABLES.EXECUTION_TIME,
-                            VARIABLES.NUMBER_OF_CHECKS,
-                            VARIABLES.NUMBER_OF_ROLLUPS,
-                            VARIABLES.NUMBER_OF_SNAPSHOTS,
-                            VARIABLES.INFORMATION_LOSS /* , VARIABLES.INFORMATION_LOSS_PERCENTAGE */}) {
-                        String measure = (variable == VARIABLES.EXECUTION_TIME) ? Analyzer.ARITHMETIC_MEAN : Analyzer.VALUE;
-                        boolean xGroupPercent = false;
-                        PlotGroupData data = getGroupData(file,
-                                                          new VARIABLES[] { variable },
-                                                          new String[] { measure },
-                                                          null,
-                                                          null,
-                                                          focus,
-                                                          scriteria,
-                                                          suppression,
-                                                          datasets,
-                                                          algorithms,
-                                                          metric,
-                                                          1.5,
-                                                          xGroupPercent,
-                                                          null);
-
-                        Labels labels = new Labels(focus, variable.val);
-                        List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                        plots.add(new PlotHistogramClustered("", labels, data.series));
-                        String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" +
-                                         metric.getName() +
-                                         "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\".";
-
-                        groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
-                    }
-                }
-            }
-
-            if (!groups.isEmpty()) {
-                LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
-            }
-        }
-    }
+    // private static void generateConventionalPlots() throws IOException, ParseException {
+    //
+    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    //
+    // BenchmarkDataset[] datasets = BenchmarkSetup.getConventionalDatasets();
+    // List<Algorithm> algorithms = BenchmarkSetup.getAlgorithms(false, false);
+    //
+    // if (datasets.length == 0 || algorithms.size() == 0) {
+    // return;
+    // }
+    //
+    // String focus = VARIABLES.DATASET.val;
+    //
+    // // for each metric
+    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+    //
+    // // create one file with several plots
+    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
+    //
+    // // For each combination of criteria
+    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    // String scriteria = Arrays.toString(criteria);
+    //
+    // // for each suppression
+    // for (double suppr : BenchmarkSetup.getSuppression()) {
+    // String suppression = String.valueOf(suppr);
+    //
+    // for (VARIABLES variable : new VARIABLES[] {
+    // VARIABLES.EXECUTION_TIME,
+    // VARIABLES.NUMBER_OF_CHECKS,
+    // VARIABLES.NUMBER_OF_ROLLUPS,
+    // VARIABLES.NUMBER_OF_SNAPSHOTS,
+    // VARIABLES.INFORMATION_LOSS /* , VARIABLES.INFORMATION_LOSS_PERCENTAGE */}) {
+    // String measure = (variable == VARIABLES.EXECUTION_TIME) ? Analyzer.ARITHMETIC_MEAN : Analyzer.VALUE;
+    // boolean xGroupPercent = false;
+    // PlotGroupData data = getGroupData(file,
+    // new VARIABLES[] { variable },
+    // new String[] { measure },
+    // null,
+    // null,
+    // focus,
+    // scriteria,
+    // suppression,
+    // datasets,
+    // algorithms,
+    // metric,
+    // 1.5,
+    // xGroupPercent,
+    // null);
+    //
+    // Labels labels = new Labels(focus, variable.val);
+    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
+    // plots.add(new PlotHistogramClustered("", labels, data.series));
+    // String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" +
+    // metric.getName() +
+    // "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\".";
+    //
+    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+    // }
+    // }
+    // }
+    //
+    // if (!groups.isEmpty()) {
+    // LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
+    // }
+    // }
+    // }
 
     private static void generateConventionalPlotsByConfiguration() throws IOException, ParseException {
 
@@ -381,89 +381,102 @@ public class BenchmarkAnalysis {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateFlashComparisonPlots() throws IOException, ParseException {
-
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-
-        String focus = VARIABLES.DATASET.val;
-        List<Algorithm> algorithms = new ArrayList<Algorithm>();
-        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
-        BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
-
-        if (datasets.length == 0 || algorithms.size() == 0) {
-            return;
-        }
-
-        // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-            // create one file with several plots
-            List<PlotGroup> groups = new ArrayList<PlotGroup>();
-
-            // for each combination of criteria
-            for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-                String scriteria = Arrays.toString(criteria);
-
-                // for each suppression
-                for (double suppr : BenchmarkSetup.getSuppression()) {
-                    String suppression = String.valueOf(suppr);
-
-                    boolean xGroupPercent = false;
-                    PlotGroupData data = getGroupData(file,
-                                                      new VARIABLES[] {
-                                                              VARIABLES.EXHAUSTIVE_SEARCH_TIME,
-                                                              VARIABLES.EXECUTION_TIME,
-                                                              VARIABLES.SOLUTION_DISCOVERY_TIME },
-                                                      new String[] {
-                                                              Analyzer.ARITHMETIC_MEAN,
-                                                              Analyzer.ARITHMETIC_MEAN,
-                                                              Analyzer.ARITHMETIC_MEAN },
-                                                      VARIABLES.INFORMATION_LOSS_ADDITIONAL,
-                                                      Analyzer.VALUE,
-                                                      focus,
-                                                      scriteria,
-                                                      suppression,
-                                                      datasets,
-                                                      algorithms,
-                                                      metric,
-                                                      2.0d,
-                                                      xGroupPercent,
-                                                      null);
-
-                    Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
-                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                    plots.add(new PlotHistogramClustered("", labels, data.series));
-                    String caption = "Exhaustive search time, execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
-                                     " using information loss metric \"" +
-                                     metric.getName() +
-                                     "\" with " +
-                                     Double.valueOf(suppression) *
-                                     100d +
-                                     "\\%" +
-                                     " suppression " +
-                                     "listed by \"" +
-                                     focus +
-                                     "\"." +
-                                     " The execution time limits correspond to the total runtime of Flash for each configuration." +
-                                     " The QI Count used for the dataset " +
-                                     BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
-
-                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
-                }
-            }
-
-            if (!groups.isEmpty()) {
-                LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"), true);
-            }
-        }
-    }
+    // private static void generateFlashComparisonPlots() throws IOException, ParseException {
+    //
+    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    //
+    // String focus = VARIABLES.DATASET.val;
+    // List<Algorithm> algorithms = new ArrayList<Algorithm>();
+    // algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
+    // BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
+    //
+    // if (datasets.length == 0 || algorithms.size() == 0) {
+    // return;
+    // }
+    //
+    // // for each metric
+    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+    //
+    // // create one file with several plots
+    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
+    //
+    // // for each combination of criteria
+    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    // String scriteria = Arrays.toString(criteria);
+    //
+    // // for each suppression
+    // for (double suppr : BenchmarkSetup.getSuppression()) {
+    // String suppression = String.valueOf(suppr);
+    //
+    // boolean xGroupPercent = false;
+    // PlotGroupData data = getGroupData(file,
+    // new VARIABLES[] {
+    // VARIABLES.EXHAUSTIVE_SEARCH_TIME,
+    // VARIABLES.EXECUTION_TIME,
+    // VARIABLES.SOLUTION_DISCOVERY_TIME },
+    // new String[] {
+    // Analyzer.ARITHMETIC_MEAN,
+    // Analyzer.ARITHMETIC_MEAN,
+    // Analyzer.ARITHMETIC_MEAN },
+    // VARIABLES.INFORMATION_LOSS_ADDITIONAL,
+    // Analyzer.VALUE,
+    // focus,
+    // scriteria,
+    // suppression,
+    // datasets,
+    // algorithms,
+    // metric,
+    // 2.0d,
+    // xGroupPercent,
+    // null);
+    //
+    // Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
+    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
+    // plots.add(new PlotHistogramClustered("", labels, data.series));
+    // String caption = "Exhaustive search time, execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
+    // " using information loss metric \"" +
+    // metric.getName() +
+    // "\" with " +
+    // Double.valueOf(suppression) *
+    // 100d +
+    // "\\%" +
+    // " suppression " +
+    // "listed by \"" +
+    // focus +
+    // "\"." +
+    // " The execution time limits correspond to the total runtime of Flash for each configuration." +
+    // " The QI Count used for the dataset " +
+    // BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
+    //
+    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+    // }
+    // }
+    //
+    // if (!groups.isEmpty()) {
+    // LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"), true);
+    // }
+    // }
+    // }
 
     private static void generateHeuraklesSelfComparisonPlotsV2() throws IOException, ParseException {
         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
-     // create one file with several plots
+        BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+        try {
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Double[] suppressions = benchmarkConfiguration.getSuppression();
+
+        if (suppressions.length == 0) {
+            return;
+        }
+
+        // create one file with several plots
         List<PlotGroup> groups = new ArrayList<PlotGroup>();
-        
+
         // for both normal and logarithmical X-Axes
         for (boolean logX : new boolean[] { false, true }) {
 
@@ -483,7 +496,7 @@ public class BenchmarkAnalysis {
             params.lineStyle = GnuPlotParams.LineStyle.STEPS;
 
             // for each suppression
-            for (double suppr : new double[] { 0d, 0.1d, 1d }) {
+            for (double suppr : suppressions) {
                 String suppression = String.valueOf(suppr);
 
                 Selector<String[]> selector = file.getSelectorBuilder()
@@ -588,13 +601,14 @@ public class BenchmarkAnalysis {
                 List<Plot<?>> plots = new ArrayList<Plot<?>>();
                 plots.add(new PlotLinesClustered("", labels, data.series));
                 String caption = "Relative information loss for criterium 5-anonymity using information loss metric \"Loss\" with " +
-                                 Double.valueOf(suppression) * 100d + "\\%" + " suppression listed by runtime" + (logX ? " in logarithmic scaling" : "") +
+                                 Double.valueOf(suppression) * 100d + "\\%" + " suppression listed by runtime" +
+                                 (logX ? " in logarithmic scaling" : "") +
                                  " for dataset \"SS13ACS\\_SEMANTIC\". Data points required for plotting before a solution has been found have been set to 100\\%.";
 
                 groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
             }
         }
-        
+
         if (!groups.isEmpty()) {
             LaTeX.plot(groups, "results/results", true);
         }
@@ -605,148 +619,148 @@ public class BenchmarkAnalysis {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateHeuraklesSelfComparisonPlots() throws IOException, ParseException {
-
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-
-        BenchmarkDataset[] datasets = BenchmarkSetup.getQICountScalingDatasets();
-        List<Algorithm> algorithms = new ArrayList<Algorithm>();
-        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
-            if (algorithm.getType().equals(BenchmarkSetup.AlgorithmType.HEURAKLES)) {
-                algorithms.add(algorithm);
-            }
-        }
-
-        if (datasets.length == 0 || algorithms.size() == 0) {
-            return;
-        }
-
-        String focus = VARIABLES.QI_COUNT.val;
-
-        // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-            // create one file with several plots
-            List<PlotGroup> groups = new ArrayList<PlotGroup>();
-
-            // for each combination of criteria
-            for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-                String scriteria = Arrays.toString(criteria);
-
-                // for each suppression
-                for (double suppr : BenchmarkSetup.getSuppression()) {
-                    String suppression = String.valueOf(suppr);
-
-                    boolean xGroupPercent = true;
-                    PlotGroupData data = getGroupData(file,
-                                                      new VARIABLES[] { VARIABLES.INFORMATION_LOSS },
-                                                      new String[] { Analyzer.VALUE },
-                                                      null,
-                                                      null,
-                                                      focus,
-                                                      scriteria,
-                                                      suppression,
-                                                      datasets,
-                                                      algorithms,
-                                                      metric,
-                                                      1.5,
-                                                      xGroupPercent,
-                                                      new Double(-1.0d));
-
-                    Labels labels = new Labels(focus, VARIABLES.INFORMATION_LOSS.val + " relative");
-                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                    plots.add(new PlotHistogramClustered("", labels, data.series));
-                    String caption = VARIABLES.INFORMATION_LOSS.val +
-                                     " for criterium 5-anonymity using information loss metric \"" + metric.getName() + "\" with " +
-                                     Double.valueOf(suppression) * 100d + "\\%" + " suppression " + " listed by \"" + focus + "\"" +
-                                     " for dataset \"" + datasets[0].toString().replace("_", "\\_") + "\".";
-
-                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
-                }
-            }
-
-            if (!groups.isEmpty()) {
-                LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"), true);
-            }
-        }
-    }
+    // private static void generateHeuraklesSelfComparisonPlots() throws IOException, ParseException {
+    //
+    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    //
+    // BenchmarkDataset[] datasets = BenchmarkSetup.getQICountScalingDatasets();
+    // List<Algorithm> algorithms = new ArrayList<Algorithm>();
+    // for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
+    // if (algorithm.getType().equals(BenchmarkSetup.AlgorithmType.HEURAKLES)) {
+    // algorithms.add(algorithm);
+    // }
+    // }
+    //
+    // if (datasets.length == 0 || algorithms.size() == 0) {
+    // return;
+    // }
+    //
+    // String focus = VARIABLES.QI_COUNT.val;
+    //
+    // // for each metric
+    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+    //
+    // // create one file with several plots
+    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
+    //
+    // // for each combination of criteria
+    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    // String scriteria = Arrays.toString(criteria);
+    //
+    // // for each suppression
+    // for (double suppr : BenchmarkSetup.getSuppression()) {
+    // String suppression = String.valueOf(suppr);
+    //
+    // boolean xGroupPercent = true;
+    // PlotGroupData data = getGroupData(file,
+    // new VARIABLES[] { VARIABLES.INFORMATION_LOSS },
+    // new String[] { Analyzer.VALUE },
+    // null,
+    // null,
+    // focus,
+    // scriteria,
+    // suppression,
+    // datasets,
+    // algorithms,
+    // metric,
+    // 1.5,
+    // xGroupPercent,
+    // new Double(-1.0d));
+    //
+    // Labels labels = new Labels(focus, VARIABLES.INFORMATION_LOSS.val + " relative");
+    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
+    // plots.add(new PlotHistogramClustered("", labels, data.series));
+    // String caption = VARIABLES.INFORMATION_LOSS.val +
+    // " for criterium 5-anonymity using information loss metric \"" + metric.getName() + "\" with " +
+    // Double.valueOf(suppression) * 100d + "\\%" + " suppression " + " listed by \"" + focus + "\"" +
+    // " for dataset \"" + datasets[0].toString().replace("_", "\\_") + "\".";
+    //
+    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+    // }
+    // }
+    //
+    // if (!groups.isEmpty()) {
+    // LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"), true);
+    // }
+    // }
+    // }
 
     /**
      * Generate the plots for the QI count scaling benchmark
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateQICountScalingPlots() throws IOException, ParseException {
-
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-
-        Algorithm flash = null;
-        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
-            if (algorithm.getType() == AlgorithmType.FLASH) {
-                flash = algorithm;
-            }
-        }
-        if (flash == null) {
-            throw new RuntimeException("Flash algorithm not found");
-        }
-
-        String focus = VARIABLES.QI_COUNT.val;
-
-        // for each Qi count scaling dataset
-        for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
-
-            // create one file with several plots
-            List<PlotGroup> groups = new ArrayList<PlotGroup>();
-
-            // for each metric
-            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-                // For each combination of criteria
-                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-                    String scriteria = Arrays.toString(criteria);
-
-                    // for each suppression
-                    for (double suppr : BenchmarkSetup.getSuppression()) {
-                        String suppression = String.valueOf(suppr);
-
-                        // For each algorithm of type heurakles
-                        for (Algorithm heurakles : BenchmarkSetup.getAlgorithms(false, false)) {
-                            if (heurakles.getType() != AlgorithmType.HEURAKLES) continue;
-
-                            boolean xGroupPercent = false;
-                            PlotGroupData data = getGroupData(file,
-                                                              new VARIABLES[] { VARIABLES.EXECUTION_TIME },
-                                                              new String[] { Analyzer.ARITHMETIC_MEAN },
-                                                              null,
-                                                              null,
-                                                              focus,
-                                                              scriteria,
-                                                              suppression,
-                                                              new BenchmarkDataset[] { dataset },
-                                                              Arrays.asList(new Algorithm[] { flash, heurakles }),
-                                                              metric,
-                                                              1.5,
-                                                              xGroupPercent,
-                                                              null);
-
-                            Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val);
-                            List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                            plots.add(new PlotLinesClustered("", labels, data.series));
-                            String caption = VARIABLES.EXECUTION_TIME.val +
-                                             " for criteria " + scriteria + " using information loss metric \"" + metric.getName() +
-                                             "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\".";
-
-                            groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
-                        }
-                    }
-                }
-            }
-
-            if (!groups.isEmpty()) {
-                LaTeX.plot(groups, "results/results_QI_count_scaling_" + dataset.toString());
-            }
-        }
-    }
+    // private static void generateQICountScalingPlots() throws IOException, ParseException {
+    //
+    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    //
+    // Algorithm flash = null;
+    // for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
+    // if (algorithm.getType() == AlgorithmType.FLASH) {
+    // flash = algorithm;
+    // }
+    // }
+    // if (flash == null) {
+    // throw new RuntimeException("Flash algorithm not found");
+    // }
+    //
+    // String focus = VARIABLES.QI_COUNT.val;
+    //
+    // // for each Qi count scaling dataset
+    // for (BenchmarkDataset dataset : BenchmarkSetup.getQICountScalingDatasets()) {
+    //
+    // // create one file with several plots
+    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
+    //
+    // // for each metric
+    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+    //
+    // // For each combination of criteria
+    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    // String scriteria = Arrays.toString(criteria);
+    //
+    // // for each suppression
+    // for (double suppr : BenchmarkSetup.getSuppression()) {
+    // String suppression = String.valueOf(suppr);
+    //
+    // // For each algorithm of type heurakles
+    // for (Algorithm heurakles : BenchmarkSetup.getAlgorithms(false, false)) {
+    // if (heurakles.getType() != AlgorithmType.HEURAKLES) continue;
+    //
+    // boolean xGroupPercent = false;
+    // PlotGroupData data = getGroupData(file,
+    // new VARIABLES[] { VARIABLES.EXECUTION_TIME },
+    // new String[] { Analyzer.ARITHMETIC_MEAN },
+    // null,
+    // null,
+    // focus,
+    // scriteria,
+    // suppression,
+    // new BenchmarkDataset[] { dataset },
+    // Arrays.asList(new Algorithm[] { flash, heurakles }),
+    // metric,
+    // 1.5,
+    // xGroupPercent,
+    // null);
+    //
+    // Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val);
+    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
+    // plots.add(new PlotLinesClustered("", labels, data.series));
+    // String caption = VARIABLES.EXECUTION_TIME.val +
+    // " for criteria " + scriteria + " using information loss metric \"" + metric.getName() +
+    // "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\".";
+    //
+    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+    // }
+    // }
+    // }
+    // }
+    //
+    // if (!groups.isEmpty()) {
+    // LaTeX.plot(groups, "results/results_QI_count_scaling_" + dataset.toString());
+    // }
+    // }
+    // }
 
     /**
      * Generates a single table
@@ -759,174 +773,174 @@ public class BenchmarkAnalysis {
      * @throws ParseException
      * @throws IOException
      */
-    private static void
-            generateTable(CSVFile file, String suppression, Metric<?> metric, VARIABLES variable, String measure, boolean lowerIsBetter) throws ParseException,
-                                                                                                                                        IOException {
-
-        // Create csv header
-        ArrayList<String> header = new ArrayList<String>();
-        header.add("");
-        for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
-            int minQI = BenchmarkSetup.getMinQICount(dataset);
-            int maxQI = minQI;
-            for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
-                maxQI = Math.max(BenchmarkSetup.getMaxQICount(algorithm, dataset), maxQI);
-            }
-
-            for (int numQI = minQI; numQI <= maxQI; ++numQI) {
-                header.add(dataset.toString() + " " + numQI + " QIs");
-            }
-        }
-
-        String[] header2 = new String[header.size()];
-        header.toArray(header2);
-        String[] header1 = new String[header.size()];
-        Arrays.fill(header1, "");
-
-        // Create csv
-        CSVFile csv = new CSVFile(header1, header2);
-
-        // For each criterion
-        for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-
-            // For each algorithm of type heurakles
-            for (Algorithm heurakles : BenchmarkSetup.getAlgorithms(false, false)) {
-                if (heurakles.getType() != AlgorithmType.HEURAKLES) continue;
-
-                // The current line
-                String scriteria = Arrays.toString(criteria);
-                ArrayList<String> line = new ArrayList<String>();
-                line.add(scriteria);
-
-                // For each dataset and QI count combination
-                for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
-                    int minQI = BenchmarkSetup.getMinQICount(dataset);
-                    int maxQI = minQI;
-                    for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
-                        maxQI = Math.max(BenchmarkSetup.getMaxQICount(algorithm, dataset), maxQI);
-                    }
-
-                    for (int numQI = minQI; numQI <= maxQI; ++numQI) {
-
-                        // Init
-                        String firstAlgorithm = null;
-                        String secondAlgorithm = null;
-                        double firstValue = Double.MAX_VALUE;
-                        double secondValue = Double.MAX_VALUE;
-                        if (!lowerIsBetter) {
-                            firstValue = Double.MIN_VALUE;
-                            secondValue = Double.MIN_VALUE;
-                        }
-
-                        // Select data for the given data point
-                        Selector<String[]> selector = file.getSelectorBuilder()
-                                                          .field(VARIABLES.DATASET.val)
-                                                          .equals(dataset.toString())
-                                                          .and()
-                                                          .field(VARIABLES.QI_COUNT.val)
-                                                          .equals(String.valueOf(numQI))
-                                                          .and()
-                                                          .field(VARIABLES.CRITERIA.val)
-                                                          .equals(scriteria)
-                                                          .and()
-                                                          .field(VARIABLES.METRIC.val)
-                                                          .equals(metric.getName())
-                                                          .and()
-                                                          .field(VARIABLES.SUPPRESSION.val)
-                                                          .equals(suppression)
-                                                          .and()
-                                                          .begin()
-                                                          .field(VARIABLES.ALGORITHM.val)
-                                                          .equals(heurakles.toString())
-                                                          .or()
-                                                          .field(VARIABLES.ALGORITHM.val)
-                                                          .equals(AlgorithmType.FLASH.toString())
-                                                          .end()
-                                                          .build();
-
-                        // Create series
-                        Series2D series = new Series2D(file, selector,
-                                                       new Field(VARIABLES.ALGORITHM.val),
-                                                       new Field(variable.val, measure));
-
-                        boolean noSolutionFound = false;
-
-                        // Select from series
-                        for (Point2D point : series.getData()) {
-
-                            // Read
-                            double value = Double.valueOf(point.y);
-                            if (variable == VARIABLES.INFORMATION_LOSS && value == (double) BenchmarkDriver.NO_SOLUTION_FOUND) noSolutionFound = true;
-                            String algorithm = point.x;
-
-                            // Check
-                            if ((lowerIsBetter && value < firstValue) ||
-                                (!lowerIsBetter && value > firstValue)) {
-
-                                secondValue = firstValue;
-                                secondAlgorithm = firstAlgorithm;
-
-                                firstValue = value;
-                                firstAlgorithm = algorithm;
-
-                            } else if ((lowerIsBetter && value < secondValue) ||
-                                       (!lowerIsBetter && value > secondValue)) {
-
-                                secondValue = value;
-                                secondAlgorithm = algorithm;
-                            }
-                        }
-
-                        // Compute difference
-                        double difference = 0;
-                        if (lowerIsBetter) difference = (1d - (firstValue / secondValue)) * 100d;
-                        else difference = (1d - (secondValue / firstValue)) * 100d;
-
-                        // Render and store
-                        final NumberFormat df = new DecimalFormat("#");
-                        line.add(noSolutionFound ? "No solution found" : firstAlgorithm + " (" + df.format(difference) + "%) " +
-                                                                         secondAlgorithm);
-                    }
-                }
-
-                // Add line
-                String[] lineArr = new String[line.size()];
-                line.toArray(lineArr);
-                csv.addLine(lineArr);
-            }
-
-        }
-
-        // Write to file
-        csv.write(new File("results/table_" + variable.val.toLowerCase().replaceAll(" ", "_") + "_" +
-                           metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
-                           suppression.toLowerCase().replaceAll(" ", "_") + ".csv"));
-    }
+    // private static void
+    // generateTable(CSVFile file, String suppression, Metric<?> metric, VARIABLES variable, String measure, boolean lowerIsBetter) throws ParseException,
+    // IOException {
+    //
+    // // Create csv header
+    // ArrayList<String> header = new ArrayList<String>();
+    // header.add("");
+    // for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+    // int minQI = BenchmarkSetup.getMinQICount(dataset);
+    // int maxQI = minQI;
+    // for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
+    // maxQI = Math.max(BenchmarkSetup.getMaxQICount(algorithm, dataset), maxQI);
+    // }
+    //
+    // for (int numQI = minQI; numQI <= maxQI; ++numQI) {
+    // header.add(dataset.toString() + " " + numQI + " QIs");
+    // }
+    // }
+    //
+    // String[] header2 = new String[header.size()];
+    // header.toArray(header2);
+    // String[] header1 = new String[header.size()];
+    // Arrays.fill(header1, "");
+    //
+    // // Create csv
+    // CSVFile csv = new CSVFile(header1, header2);
+    //
+    // // For each criterion
+    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    //
+    // // For each algorithm of type heurakles
+    // for (Algorithm heurakles : BenchmarkSetup.getAlgorithms(false, false)) {
+    // if (heurakles.getType() != AlgorithmType.HEURAKLES) continue;
+    //
+    // // The current line
+    // String scriteria = Arrays.toString(criteria);
+    // ArrayList<String> line = new ArrayList<String>();
+    // line.add(scriteria);
+    //
+    // // For each dataset and QI count combination
+    // for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+    // int minQI = BenchmarkSetup.getMinQICount(dataset);
+    // int maxQI = minQI;
+    // for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
+    // maxQI = Math.max(BenchmarkSetup.getMaxQICount(algorithm, dataset), maxQI);
+    // }
+    //
+    // for (int numQI = minQI; numQI <= maxQI; ++numQI) {
+    //
+    // // Init
+    // String firstAlgorithm = null;
+    // String secondAlgorithm = null;
+    // double firstValue = Double.MAX_VALUE;
+    // double secondValue = Double.MAX_VALUE;
+    // if (!lowerIsBetter) {
+    // firstValue = Double.MIN_VALUE;
+    // secondValue = Double.MIN_VALUE;
+    // }
+    //
+    // // Select data for the given data point
+    // Selector<String[]> selector = file.getSelectorBuilder()
+    // .field(VARIABLES.DATASET.val)
+    // .equals(dataset.toString())
+    // .and()
+    // .field(VARIABLES.QI_COUNT.val)
+    // .equals(String.valueOf(numQI))
+    // .and()
+    // .field(VARIABLES.CRITERIA.val)
+    // .equals(scriteria)
+    // .and()
+    // .field(VARIABLES.METRIC.val)
+    // .equals(metric.getName())
+    // .and()
+    // .field(VARIABLES.SUPPRESSION.val)
+    // .equals(suppression)
+    // .and()
+    // .begin()
+    // .field(VARIABLES.ALGORITHM.val)
+    // .equals(heurakles.toString())
+    // .or()
+    // .field(VARIABLES.ALGORITHM.val)
+    // .equals(AlgorithmType.FLASH.toString())
+    // .end()
+    // .build();
+    //
+    // // Create series
+    // Series2D series = new Series2D(file, selector,
+    // new Field(VARIABLES.ALGORITHM.val),
+    // new Field(variable.val, measure));
+    //
+    // boolean noSolutionFound = false;
+    //
+    // // Select from series
+    // for (Point2D point : series.getData()) {
+    //
+    // // Read
+    // double value = Double.valueOf(point.y);
+    // if (variable == VARIABLES.INFORMATION_LOSS && value == (double) BenchmarkDriver.NO_SOLUTION_FOUND) noSolutionFound = true;
+    // String algorithm = point.x;
+    //
+    // // Check
+    // if ((lowerIsBetter && value < firstValue) ||
+    // (!lowerIsBetter && value > firstValue)) {
+    //
+    // secondValue = firstValue;
+    // secondAlgorithm = firstAlgorithm;
+    //
+    // firstValue = value;
+    // firstAlgorithm = algorithm;
+    //
+    // } else if ((lowerIsBetter && value < secondValue) ||
+    // (!lowerIsBetter && value > secondValue)) {
+    //
+    // secondValue = value;
+    // secondAlgorithm = algorithm;
+    // }
+    // }
+    //
+    // // Compute difference
+    // double difference = 0;
+    // if (lowerIsBetter) difference = (1d - (firstValue / secondValue)) * 100d;
+    // else difference = (1d - (secondValue / firstValue)) * 100d;
+    //
+    // // Render and store
+    // final NumberFormat df = new DecimalFormat("#");
+    // line.add(noSolutionFound ? "No solution found" : firstAlgorithm + " (" + df.format(difference) + "%) " +
+    // secondAlgorithm);
+    // }
+    // }
+    //
+    // // Add line
+    // String[] lineArr = new String[line.size()];
+    // line.toArray(lineArr);
+    // csv.addLine(lineArr);
+    // }
+    //
+    // }
+    //
+    // // Write to file
+    // csv.write(new File("results/table_" + variable.val.toLowerCase().replaceAll(" ", "_") + "_" +
+    // metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
+    // suppression.toLowerCase().replaceAll(" ", "_") + ".csv"));
+    // }
 
     /**
      * Generate the tables
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateTables() throws IOException, ParseException {
-
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-
-        // for each metric
-        for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-
-            // for each suppression
-            for (double suppr : BenchmarkSetup.getSuppression()) {
-                String suppression = String.valueOf(suppr);
-
-                generateTable(file, suppression, metric, VARIABLES.EXECUTION_TIME, Analyzer.ARITHMETIC_MEAN, true);
-                generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, true);
-                generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, false);
-                generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, false);
-                generateTable(file, suppression, metric, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, true);
-            }
-        }
-    }
+    // private static void generateTables() throws IOException, ParseException {
+    //
+    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    //
+    // // for each metric
+    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+    //
+    // // for each suppression
+    // for (double suppr : BenchmarkSetup.getSuppression()) {
+    // String suppression = String.valueOf(suppr);
+    //
+    // generateTable(file, suppression, metric, VARIABLES.EXECUTION_TIME, Analyzer.ARITHMETIC_MEAN, true);
+    // generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_CHECKS, Analyzer.VALUE, true);
+    // generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_ROLLUPS, Analyzer.VALUE, false);
+    // generateTable(file, suppression, metric, VARIABLES.NUMBER_OF_SNAPSHOTS, Analyzer.VALUE, false);
+    // generateTable(file, suppression, metric, VARIABLES.INFORMATION_LOSS, Analyzer.VALUE, true);
+    // }
+    // }
+    // }
 
     /**
      * Returns a plot group
@@ -1305,42 +1319,42 @@ public class BenchmarkAnalysis {
         return series;
     }
 
-    private static Series3D
-            getSeries(CSVFile file,
-                      String variable,
-                      String measure,
-                      String focus,
-                      String scriteria,
-                      String suppression,
-                      BenchmarkDataset[] datasets,
-                      Metric<?> metric) throws ParseException {
-
-        // Select data for the given parameters
-
-        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
-                                                        .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
-                                                        .field(VARIABLES.CRITERIA.val).equals(scriteria).and()
-                                                        .begin();
-
-        for (int i = 0; i < datasets.length; ++i) {
-            selectorBuilder.field(VARIABLES.DATASET.val).equals(datasets[i].toString());
-            if (i < datasets.length - 1) {
-                selectorBuilder.or();
-            }
-        }
-
-        Selector<String[]> selector = selectorBuilder.end().build();
-
-        // Create series.
-        // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
-        // because by definition of selector each combination of x and y coordinates is unique
-        // and thus only one z coordinate is being encountered.
-        Series3D series = new Series3D(file, selector,
-                                       new Field(focus),
-                                       new Field(VARIABLES.METRIC.val),
-                                       new Field(variable, measure),
-                                       new BufferedGeometricMeanAnalyzer());
-
-        return series;
-    }
+    // private static Series3D
+    // getSeries(CSVFile file,
+    // String variable,
+    // String measure,
+    // String focus,
+    // String scriteria,
+    // String suppression,
+    // BenchmarkDataset[] datasets,
+    // Metric<?> metric) throws ParseException {
+    //
+    // // Select data for the given parameters
+    //
+    // SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+    // .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
+    // .field(VARIABLES.CRITERIA.val).equals(scriteria).and()
+    // .begin();
+    //
+    // for (int i = 0; i < datasets.length; ++i) {
+    // selectorBuilder.field(VARIABLES.DATASET.val).equals(datasets[i].toString());
+    // if (i < datasets.length - 1) {
+    // selectorBuilder.or();
+    // }
+    // }
+    //
+    // Selector<String[]> selector = selectorBuilder.end().build();
+    //
+    // // Create series.
+    // // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed
+    // // because by definition of selector each combination of x and y coordinates is unique
+    // // and thus only one z coordinate is being encountered.
+    // Series3D series = new Series3D(file, selector,
+    // new Field(focus),
+    // new Field(VARIABLES.METRIC.val),
+    // new Field(variable, measure),
+    // new BufferedGeometricMeanAnalyzer());
+    //
+    // return series;
+    // }
 }

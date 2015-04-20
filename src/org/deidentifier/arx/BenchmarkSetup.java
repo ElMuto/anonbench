@@ -283,7 +283,7 @@ public class BenchmarkSetup {
      * Flag indicating if the discovery time and information loss
      * of all discovered optima or only the last one should be recorded
      */
-    public static final boolean                          RECORD_ALL_OPTIMA          = false;
+    public static final boolean                          RECORD_ALL_OPTIMA          = true;
 
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.
@@ -624,37 +624,37 @@ public class BenchmarkSetup {
         };
     }
 
-    /**
-     * Returns all sets of criteria
-     * @return
-     */
-    public static BenchmarkCriterion[][] getCriteria() {
-        BenchmarkCriterion[][] result = new BenchmarkCriterion[1][];
-        result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-        return result;
-    }
+//    /**
+//     * Returns all sets of criteria
+//     * @return
+//     */
+//    public static BenchmarkCriterion[][] getCriteria() {
+//        BenchmarkCriterion[][] result = new BenchmarkCriterion[1][];
+//        result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
+//        return result;
+//    }
 
-    public static BenchmarkCriterion[] getCriteriaFromString(String criteria) {
-
-        criteria = criteria.replace("[", "");
-        criteria = criteria.replace("]", "");
-        String key = criteria;
-        String[] criteriaArray = criteria.split(",");
-
-        BenchmarkCriterion[] result = new BenchmarkCriterion[criteriaArray.length];
-        for (int i = 0; i < criteriaArray.length; i++) {
-            result[i] = BenchmarkCriterion.fromLabel(criteriaArray[i].trim());
-        }
-
-        if (null == name2Criteria) {
-            name2Criteria = new HashMap<String, BenchmarkCriterion[]>();
-        }
-        if (!name2Criteria.containsKey(key)) {
-            name2Criteria.put(key, result);
-        }
-
-        return name2Criteria.get(key);
-    }
+//    public static BenchmarkCriterion[] getCriteriaFromString(String criteria) {
+//
+//        criteria = criteria.replace("[", "");
+//        criteria = criteria.replace("]", "");
+//        String key = criteria;
+//        String[] criteriaArray = criteria.split(",");
+//
+//        BenchmarkCriterion[] result = new BenchmarkCriterion[criteriaArray.length];
+//        for (int i = 0; i < criteriaArray.length; i++) {
+//            result[i] = BenchmarkCriterion.fromLabel(criteriaArray[i].trim());
+//        }
+//
+//        if (null == name2Criteria) {
+//            name2Criteria = new HashMap<String, BenchmarkCriterion[]>();
+//        }
+//        if (!name2Criteria.containsKey(key)) {
+//            name2Criteria.put(key, result);
+//        }
+//
+//        return name2Criteria.get(key);
+//    }
 
     /**
      * Configures and returns the dataset
@@ -1058,7 +1058,7 @@ public class BenchmarkSetup {
         case IHIS:
             return "EDUC";
         default:
-            throw new RuntimeException("Invalid dataset");
+            return null;
         }
     }
 
@@ -1067,11 +1067,10 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppression() {
-        return new double[] { /* 0.0d , 0.02d, 0.05d, 0.1d, */1.0d };
+        return new double[] { 0d /* , 0.02d, 0.05d, 0.1d, 1.0d */};
     }
 
     public static Integer[] getTerminationLimits() {
-        // return new Integer[] { 60, 90, 125, 175, 210, 250, 500, 1000, 2000, 3000, 7500, 10000, 15000, 30000, 60000, 300000, 600000};
-        return new Integer[] { 90, 125, 175, 250, 500, 1000, 2000, 3000, 7500, 10000, 15000 };
+        return new Integer[] { 2000 /* , 5000, 10000, 20000 */};
     }
 }
