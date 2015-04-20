@@ -94,7 +94,8 @@ public class BenchmarkAnalysis {
         INFORMATION_LOSS_MINIMUM_TRANSFORMATION("Information loss minimum (Transformation)"),
         INFORMATION_LOSS_MAXIMUM("Information loss maximum"),
         INFORMATION_LOSS_MAXIMUM_TRANSFORMATION("Information loss maximum (Transformation)"),
-        INFORMATION_LOSS_PERCENTAGE("Relative information loss"),
+        INFORMATION_LOSS_ADDITIONAL("Additional information loss"),
+        INFORMATION_LOSS_RELATIVE("Relative information loss"),
         INFORMATION_LOSS_TRANSFORMATION("Information loss (Transformation)"),
         QI_COUNT("QI count"),
         ALGORITHM("Algorithm"),
@@ -135,7 +136,6 @@ public class BenchmarkAnalysis {
         // generateTables();
         // generateConventionalPlots();
         // generateHeuristicsComparison();
-        // generatePlotsForMetricComparison();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
         // generateHeuraklesSelfComparisonPlots();
@@ -155,7 +155,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
-        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS /* , VARIABLES.NUMBER_OF_CHECKS */};
+        VARIABLES[] variables = new VARIABLES[] {  VARIABLES.INFORMATION_LOSS_RELATIVE };
 
         if (datasets.length == 0 || algorithms.size() == 0) {
             return;
@@ -166,13 +166,11 @@ public class BenchmarkAnalysis {
         // for each metric
         for (Metric<?> metric : benchmarkConfiguration.getMetrics()) {
 
-            // create one file with several plots
-            List<PlotGroup> groups = new ArrayList<PlotGroup>();
-
             // For each combination of criteria
-            for (BenchmarkCriterion[] criteria : benchmarkConfiguration.getCriteria()) {
-                String scriteria = Arrays.toString(criteria);
+            for (String criteria : benchmarkConfiguration.getCriteria()) {
 
+                // create one file with several plots
+                List<PlotGroup> groups = new ArrayList<PlotGroup>();
                 // for each suppression
                 for (double suppr : benchmarkConfiguration.getSuppression()) {
                     String suppression = String.valueOf(suppr);
@@ -185,7 +183,7 @@ public class BenchmarkAnalysis {
                                                           null,
                                                           null,
                                                           focus,
-                                                          scriteria,
+                                                          criteria,
                                                           suppression,
                                                           datasets,
                                                           algorithms,
@@ -197,7 +195,8 @@ public class BenchmarkAnalysis {
                         Labels labels = new Labels(focus, variable.val);
                         List<Plot<?>> plots = new ArrayList<Plot<?>>();
                         plots.add(new PlotHistogramClustered("", labels, data.series));
-                        String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" +
+                        String caption = variable.val + " for criteria " + benchmarkConfiguration.getReadableCriteria(criteria) +
+                                         " using information loss metric \"" +
                                          metric.getName() +
                                          "\" with " + suppression + "\\%" + " suppression" +
                                          getTerminationLimitCaption(benchmarkConfiguration.getAlgorithms().get(0).getTerminationConfig()) +
@@ -206,11 +205,12 @@ public class BenchmarkAnalysis {
                         groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
                     }
                 }
+                if (!groups.isEmpty()) {
+                    LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
+                                       benchmarkConfiguration.getReadableCriteria(criteria));
+                }
             }
 
-            if (!groups.isEmpty()) {
-                LaTeX.plot(groups, "cluster-results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"));
-            }
         }
     }
 
@@ -330,9 +330,7 @@ public class BenchmarkAnalysis {
             List<PlotGroup> groups = new ArrayList<PlotGroup>();
 
             // For each combination of criteria
-            for (BenchmarkCriterion[] criteria : benchmarkConfiguration.getCriteria()) {
-                String scriteria = Arrays.toString(criteria);
-
+            for (String criteria : benchmarkConfiguration.getCriteria()) {
                 // for each suppression
                 for (double suppr : benchmarkConfiguration.getSuppression()) {
                     String suppression = String.valueOf(suppr);
@@ -351,7 +349,7 @@ public class BenchmarkAnalysis {
                                                           null,
                                                           null,
                                                           focus,
-                                                          scriteria,
+                                                          criteria,
                                                           suppression,
                                                           datasets,
                                                           algorithms,
@@ -363,7 +361,7 @@ public class BenchmarkAnalysis {
                         Labels labels = new Labels(focus, variable.val);
                         List<Plot<?>> plots = new ArrayList<Plot<?>>();
                         plots.add(new PlotHistogramClustered("", labels, data.series));
-                        String caption = variable.val + " for criteria " + scriteria + " using information loss metric \"" +
+                        String caption = variable.val + " for criteria " + criteria + " using information loss metric \"" +
                                          metric.getName() +
                                          "\" with " + suppression + "\\%" + " suppression " + " listed by \"" + focus + "\".";
 
@@ -420,7 +418,7 @@ public class BenchmarkAnalysis {
                                                               Analyzer.ARITHMETIC_MEAN,
                                                               Analyzer.ARITHMETIC_MEAN,
                                                               Analyzer.ARITHMETIC_MEAN },
-                                                      VARIABLES.INFORMATION_LOSS_PERCENTAGE,
+                                                      VARIABLES.INFORMATION_LOSS_ADDITIONAL,
                                                       Analyzer.VALUE,
                                                       focus,
                                                       scriteria,
@@ -930,74 +928,6 @@ public class BenchmarkAnalysis {
         }
     }
 
-    private static PlotGroupData getGroupData(CSVFile file,
-                                              VARIABLES variable,
-                                              String measure,
-                                              String focus,
-                                              String scriteria,
-                                              String suppression,
-                                              BenchmarkDataset[] datasets,
-                                              Metric<?>[] metrics,
-                                              double keyPosX) throws ParseException {
-
-        GnuPlotParams params = new GnuPlotParams();
-        params.rotateXTicks = 0;
-        params.printValues = true;
-        params.size = 1.5;
-        params.logY = false;
-        params.enhance = false;
-        params.ratio = 0.2d;
-        params.minY = 0d;
-        params.printValuesFormatString = "%.0f";
-
-        // Prepare
-        Series3D series = null;
-
-        // Collect data for all metrics and the first variable
-        for (int i = 0; i < metrics.length; i++) {
-
-            Series3D _series = getSeries(file,
-                                         variable.val,
-                                         measure,
-                                         focus,
-                                         scriteria,
-                                         suppression,
-                                         datasets,
-                                         metrics[i]);
-
-            if (series == null) series = _series;
-            else series.append(_series);
-
-        }
-
-        double max = Math.max(getMax(series.getData()), 0d);
-        double padding = max * 0.3d;
-
-        if (max < 10d) {
-            params.printValuesFormatString = "%.2f";
-        }
-
-        if (max >= 10000d) {
-            padding = max * 0.7d;
-            params.printValuesFormatString = "%.2e";
-        }
-
-        params.maxY = max + padding;
-        params.keypos = KeyPos.AT(keyPosX, params.maxY * 1.1d, "horiz bot center");
-
-        // Make sure labels are printed correctly
-        if (!focus.equals(VARIABLES.QI_COUNT.val)) {
-            series.transform(new Function<Point3D>() {
-                @Override
-                public Point3D apply(Point3D t) {
-                    return new Point3D("\"" + t.x + "\"", t.y, t.z);
-                }
-            });
-        }
-
-        return new PlotGroupData(series, params);
-    }
-
     /**
      * Returns a plot group
      * @param file
@@ -1080,7 +1010,7 @@ public class BenchmarkAnalysis {
             max = Math.max(getMax(series.getData()), max);
             padding = max * 0.3d;
 
-            if (variables[i] != VARIABLES.INFORMATION_LOSS_PERCENTAGE) {
+            if (variables[i] != VARIABLES.INFORMATION_LOSS_ADDITIONAL) {
                 allVariablesRelative = false;
             }
             if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME &&
@@ -1097,7 +1027,7 @@ public class BenchmarkAnalysis {
             params.printValuesFormatString = "%.2f";
         }
 
-        if (max >= 10000d) {
+        if (max >= 10000d || variables[0] == VARIABLES.INFORMATION_LOSS_RELATIVE) {
             padding = max * 0.7d;
             params.printValuesFormatString = "%.2e";
         }

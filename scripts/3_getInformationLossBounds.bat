@@ -5,16 +5,16 @@ Set _path=C:\IDE\eclipse_luna\workspace\anonbench_fork
 Set _merged_file_name=results_merged.csv
 
 
-Set _local_results_path=%_path%\cluster-results
+Set _local_results_path=%_path%\cluster-ILBounds
 
 echo getting results from FED1
-pscp PCluster-fed1:/home/imse/heurakles-bench/results/results.csv %_local_results_path%\results1.csv
+pscp PCluster-fed1:/home/imse/heurakles-bench/results/informationLossBounds.csv %_local_results_path%\results1.csv
 echo getting results from FED2
-pscp PCluster-fed2:/home/imse/heurakles-bench/results/results.csv %_local_results_path%\results2.csv
+pscp PCluster-fed2:/home/imse/heurakles-bench/results/informationLossBounds.csv %_local_results_path%\results2.csv
 echo getting results from FED3
-pscp PCluster-fed3:/home/imse/heurakles-bench/results/results.csv %_local_results_path%\results3.csv
+pscp PCluster-fed3:/home/imse/heurakles-bench/results/informationLossBounds.csv %_local_results_path%\results3.csv
 echo getting results from FED4
-pscp PCluster-fed4:/home/imse/heurakles-bench/results/results.csv %_local_results_path%\results4.csv
+pscp PCluster-fed4:/home/imse/heurakles-bench/results/informationLossBounds.csv %_local_results_path%\results4.csv
 
 
 Set _merging_area_path=/home/imse/heurakles-bench/merging-area

@@ -15,4 +15,4 @@ done
 #5 - compute relative IL
 #6 - create configuration file based on code
 
-java -Xmx5G -jar jars/heurakles-bench.jar 2 1 worklist.csv
+java -Xmx5G -jar jars/heurakles-bench.jar 4 1 worklist.csv

@@ -44,6 +44,7 @@ import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.PopulationUniqueness;
+import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
@@ -287,14 +288,15 @@ public class BenchmarkSetup {
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.
      * @param configurationFile
+     * @throws IOException
      */
-    public static void createAndSaveDefaultBenchmarkConfiguration(String configurationFile) {
+    public static void createAndSaveDefaultBenchmarkConfiguration(String configurationFile) throws IOException {
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
 
         // For each algorithm (flash, ilbounds, heurakles, datafly, improvedGreedy)
-        for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(true, true)) {
+        for (Algorithm algorithm : getAlgorithms(true, true)) {
             // For each metric
-            for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
+            for (Metric<?> metric : getMetrics()) {
                 Metric<?> decisionMetric = null;
                 Metric<?> iLMetric = null;
 
@@ -305,31 +307,32 @@ public class BenchmarkSetup {
                     decisionMetric = iLMetric = metric;
                     break;
                 case DATAFLY:
-                    decisionMetric = BenchmarkSetup.getMetricByName("DataFly");
+                    decisionMetric = getMetricByName("DataFly");
                     iLMetric = metric;
                     break;
                 case IMPROVED_GREEDY:
-                    decisionMetric = BenchmarkSetup.getMetricByName("ImprovedGreedy");
+                    decisionMetric = getMetricByName("ImprovedGreedy");
                     iLMetric = metric;
                 default:
                     break;
                 }
 
                 // For each suppression factor
-                for (double suppression : BenchmarkSetup.getSuppression()) {
+                for (double suppression : getSuppression()) {
                     // For each combination of criteria
-                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                    for (String criteria : getDefaultBenchmarkCriteria()) {
                         // For each dataset
-                        BenchmarkDataset[] datasets = (algorithm.getType() == AlgorithmType.DATAFLY || algorithm.getType() == AlgorithmType.IMPROVED_GREEDY) ? BenchmarkSetup.getConventionalDatasets() : BenchmarkSetup.getDatasets();
+                        BenchmarkDataset[] datasets = (algorithm.getType() == AlgorithmType.DATAFLY || algorithm.getType() == AlgorithmType.IMPROVED_GREEDY) ? getConventionalDatasets() : getDatasets();
                         for (BenchmarkDataset data : datasets) {
                             // For each qiCount
-                            for (int qiCount = BenchmarkSetup.getMinQICount(data); qiCount <= BenchmarkSetup.getMaxQICount(algorithm, data); qiCount++) {
+                            for (int qiCount = getMinQICount(data); qiCount <= getMaxQICount(algorithm, data); qiCount++) {
 
                                 AnonConfiguration c = benchmarkConfiguration.new AnonConfiguration(algorithm,
                                                                                                    decisionMetric,
                                                                                                    iLMetric,
                                                                                                    suppression,
                                                                                                    criteria,
+                                                                                                   getDefaultPrivacyCriteria(data, qiCount),
                                                                                                    data,
                                                                                                    qiCount);
                                 benchmarkConfiguration.addAnonConfiguration(c);
@@ -345,6 +348,30 @@ public class BenchmarkSetup {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static List<PrivacyCriterion> getDefaultPrivacyCriteria(final BenchmarkDataset dataset, final int qiCount) throws IOException {
+        return new ArrayList<PrivacyCriterion>() {
+            {
+                add(new KAnonymity(5));
+                // add(new DPresence(0.05d, 0.15d, getResearchSubset(dataset, qiCount)));
+                // add(new RecursiveCLDiversity(getSensitiveAttribute(dataset), 4, 3));
+                // add(new HierarchicalDistanceTCloseness(getSensitiveAttribute(dataset), 0.2d, getHierarchy(dataset, getSensitiveAttribute(dataset))));
+                // add(new PopulationUniqueness(0.01d, ARXPopulationModel.create(Region.USA)));
+            }
+        };
+    }
+
+    private static List<String> getDefaultBenchmarkCriteria() {
+        return new ArrayList<String>() {
+            {
+                add("k,5");
+                // add("d,0.05d,0.15d");
+                // add("l,4,3");
+                // add("t,0.2d");
+                // add("r,0.01d");
+            }
+        };
     }
 
     /**
@@ -400,9 +427,12 @@ public class BenchmarkSetup {
         AlgorithmType algorithmType = AlgorithmType.fromLabel(name);
         TerminationConfiguration terminationConfiguration = null;
 
-        if (AlgorithmType.FLASH == algorithmType && (!_terminationLimitType.isEmpty() || !_terminationLimitValue.isEmpty())) {
-            System.out.println("Algorithm " + name + " cannot be used with termination limits. Parameters [" + _terminationLimitType + ";" +
-                               _terminationLimitValue + " ] will be ignored.");
+        if (AlgorithmType.FLASH == algorithmType || AlgorithmType.INFORMATION_LOSS_BOUNDS == algorithmType) {
+            if (!_terminationLimitType.isEmpty() || !_terminationLimitValue.isEmpty()) {
+                System.out.println("Algorithm " + name + " cannot be used with termination limits. Parameters [" + _terminationLimitType +
+                                   ";" +
+                                   _terminationLimitValue + " ] will be ignored.");
+            }
         }
         else {
             TerminationConfiguration.Type terminationLimitType = TerminationConfiguration.Type.fromLabel(_terminationLimitType);
@@ -459,7 +489,7 @@ public class BenchmarkSetup {
             case DATAFLY:
             case IMPROVED_GREEDY:
                 if (includeHeuristics) {
-                    TerminationConfiguration tC = new TerminationConfiguration(TERMINATION_TYPE.ANONYMITY, 0);
+                    TerminationConfiguration tC = new TerminationConfiguration(TERMINATION_TYPE, 0);
                     benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.DATAFLY, tC));
                     benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.IMPROVED_GREEDY, tC));
                 }
@@ -483,33 +513,101 @@ public class BenchmarkSetup {
                                                     Metric<?> metric,
                                                     double suppression,
                                                     int qiCount,
-                                                    BenchmarkCriterion... criteria) throws IOException {
+                                                    List<PrivacyCriterion> criteria) throws IOException {
         ARXConfiguration config = ARXConfiguration.create();
         config.setMetric(metric);
         config.setMaxOutliers(suppression);
-        for (BenchmarkCriterion c : criteria) {
-            switch (c) {
+        for (PrivacyCriterion c : criteria) {
+            config.addCriterion(c);
+        }
+        return config;
+    }
+
+    public static List<PrivacyCriterion> getPrivacyCriteria(String _criteria, BenchmarkDataset dataset, int qiCount) throws IOException {
+        List<PrivacyCriterion> privacyCriteria = new ArrayList<PrivacyCriterion>();
+        String[] criteria = _criteria.split("/");
+        String sensitive = getSensitiveAttribute(dataset);
+        for (int i = 0; i < criteria.length; i++) {
+            String[] criterion = criteria[i].split(",", -1);
+            BenchmarkCriterion bC = BenchmarkCriterion.fromLabel(criterion[0]);
+            switch (bC) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, getResearchSubset(dataset, qiCount)));
+                if (3 != criterion.length) {
+                    System.out.println("Wrong Number of Arguments. D-Presence needs 2 parameter. Found: " +
+                                       _criteria);
+                    System.exit(0);
+                }
+                try {
+                    privacyCriteria.add(new DPresence(Double.parseDouble(criterion[1]),
+                                                      Double.parseDouble(criterion[2]),
+                                                      getResearchSubset(dataset, qiCount)));
+                } catch (NumberFormatException e) {
+                    System.out.println("Wrong format: D-Presence paramater need to be Double. Found: " + _criteria);
+                    System.exit(0);
+                }
+
                 break;
             case K_ANONYMITY:
-                config.addCriterion(new KAnonymity(5));
+                if (2 != criterion.length) {
+                    System.out.println("Wrong Number of Arguments. K-Anonymity needs 1 parameter. Found: " +
+                                       _criteria);
+                    System.exit(0);
+                }
+                try {
+                    privacyCriteria.add(new KAnonymity(Integer.parseInt(criterion[1])));
+                } catch (NumberFormatException e) {
+                    System.out.println("Wrong format: K-Anonymity paramater needs to be an Integer. Found: " + _criteria);
+                    System.exit(0);
+                }
                 break;
             case L_DIVERSITY:
-                String sensitive = getSensitiveAttribute(dataset);
-                config.addCriterion(new RecursiveCLDiversity(sensitive, 4, 3));
+                if (3 != criterion.length) {
+                    System.out.println("Wrong Number of Arguments. L-Diversity needs 2 parameter. Found: " +
+                                       _criteria);
+                    System.exit(0);
+                }
+                try {
+                    privacyCriteria.add(new RecursiveCLDiversity(sensitive,
+                                                                 Double.parseDouble(criterion[1]),
+                                                                 Integer.parseInt(criterion[2])));
+                } catch (NumberFormatException e) {
+                    System.out.println("Wrong format: D-Presence paramater need to be Double. Found: " + _criteria);
+                    System.exit(0);
+                }
                 break;
             case T_CLOSENESS:
-                sensitive = getSensitiveAttribute(dataset);
-                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, 0.2d, getHierarchy(dataset, sensitive)));
+                if (2 != criterion.length) {
+                    System.out.println("Wrong Number of Arguments. T-Closeness needs 1 parameter. Found: " +
+                                       _criteria);
+                    System.exit(0);
+                }
+                try {
+                    privacyCriteria.add(new HierarchicalDistanceTCloseness(sensitive,
+                                                                           Double.parseDouble(criterion[1]),
+                                                                           getHierarchy(dataset, sensitive)));
+                } catch (NumberFormatException e) {
+                    System.out.println("Wrong format: K-Anonymity paramater needs to be an Integer. Found: " + _criteria);
+                    System.exit(0);
+                }
                 break;
             case RISK_BASED:
-                config.addCriterion(new PopulationUniqueness(0.01d, ARXPopulationModel.create(Region.USA)));
+                if (2 != criterion.length) {
+                    System.out.println("Wrong Number of Arguments. Risk-based needs 1 parameter. Found: " +
+                                       _criteria);
+                    System.exit(0);
+                }
+                try {
+                    privacyCriteria.add(new PopulationUniqueness(Double.parseDouble(criterion[1]), ARXPopulationModel.create(Region.USA)));
+                } catch (NumberFormatException e) {
+                    System.out.println("Wrong format: K-Anonymity paramater needs to be an Integer. Found: " + _criteria);
+                    System.exit(0);
+                }
+                break;
             default:
                 throw new RuntimeException("Invalid criterion");
             }
         }
-        return config;
+        return privacyCriteria;
     }
 
     /**
@@ -565,21 +663,18 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    @SuppressWarnings("incomplete-switch")
-    public static Data getData(BenchmarkDataset dataset, BenchmarkCriterion[] criteria, int qiCount) throws IOException {
+    public static Data getData(BenchmarkDataset dataset, List<PrivacyCriterion> criteria, int qiCount) throws IOException {
         Data data = Data.create(getFilePath(dataset), ';');
 
         if (criteria != null) {
             for (String qi : Arrays.copyOf(getQuasiIdentifyingAttributes(dataset), qiCount)) {
                 data.getDefinition().setAttributeType(qi, getHierarchy(dataset, qi));
             }
-            for (BenchmarkCriterion c : criteria) {
-                switch (c) {
-                case L_DIVERSITY:
-                case T_CLOSENESS:
+            for (PrivacyCriterion c : criteria) {
+                if (c instanceof RecursiveCLDiversity || c instanceof HierarchicalDistanceTCloseness)
+                {
                     String sensitive = getSensitiveAttribute(dataset);
                     data.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
-                    break;
                 }
             }
         }
@@ -834,11 +929,14 @@ public class BenchmarkSetup {
                     "race",
                     "salary-class",
                     "sex",
-                    "workclass" };
+                    "workclass",
+                    "occupation"
+            }; //
         case ATUS:
             return new String[] { "Age",
                     "Birthplace",
                     "Citizenship status",
+                    "Highest level of school completed", //
                     "Labor force status",
                     "Marital status",
                     "Race",
@@ -850,6 +948,7 @@ public class BenchmarkSetup {
                     "INCOME",
                     "MINRAMNT",
                     "NGIFTALL",
+                    "RAMNTALL", //
                     "STATE",
                     "ZIP" };
         case FARS:
@@ -859,9 +958,11 @@ public class BenchmarkSetup {
                     "ihispanic",
                     "iinjury",
                     "irace",
-                    "isex" };
+                    "isex",
+                    "istatenum" }; //
         case IHIS:
             return new String[] { "AGE",
+                    "EDUC", //
                     "MARSTAT",
                     "PERNUM",
                     "QUARTER",
