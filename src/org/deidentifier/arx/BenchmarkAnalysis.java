@@ -482,7 +482,7 @@ public class BenchmarkAnalysis {
             params.maxY = 100d;
             params.keypos = KeyPos.TOP_RIGHT;
             params.colorize = true;
-            params.lineStyle = GnuPlotParams.Style.STEPS;
+            params.lineStyle = GnuPlotParams.LineStyle.STEPS;
 
             // for each suppression
             for (double suppr : new double[] { 0d, 0.1d, 1d }) {
