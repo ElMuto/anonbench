@@ -5,8 +5,4 @@
 data/*.csv
 hierarchies/*.csv
 *.jar
-<<<<<<< HEAD
-/worklist.csv
-=======
 /cluster-ILBounds/
->>>>>>> refs/remotes/origin/master
