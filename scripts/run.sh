@@ -14,5 +14,6 @@ done
 #4 - compute ILbounds
 #5 - compute relative IL
 #6 - create configuration file based on code
+#7 - compute geometric mean over all datasets
 
 java -Xmx5G -jar jars/heurakles-bench.jar 4 1 worklist.csv

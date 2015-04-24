@@ -22,15 +22,12 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +36,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
-import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.metric.Metric;
@@ -55,9 +50,7 @@ import de.linearbits.subframe.graph.Labels;
 import de.linearbits.subframe.graph.Plot;
 import de.linearbits.subframe.graph.PlotHistogramClustered;
 import de.linearbits.subframe.graph.PlotLinesClustered;
-import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Point3D;
-import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.render.GnuPlotParams;
@@ -135,11 +128,73 @@ public class BenchmarkAnalysis {
     public static void main(String[] args) throws IOException, ParseException {
         // generateTables();
         // generateConventionalPlots();
-        // generateHeuristicsComparison();
+        generateHeuristicsComparisonGeoMean();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
         // generateHeuraklesSelfComparisonPlots();
-        generateHeuraklesSelfComparisonPlotsV2();
+        // generateHeuraklesSelfComparisonPlotsV2();
+    }
+
+    private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
+
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE_GEOMEAN));
+
+        BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+        try {
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
+        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS_RELATIVE };
+
+        String focus = VARIABLES.CRITERIA.val;
+
+        // create one file with several plots
+        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
+        // for each metric
+        for (Metric<?> metric : benchmarkConfiguration.getMetrics()) {
+
+            // for each suppression
+            for (double suppr : benchmarkConfiguration.getSuppression()) {
+                String suppression = String.valueOf(suppr);
+
+                for (VARIABLES variable : variables) {
+                    boolean xGroupPercent = false;
+                    PlotGroupData data = getGroupData2(file,
+                                                       new VARIABLES[] { variable },
+                                                       new String[] { Analyzer.VALUE },
+                                                       null,
+                                                       null,
+                                                       focus,
+                                                       suppression,
+                                                       benchmarkConfiguration.getCriteria(),
+                                                       algorithms,
+                                                       metric,
+                                                       1.5,
+                                                       xGroupPercent,
+                                                       null);
+
+                    Labels labels = new Labels(focus, variable.val);
+                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
+                    plots.add(new PlotHistogramClustered("", labels, data.series));
+                    String caption = variable.val +
+                                     " using information loss metric \"" +
+                                     metric.getName() +
+                                     "\" with " + suppression + "\\%" + " suppression" +
+                                     getTerminationLimitCaption(benchmarkConfiguration.getAlgorithms().get(0).getTerminationConfig()) +
+                                     " listed by \"" + focus + "\".";
+
+                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+                }
+            }
+        }
+        if (!groups.isEmpty()) {
+            LaTeX.plot(groups, "results/results");
+        }
+
     }
 
     private static void generateHeuristicsComparison() throws IOException, ParseException {
@@ -1166,6 +1221,213 @@ public class BenchmarkAnalysis {
         return new PlotGroupData(series, params);
     }
 
+    private static PlotGroupData getGroupData2(CSVFile file,
+                                               VARIABLES[] variables,
+                                               String[] measures,
+                                               VARIABLES variableY2,
+                                               String measureY2,
+                                               String focus,
+                                               String suppression,
+                                               List<String> criteria,
+                                               List<Algorithm> algorithms,
+                                               Metric<?> metric,
+                                               double keyPosX,
+                                               boolean xGroupPercent,
+                                               Double missingAlgorithmDummyValue) throws ParseException {
+        // Sanity check
+        if (variables.length != measures.length) {
+            throw new RuntimeException("For each variable, exactly one measure is required");
+        }
+
+        // Prepare
+        Series3D series = null;
+
+        GnuPlotParams params = new GnuPlotParams();
+        params.rotateXTicks = 0;
+        params.printValues = true;
+        params.size = 1.5;
+        params.logY = false;
+        params.enhance = false;
+        params.ratio = 0.2d;
+        params.minY = 0d;
+        params.printValuesFormatString = "%.0f";
+
+        double max = 0d;
+        double padding = 0d;
+
+        boolean allVariablesRelative = true;
+        boolean allVariablesTimes = true;
+
+        // Collect data for all algorithms and the variables array
+        boolean includeVariableInYCoordinates = variables.length > 1 || variableY2 != null;
+        for (int i = 0; i < variables.length; ++i) {
+            Series3D _series = collectData2(file,
+                                            variables[i],
+                                            measures[i],
+                                            focus,
+                                            criteria,
+                                            suppression,
+                                            algorithms,
+                                            metric,
+                                            includeVariableInYCoordinates,
+                                            null);
+
+            _series.sort(new Comparator<Point3D>() {
+                @Override
+                public int compare(Point3D o1, Point3D o2) {
+                    return o1.x.compareTo(o2.x);
+                }
+            });
+            if (series == null) {
+                series = _series;
+            } else {
+                series.append(_series);
+            }
+
+            max = Math.max(getMax(series.getData()), max);
+            padding = max * 0.3d;
+
+            if (variables[i] != VARIABLES.INFORMATION_LOSS_ADDITIONAL) {
+                allVariablesRelative = false;
+            }
+            if (variables[i] != VARIABLES.EXECUTION_TIME && variables[i] != VARIABLES.SOLUTION_DISCOVERY_TIME &&
+                variables[i] != VARIABLES.EXHAUSTIVE_SEARCH_TIME) {
+                allVariablesTimes = false;
+            }
+        }
+
+        if (allVariablesRelative) {
+            max = 100d;
+        }
+
+        if (allVariablesTimes || max < 10d) {
+            params.printValuesFormatString = "%.2f";
+        }
+
+        if (max >= 10000d || variables[0] == VARIABLES.INFORMATION_LOSS_RELATIVE) {
+            padding = max * 0.7d;
+            params.printValuesFormatString = "%.2e";
+        }
+
+        params.maxY = max + padding;
+        params.keypos = KeyPos.AT(keyPosX, params.maxY * 1.1d, "horiz bot center");
+
+        // Collect data for all algorithms and variableY2, if any
+        if (variableY2 != null) {
+            Double relativeScalingMax = new Double(max);
+
+            series.append(collectData2(file,
+                                       variableY2,
+                                       measureY2,
+                                       focus,
+                                       criteria,
+                                       suppression,
+                                       algorithms,
+                                       metric,
+                                       true,
+                                       relativeScalingMax));
+
+            params.y2tics = "('0%%' 0, '25%%' " + max / 4d + ", '50%%' " + max / 2d + ", '75%%' " + max * 3d / 4d + ",'100%%' " + max + ")";
+        }
+
+        // Make sure labels are printed correctly
+        if (!focus.equals(VARIABLES.QI_COUNT.val)) {
+            series.transform(new Function<Point3D>() {
+                @Override
+                public Point3D apply(Point3D t) {
+                    return new Point3D("\"" + t.x + "\"", t.y, t.z);
+                }
+            });
+        }
+
+        if (xGroupPercent) {
+            List<Point3D> data = series.getData();
+
+            Map<String, List<Point3D>> byXValue = new HashMap<String, List<Point3D>>();
+            for (Point3D point : data) {
+                if (!byXValue.containsKey(point.x)) byXValue.put(point.x, new ArrayList<Point3D>());
+                byXValue.get(point.x).add(point);
+            }
+
+            data.clear();
+
+            String[] keyArray = byXValue.keySet().toArray(new String[byXValue.keySet().size()]);
+            Arrays.sort(keyArray, new Comparator<String>() {
+                public int compare(String s1, String s2)
+                {
+                    return Long.valueOf(s1).compareTo(Long.valueOf(s2));
+                }
+            });
+
+            for (String key : keyArray) {
+                List<Point3D> points = byXValue.get(key);
+                double minVal = getMin(points);
+                double maxVal = getMax(points);
+                for (Point3D point : points) {
+                    double percent = ((Double.valueOf(point.z) - minVal) / (maxVal - minVal)) * 100.0d;
+                    if (maxVal == minVal) {
+                        percent = 0d;
+                    }
+                    data.add(new Point3D(point.x, point.y, Double.toString(percent)));
+                }
+            }
+
+            params.minY = 0d;
+            params.maxY = 120d;
+
+            params.printValuesFormatString = "%.0f";
+
+            params.keypos = KeyPos.AT(keyPosX, params.maxY * 1.1d, "horiz bot center");
+        }
+
+        if (missingAlgorithmDummyValue != null) {
+            List<Point3D> data = series.getData();
+            Map<String, List<Point3D>> byXValue = new HashMap<String, List<Point3D>>();
+            for (Point3D point : data) {
+                if (!byXValue.containsKey(point.x)) byXValue.put(point.x, new ArrayList<Point3D>());
+                byXValue.get(point.x).add(point);
+            }
+
+            Map<String, Map<String, Point3D>> byXAndYValue = new HashMap<String, Map<String, Point3D>>();
+            for (Point3D point : data) {
+                if (!byXAndYValue.containsKey(point.x)) byXAndYValue.put(point.x, new HashMap<String, Point3D>());
+                byXAndYValue.get(point.x).put(point.y, point);
+            }
+
+            for (Entry<String, Map<String, Point3D>> entry : byXAndYValue.entrySet()) {
+                String xValue = entry.getKey();
+                Map<String, Point3D> byYvalue = entry.getValue();
+                for (Algorithm algorithm : algorithms) {
+                    String algorithmString = algorithm.toString();
+                    if (!byYvalue.containsKey(algorithmString)) {
+                        byYvalue.put(algorithmString, new Point3D(xValue, algorithmString, Double.toString(missingAlgorithmDummyValue)));
+                    }
+                }
+            }
+
+            data.clear();
+
+            for (Map<String, Point3D> byYValue : byXAndYValue.values()) {
+                for (Point3D point : byYValue.values()) {
+                    data.add(point);
+                }
+            }
+
+            Collections.sort(data, new Comparator<Point3D>() {
+                public int compare(Point3D p1, Point3D p2)
+                {
+                    int xCompare = Double.valueOf(p1.x).compareTo(Double.valueOf(p2.x));
+                    if (xCompare != 0) return xCompare;
+                    int yLengthCompare = p1.y.length() - p2.y.length();
+                    if (yLengthCompare != 0) return yLengthCompare;
+                    return p1.y.compareTo(p2.y);
+                }
+            });
+        }
+
+        return new PlotGroupData(series, params);
+    }
+
     private static Series3D collectData(CSVFile file,
                                         VARIABLES variable,
                                         String measure,
@@ -1233,6 +1495,75 @@ public class BenchmarkAnalysis {
         return series;
     }
 
+    private static Series3D collectData2(CSVFile file,
+                                         VARIABLES variable,
+                                         String measure,
+                                         String focus,
+                                         List<String> scriteria,
+                                         String suppression,
+                                         List<Algorithm> algorithms,
+                                         Metric<?> metric,
+                                         boolean includeVariableInYCoordinates,
+                                         Double relativeScalingMax) throws ParseException {
+        // Prepare
+        Series3D series = null;
+
+        // Collect data for all algorithms and the first variable
+        for (Algorithm algorithm : algorithms) {
+
+            for (String criteria : scriteria) {
+
+                Series3D _series = getSeries(file,
+                                             algorithm.toString(),
+                                             variable.val,
+                                             measure,
+                                             focus,
+                                             criteria,
+                                             suppression,
+                                             null,
+                                             metric);
+
+                if (includeVariableInYCoordinates) {
+                    // Assure that y coordinates are unique for each algorithm and variable combination
+                    final String var = variable.val;
+                    final String algo = algorithm.toString();
+                    _series.transform(new Function<Point3D>() {
+                        @Override
+                        public Point3D apply(Point3D t) {
+                            return new Point3D(t.x, algo + " " + var, t.z);
+                        }
+                    });
+                }
+
+                if (relativeScalingMax != null) {
+                    // Assure that z coordinates are scaled so that 100% equals max
+                    final double maxConst = relativeScalingMax;
+                    _series.transform(new Function<Point3D>() {
+                        @Override
+                        public Point3D apply(Point3D t) {
+                            return new Point3D(t.x, t.y, String.valueOf(Double.valueOf(t.z) * maxConst / 100d));
+                        }
+                    });
+                } else if (VARIABLES.EXECUTION_TIME == variable || VARIABLES.SOLUTION_DISCOVERY_TIME == variable ||
+                           VARIABLES.EXHAUSTIVE_SEARCH_TIME == variable) {
+                    // Transform times from nanos to seconds
+                    _series.transform(new Function<Point3D>() {
+                        @Override
+                        public Point3D apply(Point3D t) {
+                            return new Point3D(t.x, t.y, String.valueOf(Double.valueOf(t.z) / 1000000000d));
+                        }
+                    });
+                }
+
+                if (series == null) series = _series;
+                else series.append(_series);
+
+            }
+        }
+
+        return series;
+    }
+
     /**
      * Returns a maximum for the given list of points
      * @param points
@@ -1291,20 +1622,29 @@ public class BenchmarkAnalysis {
 
         // Select data for the given parameters
 
-        SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field(VARIABLES.ALGORITHM.val).equals(algorithm).and()
-                                                        .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
-                                                        .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
-                                                        .field(VARIABLES.CRITERIA.val).equals(scriteria).and()
-                                                        .begin();
+        Selector<String[]> selector = null;
+        if (null != datasets) {
 
-        for (int i = 0; i < datasets.length; ++i) {
-            selectorBuilder.field(VARIABLES.DATASET.val).equals(datasets[i].toString());
-            if (i < datasets.length - 1) {
-                selectorBuilder.or();
+            SelectorBuilder<String[]> selectorBuilder = file.getSelectorBuilder().field(VARIABLES.ALGORITHM.val).equals(algorithm).and()
+                                                            .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                            .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
+                                                            .field(VARIABLES.CRITERIA.val).equals(scriteria)
+                                                            .and().begin();
+
+            for (int i = 0; i < datasets.length; ++i) {
+                selectorBuilder.field(VARIABLES.DATASET.val).equals(datasets[i].toString());
+                if (i < datasets.length - 1) {
+                    selectorBuilder.or();
+                }
             }
-        }
+            selector = selectorBuilder.end().build();
+        } else {
+            selector = file.getSelectorBuilder().field(VARIABLES.ALGORITHM.val).equals(algorithm).and()
+                           .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                           .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
+                           .field(VARIABLES.CRITERIA.val).equals(scriteria).build();
 
-        Selector<String[]> selector = selectorBuilder.end().build();
+        }
 
         // Create series.
         // Note that actually no aggregation using the BufferedGeometricMeanAnalyzer is performed

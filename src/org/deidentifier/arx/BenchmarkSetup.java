@@ -276,6 +276,7 @@ public class BenchmarkSetup {
     private static Map<String, Metric<?>>                name2Metric;
 
     public static final String                           RESULTS_FILE               = "results/results.csv";
+    public static final String                           RESULTS_FILE_GEOMEAN       = "results/resultsGeoMean.csv";
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE           = TerminationConfiguration.Type.ANONYMITY;
 
@@ -624,37 +625,37 @@ public class BenchmarkSetup {
         };
     }
 
-//    /**
-//     * Returns all sets of criteria
-//     * @return
-//     */
-//    public static BenchmarkCriterion[][] getCriteria() {
-//        BenchmarkCriterion[][] result = new BenchmarkCriterion[1][];
-//        result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-//        return result;
-//    }
+    // /**
+    // * Returns all sets of criteria
+    // * @return
+    // */
+    // public static BenchmarkCriterion[][] getCriteria() {
+    // BenchmarkCriterion[][] result = new BenchmarkCriterion[1][];
+    // result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
+    // return result;
+    // }
 
-//    public static BenchmarkCriterion[] getCriteriaFromString(String criteria) {
-//
-//        criteria = criteria.replace("[", "");
-//        criteria = criteria.replace("]", "");
-//        String key = criteria;
-//        String[] criteriaArray = criteria.split(",");
-//
-//        BenchmarkCriterion[] result = new BenchmarkCriterion[criteriaArray.length];
-//        for (int i = 0; i < criteriaArray.length; i++) {
-//            result[i] = BenchmarkCriterion.fromLabel(criteriaArray[i].trim());
-//        }
-//
-//        if (null == name2Criteria) {
-//            name2Criteria = new HashMap<String, BenchmarkCriterion[]>();
-//        }
-//        if (!name2Criteria.containsKey(key)) {
-//            name2Criteria.put(key, result);
-//        }
-//
-//        return name2Criteria.get(key);
-//    }
+    // public static BenchmarkCriterion[] getCriteriaFromString(String criteria) {
+    //
+    // criteria = criteria.replace("[", "");
+    // criteria = criteria.replace("]", "");
+    // String key = criteria;
+    // String[] criteriaArray = criteria.split(",");
+    //
+    // BenchmarkCriterion[] result = new BenchmarkCriterion[criteriaArray.length];
+    // for (int i = 0; i < criteriaArray.length; i++) {
+    // result[i] = BenchmarkCriterion.fromLabel(criteriaArray[i].trim());
+    // }
+    //
+    // if (null == name2Criteria) {
+    // name2Criteria = new HashMap<String, BenchmarkCriterion[]>();
+    // }
+    // if (!name2Criteria.containsKey(key)) {
+    // name2Criteria.put(key, result);
+    // }
+    //
+    // return name2Criteria.get(key);
+    // }
 
     /**
      * Configures and returns the dataset
