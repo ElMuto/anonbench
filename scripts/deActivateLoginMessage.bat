@@ -1,5 +1,5 @@
 @echo off
-Set _path=C:\IDE\eclipse_luna\workspace\anonbench_fork
+Set _path=C:\IDE\eclipse_kepler\arx\anonbench-fork
 Set _messageFile=loginMessage.txt
 Set _remoteHomeDir=/home/imse
 Set _heuraklesDir=heurakles-bench

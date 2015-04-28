@@ -24,11 +24,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
+import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
+import org.deidentifier.arx.criteria.PrivacyCriterion;
+import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
 import de.linearbits.subframe.Benchmark;
@@ -141,6 +146,7 @@ public class BenchmarkMain {
         System.out.println("4 - compute ILbounds");
         System.out.println("5 - compute relative IL");
         System.out.println("6 - create configurationFile based on code");
+        System.out.println("7 - compute geometric mean over datasets");
     }
 
     /**
@@ -165,12 +171,18 @@ public class BenchmarkMain {
 
         BenchmarkConfiguration benchmarkConfiguration = getConfiguration(args, mode);
 
+        if (7 == mode) {
+            computeGeometricMean(benchmarkConfiguration);
+            System.exit(0);
+        }
+
         if (1 == mode || 2 == mode || 3 == mode || 4 == mode || 6 == mode) {
             executeAlgorithms(args, mode, benchmarkConfiguration);
         }
         if (1 == mode || 3 == mode || 5 == mode) {
             computeRelativeInformationLoss(benchmarkConfiguration);
         }
+
     }
 
     private static void computeRelativeInformationLoss(BenchmarkConfiguration benchmarkConfiguration) {
@@ -244,14 +256,14 @@ public class BenchmarkMain {
     private static void runBenchmark(BenchmarkDriver driver, int repetitions,
                                      AnonConfiguration c, Benchmark benchmark) throws IOException {
 
-        // if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
-        //
-        // // Print status info
-        // System.out.println("Warm Up: " + c.getStatusLine());
-        //
-        // // Warmup run
-        // driver.anonymize(c, true);
-        // }
+         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
+        
+         // Print status info
+         System.out.println("Warm Up: " + c.getStatusLine());
+        
+         // Warmup run
+         driver.anonymize(c, true);
+         }
 
         // Print status info
         System.out.println("Running: " + c.getStatusLine());
@@ -292,6 +304,83 @@ public class BenchmarkMain {
         try {
             benchmark.getResults().write(new File(fileName));
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void computeGeometricMean(BenchmarkConfiguration benchmarkConfiguration) {
+
+        try {
+
+            CSVFile results = null;
+            try {
+                results = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.out.println(e);
+                System.exit(0);
+            }
+
+            String[] header1Column = new String[] { "", "", "", "", VARIABLES.INFORMATION_LOSS_RELATIVE.val };
+            String[] header2Column = new String[] { "Algorithm", "Criteria", "Metric", "Suppression", "Value" };
+            CSVFile resultsGeoMean = new CSVFile(header1Column, header2Column);
+
+            Selector<String[]> selector;
+            for (Algorithm algorithm : benchmarkConfiguration.getAlgorithms()) {
+                for (String criteria : benchmarkConfiguration.getCriteria()) {
+                    for (Metric<?> metric : benchmarkConfiguration.getMetrics()) {
+                        for (Double suppression : benchmarkConfiguration.getSuppression()) {
+
+                            String algorithmString = algorithm.toString();
+                            String metricString = metric.getName();
+                            String suppressionString = String.valueOf(suppression);
+
+                            // for each dataset, store relative information loss
+                            Double value = null;
+                            for (BenchmarkSetup.BenchmarkDataset dataset : benchmarkConfiguration.getDatasets()) {
+
+                                // Select data point acc to the variables
+                                selector = results.getSelectorBuilder()
+                                                  .field(VARIABLES.ALGORITHM.val).equals(algorithmString)
+                                                  .and()
+                                                  .field(VARIABLES.DATASET.val).equals(dataset.toString())
+                                                  .and()
+                                                  .field(VARIABLES.CRITERIA.val).equals(criteria)
+                                                  .and()
+                                                  .field(VARIABLES.METRIC.val).equals(metricString)
+                                                  .and()
+                                                  .field(VARIABLES.SUPPRESSION.val).equals(suppressionString)
+                                                  .build();
+
+                                Iterator<CSVLine> iter = results.iterator();
+                                while (iter.hasNext()) {
+                                    CSVLine csvline = iter.next();
+                                    String[] line = csvline.getData();
+                                    if (selector.isSelected(line)) {
+                                        double newValue = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_RELATIVE.val, "Value"));
+                                        // TODO add +1 in order deal with zero values
+                                        value = null == value ? newValue : value * newValue;
+                                    }
+                                }
+                            }
+
+                            // calculate geometric mean
+                            value = Math.pow(value, 1.0 / ((double) benchmarkConfiguration.getDatasets().length));
+                            resultsGeoMean.addLine(new String[] {
+                                    algorithmString,
+                                    criteria,
+                                    metricString,
+                                    suppressionString,
+                                    String.valueOf(value) });
+                        }
+                    }
+                }
+            }
+
+            resultsGeoMean.write(new File(BenchmarkSetup.RESULTS_FILE_GEOMEAN));
+        } catch (
+                IOException
+                | ParseException e) {
             e.printStackTrace();
         }
     }

@@ -65,6 +65,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     }
 
     public static final int         NODE_PROPERTY_COMPLETED = 1 << 20;
+    private static boolean          PRUNE                   = true;
     private final StopCriterion     stopCriterion;
     private final AnonConfiguration config;
 
@@ -118,7 +119,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         if (!stopCriterion.isFulfilled()) {
             traverse(bottom);
         }
-        if(stopCriterion.isFulfilled()) {
+        if (stopCriterion.isFulfilled()) {
             latticeCompleted = false;
         }
     }
@@ -165,7 +166,8 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                     boolean metricMonotonic = checker.getMetric().isMonotonic() || checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
 
                     // Depending on monotony of metric we choose to compare either IL of monotonic subset with the global optimum
-                    boolean prune = getGlobalOptimum() != null &&
+                    boolean prune = PRUNE &&
+                                    getGlobalOptimum() != null &&
                                     (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
 
                     // Next
