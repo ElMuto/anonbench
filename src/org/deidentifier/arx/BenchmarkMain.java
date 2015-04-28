@@ -256,14 +256,14 @@ public class BenchmarkMain {
     private static void runBenchmark(BenchmarkDriver driver, int repetitions,
                                      AnonConfiguration c, Benchmark benchmark) throws IOException {
 
-         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
-        
-         // Print status info
-         System.out.println("Warm Up: " + c.getStatusLine());
-        
-         // Warmup run
-         driver.anonymize(c, true);
-         }
+        // if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
+        //
+        // // Print status info
+        // System.out.println("Warm Up: " + c.getStatusLine());
+        //
+        // // Warmup run
+        // driver.anonymize(c, true);
+        // }
 
         // Print status info
         System.out.println("Running: " + c.getStatusLine());

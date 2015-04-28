@@ -135,6 +135,68 @@ public class BenchmarkAnalysis {
         // generateHeuraklesSelfComparisonPlots();
     }
 
+    private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
+
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE_GEOMEAN));
+
+        BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+        try {
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
+        VARIABLES[] variables = new VARIABLES[] { VARIABLES.INFORMATION_LOSS_RELATIVE };
+
+        String focus = VARIABLES.CRITERIA.val;
+
+        // create one file with several plots
+        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
+        // for each metric
+        for (Metric<?> metric : benchmarkConfiguration.getMetrics()) {
+
+            // for each suppression
+            for (double suppr : benchmarkConfiguration.getSuppression()) {
+                String suppression = String.valueOf(suppr);
+
+                for (VARIABLES variable : variables) {
+                    boolean xGroupPercent = false;
+                    PlotGroupData data = getGroupData2(file,
+                                                       new VARIABLES[] { variable },
+                                                       new String[] { Analyzer.VALUE },
+                                                       null,
+                                                       null,
+                                                       focus,
+                                                       suppression,
+                                                       benchmarkConfiguration.getCriteria(),
+                                                       algorithms,
+                                                       metric,
+                                                       1.5,
+                                                       xGroupPercent,
+                                                       null);
+
+                    Labels labels = new Labels(focus, variable.val);
+                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
+                    plots.add(new PlotHistogramClustered("", labels, data.series));
+                    String caption = variable.val +
+                                     " using information loss metric \"" +
+                                     metric.getName() +
+                                     "\" with " + suppression + "\\%" + " suppression" +
+                                     getTerminationLimitCaption(benchmarkConfiguration.getAlgorithms().get(0).getTerminationConfig()) +
+                                     " listed by \"" + focus + "\".";
+
+                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+                }
+            }
+        }
+        if (!groups.isEmpty()) {
+            LaTeX.plot(groups, "results/results");
+        }
+
+    }
+
     private static void generateHeuristicsComparison() throws IOException, ParseException {
 
         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
