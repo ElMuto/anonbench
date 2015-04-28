@@ -24,15 +24,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
-import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
