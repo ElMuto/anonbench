@@ -28,7 +28,7 @@ import org.deidentifier.arx.framework.lattice.NodeAction;
  */
 public class FLASHConfiguration {
     
-    public static boolean PRUNE_LOWER_BOUND = true;
+    public static boolean PRUNE_LOWER_BOUND = false;
 
     /**
      * Creates a binary-phase only configuration.

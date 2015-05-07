@@ -65,7 +65,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
     }
 
     public static final int         NODE_PROPERTY_COMPLETED = 1 << 20;
-    private static boolean          PRUNE                   = true;
+    private static boolean          PRUNE_LOWER_BOUND       = false;
     private final StopCriterion     stopCriterion;
     private final AnonConfiguration config;
 
@@ -165,10 +165,12 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
                     // global maximum (regardless of the anonymity criterion's monotonicity)
                     boolean metricMonotonic = checker.getMetric().isMonotonic() || checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
 
-                    // Depending on monotony of metric we choose to compare either IL of monotonic subset with the global optimum
-                    boolean prune = PRUNE &&
-                                    getGlobalOptimum() != null &&
-                                    (metricMonotonic ? next.getInformationLoss() : next.getLowerBound()).compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+                    // Depending on monotony of metric we choose to compare either IL or monotonic subset with the global optimum
+                    boolean prune = false;
+                    if (getGlobalOptimum() != null) {
+                        if (metricMonotonic) prune = next.getInformationLoss().compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+                        else if (PRUNE_LOWER_BOUND) prune = next.getLowerBound().compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+                    }
 
                     // Next
                     if (!prune) traverse(next);
