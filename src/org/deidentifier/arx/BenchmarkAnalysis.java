@@ -132,7 +132,7 @@ public class BenchmarkAnalysis {
         // generateHeuristicsComparisonGeoMean();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
-         generateHeuraklesSelfComparisonPlots();
+        generateHeuraklesSelfComparisonPlots();
     }
 
     private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
@@ -450,9 +450,9 @@ public class BenchmarkAnalysis {
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
         List<String> criteria = benchmarkConfiguration.getCriteria();
-        
+
         List<Algorithm> algorithms = new ArrayList<Algorithm>();
-         algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
+        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
 
         if (suppressions.length == 0 || algorithms.size() == 0 || datasets.length == 0) {
             return;
@@ -462,7 +462,7 @@ public class BenchmarkAnalysis {
 
         // create one file with several plots
         List<PlotGroup> groups = new ArrayList<PlotGroup>();
-        
+
         // for each suppression
         for (double suppr : suppressions) {
             String suppression = String.valueOf(suppr);
@@ -476,11 +476,11 @@ public class BenchmarkAnalysis {
                     boolean xGroupPercent = false;
                     PlotGroupData data = getGroupData(file,
                                                       new VARIABLES[] {
-                                                              //VARIABLES.EXHAUSTIVE_SEARCH_TIME,
+                                                              // VARIABLES.EXHAUSTIVE_SEARCH_TIME,
                                                               VARIABLES.EXECUTION_TIME,
                                                               VARIABLES.SOLUTION_DISCOVERY_TIME },
                                                       new String[] {
-                                                              //Analyzer.ARITHMETIC_MEAN,
+                                                              // Analyzer.ARITHMETIC_MEAN,
                                                               Analyzer.ARITHMETIC_MEAN,
                                                               Analyzer.ARITHMETIC_MEAN },
                                                       VARIABLES.INFORMATION_LOSS_ADDITIONAL,
@@ -515,7 +515,7 @@ public class BenchmarkAnalysis {
                 }
             }
         }
-        
+
         if (!groups.isEmpty()) {
             LaTeX.plot(groups, "results/results", true);
         }
@@ -532,144 +532,149 @@ public class BenchmarkAnalysis {
         }
 
         Double[] suppressions = benchmarkConfiguration.getSuppression();
+        Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
 
-        if (suppressions.length == 0) {
+        if (suppressions.length == 0 || metrics.length == 0) {
             return;
         }
 
         // create one file with several plots
         List<PlotGroup> groups = new ArrayList<PlotGroup>();
 
-        // for both normal and logarithmical X-Axes
-        for (boolean logX : new boolean[] { false, true }) {
+        for (Metric<?> metric : metrics) {
 
-            GnuPlotParams params = new GnuPlotParams();
-            params.rotateXTicks = 0;
-            params.printValues = false;
-            params.size = 1.5;
-            params.logX = logX;
-            params.logY = false;
-            params.enhance = false;
-            params.ratio = 0.2d;
-            params.minY = 0d;
-            params.printValuesFormatString = "%.0f";
-            params.maxY = 100d;
-            params.keypos = KeyPos.TOP_RIGHT;
-            params.colorize = true;
-            params.lineStyle = GnuPlotParams.LineStyle.STEPS;
+            // for both normal and logarithmical X-Axes
+            for (boolean logX : new boolean[] { false, true }) {
 
-            // for each suppression
-            for (double suppr : suppressions) {
-                String suppression = String.valueOf(suppr);
+                GnuPlotParams params = new GnuPlotParams();
+                params.rotateXTicks = 0;
+                params.printValues = false;
+                params.size = 1.5;
+                params.logX = logX;
+                params.logY = false;
+                params.enhance = false;
+                params.ratio = 0.2d;
+                params.minY = 0d;
+                params.printValuesFormatString = "%.0f";
+                params.maxY = 100d;
+                params.keypos = KeyPos.TOP_RIGHT;
+                params.colorize = true;
+                params.lineStyle = GnuPlotParams.LineStyle.STEPS;
 
-                Selector<String[]> selector = file.getSelectorBuilder()
-                                                  .field(VARIABLES.SUPPRESSION.val).equals(suppression).build();
+                // for each suppression
+                for (double suppr : suppressions) {
+                    String suppression = String.valueOf(suppr);
 
-                Series3D series = new Series3D(file,
-                                               selector,
-                                               new Field("", VARIABLES.QI_COUNT.val),
-                                               new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
-                                               new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
+                    Selector<String[]> selector = file.getSelectorBuilder()
+                                                      .field(VARIABLES.SUPPRESSION.val).equals(suppression).build();
 
-                // create Points for each discovery time resp. information loss value
-                // and extract all distinct discovery time values and QIs
+                    Series3D series = new Series3D(file,
+                                                   selector,
+                                                   new Field("", VARIABLES.QI_COUNT.val),
+                                                   new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
+                                                   new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
 
-                Set<Long> dTimeNanos = new TreeSet<Long>();
-                Set<Long> qis = new TreeSet<Long>();
-                List<Point3D> newData = new ArrayList<Point3D>();
+                    // create Points for each discovery time resp. information loss value
+                    // and extract all distinct discovery time values and QIs
 
-                for (Point3D p : series.getData()) {
-                    qis.add(Long.valueOf(p.x));
+                    Set<Long> dTimeNanos = new TreeSet<Long>();
+                    Set<Long> qis = new TreeSet<Long>();
+                    List<Point3D> newData = new ArrayList<Point3D>();
 
-                    String timeString = p.y.substring(1);
-                    timeString = timeString.substring(0, timeString.length() - 1);
-                    String times[] = timeString.split(",");
+                    for (Point3D p : series.getData()) {
+                        qis.add(Long.valueOf(p.x));
 
-                    String ilString = p.z.substring(1);
-                    ilString = ilString.substring(0, ilString.length() - 1);
-                    String ilValues[] = ilString.split(",");
+                        String timeString = p.y.substring(1);
+                        timeString = timeString.substring(0, timeString.length() - 1);
+                        String times[] = timeString.split(",");
 
-                    for (int i = 0; i < ilValues.length; ++i) {
-                        // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
-                        Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
-                        dTimeNanos.add(nano);
-                        Point3D pNew = new Point3D(String.valueOf(nano), p.x, ilValues[i].replaceAll(" ", ""));
-                        newData.add(pNew);
-                    }
-                }
+                        String ilString = p.z.substring(1);
+                        ilString = ilString.substring(0, ilString.length() - 1);
+                        String ilValues[] = ilString.split(",");
 
-                // scale relative
-                List<Point3D> relativeData = new ArrayList<Point3D>();
-                for (Long qi : qis) {
-                    double min = Double.MAX_VALUE;
-                    double max = Double.MIN_VALUE;
-
-                    for (Point3D p : newData) {
-                        if (p.y.equals(String.valueOf(qi))) {
-                            double value = Double.valueOf(p.z);
-                            if (value > max) max = value;
-                            if (value < min) min = value;
+                        for (int i = 0; i < ilValues.length; ++i) {
+                            // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
+                            Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
+                            dTimeNanos.add(nano);
+                            Point3D pNew = new Point3D(String.valueOf(nano), p.x, ilValues[i].replaceAll(" ", ""));
+                            newData.add(pNew);
                         }
                     }
 
-                    for (Point3D p : newData) {
-                        if (p.y.equals(String.valueOf(qi))) {
-                            double percent = (max != min) ? ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d : 0d;
-                            relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
-                        }
-                    }
-                }
-                newData = relativeData;
+                    // scale relative
+                    List<Point3D> relativeData = new ArrayList<Point3D>();
+                    for (Long qi : qis) {
+                        double min = Double.MAX_VALUE;
+                        double max = Double.MIN_VALUE;
 
-                // insert missing values
-
-                dTimeNanos.add(0L); // Assure that for every line, an initial value of 100 will be generated
-                List<Point3D> missingValues = new ArrayList<Point3D>();
-                for (Long qi : qis) {
-                    Iterator<Long> iter = dTimeNanos.iterator();
-                    Long dTimeNano = iter.next();
-                    String lastValue = "100";
-
-                    for (Point3D p : newData) {
-                        if (p.y.equals(String.valueOf(qi))) {
-                            while (dTimeNano < Long.valueOf(p.x)) {
-                                Point3D pMissing = new Point3D(String.valueOf(dTimeNano), p.y, lastValue);
-                                missingValues.add(pMissing);
-                                dTimeNano = iter.next();
+                        for (Point3D p : newData) {
+                            if (p.y.equals(String.valueOf(qi))) {
+                                double value = Double.valueOf(p.z);
+                                if (value > max) max = value;
+                                if (value < min) min = value;
                             }
-                            lastValue = p.z;
-                            if (iter.hasNext()) dTimeNano = iter.next();
+                        }
+
+                        for (Point3D p : newData) {
+                            if (p.y.equals(String.valueOf(qi))) {
+                                double percent = (max != min) ? ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d : 0d;
+                                relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
+                            }
                         }
                     }
-                }
+                    newData = relativeData;
 
-                series.getData().clear();
-                for (Point3D p : newData) {
-                    series.getData().add(p);
-                }
-                for (Point3D p : missingValues) {
-                    series.getData().add(p);
-                }
+                    // insert missing values
 
-                Collections.sort(series.getData(), new Comparator<Point3D>() {
-                    public int compare(Point3D p1, Point3D p2)
-                    {
-                        if (!p1.y.equals(p2.y)) return Long.valueOf(p1.y).compareTo(Long.valueOf(p2.y));
-                        return Long.valueOf(p1.x).compareTo(Long.valueOf(p2.x));
+                    dTimeNanos.add(0L); // Assure that for every line, an initial value of 100 will be generated
+                    List<Point3D> missingValues = new ArrayList<Point3D>();
+                    for (Long qi : qis) {
+                        Iterator<Long> iter = dTimeNanos.iterator();
+                        Long dTimeNano = iter.next();
+                        String lastValue = "100";
+
+                        for (Point3D p : newData) {
+                            if (p.y.equals(String.valueOf(qi))) {
+                                while (dTimeNano < Long.valueOf(p.x)) {
+                                    Point3D pMissing = new Point3D(String.valueOf(dTimeNano), p.y, lastValue);
+                                    missingValues.add(pMissing);
+                                    dTimeNano = iter.next();
+                                }
+                                lastValue = p.z;
+                                if (iter.hasNext()) dTimeNano = iter.next();
+                            }
+                        }
                     }
-                });
 
-                PlotGroupData data = new PlotGroupData(series, params);
+                    series.getData().clear();
+                    for (Point3D p : newData) {
+                        series.getData().add(p);
+                    }
+                    for (Point3D p : missingValues) {
+                        series.getData().add(p);
+                    }
 
-                Labels labels = new Labels("Runtime", "Relative information loss");
-                List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                plots.add(new PlotLinesClustered("", labels, data.series));
-                String caption = "Relative information loss for criterium 5-anonymity using information loss metric \"Loss\" with " +
-                                 Double.valueOf(suppression) * 100d + "\\%" + " suppression listed by runtime" +
-                                 (logX ? " in logarithmic scaling" : "") +
-                                 " for dataset \"SS13ACS\\_SEMANTIC\". Data points required for plotting before a solution has been found have been set to 100\\%.";
+                    Collections.sort(series.getData(), new Comparator<Point3D>() {
+                        public int compare(Point3D p1, Point3D p2)
+                        {
+                            if (!p1.y.equals(p2.y)) return Long.valueOf(p1.y).compareTo(Long.valueOf(p2.y));
+                            return Long.valueOf(p1.x).compareTo(Long.valueOf(p2.x));
+                        }
+                    });
 
-                groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+                    PlotGroupData data = new PlotGroupData(series, params);
+
+                    Labels labels = new Labels("Runtime", "Relative information loss");
+                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
+                    plots.add(new PlotLinesClustered("", labels, data.series));
+                    String caption = "Relative information loss for criterium 5-anonymity using information loss metric \"" +
+                                     metric.toString() +
+                                     "\" with " + Double.valueOf(suppression) * 100d + "\\%" + " suppression listed by runtime" +
+                                     (logX ? " in logarithmic scaling" : "") +
+                                     " for dataset \"SS13ACS\\_SEMANTIC\". Data points required for plotting before a solution has been found have been set to 100\\%.";
+
+                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+                }
             }
         }
 
