@@ -29,6 +29,7 @@ import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
+import org.deidentifier.arx.algorithm.AlgorithmHeuraklesBreadthSearch;
 import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
@@ -200,7 +201,7 @@ public class BenchmarkDriver {
         // Build or clean the lattice
         AbstractLattice lattice;
         // Heurakles does not need materialized lattice
-        if (AlgorithmType.HEURAKLES == c.getAlgorithm().getType() || AlgorithmType.DATAFLY == c.getAlgorithm().getType() ||
+        if (AlgorithmType.HEURAKLES == c.getAlgorithm().getType() || AlgorithmType.HEURAKLES_BREADTH_SEARCH == c.getAlgorithm().getType() || AlgorithmType.DATAFLY == c.getAlgorithm().getType() ||
             AlgorithmType.IMPROVED_GREEDY == c.getAlgorithm().getType()) {
             lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
         }
@@ -236,6 +237,9 @@ public class BenchmarkDriver {
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);
+            break;
+        case HEURAKLES_BREADTH_SEARCH:
+            implementation = new AlgorithmHeuraklesBreadthSearch(lattice, checker, c);
             break;
         default:
             throw new RuntimeException("Invalid algorithm");

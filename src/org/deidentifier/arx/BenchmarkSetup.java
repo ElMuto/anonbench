@@ -64,7 +64,7 @@ public class BenchmarkSetup {
             this.type = type;
             this.terminationConfig = terminationConfig;
             if (null != terminationConfig) {
-                this.name = null != terminationConfig ? type.toString() + String.valueOf(terminationConfig.getValue()) : type.toString();
+                this.name = (null != terminationConfig ? type.toString() + String.valueOf(terminationConfig.getValue()) : type.toString());
             }
         }
 
@@ -99,7 +99,8 @@ public class BenchmarkSetup {
         HEURAKLES("Heurakles", 2),
         INFORMATION_LOSS_BOUNDS("InformationLossBounds", 0),
         DATAFLY("DataFly", 3),
-        IMPROVED_GREEDY("ImprovedGreedy", 4);
+        IMPROVED_GREEDY("ImprovedGreedy", 4),
+        HEURAKLES_BREADTH_SEARCH("HeuraklesBreadthSearch", 5);
 
         public static AlgorithmType fromLabel(String label) {
             if (label != null) {
