@@ -129,10 +129,10 @@ public class BenchmarkAnalysis {
     public static void main(String[] args) throws IOException, ParseException {
         // generateTables();
         // generateConventionalPlots();
-        generateHeuristicsComparisonGeoMean();
+        // generateHeuristicsComparisonGeoMean();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
-        // generateHeuraklesSelfComparisonPlots();
+         generateHeuraklesSelfComparisonPlots();
     }
 
     private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
@@ -614,7 +614,7 @@ public class BenchmarkAnalysis {
 
                     for (Point3D p : newData) {
                         if (p.y.equals(String.valueOf(qi))) {
-                            double percent = ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d;
+                            double percent = (max != min) ? ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d : 0d;
                             relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
                         }
                     }
@@ -623,6 +623,7 @@ public class BenchmarkAnalysis {
 
                 // insert missing values
 
+                dTimeNanos.add(0L); // Assure that for every line, an initial value of 100 will be generated
                 List<Point3D> missingValues = new ArrayList<Point3D>();
                 for (Long qi : qis) {
                     Iterator<Long> iter = dTimeNanos.iterator();
