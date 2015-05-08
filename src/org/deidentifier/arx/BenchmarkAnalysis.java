@@ -566,7 +566,9 @@ public class BenchmarkAnalysis {
                     String suppression = String.valueOf(suppr);
 
                     Selector<String[]> selector = file.getSelectorBuilder()
-                                                      .field(VARIABLES.SUPPRESSION.val).equals(suppression).build();
+                                                      .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                      .field(VARIABLES.METRIC.val).equals(metric.getName())
+                                                      .build();
 
                     Series3D series = new Series3D(file,
                                                    selector,
