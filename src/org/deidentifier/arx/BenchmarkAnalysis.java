@@ -533,6 +533,7 @@ public class BenchmarkAnalysis {
 
         Double[] suppressions = benchmarkConfiguration.getSuppression();
         Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
+        List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
 
         if (suppressions.length == 0 || metrics.length == 0) {
             return;
@@ -544,7 +545,7 @@ public class BenchmarkAnalysis {
         for (Metric<?> metric : metrics) {
 
             // for both normal and logarithmical X-Axes
-            for (boolean logX : new boolean[] { false, true }) {
+            for (boolean logX : new boolean[] { false/*, true*/ }) {
 
                 GnuPlotParams params = new GnuPlotParams();
                 params.rotateXTicks = 0;
@@ -563,25 +564,24 @@ public class BenchmarkAnalysis {
 
                 // for each suppression
                 for (double suppr : suppressions) {
+
                     String suppression = String.valueOf(suppr);
 
-                    Selector<String[]> selector = file.getSelectorBuilder()
-                                                      .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
-                                                      .field(VARIABLES.METRIC.val).equals(metric.getName())
-                                                      .build();
+                    Selector<String[]> timeSelector = file.getSelectorBuilder()
+                                                          .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                          .field(VARIABLES.METRIC.val).equals(metric.getName())
+                                                          .build();
 
                     Series3D series = new Series3D(file,
-                                                   selector,
+                                                   timeSelector,
                                                    new Field("", VARIABLES.QI_COUNT.val),
                                                    new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
                                                    new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
 
-                    // create Points for each discovery time resp. information loss value
-                    // and extract all distinct discovery time values and QIs
+                    // extract all distinct discovery time values and QIs
 
                     Set<Long> dTimeNanos = new TreeSet<Long>();
                     Set<Long> qis = new TreeSet<Long>();
-                    List<Point3D> newData = new ArrayList<Point3D>();
 
                     for (Point3D p : series.getData()) {
                         qis.add(Long.valueOf(p.x));
@@ -590,79 +590,114 @@ public class BenchmarkAnalysis {
                         timeString = timeString.substring(0, timeString.length() - 1);
                         String times[] = timeString.split(",");
 
-                        String ilString = p.z.substring(1);
-                        ilString = ilString.substring(0, ilString.length() - 1);
-                        String ilValues[] = ilString.split(",");
-
-                        for (int i = 0; i < ilValues.length; ++i) {
+                        for (int i = 0; i < times.length; ++i) {
                             // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
                             Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
                             dTimeNanos.add(nano);
-                            Point3D pNew = new Point3D(String.valueOf(nano), p.x, ilValues[i].replaceAll(" ", ""));
-                            newData.add(pNew);
                         }
                     }
 
-                    // scale relative
-                    List<Point3D> relativeData = new ArrayList<Point3D>();
-                    for (Long qi : qis) {
-                        double min = Double.MAX_VALUE;
-                        double max = Double.MIN_VALUE;
-
-                        for (Point3D p : newData) {
-                            if (p.y.equals(String.valueOf(qi))) {
-                                double value = Double.valueOf(p.z);
-                                if (value > max) max = value;
-                                if (value < min) min = value;
-                            }
-                        }
-
-                        for (Point3D p : newData) {
-                            if (p.y.equals(String.valueOf(qi))) {
-                                double percent = (max != min) ? ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d : 0d;
-                                relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
-                            }
-                        }
-                    }
-                    newData = relativeData;
-
-                    // insert missing values
-
-                    dTimeNanos.add(0L); // Assure that for every line, an initial value of 100 will be generated
-                    List<Point3D> missingValues = new ArrayList<Point3D>();
-                    for (Long qi : qis) {
-                        Iterator<Long> iter = dTimeNanos.iterator();
-                        Long dTimeNano = iter.next();
-                        String lastValue = "100";
-
-                        for (Point3D p : newData) {
-                            if (p.y.equals(String.valueOf(qi))) {
-                                while (dTimeNano < Long.valueOf(p.x)) {
-                                    Point3D pMissing = new Point3D(String.valueOf(dTimeNano), p.y, lastValue);
-                                    missingValues.add(pMissing);
-                                    dTimeNano = iter.next();
-                                }
-                                lastValue = p.z;
-                                if (iter.hasNext()) dTimeNano = iter.next();
-                            }
-                        }
-                    }
-
+                    dTimeNanos.add(0L);
+                    
                     series.getData().clear();
-                    for (Point3D p : newData) {
-                        series.getData().add(p);
-                    }
-                    for (Point3D p : missingValues) {
-                        series.getData().add(p);
-                    }
 
-                    Collections.sort(series.getData(), new Comparator<Point3D>() {
-                        public int compare(Point3D p1, Point3D p2)
-                        {
-                            if (!p1.y.equals(p2.y)) return Long.valueOf(p1.y).compareTo(Long.valueOf(p2.y));
-                            return Long.valueOf(p1.x).compareTo(Long.valueOf(p2.x));
+                    // for each algorithm
+                    for (Algorithm algorithm : algorithms) {
+
+                        Selector<String[]> selector = file.getSelectorBuilder()
+                                                          .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                          .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
+                                                          .field(VARIABLES.ALGORITHM.val).equals(algorithm.toString())
+                                                          .build();
+
+                        Series3D algorithmSeries = new Series3D(file,
+                                                                selector,
+                                                                new Field("", VARIABLES.QI_COUNT.val),
+                                                                new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
+                                                                new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
+
+                        // create Points for each discovery time resp. information loss value for the given algorithm
+
+                        List<Point3D> algorithmData = new ArrayList<Point3D>();
+
+                        for (Point3D p : algorithmSeries.getData()) {
+                            String timeString = p.y.substring(1);
+                            timeString = timeString.substring(0, timeString.length() - 1);
+                            String times[] = timeString.split(",");
+
+                            String ilString = p.z.substring(1);
+                            ilString = ilString.substring(0, ilString.length() - 1);
+                            String ilValues[] = ilString.split(",");
+
+                            for (int i = 0; i < ilValues.length; ++i) {
+                                // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
+                                Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
+                                Point3D pNew = new Point3D(String.valueOf(nano), p.x, ilValues[i].replaceAll(" ", ""));
+                                algorithmData.add(pNew);
+                            }
                         }
-                    });
+
+                        // scale relative
+                        List<Point3D> relativeData = new ArrayList<Point3D>();
+                        for (Long qi : qis) {
+                            double min = Double.MAX_VALUE;
+                            double max = Double.MIN_VALUE;
+
+                            for (Point3D p : algorithmData) {
+                                if (p.y.equals(String.valueOf(qi))) {
+                                    double value = Double.valueOf(p.z);
+                                    if (value > max) max = value;
+                                    if (value < min) min = value;
+                                }
+                            }
+
+                            for (Point3D p : algorithmData) {
+                                if (p.y.equals(String.valueOf(qi))) {
+                                    double percent = (max != min) ? ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d : 0d;
+                                    relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
+                                }
+                            }
+                        }
+                        algorithmData = relativeData;
+
+                        // insert missing values
+
+                        List<Point3D> missingValues = new ArrayList<Point3D>();
+                        for (Long qi : qis) {
+                            Iterator<Long> iter = dTimeNanos.iterator();
+                            Long dTimeNano = iter.next();
+                            String lastValue = "100";
+
+                            for (Point3D p : algorithmData) {
+                                if (p.y.equals(String.valueOf(qi))) {
+                                    while (dTimeNano < Long.valueOf(p.x)) {
+                                        Point3D pMissing = new Point3D(String.valueOf(dTimeNano), p.y, lastValue);
+                                        missingValues.add(pMissing);
+                                        dTimeNano = iter.next();
+                                    }
+                                    lastValue = p.z;
+                                    if (iter.hasNext()) dTimeNano = iter.next();
+                                }
+                            }
+                        }
+
+                        for (Point3D p : missingValues) {
+                            algorithmData.add(p);
+                        }
+
+                        Collections.sort(algorithmData, new Comparator<Point3D>() {
+                            public int compare(Point3D p1, Point3D p2)
+                            {
+                                if (!p1.y.equals(p2.y)) return Long.valueOf(p1.y).compareTo(Long.valueOf(p2.y));
+                                return Long.valueOf(p1.x).compareTo(Long.valueOf(p2.x));
+                            }
+                        });
+
+                        for (Point3D p : algorithmData) {
+                            Point3D p2 = new Point3D(p.x, algorithm.toString() + " " + p.y, p.z);
+                            series.getData().add(p2);
+                        }
+                    }
 
                     PlotGroupData data = new PlotGroupData(series, params);
 
