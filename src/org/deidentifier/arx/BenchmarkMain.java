@@ -24,15 +24,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.deidentifier.arx.BenchmarkAnalysis.VARIABLES;
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
-import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.metric.Metric;
 
 import de.linearbits.objectselector.Selector;
@@ -256,14 +253,14 @@ public class BenchmarkMain {
     private static void runBenchmark(BenchmarkDriver driver, int repetitions,
                                      AnonConfiguration c, Benchmark benchmark) throws IOException {
 
-        // if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
-        //
-        // // Print status info
-        // System.out.println("Warm Up: " + c.getStatusLine());
-        //
-        // // Warmup run
-        // driver.anonymize(c, true);
-        // }
+         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
+        
+         // Print status info
+         System.out.println("Warm Up: " + c.getStatusLine());
+        
+         // Warmup run
+         driver.anonymize(c, true);
+         }
 
         // Print status info
         System.out.println("Running: " + c.getStatusLine());

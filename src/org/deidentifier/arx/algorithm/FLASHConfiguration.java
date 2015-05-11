@@ -27,6 +27,8 @@ import org.deidentifier.arx.framework.lattice.NodeAction;
  * @author Florian Kohlmayer
  */
 public class FLASHConfiguration {
+    
+    public static boolean PRUNE_LOWER_BOUND = false;
 
     /**
      * Creates a binary-phase only configuration.
@@ -178,6 +180,6 @@ public class FLASHConfiguration {
      * @return
      */
     public boolean isPruneInsufficientUtility() {
-        return pruneInsufficientUtility;
+        return PRUNE_LOWER_BOUND && pruneInsufficientUtility;
     }
 }

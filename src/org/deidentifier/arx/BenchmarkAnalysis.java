@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.deidentifier.arx.BenchmarkSetup.Algorithm;
+import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.TerminationConfiguration;
 import org.deidentifier.arx.metric.Metric;
@@ -128,11 +129,11 @@ public class BenchmarkAnalysis {
     public static void main(String[] args) throws IOException, ParseException {
         // generateTables();
         // generateConventionalPlots();
-        generateHeuristicsComparisonGeoMean();
+//        generateHeuristicsComparisonGeoMean();
+        generateHeuristicsComparison();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
-        // generateHeuraklesSelfComparisonPlots();
-        // generateHeuraklesSelfComparisonPlotsV2();
+        generateHeuraklesSelfComparisonPlots();
     }
 
     private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
@@ -141,7 +142,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
         try {
-            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE_GEOMEAN);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -218,14 +219,15 @@ public class BenchmarkAnalysis {
 
         String focus = VARIABLES.DATASET.val;
 
+        // create one file with several plots
+        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
         // for each metric
         for (Metric<?> metric : benchmarkConfiguration.getMetrics()) {
 
             // For each combination of criteria
             for (String criteria : benchmarkConfiguration.getCriteria()) {
 
-                // create one file with several plots
-                List<PlotGroup> groups = new ArrayList<PlotGroup>();
                 // for each suppression
                 for (double suppr : benchmarkConfiguration.getSuppression()) {
                     String suppression = String.valueOf(suppr);
@@ -260,12 +262,11 @@ public class BenchmarkAnalysis {
                         groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
                     }
                 }
-                if (!groups.isEmpty()) {
-                    LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_") + "_" +
-                                       benchmarkConfiguration.getReadableCriteria(criteria));
-                }
             }
 
+        }
+        if (!groups.isEmpty()) {
+            LaTeX.plot(groups, "results/results");
         }
     }
 
@@ -436,84 +437,7 @@ public class BenchmarkAnalysis {
      * @throws IOException
      * @throws ParseException
      */
-    // private static void generateFlashComparisonPlots() throws IOException, ParseException {
-    //
-    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-    //
-    // String focus = VARIABLES.DATASET.val;
-    // List<Algorithm> algorithms = new ArrayList<Algorithm>();
-    // algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
-    // BenchmarkDataset[] datasets = BenchmarkSetup.getDatasets();
-    //
-    // if (datasets.length == 0 || algorithms.size() == 0) {
-    // return;
-    // }
-    //
-    // // for each metric
-    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-    //
-    // // create one file with several plots
-    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
-    //
-    // // for each combination of criteria
-    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-    // String scriteria = Arrays.toString(criteria);
-    //
-    // // for each suppression
-    // for (double suppr : BenchmarkSetup.getSuppression()) {
-    // String suppression = String.valueOf(suppr);
-    //
-    // boolean xGroupPercent = false;
-    // PlotGroupData data = getGroupData(file,
-    // new VARIABLES[] {
-    // VARIABLES.EXHAUSTIVE_SEARCH_TIME,
-    // VARIABLES.EXECUTION_TIME,
-    // VARIABLES.SOLUTION_DISCOVERY_TIME },
-    // new String[] {
-    // Analyzer.ARITHMETIC_MEAN,
-    // Analyzer.ARITHMETIC_MEAN,
-    // Analyzer.ARITHMETIC_MEAN },
-    // VARIABLES.INFORMATION_LOSS_ADDITIONAL,
-    // Analyzer.VALUE,
-    // focus,
-    // scriteria,
-    // suppression,
-    // datasets,
-    // algorithms,
-    // metric,
-    // 2.0d,
-    // xGroupPercent,
-    // null);
-    //
-    // Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
-    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
-    // plots.add(new PlotHistogramClustered("", labels, data.series));
-    // String caption = "Exhaustive search time, execution time, solution discovery time and additional information loss of Heurakles without pruning for criterium 5-anonymity " +
-    // " using information loss metric \"" +
-    // metric.getName() +
-    // "\" with " +
-    // Double.valueOf(suppression) *
-    // 100d +
-    // "\\%" +
-    // " suppression " +
-    // "listed by \"" +
-    // focus +
-    // "\"." +
-    // " The execution time limits correspond to the total runtime of Flash for each configuration." +
-    // " The QI Count used for the dataset " +
-    // BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
-    //
-    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
-    // }
-    // }
-    //
-    // if (!groups.isEmpty()) {
-    // LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"), true);
-    // }
-    // }
-    // }
-
-    private static void generateHeuraklesSelfComparisonPlotsV2() throws IOException, ParseException {
+    private static void generateFlashComparisonPlots() throws IOException, ParseException {
         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
@@ -524,143 +448,72 @@ public class BenchmarkAnalysis {
         }
 
         Double[] suppressions = benchmarkConfiguration.getSuppression();
+        BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
+        Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
+        List<String> criteria = benchmarkConfiguration.getCriteria();
 
-        if (suppressions.length == 0) {
+        List<Algorithm> algorithms = new ArrayList<Algorithm>();
+        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
+
+        if (suppressions.length == 0 || algorithms.size() == 0 || datasets.length == 0) {
             return;
         }
+
+        String focus = VARIABLES.DATASET.val;
 
         // create one file with several plots
         List<PlotGroup> groups = new ArrayList<PlotGroup>();
 
-        // for both normal and logarithmical X-Axes
-        for (boolean logX : new boolean[] { false, true }) {
+        // for each suppression
+        for (double suppr : suppressions) {
+            String suppression = String.valueOf(suppr);
 
-            GnuPlotParams params = new GnuPlotParams();
-            params.rotateXTicks = 0;
-            params.printValues = false;
-            params.size = 1.5;
-            params.logX = logX;
-            params.logY = false;
-            params.enhance = false;
-            params.ratio = 0.2d;
-            params.minY = 0d;
-            params.printValuesFormatString = "%.0f";
-            params.maxY = 100d;
-            params.keypos = KeyPos.TOP_RIGHT;
-            params.colorize = true;
-            params.lineStyle = GnuPlotParams.LineStyle.STEPS;
+            // for each criteria
+            for (String scriteria : criteria) {
 
-            // for each suppression
-            for (double suppr : suppressions) {
-                String suppression = String.valueOf(suppr);
+                // for each metric
+                for (Metric<?> metric : metrics) {
 
-                Selector<String[]> selector = file.getSelectorBuilder()
-                                                  .field(VARIABLES.SUPPRESSION.val).equals(suppression).build();
+                    boolean xGroupPercent = false;
+                    PlotGroupData data = getGroupData(file,
+                                                      new VARIABLES[] {
+                                                              // VARIABLES.EXHAUSTIVE_SEARCH_TIME,
+                                                              VARIABLES.EXECUTION_TIME,
+                                                              VARIABLES.SOLUTION_DISCOVERY_TIME },
+                                                      new String[] {
+                                                              // Analyzer.ARITHMETIC_MEAN,
+                                                              Analyzer.ARITHMETIC_MEAN,
+                                                              Analyzer.ARITHMETIC_MEAN },
+                                                      VARIABLES.INFORMATION_LOSS_ADDITIONAL,
+                                                      Analyzer.VALUE,
+                                                      focus,
+                                                      scriteria,
+                                                      suppression,
+                                                      datasets,
+                                                      algorithms,
+                                                      metric,
+                                                      2.0d,
+                                                      xGroupPercent,
+                                                      null);
 
-                Series3D series = new Series3D(file,
-                                               selector,
-                                               new Field("", VARIABLES.QI_COUNT.val),
-                                               new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
-                                               new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
+                    Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
+                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
+                    plots.add(new PlotHistogramClustered("", labels, data.series));
+                    String caption = "Execution time of Flash, Solution discovery time and Additional information loss of Heurakles for criterium 5-anonymity " +
+                                     " using information loss metric \"" +
+                                     metric.getName() +
+                                     "\" with " +
+                                     Double.valueOf(suppression) *
+                                     100d +
+                                     "\\%" +
+                                     " suppression " +
+                                     "listed by \"" +
+                                     focus +
+                                     "\". The QI Count used for the dataset " +
+                                     BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
 
-                // create Points for each discovery time resp. information loss value
-                // and extract all distinct discovery time values and QIs
-
-                Set<Long> dTimeNanos = new TreeSet<Long>();
-                Set<Long> qis = new TreeSet<Long>();
-                List<Point3D> newData = new ArrayList<Point3D>();
-
-                for (Point3D p : series.getData()) {
-                    qis.add(Long.valueOf(p.x));
-
-                    String timeString = p.y.substring(1);
-                    timeString = timeString.substring(0, timeString.length() - 1);
-                    String times[] = timeString.split(",");
-
-                    String ilString = p.z.substring(1);
-                    ilString = ilString.substring(0, ilString.length() - 1);
-                    String ilValues[] = ilString.split(",");
-
-                    for (int i = 0; i < ilValues.length; ++i) {
-                        // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
-                        Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
-                        dTimeNanos.add(nano);
-                        Point3D pNew = new Point3D(String.valueOf(nano), p.x, ilValues[i].replaceAll(" ", ""));
-                        newData.add(pNew);
-                    }
+                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
                 }
-
-                // scale relative
-                List<Point3D> relativeData = new ArrayList<Point3D>();
-                for (Long qi : qis) {
-                    double min = Double.MAX_VALUE;
-                    double max = Double.MIN_VALUE;
-
-                    for (Point3D p : newData) {
-                        if (p.y.equals(String.valueOf(qi))) {
-                            double value = Double.valueOf(p.z);
-                            if (value > max) max = value;
-                            if (value < min) min = value;
-                        }
-                    }
-
-                    for (Point3D p : newData) {
-                        if (p.y.equals(String.valueOf(qi))) {
-                            double percent = ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d;
-                            relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
-                        }
-                    }
-                }
-                newData = relativeData;
-
-                // insert missing values
-
-                List<Point3D> missingValues = new ArrayList<Point3D>();
-                for (Long qi : qis) {
-                    Iterator<Long> iter = dTimeNanos.iterator();
-                    Long dTimeNano = iter.next();
-                    String lastValue = "100";
-
-                    for (Point3D p : newData) {
-                        if (p.y.equals(String.valueOf(qi))) {
-                            while (dTimeNano < Long.valueOf(p.x)) {
-                                Point3D pMissing = new Point3D(String.valueOf(dTimeNano), p.y, lastValue);
-                                missingValues.add(pMissing);
-                                dTimeNano = iter.next();
-                            }
-                            lastValue = p.z;
-                            if (iter.hasNext()) dTimeNano = iter.next();
-                        }
-                    }
-                }
-
-                series.getData().clear();
-                for (Point3D p : newData) {
-                    series.getData().add(p);
-                }
-                for (Point3D p : missingValues) {
-                    series.getData().add(p);
-                }
-
-                Collections.sort(series.getData(), new Comparator<Point3D>() {
-                    public int compare(Point3D p1, Point3D p2)
-                    {
-                        if (!p1.y.equals(p2.y)) return Long.valueOf(p1.y).compareTo(Long.valueOf(p2.y));
-                        return Long.valueOf(p1.x).compareTo(Long.valueOf(p2.x));
-                    }
-                });
-
-                PlotGroupData data = new PlotGroupData(series, params);
-
-                Labels labels = new Labels("Runtime", "Relative information loss");
-                List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                plots.add(new PlotLinesClustered("", labels, data.series));
-                String caption = "Relative information loss for criterium 5-anonymity using information loss metric \"Loss\" with " +
-                                 Double.valueOf(suppression) * 100d + "\\%" + " suppression listed by runtime" +
-                                 (logX ? " in logarithmic scaling" : "") +
-                                 " for dataset \"SS13ACS\\_SEMANTIC\". Data points required for plotting before a solution has been found have been set to 100\\%.";
-
-                groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
             }
         }
 
@@ -669,76 +522,204 @@ public class BenchmarkAnalysis {
         }
     }
 
-    /**
-     * Generate the plots for the heurakles self comparison benchmark
-     * @throws IOException
-     * @throws ParseException
-     */
-    // private static void generateHeuraklesSelfComparisonPlots() throws IOException, ParseException {
-    //
-    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-    //
-    // BenchmarkDataset[] datasets = BenchmarkSetup.getQICountScalingDatasets();
-    // List<Algorithm> algorithms = new ArrayList<Algorithm>();
-    // for (Algorithm algorithm : BenchmarkSetup.getAlgorithms(false, false)) {
-    // if (algorithm.getType().equals(BenchmarkSetup.AlgorithmType.HEURAKLES)) {
-    // algorithms.add(algorithm);
-    // }
-    // }
-    //
-    // if (datasets.length == 0 || algorithms.size() == 0) {
-    // return;
-    // }
-    //
-    // String focus = VARIABLES.QI_COUNT.val;
-    //
-    // // for each metric
-    // for (Metric<?> metric : BenchmarkSetup.getMetrics()) {
-    //
-    // // create one file with several plots
-    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
-    //
-    // // for each combination of criteria
-    // for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-    // String scriteria = Arrays.toString(criteria);
-    //
-    // // for each suppression
-    // for (double suppr : BenchmarkSetup.getSuppression()) {
-    // String suppression = String.valueOf(suppr);
-    //
-    // boolean xGroupPercent = true;
-    // PlotGroupData data = getGroupData(file,
-    // new VARIABLES[] { VARIABLES.INFORMATION_LOSS },
-    // new String[] { Analyzer.VALUE },
-    // null,
-    // null,
-    // focus,
-    // scriteria,
-    // suppression,
-    // datasets,
-    // algorithms,
-    // metric,
-    // 1.5,
-    // xGroupPercent,
-    // new Double(-1.0d));
-    //
-    // Labels labels = new Labels(focus, VARIABLES.INFORMATION_LOSS.val + " relative");
-    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
-    // plots.add(new PlotHistogramClustered("", labels, data.series));
-    // String caption = VARIABLES.INFORMATION_LOSS.val +
-    // " for criterium 5-anonymity using information loss metric \"" + metric.getName() + "\" with " +
-    // Double.valueOf(suppression) * 100d + "\\%" + " suppression " + " listed by \"" + focus + "\"" +
-    // " for dataset \"" + datasets[0].toString().replace("_", "\\_") + "\".";
-    //
-    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
-    // }
-    // }
-    //
-    // if (!groups.isEmpty()) {
-    // LaTeX.plot(groups, "results/results_" + metric.getName().toLowerCase().replaceAll(" ", "_"), true);
-    // }
-    // }
-    // }
+    private static void generateHeuraklesSelfComparisonPlots() throws IOException, ParseException {
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+
+        BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+        try {
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Double[] suppressions = benchmarkConfiguration.getSuppression();
+        Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
+        List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
+
+        if (suppressions.length == 0 || metrics.length == 0) {
+            return;
+        }
+
+        // create one file with several plots
+        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+
+        for (Metric<?> metric : metrics) {
+
+            // for both normal and logarithmical X-Axes
+            for (boolean logX : new boolean[] { false/*, true*/ }) {
+
+                GnuPlotParams params = new GnuPlotParams();
+                params.rotateXTicks = 0;
+                params.printValues = false;
+                params.size = 1.5;
+                params.logX = logX;
+                params.logY = false;
+                params.enhance = false;
+                params.ratio = 0.2d;
+                params.minY = 0d;
+                params.printValuesFormatString = "%.0f";
+                params.maxY = 100d;
+                params.keypos = KeyPos.TOP_RIGHT;
+                params.colorize = true;
+                params.lineStyle = GnuPlotParams.LineStyle.STEPS;
+
+                // for each suppression
+                for (double suppr : suppressions) {
+
+                    String suppression = String.valueOf(suppr);
+
+                    Selector<String[]> timeSelector = file.getSelectorBuilder()
+                                                          .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                          .field(VARIABLES.METRIC.val).equals(metric.getName())
+                                                          .build();
+
+                    Series3D series = new Series3D(file,
+                                                   timeSelector,
+                                                   new Field("", VARIABLES.QI_COUNT.val),
+                                                   new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
+                                                   new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
+
+                    // extract all distinct discovery time values and QIs
+
+                    Set<Long> dTimeNanos = new TreeSet<Long>();
+                    Set<Long> qis = new TreeSet<Long>();
+
+                    for (Point3D p : series.getData()) {
+                        qis.add(Long.valueOf(p.x));
+
+                        String timeString = p.y.substring(1);
+                        timeString = timeString.substring(0, timeString.length() - 1);
+                        String times[] = timeString.split(",");
+
+                        for (int i = 0; i < times.length; ++i) {
+                            // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
+                            Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
+                            dTimeNanos.add(nano);
+                        }
+                    }
+
+                    dTimeNanos.add(0L);
+                    
+                    series.getData().clear();
+
+                    // for each algorithm
+                    for (Algorithm algorithm : algorithms) {
+
+                        Selector<String[]> selector = file.getSelectorBuilder()
+                                                          .field(VARIABLES.SUPPRESSION.val).equals(suppression).and()
+                                                          .field(VARIABLES.METRIC.val).equals(metric.getName()).and()
+                                                          .field(VARIABLES.ALGORITHM.val).equals(algorithm.toString())
+                                                          .build();
+
+                        Series3D algorithmSeries = new Series3D(file,
+                                                                selector,
+                                                                new Field("", VARIABLES.QI_COUNT.val),
+                                                                new Field(VARIABLES.SOLUTION_DISCOVERY_TIME.val, Analyzer.VALUE),
+                                                                new Field(VARIABLES.INFORMATION_LOSS.val, Analyzer.VALUE));
+
+                        // create Points for each discovery time resp. information loss value for the given algorithm
+
+                        List<Point3D> algorithmData = new ArrayList<Point3D>();
+
+                        for (Point3D p : algorithmSeries.getData()) {
+                            String timeString = p.y.substring(1);
+                            timeString = timeString.substring(0, timeString.length() - 1);
+                            String times[] = timeString.split(",");
+
+                            String ilString = p.z.substring(1);
+                            ilString = ilString.substring(0, ilString.length() - 1);
+                            String ilValues[] = ilString.split(",");
+
+                            for (int i = 0; i < ilValues.length; ++i) {
+                                // Long millis = Long.valueOf(times[i].replaceAll(" ", "")) / 1000000;
+                                Long nano = Long.valueOf(times[i].replaceAll(" ", ""));
+                                Point3D pNew = new Point3D(String.valueOf(nano), p.x, ilValues[i].replaceAll(" ", ""));
+                                algorithmData.add(pNew);
+                            }
+                        }
+
+                        // scale relative
+                        List<Point3D> relativeData = new ArrayList<Point3D>();
+                        for (Long qi : qis) {
+                            double min = Double.MAX_VALUE;
+                            double max = Double.MIN_VALUE;
+
+                            for (Point3D p : algorithmData) {
+                                if (p.y.equals(String.valueOf(qi))) {
+                                    double value = Double.valueOf(p.z);
+                                    if (value > max) max = value;
+                                    if (value < min) min = value;
+                                }
+                            }
+
+                            for (Point3D p : algorithmData) {
+                                if (p.y.equals(String.valueOf(qi))) {
+                                    double percent = (max != min) ? ((Double.valueOf(p.z) - min) / (max - min)) * 100.0d : 0d;
+                                    relativeData.add(new Point3D(p.x, p.y, String.valueOf(percent)));
+                                }
+                            }
+                        }
+                        algorithmData = relativeData;
+
+                        // insert missing values
+
+                        List<Point3D> missingValues = new ArrayList<Point3D>();
+                        for (Long qi : qis) {
+                            Iterator<Long> iter = dTimeNanos.iterator();
+                            Long dTimeNano = iter.next();
+                            String lastValue = "100";
+
+                            for (Point3D p : algorithmData) {
+                                if (p.y.equals(String.valueOf(qi))) {
+                                    while (dTimeNano < Long.valueOf(p.x)) {
+                                        Point3D pMissing = new Point3D(String.valueOf(dTimeNano), p.y, lastValue);
+                                        missingValues.add(pMissing);
+                                        dTimeNano = iter.next();
+                                    }
+                                    lastValue = p.z;
+                                    if (iter.hasNext()) dTimeNano = iter.next();
+                                }
+                            }
+                        }
+
+                        for (Point3D p : missingValues) {
+                            algorithmData.add(p);
+                        }
+
+                        Collections.sort(algorithmData, new Comparator<Point3D>() {
+                            public int compare(Point3D p1, Point3D p2)
+                            {
+                                if (!p1.y.equals(p2.y)) return Long.valueOf(p1.y).compareTo(Long.valueOf(p2.y));
+                                return Long.valueOf(p1.x).compareTo(Long.valueOf(p2.x));
+                            }
+                        });
+
+                        for (Point3D p : algorithmData) {
+                            Point3D p2 = new Point3D(p.x, algorithm.toString() + " " + p.y, p.z);
+                            series.getData().add(p2);
+                        }
+                    }
+
+                    PlotGroupData data = new PlotGroupData(series, params);
+
+                    Labels labels = new Labels("Runtime", "Relative information loss");
+                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
+                    plots.add(new PlotLinesClustered("", labels, data.series));
+                    String caption = "Relative information loss for criterium 5-anonymity using information loss metric \"" +
+                                     metric.toString() +
+                                     "\" with " + Double.valueOf(suppression) * 100d + "\\%" + " suppression listed by runtime" +
+                                     (logX ? " in logarithmic scaling" : "") +
+                                     " for dataset \"SS13ACS\\_SEMANTIC\". Data points required for plotting before a solution has been found have been set to 100\\%.";
+
+                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+                }
+            }
+        }
+
+        if (!groups.isEmpty()) {
+            LaTeX.plot(groups, "results/results", true);
+        }
+    }
 
     /**
      * Generate the plots for the QI count scaling benchmark

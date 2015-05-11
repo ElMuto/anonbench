@@ -64,7 +64,7 @@ public class BenchmarkSetup {
             this.type = type;
             this.terminationConfig = terminationConfig;
             if (null != terminationConfig) {
-                this.name = null != terminationConfig ? type.toString() + String.valueOf(terminationConfig.getValue()) : type.toString();
+                this.name = (null != terminationConfig ? type.toString() + String.valueOf(terminationConfig.getValue()) : type.toString());
             }
         }
 
@@ -99,7 +99,8 @@ public class BenchmarkSetup {
         HEURAKLES("Heurakles", 2),
         INFORMATION_LOSS_BOUNDS("InformationLossBounds", 0),
         DATAFLY("DataFly", 3),
-        IMPROVED_GREEDY("ImprovedGreedy", 4);
+        IMPROVED_GREEDY("ImprovedGreedy", 4),
+        HEURAKLES_BREADTH_SEARCH("HeuraklesBreadthSearch", 5);
 
         public static AlgorithmType fromLabel(String label) {
             if (label != null) {
@@ -266,6 +267,7 @@ public class BenchmarkSetup {
     }
 
     public static final String                           DEFAULT_CONFIGURAITON_FILE = "results/defaultConfiguration.csv";
+    public static final String                           DEFAULT_CONFIGURAITON_FILE_GEOMEAN = "results/defaultConfigurationGeoMean.csv";
 
     public static final String                           INFORMATION_LOSS_FILE      = "results/informationLossBounds.csv";
 
@@ -276,7 +278,7 @@ public class BenchmarkSetup {
     private static Map<String, Metric<?>>                name2Metric;
 
     public static final String                           RESULTS_FILE               = "results/results.csv";
-    public static final String                           RESULTS_FILE_GEOMEAN       = "results/resultsGeoMean.csv";
+    public static final String                           RESULTS_FILE_GEOMEAN       = "results/resultsRelILGeoMean.csv";
 
     protected static final TerminationConfiguration.Type TERMINATION_TYPE           = TerminationConfiguration.Type.ANONYMITY;
 
@@ -284,7 +286,7 @@ public class BenchmarkSetup {
      * Flag indicating if the discovery time and information loss
      * of all discovered optima or only the last one should be recorded
      */
-    public static final boolean                          RECORD_ALL_OPTIMA          = true;
+    public static final boolean                          RECORD_ALL_OPTIMA          = false;
 
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.

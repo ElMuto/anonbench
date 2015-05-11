@@ -21,10 +21,8 @@
 package org.deidentifier.arx.algorithm;
 
 import java.util.Comparator;
-import java.util.PriorityQueue;
 
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
-import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.history.History;
 import org.deidentifier.arx.framework.lattice.AbstractLattice;
@@ -36,7 +34,7 @@ import org.deidentifier.arx.framework.lattice.Node;
  * @author Fabian Prasser
  * @author Florian Kohlmayer
  */
-public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
+public class AlgorithmHeuraklesBreadthSearch extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
         private final TerminationConfiguration config;
@@ -51,7 +49,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
             case TIME:
                 return System.currentTimeMillis() - timestamp >= config.getValue();
             case CHECKS:
-                return AlgorithmHeurakles.this.checks >= config.getValue();
+                return AlgorithmHeuraklesBreadthSearch.this.checks >= config.getValue();
             case ANONYMITY:
                 return getGlobalOptimum() != null;
             default:
@@ -64,10 +62,11 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
         }
     }
 
-    public static final int         NODE_PROPERTY_COMPLETED = 1 << 20;
-    private static boolean          PRUNE_LOWER_BOUND       = false;
-    private final StopCriterion     stopCriterion;
-    private final AnonConfiguration config;
+    private static final int          MAX_QUEUE_SIZE          = 50000;
+    public static final int           NODE_PROPERTY_COMPLETED = 1 << 20;
+    private static boolean            PRUNE_LOWER_BOUND       = false;
+    private final StopCriterion       stopCriterion;
+    private final AnonConfiguration   config;
 
     /**
      * Creates a new instance of the heurakles algorithm.
@@ -77,7 +76,7 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
      * @param config The config
      * 
      */
-    public AlgorithmHeurakles(AbstractLattice lattice, INodeChecker checker, AnonConfiguration config) {
+    public AlgorithmHeuraklesBreadthSearch(AbstractLattice lattice, INodeChecker checker, AnonConfiguration config) {
         super(lattice, checker);
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         this.config = config;
@@ -113,71 +112,61 @@ public class AlgorithmHeurakles extends AbstractBenchmarkAlgorithm {
 
     @Override
     public void traverse() {
+        
+        MinMaxPriorityQueue<Node> _queue = new MinMaxPriorityQueue<Node>(MAX_QUEUE_SIZE, new Comparator<Node>() {
+            @Override
+            public int compare(Node arg0, Node arg1) {
+                return arg0.getInformationLoss().compareTo(arg1.getInformationLoss());
+            }
+        });
+        
         stopCriterion.resetTimer();
         Node bottom = lattice.getBottom();
         assureChecked(bottom);
-        if (!stopCriterion.isFulfilled()) {
-            traverse(bottom);
-        }
         if (stopCriterion.isFulfilled()) {
             latticeCompleted = false;
+            return;
         }
-    }
+        _queue.add(bottom);
+        
+        Node next;
+        while ((next = _queue.poll()) != null) {
 
-    /**
-     * Traverse
-     * @param node
-     */
-    private void traverse(final Node node) {
-        Node[] successors = node.getSuccessors(true);
-        if (successors.length > 0) {
-            // Build a PriorityQueue based on information loss containing the successors
-            PriorityQueue<Node> queue = new PriorityQueue<Node>(successors.length, new Comparator<Node>() {
-                @Override
-                public int compare(Node arg0, Node arg1) {
-                    return arg0.getInformationLoss().compareTo(arg1.getInformationLoss());
-                }
-            });
-            for (Node successor : successors) {
-                if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
-                    assureChecked(successor);
-                    queue.add(successor);
-                }
-                // FIXME is this correct?
-                if (AlgorithmType.IMPROVED_GREEDY != this.config.getAlgorithm().getType()) {
+            // A node (and it's direct and indirect successors, respectively) can be pruned if
+            // the information loss is monotonic and the nodes's IL is greater or equal than the IL of the
+            // global maximum (regardless of the anonymity criterion's monotonicity)
+            boolean metricMonotonic = checker.getMetric().isMonotonic() || checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
+
+            // Depending on monotony of metric we choose to compare either IL or monotonic subset with the global optimum
+            boolean prune = false;
+            if (getGlobalOptimum() != null) {
+                if (metricMonotonic) prune = next.getInformationLoss().compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+                else if (PRUNE_LOWER_BOUND) prune = next.getLowerBound().compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
+            }
+
+            if (!prune && !next.hasProperty(NODE_PROPERTY_COMPLETED)) {
+
+                for (Node successor : next.getSuccessors(true)) {
+                    
+                    if (!successor.hasProperty(NODE_PROPERTY_COMPLETED)) {
+                        assureChecked(successor);
+                        _queue.add(successor);
+                    }
+                    
+                    while (_queue.size() > MAX_QUEUE_SIZE) {
+                        _queue.removeTail();
+                    }
+
                     if (stopCriterion.isFulfilled()) {
+                        latticeCompleted = false;
                         return;
                     }
                 }
-            }
-
-            Node next;
-            while ((next = queue.poll()) != null) {
-
-                if (!next.hasProperty(NODE_PROPERTY_COMPLETED)) {
-
-                    if (stopCriterion.isFulfilled()) {
-                        return;
-                    }
-
-                    // A node (and it's direct and indirect successors, respectively) can be pruned iff
-                    // the information loss is monotonic and the nodes's IL is greater or equal than the IL of the
-                    // global maximum (regardless of the anonymity criterion's monotonicity)
-                    boolean metricMonotonic = checker.getMetric().isMonotonic() || checker.getConfiguration().getAbsoluteMaxOutliers() == 0;
-
-                    // Depending on monotony of metric we choose to compare either IL or monotonic subset with the global optimum
-                    boolean prune = false;
-                    if (getGlobalOptimum() != null) {
-                        if (metricMonotonic) prune = next.getInformationLoss().compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
-                        else if (PRUNE_LOWER_BOUND) prune = next.getLowerBound().compareTo(getGlobalOptimum().getInformationLoss()) >= 0;
-                    }
-
-                    // Next
-                    if (!prune) traverse(next);
-                }
+                
+                lattice.setProperty(next, NODE_PROPERTY_COMPLETED);
             }
         }
-
-        lattice.setProperty(node, NODE_PROPERTY_COMPLETED);
+        
+        latticeCompleted = true;
     }
 }
