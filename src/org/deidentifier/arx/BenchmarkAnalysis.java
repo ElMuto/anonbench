@@ -131,6 +131,7 @@ public class BenchmarkAnalysis {
         // generateConventionalPlots();
 //        generateHeuristicsComparisonGeoMean();
         generateHeuristicsComparison();
+        // generateHeuristicsComparisonGeoMean();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
         generateHeuraklesSelfComparisonPlots();
