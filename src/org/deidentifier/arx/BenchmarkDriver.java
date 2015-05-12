@@ -203,7 +203,7 @@ public class BenchmarkDriver {
         AbstractLattice lattice;
         // Heurakles does not need materialized lattice
         if (AlgorithmType.HEURAKLES_DFS == c.getAlgorithm().getType() || AlgorithmType.HEURAKLES_BFS == c.getAlgorithm().getType() ||
-            AlgorithmType.DATAFLY == c.getAlgorithm().getType() ||
+            AlgorithmType.DATAFLY == c.getAlgorithm().getType() || AlgorithmType.HEURAKLES_BFSDFS == c.getAlgorithm().getType() ||
             AlgorithmType.IMPROVED_GREEDY == c.getAlgorithm().getType()) {
             lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
         }
