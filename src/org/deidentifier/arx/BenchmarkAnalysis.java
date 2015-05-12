@@ -130,11 +130,10 @@ public class BenchmarkAnalysis {
         // generateTables();
         // generateConventionalPlots();
 //        generateHeuristicsComparisonGeoMean();
-        generateHeuristicsComparison();
-        // generateHeuristicsComparisonGeoMean();
+         generateHeuristicsComparison();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
-//        generateHeuraklesSelfComparisonPlots();
+        // generateHeuraklesSelfComparisonPlots();
     }
 
     private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
@@ -143,7 +142,7 @@ public class BenchmarkAnalysis {
 
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
         try {
-            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE_GEOMEAN);
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -232,6 +231,10 @@ public class BenchmarkAnalysis {
                 // for each suppression
                 for (double suppr : benchmarkConfiguration.getSuppression()) {
                     String suppression = String.valueOf(suppr);
+                    
+                    //FIXME temporary fix
+                    if(metric.getName().equals("Average equivalence class size") && suppr == 0.1 || metric.getName().equals("Loss") && suppr == 0.0)
+                        continue;
 
                     for (VARIABLES variable : variables) {
                         boolean xGroupPercent = false;
@@ -547,7 +550,7 @@ public class BenchmarkAnalysis {
         for (Metric<?> metric : metrics) {
 
             // for both normal and logarithmical X-Axes
-            for (boolean logX : new boolean[] { false/*, true*/ }) {
+            for (boolean logX : new boolean[] { false /* , true */}) {
 
                 GnuPlotParams params = new GnuPlotParams();
                 params.rotateXTicks = 0;
@@ -600,7 +603,7 @@ public class BenchmarkAnalysis {
                     }
 
                     dTimeNanos.add(0L);
-                    
+
                     series.getData().clear();
 
                     // for each algorithm

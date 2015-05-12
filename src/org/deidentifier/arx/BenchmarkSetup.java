@@ -267,10 +267,9 @@ public class BenchmarkSetup {
         }
     }
 
-    public static final String                           DEFAULT_CONFIGURAITON_FILE         = "results/defaultConfiguration.csv";
-    public static final String                           DEFAULT_CONFIGURAITON_FILE_GEOMEAN = "results/defaultConfigurationGeoMean.csv";
+    public static final String                           DEFAULT_CONFIGURAITON_FILE = "results/defaultConfiguration.csv";
 
-    public static final String                           INFORMATION_LOSS_FILE              = "results/informationLossBounds.csv";
+    public static final String                           INFORMATION_LOSS_FILE      = "results/informationLossBounds.csv";
 
     private static Map<String, Algorithm>                name2Algorithm;
 
@@ -278,16 +277,16 @@ public class BenchmarkSetup {
 
     private static Map<String, Metric<?>>                name2Metric;
 
-    public static final String                           RESULTS_FILE                       = "results/results.csv";
-    public static final String                           RESULTS_FILE_GEOMEAN               = "results/resultsRelILGeoMean.csv";
+    public static final String                           RESULTS_FILE               = "results/results.csv";
+    public static final String                           RESULTS_FILE_GEOMEAN       = "results/resultsRelILGeoMean.csv";
 
-    protected static final TerminationConfiguration.Type TERMINATION_TYPE                   = TerminationConfiguration.Type.ANONYMITY;
+    protected static final TerminationConfiguration.Type TERMINATION_TYPE           = TerminationConfiguration.Type.ANONYMITY;
 
     /**
      * Flag indicating if the discovery time and information loss
      * of all discovered optima or only the last one should be recorded
      */
-    public static final boolean                          RECORD_ALL_OPTIMA                  = false;
+    public static final boolean                          RECORD_ALL_OPTIMA          = false;
 
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.
