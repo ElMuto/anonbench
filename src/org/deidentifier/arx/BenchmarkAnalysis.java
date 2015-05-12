@@ -134,7 +134,7 @@ public class BenchmarkAnalysis {
         // generateHeuristicsComparisonGeoMean();
         // generateQICountScalingPlots();
         // generateFlashComparisonPlots();
-        generateHeuraklesSelfComparisonPlots();
+//        generateHeuraklesSelfComparisonPlots();
     }
 
     private static void generateHeuristicsComparisonGeoMean() throws IOException, ParseException {
@@ -454,7 +454,7 @@ public class BenchmarkAnalysis {
         List<String> criteria = benchmarkConfiguration.getCriteria();
 
         List<Algorithm> algorithms = new ArrayList<Algorithm>();
-        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES, null));
+        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES_DFS, null));
 
         if (suppressions.length == 0 || algorithms.size() == 0 || datasets.length == 0) {
             return;

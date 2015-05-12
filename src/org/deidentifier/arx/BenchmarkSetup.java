@@ -73,7 +73,7 @@ public class BenchmarkSetup {
         }
 
         public String getStatusSuffix() {
-            return type.equals(AlgorithmType.HEURAKLES) ?
+            return type.equals(AlgorithmType.HEURAKLES_DFS) ?
                     terminationConfig.getValue() + (BenchmarkSetup.TERMINATION_TYPE == TerminationConfiguration.Type.CHECKS ?
                             " checks" :
                             " milliseconds") :
@@ -96,11 +96,12 @@ public class BenchmarkSetup {
 
     public static enum AlgorithmType {
         FLASH("Flash", 1),
-        HEURAKLES("Heurakles", 2),
-        INFORMATION_LOSS_BOUNDS("InformationLossBounds", 0),
-        DATAFLY("DataFly", 3),
-        IMPROVED_GREEDY("ImprovedGreedy", 4),
-        HEURAKLES_BREADTH_SEARCH("HeuraklesBreadthSearch", 5);
+        HEURAKLES_BFS("HeuraklesBFS", 2),
+        HEURAKLES_DFS("HeuraklesDFS", 3),
+        HEURAKLES_BFSDFS("HeuraklesBFSDFS", 4),
+        DATAFLY("DataFly", 5),
+        IMPROVED_GREEDY("ImprovedGreedy", 6),
+        INFORMATION_LOSS_BOUNDS("InformationLossBounds", 0);
 
         public static AlgorithmType fromLabel(String label) {
             if (label != null) {
@@ -266,10 +267,10 @@ public class BenchmarkSetup {
         }
     }
 
-    public static final String                           DEFAULT_CONFIGURAITON_FILE = "results/defaultConfiguration.csv";
+    public static final String                           DEFAULT_CONFIGURAITON_FILE         = "results/defaultConfiguration.csv";
     public static final String                           DEFAULT_CONFIGURAITON_FILE_GEOMEAN = "results/defaultConfigurationGeoMean.csv";
 
-    public static final String                           INFORMATION_LOSS_FILE      = "results/informationLossBounds.csv";
+    public static final String                           INFORMATION_LOSS_FILE              = "results/informationLossBounds.csv";
 
     private static Map<String, Algorithm>                name2Algorithm;
 
@@ -277,16 +278,16 @@ public class BenchmarkSetup {
 
     private static Map<String, Metric<?>>                name2Metric;
 
-    public static final String                           RESULTS_FILE               = "results/results.csv";
-    public static final String                           RESULTS_FILE_GEOMEAN       = "results/resultsRelILGeoMean.csv";
+    public static final String                           RESULTS_FILE                       = "results/results.csv";
+    public static final String                           RESULTS_FILE_GEOMEAN               = "results/resultsRelILGeoMean.csv";
 
-    protected static final TerminationConfiguration.Type TERMINATION_TYPE           = TerminationConfiguration.Type.ANONYMITY;
+    protected static final TerminationConfiguration.Type TERMINATION_TYPE                   = TerminationConfiguration.Type.ANONYMITY;
 
     /**
      * Flag indicating if the discovery time and information loss
      * of all discovered optima or only the last one should be recorded
      */
-    public static final boolean                          RECORD_ALL_OPTIMA          = false;
+    public static final boolean                          RECORD_ALL_OPTIMA                  = false;
 
     /**
      * Create {@link BenchmarkConfiguration} from set parameters and save to file.
@@ -305,7 +306,7 @@ public class BenchmarkSetup {
 
                 switch (algorithm.getType()) {
                 case FLASH:
-                case HEURAKLES:
+                case HEURAKLES_DFS:
                 case INFORMATION_LOSS_BOUNDS:
                     decisionMetric = iLMetric = metric;
                     break;
@@ -483,9 +484,21 @@ public class BenchmarkSetup {
                     benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.INFORMATION_LOSS_BOUNDS, null));
                 }
                 break;
-            case HEURAKLES:
+            case HEURAKLES_DFS:
                 for (Integer tLimit : getTerminationLimits()) {
-                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES,
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES_DFS,
+                                                             new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
+                }
+                break;
+            case HEURAKLES_BFS:
+                for (Integer tLimit : getTerminationLimits()) {
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES_BFS,
+                                                             new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
+                }
+                break;
+            case HEURAKLES_BFSDFS:
+                for (Integer tLimit : getTerminationLimits()) {
+                    benchmarkAlgorithmList.add(new Algorithm(AlgorithmType.HEURAKLES_BFSDFS,
                                                              new TerminationConfiguration(TERMINATION_TYPE, tLimit)));
                 }
                 break;
@@ -818,14 +831,14 @@ public class BenchmarkSetup {
             if (algorithm.getType() == AlgorithmType.FLASH) {
                 return 10;
             }
-            else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
+            else if (algorithm.getType() == AlgorithmType.HEURAKLES_DFS || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
                 return 16;
             }
         } else if (dataset == BenchmarkDataset.SS13ACS_SEMANTIC) {
             if (algorithm.getType() == AlgorithmType.FLASH) {
                 return 10;
             }
-            else if (algorithm.getType() == AlgorithmType.HEURAKLES || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
+            else if (algorithm.getType() == AlgorithmType.HEURAKLES_DFS || algorithm.getType() == AlgorithmType.INFORMATION_LOSS_BOUNDS) {
                 return 11;
             }
         }
