@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="heurakles-bech" default="release" basedir=".">
-
-  <property name="arx" value="C:\dev\workspace-arx\arx-fork" />
+  
+  <!-- johanna home
+	<property name="arx" value="/Users/jeanzi/dev/workspace/arx_fork" />
+	<property name="subframe" value="/Users/jeanzi/dev/workspace/subframe_fork" />
+	-->
 	
-  <!-- Helmut -->
-  <property name="subframe" value="C:\dev\workspace-arx\subframe-fork" />
+	<!-- johanna -->
+	<property name="arx" value="C:\IDE\eclipse_luna\workspace\arx_fork" />
+	<property name="subframe" value="C:\IDE\eclipse_luna\workspace\subfram_fork" />
+	
+	<!-- raffael
+	<property name="arx" value="C:\IDE\eclipse_kepler\arx\arx-fork" />
+	<property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" /> -->
+
+
+	<!-- Helmut -->
+	<!--property name="arx" value="C:\dev\workspace-arx\arx-fork" />
+	<property name="subframe" value="C:\dev\workspace-arx\subframe-fork" /-->
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">

@@ -253,14 +253,14 @@ public class BenchmarkMain {
     private static void runBenchmark(BenchmarkDriver driver, int repetitions,
                                      AnonConfiguration c, Benchmark benchmark) throws IOException {
 
-         if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
-        
-         // Print status info
-         System.out.println("Warm Up: " + c.getStatusLine());
-        
-         // Warmup run
-         driver.anonymize(c, true);
-         }
+        if (AlgorithmType.INFORMATION_LOSS_BOUNDS != c.getAlgorithm().getType()) {
+
+            // Print status info
+            System.out.println("Warm Up: " + c.getStatusLine());
+
+            // Warmup run
+            driver.anonymize(c, true);
+        }
 
         // Print status info
         System.out.println("Running: " + c.getStatusLine());
@@ -333,7 +333,7 @@ public class BenchmarkMain {
                             String suppressionString = String.valueOf(suppression);
 
                             // for each dataset, store relative information loss
-                            Double value = null;
+                            Double value = 1.0;
                             for (BenchmarkSetup.BenchmarkDataset dataset : benchmarkConfiguration.getDatasets()) {
 
                                 // Select data point acc to the variables
@@ -355,14 +355,14 @@ public class BenchmarkMain {
                                     String[] line = csvline.getData();
                                     if (selector.isSelected(line)) {
                                         double newValue = Double.parseDouble(csvline.get(VARIABLES.INFORMATION_LOSS_RELATIVE.val, "Value"));
-                                        // TODO add +1 in order deal with zero values
-                                        value = null == value ? newValue : value * newValue;
+                                        // add 1 to each value in order to handle zeros
+                                        value = value * (newValue + 1);
                                     }
                                 }
                             }
 
                             // calculate geometric mean
-                            value = Math.pow(value, 1.0 / ((double) benchmarkConfiguration.getDatasets().length));
+                            value = Math.pow(value, 1.0 / ((double) benchmarkConfiguration.getDatasets().length)) -1;
                             resultsGeoMean.addLine(new String[] {
                                     algorithmString,
                                     criteria,

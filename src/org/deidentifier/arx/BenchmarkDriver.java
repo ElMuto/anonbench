@@ -28,8 +28,9 @@ import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
 import org.deidentifier.arx.BenchmarkSetup.AlgorithmType;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
-import org.deidentifier.arx.algorithm.AlgorithmHeurakles;
-import org.deidentifier.arx.algorithm.AlgorithmHeuraklesBreadthSearch;
+import org.deidentifier.arx.algorithm.AlgorithmHeuraklesBFSDFS;
+import org.deidentifier.arx.algorithm.AlgorithmHeuraklesDFS;
+import org.deidentifier.arx.algorithm.AlgorithmHeuraklesBFS;
 import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
@@ -201,7 +202,8 @@ public class BenchmarkDriver {
         // Build or clean the lattice
         AbstractLattice lattice;
         // Heurakles does not need materialized lattice
-        if (AlgorithmType.HEURAKLES == c.getAlgorithm().getType() || AlgorithmType.HEURAKLES_BREADTH_SEARCH == c.getAlgorithm().getType() || AlgorithmType.DATAFLY == c.getAlgorithm().getType() ||
+        if (AlgorithmType.HEURAKLES_DFS == c.getAlgorithm().getType() || AlgorithmType.HEURAKLES_BFS == c.getAlgorithm().getType() ||
+            AlgorithmType.DATAFLY == c.getAlgorithm().getType() || AlgorithmType.HEURAKLES_BFSDFS == c.getAlgorithm().getType() ||
             AlgorithmType.IMPROVED_GREEDY == c.getAlgorithm().getType()) {
             lattice = new VirtualLattice(manager.getMinLevels(), manager.getMaxLevels());
         }
@@ -230,16 +232,19 @@ public class BenchmarkDriver {
         case FLASH:
             implementation = AlgorithmFlash.create((MaterializedLattice) lattice, checker, manager.getHierarchies());
             break;
-        case HEURAKLES:
+        case HEURAKLES_DFS:
         case DATAFLY:
         case IMPROVED_GREEDY:
-            implementation = new AlgorithmHeurakles(lattice, checker, c);
+            implementation = new AlgorithmHeuraklesDFS(lattice, checker, c);
             break;
         case INFORMATION_LOSS_BOUNDS:
             implementation = new AlgorithmInformationLossBounds((MaterializedLattice) lattice, checker);
             break;
-        case HEURAKLES_BREADTH_SEARCH:
-            implementation = new AlgorithmHeuraklesBreadthSearch(lattice, checker, c);
+        case HEURAKLES_BFS:
+            implementation = new AlgorithmHeuraklesBFS(lattice, checker, c);
+            break;
+        case HEURAKLES_BFSDFS:
+            implementation = new AlgorithmHeuraklesBFSDFS(lattice, checker, c);
             break;
         default:
             throw new RuntimeException("Invalid algorithm");

@@ -34,7 +34,7 @@ import org.deidentifier.arx.framework.lattice.Node;
  * @author Fabian Prasser
  * @author Florian Kohlmayer
  */
-public class AlgorithmHeuraklesBreadthSearch extends AbstractBenchmarkAlgorithm {
+public class AlgorithmHeuraklesBFS extends AbstractBenchmarkAlgorithm {
 
     private class StopCriterion {
         private final TerminationConfiguration config;
@@ -49,7 +49,7 @@ public class AlgorithmHeuraklesBreadthSearch extends AbstractBenchmarkAlgorithm 
             case TIME:
                 return System.currentTimeMillis() - timestamp >= config.getValue();
             case CHECKS:
-                return AlgorithmHeuraklesBreadthSearch.this.checks >= config.getValue();
+                return AlgorithmHeuraklesBFS.this.checks >= config.getValue();
             case ANONYMITY:
                 return getGlobalOptimum() != null;
             default:
@@ -76,7 +76,7 @@ public class AlgorithmHeuraklesBreadthSearch extends AbstractBenchmarkAlgorithm 
      * @param config The config
      * 
      */
-    public AlgorithmHeuraklesBreadthSearch(AbstractLattice lattice, INodeChecker checker, AnonConfiguration config) {
+    public AlgorithmHeuraklesBFS(AbstractLattice lattice, INodeChecker checker, AnonConfiguration config) {
         super(lattice, checker);
         checker.getHistory().setStorageTrigger(History.STORAGE_TRIGGER_ALL);
         this.config = config;
