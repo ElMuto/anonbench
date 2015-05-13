@@ -3,10 +3,10 @@
 Set _merge_host=PCluster-fed1
 
 rem raffael
-Set _path=C:\IDE\eclipse_kepler\arx\anonbench-fork
+rem Set _path=C:\IDE\eclipse_kepler\arx\anonbench-fork
 
 rem johanna
-rem Set _path=C:\IDE\eclipse_luna\workspace\anonbench_fork
+Set _path=C:\IDE\eclipse_luna\workspace\anonbench_fork
 
 Set _merged_file_name=results_merged.csv
 

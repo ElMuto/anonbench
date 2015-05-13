@@ -7,8 +7,12 @@
 	-->
 	
 	<!-- johanna -->
+	<property name="arx" value="C:\IDE\eclipse_luna\workspace\arx_fork" />
+	<property name="subframe" value="C:\IDE\eclipse_luna\workspace\subfram_fork" />
+	
+	<!-- raffael
 	<property name="arx" value="C:\IDE\eclipse_kepler\arx\arx-fork" />
-	<property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" />
+	<property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" /> -->
 
 	<!-- defines the to be included libraries -->
 	<fileset id="lib.jars" dir="${arx}/lib">

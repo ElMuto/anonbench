@@ -1,9 +1,9 @@
 @echo off
 rem raffael
-Set _path=C:\IDE\eclipse_kepler\arx\anonbench-fork
+rem Set _path=C:\IDE\eclipse_kepler\arx\anonbench-fork
 
 rem johanna
-rem Set _path=C:\IDE\eclipse_luna\workspace\anonbench_fork
+Set _path=C:\IDE\eclipse_luna\workspace\anonbench_fork
 
 Set _worklist_path=%_path%\cluster-worklists
 Set _commandfile=%_path%\scripts\plink-commands.txt
