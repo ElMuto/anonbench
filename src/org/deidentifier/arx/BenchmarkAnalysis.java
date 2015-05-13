@@ -550,7 +550,7 @@ public class BenchmarkAnalysis {
         for (Metric<?> metric : metrics) {
 
             // for both normal and logarithmical X-Axes
-            for (boolean logX : new boolean[] { false/*, true*/ }) {
+            for (boolean logX : new boolean[] { false /* , true */}) {
 
                 GnuPlotParams params = new GnuPlotParams();
                 params.rotateXTicks = 0;

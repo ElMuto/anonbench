@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="heurakles-bech" default="release" basedir=".">
 
+	<!-- johanna home
+	<property name="arx" value="/Users/jeanzi/dev/workspace/arx_fork" />
+	<property name="subframe" value="/Users/jeanzi/dev/workspace/subframe_fork" />
+	-->
+	
 	<!-- johanna -->
 	<property name="arx" value="C:\IDE\eclipse_kepler\arx\arx-fork" />
 	<property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" />
