@@ -1,5 +1,9 @@
 @echo off
-Set _path=C:\IDE\eclipse_kepler\arx\anonbench-fork
+
+rem Helmut
+Set _path=C:\dev\workspace-arx\anonbench-fork
+
+
 Set _worklist_path=%_path%\cluster-worklists
 Set _commandfile=%_path%\scripts\plink-commands.txt
 Set _heurakles_jar_name=heurakles-bench.jar
