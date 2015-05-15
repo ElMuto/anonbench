@@ -22,6 +22,8 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +56,7 @@ import de.linearbits.subframe.graph.PlotLinesClustered;
 import de.linearbits.subframe.graph.Point3D;
 import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
+import de.linearbits.subframe.io.CSVLine;
 import de.linearbits.subframe.render.GnuPlotParams;
 import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 import de.linearbits.subframe.render.LaTeX;
@@ -129,10 +132,10 @@ public class BenchmarkAnalysis {
     public static void main(String[] args) throws IOException, ParseException {
         // generateTables();
         // generateConventionalPlots();
-//        generateHeuristicsComparisonGeoMean();
-         generateHeuristicsComparison();
+        // generateHeuristicsComparisonGeoMean();
+        // generateHeuristicsComparison();
         // generateQICountScalingPlots();
-        // generateFlashComparisonPlots();
+        printFlashComparisonTableTexCode();
         // generateHeuraklesSelfComparisonPlots();
     }
 
@@ -231,10 +234,10 @@ public class BenchmarkAnalysis {
                 // for each suppression
                 for (double suppr : benchmarkConfiguration.getSuppression()) {
                     String suppression = String.valueOf(suppr);
-                    
-                    //FIXME temporary fix
-                    if(metric.getName().equals("Average equivalence class size") && suppr == 0.1 || metric.getName().equals("Loss") && suppr == 0.0)
-                        continue;
+
+                    // FIXME temporary fix
+                    if (metric.getName().equals("Average equivalence class size") && suppr == 0.1 || metric.getName().equals("Loss") &&
+                        suppr == 0.0) continue;
 
                     for (VARIABLES variable : variables) {
                         boolean xGroupPercent = false;
@@ -436,17 +439,104 @@ public class BenchmarkAnalysis {
         }
     }
 
-    /**
-     * Generate the plots for the flash comparison benchmark
-     * @throws IOException
-     * @throws ParseException
-     */
-    private static void generateFlashComparisonPlots() throws IOException, ParseException {
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    // /**
+    // * Generate the plots for the flash comparison benchmark
+    // * @throws IOException
+    // * @throws ParseException
+    // */
+    // private static void generateFlashComparisonPlots() throws IOException, ParseException {
+    // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    //
+    // BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+    // try {
+    // benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    //
+    // Double[] suppressions = benchmarkConfiguration.getSuppression();
+    // BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
+    // Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
+    // List<String> criteria = benchmarkConfiguration.getCriteria();
+    //
+    // List<Algorithm> algorithms = new ArrayList<Algorithm>();
+    // algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES_DFS, null));
+    //
+    // if (suppressions.length == 0 || algorithms.size() == 0 || datasets.length == 0) {
+    // return;
+    // }
+    //
+    // String focus = VARIABLES.DATASET.val;
+    //
+    // // create one file with several plots
+    // List<PlotGroup> groups = new ArrayList<PlotGroup>();
+    //
+    // // for each suppression
+    // for (double suppr : suppressions) {
+    // String suppression = String.valueOf(suppr);
+    //
+    // // for each criteria
+    // for (String scriteria : criteria) {
+    //
+    // // for each metric
+    // for (Metric<?> metric : metrics) {
+    //
+    // boolean xGroupPercent = false;
+    // PlotGroupData data = getGroupData(file,
+    // new VARIABLES[] {
+    // // VARIABLES.EXHAUSTIVE_SEARCH_TIME,
+    // VARIABLES.EXECUTION_TIME,
+    // VARIABLES.SOLUTION_DISCOVERY_TIME },
+    // new String[] {
+    // // Analyzer.ARITHMETIC_MEAN,
+    // Analyzer.ARITHMETIC_MEAN,
+    // Analyzer.ARITHMETIC_MEAN },
+    // VARIABLES.INFORMATION_LOSS_ADDITIONAL,
+    // Analyzer.VALUE,
+    // focus,
+    // scriteria,
+    // suppression,
+    // datasets,
+    // algorithms,
+    // metric,
+    // 2.0d,
+    // xGroupPercent,
+    // null);
+    //
+    // Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
+    // List<Plot<?>> plots = new ArrayList<Plot<?>>();
+    // plots.add(new PlotHistogramClustered("", labels, data.series));
+    // String caption = "Execution time of Flash, Solution discovery time and Additional information loss of Heurakles for criterium 5-anonymity " +
+    // " using information loss metric \"" +
+    // metric.getName() +
+    // "\" with " +
+    // Double.valueOf(suppression) *
+    // 100d +
+    // "\\%" +
+    // " suppression " +
+    // "listed by \"" +
+    // focus +
+    // "\". The QI Count used for the dataset " +
+    // BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
+    //
+    // groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+    // }
+    // }
+    // }
+    //
+    // if (!groups.isEmpty()) {
+    // LaTeX.plot(groups, "results/results", true);
+    // }
+    // }
+
+    private static void printFlashComparisonTableTexCode() throws IOException, ParseException {
+        // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+        CSVFile file = new CSVFile(new File("resultsHeuraklesBFSDFS.csv"));
 
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
         try {
-            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+            // benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+            benchmarkConfiguration.readBenchmarkConfiguration("worklistHeuraklesBFSDFS.csv");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -455,75 +545,111 @@ public class BenchmarkAnalysis {
         BenchmarkDataset[] datasets = benchmarkConfiguration.getDatasets();
         Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
         List<String> criteria = benchmarkConfiguration.getCriteria();
-
-        List<Algorithm> algorithms = new ArrayList<Algorithm>();
-        algorithms.add(new BenchmarkSetup.Algorithm(AlgorithmType.HEURAKLES_DFS, null));
+        List<Algorithm> algorithms = benchmarkConfiguration.getAlgorithms();
 
         if (suppressions.length == 0 || algorithms.size() == 0 || datasets.length == 0) {
             return;
         }
 
-        String focus = VARIABLES.DATASET.val;
+        // for each criteria
+        for (String scriteria : criteria) {
 
-        // create one file with several plots
-        List<PlotGroup> groups = new ArrayList<PlotGroup>();
+            // for each metric
+            for (Metric<?> metric : metrics) {
 
-        // for each suppression
-        for (double suppr : suppressions) {
-            String suppression = String.valueOf(suppr);
+                System.out.println("\\begin{table}[htb!]");
+                System.out.println("\\center");
+                System.out.println("\\footnotesize");
+                System.out.println("\\tabcolsep 2pt");
+                System.out.println("\\begin{tabular}{|l|r|r|r|r|r|r|r|r|}\\hhline{~--------}");
+                System.out.println("\\multicolumn{1}{c}{} &  \\multicolumn{4}{c}{0\\% Suppression limit} & \\multicolumn{4}{c}{100\\% Suppression limit}\\\\\\hhline{~--------}");
+                System.out.println("Dataset & Flash [s] & Total [s] & Discovery [s] & Utility [\\%] & Flash [s] & Total [s] & Discovery [s] & Utility [\\%] \\\\\\hline");
 
-            // for each criteria
-            for (String scriteria : criteria) {
+                // for each dataset
+                for (BenchmarkDataset dataset : datasets) {
 
-                // for each metric
-                for (Metric<?> metric : metrics) {
+                    Selector<String[]> selector = file.getSelectorBuilder()
+                                                      .field(VARIABLES.DATASET.val)
+                                                      .equals(dataset.toString())
+                                                      .and()
+                                                      .field(VARIABLES.CRITERIA.val)
+                                                      .equals(scriteria)
+                                                      .and()
+                                                      .field(VARIABLES.METRIC.val)
+                                                      .equals(metric.getName())
+                                                      .build();
 
-                    boolean xGroupPercent = false;
-                    PlotGroupData data = getGroupData(file,
-                                                      new VARIABLES[] {
-                                                              // VARIABLES.EXHAUSTIVE_SEARCH_TIME,
-                                                              VARIABLES.EXECUTION_TIME,
-                                                              VARIABLES.SOLUTION_DISCOVERY_TIME },
-                                                      new String[] {
-                                                              // Analyzer.ARITHMETIC_MEAN,
-                                                              Analyzer.ARITHMETIC_MEAN,
-                                                              Analyzer.ARITHMETIC_MEAN },
-                                                      VARIABLES.INFORMATION_LOSS_ADDITIONAL,
-                                                      Analyzer.VALUE,
-                                                      focus,
-                                                      scriteria,
-                                                      suppression,
-                                                      datasets,
-                                                      algorithms,
-                                                      metric,
-                                                      2.0d,
-                                                      xGroupPercent,
-                                                      null);
+                    String flashRuntimeZero = null;
+                    String heuraklesTotalTimeZero = null;
+                    String discoveryTimeZero = null;
+                    String utilityZero = null;
+                    String flashRuntimeFull = null;
+                    String heuraklesTotalTimeFull = null;
+                    String discoveryTimeFull = null;
+                    String utilityFull = null;
 
-                    Labels labels = new Labels(focus, VARIABLES.EXECUTION_TIME.val, "Additional information loss", "");
-                    List<Plot<?>> plots = new ArrayList<Plot<?>>();
-                    plots.add(new PlotHistogramClustered("", labels, data.series));
-                    String caption = "Execution time of Flash, Solution discovery time and Additional information loss of Heurakles for criterium 5-anonymity " +
-                                     " using information loss metric \"" +
-                                     metric.getName() +
-                                     "\" with " +
-                                     Double.valueOf(suppression) *
-                                     100d +
-                                     "\\%" +
-                                     " suppression " +
-                                     "listed by \"" +
-                                     focus +
-                                     "\". The QI Count used for the dataset " +
-                                     BenchmarkDataset.SS13ACS_SEMANTIC.toString().replaceAll("_", "\\\\_") + " was 10.";
+                    Iterator<CSVLine> iter = file.iterator();
+                    while (iter.hasNext()) {
+                        CSVLine csvline = iter.next();
+                        String[] line = csvline.getData();
 
-                    groups.add(new PlotGroup(caption, plots, data.params, 1.0d));
+                        if (selector.isSelected(line)) {
+                            if (csvline.get("", VARIABLES.ALGORITHM.val).equals("Flash")) {
+                                if (csvline.get("", VARIABLES.SUPPRESSION.val).equals("0.0")) {
+                                    flashRuntimeZero = csvline.get(VARIABLES.EXECUTION_TIME.val, "Arithmetic Mean");
+                                } else {
+                                    flashRuntimeFull = csvline.get(VARIABLES.EXECUTION_TIME.val, "Arithmetic Mean");
+                                }
+                            } else {
+                                if (csvline.get("", VARIABLES.SUPPRESSION.val).equals("0.0")) {
+//                                    heuraklesTotalTimeZero = csvline.get(VARIABLES.EXHAUSTIVE_SEARCH_TIME.val, "Arithmetic Mean");
+                                    discoveryTimeZero = csvline.get(VARIABLES.SOLUTION_DISCOVERY_TIME.val, "Arithmetic Mean");
+                                    utilityZero = csvline.get(VARIABLES.INFORMATION_LOSS_ADDITIONAL.val, "Value");
+                                } else {
+//                                    heuraklesTotalTimeFull = csvline.get(VARIABLES.EXHAUSTIVE_SEARCH_TIME.val, "Arithmetic Mean");
+                                    discoveryTimeFull = csvline.get(VARIABLES.SOLUTION_DISCOVERY_TIME.val, "Arithmetic Mean");
+                                    utilityFull = csvline.get(VARIABLES.INFORMATION_LOSS_ADDITIONAL.val, "Value");
+                                }
+                            }
+                        }
+                    }
+
+                    System.out.println(dataset.toString() + " & "
+                                       + (flashRuntimeZero == null ? "---" : round(Double.valueOf(flashRuntimeZero) / 1E9, 3)) + " & "
+//                                       + (heuraklesTotalTimeZero == null ? "---" : round(Double.valueOf(heuraklesTotalTimeZero) / 1E9, 3))
+                                       + " & "
+                                       + (discoveryTimeZero == null ? "---" : round(Double.valueOf(discoveryTimeZero) / 1E9, 3)) + " & "
+                                       + (utilityZero == null ? "---" : 100d - Double.valueOf(utilityZero)) + " & "
+                                       + (flashRuntimeFull == null ? "---" : round(Double.valueOf(flashRuntimeFull) / 1E9, 3)) + " & "
+//                                       + (heuraklesTotalTimeFull == null ? "---" : round(Double.valueOf(heuraklesTotalTimeFull) / 1E9, 3))
+                                       + " & "
+                                       + (discoveryTimeFull == null ? "---" : round(Double.valueOf(discoveryTimeFull) / 1E9, 3)) + " & "
+                                       + (utilityFull == null ? "---" : 100d - Double.valueOf(utilityFull)) + " \\\\");
+                    // System.out.println(dataset + "   & 0.054         &   2.183       & ---           & ---       & 1.169         &   2.009   & 0.077         & 100");
+                    // System.out.println("Cup     & 0.039         &   1.188       & ---           & ---       & 15.574        &   13.292  & 7.722         & 100 \\\\");
+                    // System.out.println("Fars    & 0.065         &   4.321       & ---           & ---       & 2.935         &   4.305   & 0.107         & 100 \\\\");
+                    // System.out.println("Atus    & 0.379         &   106.117     & ---           & ---       & 49.782        &   105.996 & 0.437         & 100 \\\\");
+                    // System.out.println("Ihis    & 1.284         &   55.469      & ---           & ---       & 43.449        &   56.915  & 2.829         & 100 \\\\");
+                    // System.out.println("SS13ACS & 0.196         &   $>$600      & 0.171         & 86.22     & 19.652        &   $>$600  & 0.023         & 100 \\\\\\hline");
+
                 }
+
+                System.out.println("\\end{tabular}");
+                System.out.println("\\caption{Comparison of Flash and Heurakles for " + criteria.toString() + " and " + metric.toString() +
+                                   " utility measure}");
+                System.out.println("\\label{tab:optimal_loss}");
+                System.out.println("\\end{table}");
+                System.out.println("");
             }
         }
+    }
 
-        if (!groups.isEmpty()) {
-            LaTeX.plot(groups, "results/results", true);
-        }
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     private static void generateHeuraklesSelfComparisonPlots() throws IOException, ParseException {
