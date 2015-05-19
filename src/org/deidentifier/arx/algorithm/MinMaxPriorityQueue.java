@@ -2,9 +2,17 @@ package org.deidentifier.arx.algorithm;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Set;
 
+/**
+ * Min-max-queue without duplicates
+ * @author bild
+ *
+ * @param <T>
+ */
 public class MinMaxPriorityQueue<T> extends PriorityQueue<T> {
 
     /** SVUID */
@@ -12,10 +20,12 @@ public class MinMaxPriorityQueue<T> extends PriorityQueue<T> {
 
     private final PriorityQueue<T> queue;
     private final PriorityQueue<T> inverseQueue;
+    private final Set<T>           elements;
 
     public MinMaxPriorityQueue(int initialSize, Comparator<T> comparator) {
         this.queue = new PriorityQueue<T>(initialSize, comparator);
         this.inverseQueue = new PriorityQueue<T>(initialSize, getInverseComparator(comparator));
+        this.elements = new HashSet<T>(initialSize);
     }
 
     private Comparator<? super T> getInverseComparator(final Comparator<T> comparator) {
@@ -71,6 +81,7 @@ public class MinMaxPriorityQueue<T> extends PriorityQueue<T> {
      * Removes the object from both queue and the inverseQueue
      */
     public boolean remove(Object o) {
+        this.elements.remove(o);
         return queue.remove(o) && inverseQueue.remove(0);
     }
 
@@ -111,19 +122,29 @@ public class MinMaxPriorityQueue<T> extends PriorityQueue<T> {
     }
 
     public boolean add(T e) {
-        inverseQueue.add(e);
-        return queue.add(e);
+        if (this.elements.contains(e)) {
+            return false;
+        }
+        this.elements.add(e);
+        this.inverseQueue.add(e);
+        return this.queue.add(e);
     }
 
     public T poll() {
-        T t = queue.poll();
-        inverseQueue.remove(t);
+        T t = this.queue.poll();
+        if (t != null) {
+            this.elements.remove(t);
+            this.inverseQueue.remove(t);
+        }
         return t;
     }
 
     public T removeTail() {
-        T t = inverseQueue.poll();
-        queue.remove(t);
+        T t = this.inverseQueue.poll();
+        if (t != null) {
+            this.queue.remove(t);
+            this.elements.remove(t);
+        }
         return t;
     }
 }

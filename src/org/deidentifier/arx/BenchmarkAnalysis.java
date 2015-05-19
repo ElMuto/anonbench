@@ -530,13 +530,11 @@ public class BenchmarkAnalysis {
     // }
 
     private static void printFlashComparisonTableTexCode() throws IOException, ParseException {
-        // CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-        CSVFile file = new CSVFile(new File("resultsHeuraklesBFSDFS.csv"));
+         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
 
         BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
         try {
-            // benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
-            benchmarkConfiguration.readBenchmarkConfiguration("worklistHeuraklesBFSDFS.csv");
+             benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -849,6 +847,81 @@ public class BenchmarkAnalysis {
         if (!groups.isEmpty()) {
             LaTeX.plot(groups, "results/results", true);
         }
+    }
+    
+    private static void printFastestHeuraklesSelfComparisonRuns() throws IOException, ParseException {
+        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+
+       BenchmarkConfiguration benchmarkConfiguration = new BenchmarkConfiguration();
+       try {
+            benchmarkConfiguration.readBenchmarkConfiguration(BenchmarkSetup.DEFAULT_CONFIGURAITON_FILE);
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+
+       Double[] suppressions = benchmarkConfiguration.getSuppression();
+       Metric<?>[] metrics = benchmarkConfiguration.getMetrics();
+       List<String> criteria = benchmarkConfiguration.getCriteria();
+
+       // for each criteria
+       for (String scriteria : criteria) {
+           
+           for (int qiCount : new int[] {15, 20, 25, 30}) {
+
+           // for each metric
+           for (Metric<?> metric : metrics) {
+               
+               for (Double suppression : suppressions) {
+                   
+                   Long bestTime = Long.MAX_VALUE;
+                   String[] bestLine = new String[] {"NONE FOUND"};
+
+                   Selector<String[]> selector = file.getSelectorBuilder()
+                                                     .field(VARIABLES.CRITERIA.val)
+                                                     .equals(scriteria)
+                                                     .and()
+                                                     .field(VARIABLES.QI_COUNT.val)
+                                                     .equals(String.valueOf(qiCount))
+                                                     .and()
+                                                     .field(VARIABLES.METRIC.val)
+                                                     .equals(metric.getName())
+                                                     .and()
+                                                     .field(VARIABLES.SUPPRESSION.val)
+                                                     .equals(String.valueOf(suppression))
+                                                     .build();
+
+                   Iterator<CSVLine> iter = file.iterator();
+                   while (iter.hasNext()) {
+                       CSVLine csvline = iter.next();
+                       String[] line = csvline.getData();
+
+                       if (selector.isSelected(line)) {
+                           
+                           String timeString = csvline.get(VARIABLES.SOLUTION_DISCOVERY_TIME.val, "Value").substring(1);
+                           timeString = timeString.substring(0, timeString.length() - 1);
+                           String times[] = timeString.split(",");
+
+                           if (times.length > 0) {
+                               try {
+                                   Long latestTime = Long.valueOf(times[times.length - 1].replaceAll(" ", ""));
+                                   bestTime = latestTime;
+                                   bestLine = line;
+                               } catch (Exception e) {}
+                           }
+                       }
+                   }
+                   
+                   String lineString = "";
+                   for (int i = 0; i < bestLine.length; ++i) {
+                       lineString += bestLine[i] + (i == (bestLine.length - 1) ? "" : ";");
+                   }
+                   
+                   System.out.println(lineString);
+
+           }
+           }
+           }
+       }
     }
 
     /**
