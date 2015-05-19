@@ -12,6 +12,10 @@ rem Helmut
 rem Set _path=C:\dev\workspace-arx\anonbench-fork
 
 
+rem Helmut
+rem Set _path=C:\dev\workspace-arx\anonbench-fork
+
+
 Set _merged_file_name=results_merged.csv
 
 
