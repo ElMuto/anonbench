@@ -1,84 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="heurakles-bech" default="release" basedir=".">
-
-	<!-- johanna home
+  
+  <!-- johanna home
 	<property name="arx" value="/Users/jeanzi/dev/workspace/arx_fork" />
 	<property name="subframe" value="/Users/jeanzi/dev/workspace/subframe_fork" />
 	-->
 	
-	<!-- johanna -->
+	<!-- johanna
 	<property name="arx" value="C:\IDE\eclipse_luna\workspace\arx_fork" />
-	<property name="subframe" value="C:\IDE\eclipse_luna\workspace\subfram_fork" />
+	<property name="subframe" value="C:\IDE\eclipse_luna\workspace\subfram_fork" /> -->
 	
-	<!-- raffael
+	<!-- raffael -->
 	<property name="arx" value="C:\IDE\eclipse_kepler\arx\arx-fork" />
-	<property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" /> -->
-
-	<!-- defines the to be included libraries -->
-	<fileset id="lib.jars" dir="${arx}/lib">
-		<or>
-			<filename name="**/colt-1.2.0.jar" />
-			<filename name="**/commons-math3-3.1.1.jar" />
-			<filename name="**/Jama-1.0.2.jar" />
-			<filename name="**/commons-io-2.4.jar" />
-			<filename name="**/commons-codec-1.5.jar" />
-			<filename name="**/commons-logging-1.1.jar" />
-			<filename name="**/dom4j-1.6.1.jar" />
-			<filename name="**/stax-api-1.0.1.jar" />
-			<filename name="**/xmlbeans-2.3.0.jar" />
-			<filename name="**/poi-3.10-FINAL-20140208.jar" />
-			<filename name="**/poi-ooxml-3.10-FINAL-20140208.jar" />
-			<filename name="**/poi-ooxml-schemas-3.10-FINAL-20140208.jar" />
-			<filename name="**/junit-4.11.jar" />
-			<filename name="**/hppc-0.6.0.jar" />
-			<filename name="**/objectselector-0.1-lib.jar" />
-			<filename name="**/univocity-parsers-1.3.1.jar" />
-			<filename name="**/newtonraphson-0.0.1.jar" />
-		</or>
-	</fileset>
+	<property name="subframe" value="C:\IDE\eclipse_kepler\arx\subframe-fork" />
 
 
-	<target name="release" depends="jars">
-	</target>
+	<!-- Helmut -->
+	<!--property name="arx" value="C:\dev\workspace-arx\arx-fork" />
+	<property name="subframe" value="C:\dev\workspace-arx\subframe-fork" /-->
 
-	<target name="clean">
-		<delete dir="build" failonerror="true" />
-	</target>
+  <!-- defines the to be included libraries -->
+  <fileset id="lib.jars" dir="${arx}/lib">
+    <or>
+      <filename name="**/colt-1.2.0.jar" />
+      <filename name="**/commons-math3-3.1.1.jar" />
+      <filename name="**/Jama-1.0.2.jar" />
+      <filename name="**/commons-io-2.4.jar" />
+      <filename name="**/commons-codec-1.5.jar" />
+      <filename name="**/commons-logging-1.1.jar" />
+      <filename name="**/dom4j-1.6.1.jar" />
+      <filename name="**/stax-api-1.0.1.jar" />
+      <filename name="**/xmlbeans-2.3.0.jar" />
+      <filename name="**/poi-3.10-FINAL-20140208.jar" />
+      <filename name="**/poi-ooxml-3.10-FINAL-20140208.jar" />
+      <filename name="**/poi-ooxml-schemas-3.10-FINAL-20140208.jar" />
+      <filename name="**/junit-4.11.jar" />
+      <filename name="**/hppc-0.6.0.jar" />
+      <filename name="**/objectselector-0.1-lib.jar" />
+      <filename name="**/univocity-parsers-1.3.1.jar" />
+      <filename name="**/newtonraphson-0.0.1.jar" />
+    </or>
+  </fileset>
 
-	<target name="prepare" depends="clean">
-		<mkdir dir="build" />
-	</target>
 
-	<target name="compile" depends="prepare" description="compile the source ">
-		<javac includeantruntime="false" srcdir="src/" destdir="build/">
-			<classpath>
-				<path path="${subframe}/bin/" />
-				<path path="${arx}/bin/" />
-				<path path="src/" />
-				<fileset refid="lib.jars" />
-			</classpath>
-		</javac>
-	</target>
+  <target name="release" depends="jars">
+  </target>
 
-	<target name="buildExternalLibs">
-		<jar jarfile="build/extLibs/lib.jar">
-			<zipgroupfileset refid="lib.jars" />
-		</jar>
-	</target>
+  <target name="clean">
+    <delete dir="build" failonerror="true" />
+  </target>
 
-	<target name="jars" depends="compile,buildExternalLibs">
-		<jar destfile="heurakles-bench.jar" duplicate="preserve">
-			<fileset dir="build" defaultexcludes="no" />
+  <target name="prepare" depends="clean">
+    <mkdir dir="build" />
+  </target>
 
-			<fileset dir="${subframe}/bin/" defaultexcludes="no" />
-			<fileset dir="${arx}/bin/" defaultexcludes="no" />
+  <target name="compile" depends="prepare" description="compile the source ">
+    <javac includeantruntime="false" srcdir="src/" destdir="build/">
+      <classpath>
+        <path path="${subframe}/bin/" />
+        <path path="${arx}/bin/" />
+        <path path="src/" />
+        <fileset refid="lib.jars" />
+      </classpath>
+    </javac>
+  </target>
 
-			<zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+  <target name="buildExternalLibs">
+    <jar jarfile="build/extLibs/lib.jar">
+      <zipgroupfileset refid="lib.jars" />
+    </jar>
+  </target>
 
-			<manifest>
-				<attribute name="Main-Class" value="org.deidentifier.arx.BenchmarkMain" />
-			</manifest>
-		</jar>
-		<delete dir="build" failonerror="true" />
-	</target>
+  <target name="jars" depends="compile,buildExternalLibs">
+    <jar destfile="heurakles-bench.jar" duplicate="preserve">
+      <fileset dir="build" defaultexcludes="no" />
+
+      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
+      <fileset dir="${arx}/bin/" defaultexcludes="no" />
+
+      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+
+      <manifest>
+        <attribute name="Main-Class" value="org.deidentifier.arx.BenchmarkMain" />
+      </manifest>
+    </jar>
+    <delete dir="build" failonerror="true" />
+  </target>
 </project>
