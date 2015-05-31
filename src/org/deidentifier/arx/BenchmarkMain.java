@@ -40,21 +40,14 @@ import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyze
 public class BenchmarkMain {
 
     /** Repetitions */
-    private static final int       REPETITIONS       = 3;
+    private static final int       REPETITIONS       = 1;
     /** The benchmark instance */
     private static final Benchmark BENCHMARK         = new Benchmark(new String[] { "Algorithm", "Dataset", "Criteria" });
-    /** Label for execution times */
-    public static final int        EXECUTION_TIME    = BENCHMARK.addMeasure("Execution time");
-    /** Label for number of checks */
-    public static final int        NUMBER_OF_CHECKS  = BENCHMARK.addMeasure("Number of checks");
-    /** Label for number of roll-ups */
-    public static final int        NUMBER_OF_ROLLUPS = BENCHMARK.addMeasure("Number of rollups");
+    /** Label for utility */
+    public static final int        UTILITY    = BENCHMARK.addMeasure("Utility Best");
 
     static {
-        BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
-        BENCHMARK.addAnalyzer(EXECUTION_TIME, new BufferedStandardDeviationAnalyzer(REPETITIONS));
-        BENCHMARK.addAnalyzer(NUMBER_OF_CHECKS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
-        BENCHMARK.addAnalyzer(NUMBER_OF_ROLLUPS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(UTILITY, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
     }
 
     /**

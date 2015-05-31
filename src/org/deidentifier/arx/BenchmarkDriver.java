@@ -87,11 +87,8 @@ public class BenchmarkDriver {
         AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm);
 
         // Execute
-        if (!warmup) benchmark.startTimer(BenchmarkMain.EXECUTION_TIME);
         implementation.traverse();
-        if (!warmup) benchmark.addStopTimer(BenchmarkMain.EXECUTION_TIME);
-        if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_CHECKS, implementation.getNumChecks());
-        if (!warmup) benchmark.addValue(BenchmarkMain.NUMBER_OF_ROLLUPS, implementation.getNumRollups());
+        if (!warmup) benchmark.addValue(BenchmarkMain.UTILITY, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
     }
 
     /**
