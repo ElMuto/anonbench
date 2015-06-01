@@ -28,6 +28,7 @@ import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
+import org.deidentifier.arx.metric.Metric.AggregateFunction;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -196,7 +197,8 @@ public class BenchmarkSetup {
     public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
-        config.setMetric(Metric.createEntropyMetric(true));
+//        config.setMetric(Metric.createEntropyMetric(true));
+        config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
         config.setMaxOutliers(suppFactor);
         
         for (BenchmarkCriterion c : criteria) {
