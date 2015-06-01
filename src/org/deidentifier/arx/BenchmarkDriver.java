@@ -30,6 +30,7 @@ import org.deidentifier.arx.algorithm.AlgorithmBFS;
 import org.deidentifier.arx.algorithm.AlgorithmDFS;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.algorithm.AlgorithmIncognito;
+import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
 import org.deidentifier.arx.algorithm.AlgorithmOLA;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
@@ -88,7 +89,15 @@ public class BenchmarkDriver {
 
         // Execute
         implementation.traverse();
-        if (!warmup) benchmark.addValue(BenchmarkMain.UTILITY, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+        if (!warmup) {
+            if (implementation instanceof AlgorithmInformationLossBounds) {
+                benchmark.addValue(BenchmarkMain.INFO_LOSS_MIN, Double.valueOf(((AlgorithmInformationLossBounds)implementation).getGlobalMinimum().getInformationLoss().toString()));
+                benchmark.addValue(BenchmarkMain.INFO_LOSS_MAX, Double.valueOf(((AlgorithmInformationLossBounds)implementation).getGlobalMaximum().getInformationLoss().toString()));
+            } else {
+                benchmark.addValue(BenchmarkMain.INFO_LOSS_MIN, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+                benchmark.addValue(BenchmarkMain.INFO_LOSS_MAX, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+            }
+        }
     }
 
     /**
@@ -189,6 +198,9 @@ public class BenchmarkDriver {
             break;
         case OLA:
             implementation = new AlgorithmOLA(lattice, checker);
+            break;
+        case INFORMATION_LOSS_BOUNDS:
+            implementation = new AlgorithmInformationLossBounds(lattice, checker);
             break;
         default:
             throw new RuntimeException("Invalid algorithm");

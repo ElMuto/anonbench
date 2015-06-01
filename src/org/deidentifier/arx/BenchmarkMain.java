@@ -43,11 +43,14 @@ public class BenchmarkMain {
     private static final int       REPETITIONS       = 1;
     /** The benchmark instance */
     private static final Benchmark BENCHMARK         = new Benchmark(new String[] { "Algorithm", "Dataset", "Criteria" });
-    /** Label for utility */
-    public static final int        UTILITY    = BENCHMARK.addMeasure("Utility Best");
+    /** Label for minimum utility */
+    public static final int        INFO_LOSS_MIN    = BENCHMARK.addMeasure("Info Loss Min");
+    /** Label for minimum utility */
+    public static final int        INFO_LOSS_MAX    = BENCHMARK.addMeasure("Info Loss Max");
 
     static {
-        BENCHMARK.addAnalyzer(UTILITY, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(INFO_LOSS_MIN, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(INFO_LOSS_MAX, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
     }
 
     /**
