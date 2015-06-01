@@ -34,6 +34,8 @@ import org.deidentifier.arx.metric.Metric;
  * @author Fabian Prasser
  */
 public class BenchmarkSetup {
+    
+    static String RESULTS_FILE="results/results.csv";
 
     public static enum BenchmarkAlgorithm {
         BFS {

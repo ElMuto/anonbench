@@ -90,13 +90,7 @@ public class BenchmarkDriver {
         // Execute
         implementation.traverse();
         if (!warmup) {
-            if (implementation instanceof AlgorithmInformationLossBounds) {
-                benchmark.addValue(BenchmarkMain.INFO_LOSS_MIN, Double.valueOf(((AlgorithmInformationLossBounds)implementation).getGlobalMinimum().getInformationLoss().toString()));
-                benchmark.addValue(BenchmarkMain.INFO_LOSS_MAX, Double.valueOf(((AlgorithmInformationLossBounds)implementation).getGlobalMaximum().getInformationLoss().toString()));
-            } else {
-                benchmark.addValue(BenchmarkMain.INFO_LOSS_MIN, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
-                benchmark.addValue(BenchmarkMain.INFO_LOSS_MAX, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
-            }
+            benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
         }
     }
 

@@ -42,15 +42,12 @@ public class BenchmarkMain {
     /** Repetitions */
     private static final int       REPETITIONS       = 1;
     /** The benchmark instance */
-    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { "Algorithm", "Dataset", "Criteria" });
+    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { "Dataset", "Criteria" });
     /** Label for minimum utility */
-    public static final int        INFO_LOSS_MIN    = BENCHMARK.addMeasure("Info Loss Min");
-    /** Label for minimum utility */
-    public static final int        INFO_LOSS_MAX    = BENCHMARK.addMeasure("Info Loss Max");
+    public static final int        INFO_LOSS    = BENCHMARK.addMeasure("Info Loss");
 
     static {
-        BENCHMARK.addAnalyzer(INFO_LOSS_MIN, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
-        BENCHMARK.addAnalyzer(INFO_LOSS_MAX, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
+        BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
     }
 
     /**
@@ -79,7 +76,7 @@ public class BenchmarkMain {
                     System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + Arrays.toString(criteria));
 
                     // Benchmark
-                    BENCHMARK.addRun(algorithm.toString(), data.toString(), Arrays.toString(criteria));
+                    BENCHMARK.addRun(data.toString(), Arrays.toString(criteria));
                     
                     // Repeat
                     for (int i = 0; i < REPETITIONS; i++) {
