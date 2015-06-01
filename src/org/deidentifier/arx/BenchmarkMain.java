@@ -43,7 +43,7 @@ public class BenchmarkMain {
     /** Repetitions */
     private static final int       REPETITIONS       = 1;
     /** The benchmark instance */
-    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { VARIABLES.DATASET.toString(), VARIABLES.CRITERIA.toString() });
+    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { VARIABLES.SUPPRESSION_FACTOR.toString(), VARIABLES.DATASET.toString(), VARIABLES.CRITERIA.toString() });
     /** Label for minimum utility */
     public static final int        INFO_LOSS    = BENCHMARK.addMeasure(VARIABLES.INFO_LOSS.toString());
 
@@ -63,31 +63,35 @@ public class BenchmarkMain {
 
         // For each algorithm
         for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
-            
-            // For each dataset
-            for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
-                
-                // For each combination of criteria
-                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
-                    // Warmup run
-                    driver.anonymize(data, criteria, algorithm, true);
+        	// for each suppression factor
+        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-                    // Print status info
-                    System.out.println("Running: " + algorithm.toString() + " / " + data.toString() + " / " + Arrays.toString(criteria));
+        		// For each dataset
+        		for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
-                    // Benchmark
-                    BENCHMARK.addRun(data.toString(), Arrays.toString(criteria));
-                    
-                    // Repeat
-                    for (int i = 0; i < REPETITIONS; i++) {
-                        driver.anonymize(data, criteria, algorithm, false);
-                    }
-                    
-                    // Write results incrementally
-                    BENCHMARK.getResults().write(new File("results/results.csv"));
-                }
-            }
+        			// For each combination of criteria
+        			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+
+        				// Warmup run
+        				driver.anonymize(data, criteria, algorithm, suppFactor, true);
+
+        				// Print status info
+        				System.out.println("Running: " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+
+        				// Benchmark
+        				BENCHMARK.addRun(String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
+
+        				// Repeat
+        				for (int i = 0; i < REPETITIONS; i++) {
+        					driver.anonymize(data, criteria, algorithm, suppFactor, false);
+        				}
+
+        				// Write results incrementally
+        				BENCHMARK.getResults().write(new File("results/results.csv"));
+        			}
+        		}
+        	}
         }
     }
 }

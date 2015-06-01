@@ -56,6 +56,12 @@ public class BenchmarkSetup {
                 return "Info Loss";
             }
         },
+        SUPPRESSION_FACTOR {
+            @Override
+            public String toString() {
+                return "Suppression Factor";
+            }
+        },
     }
 
     public static enum BenchmarkAlgorithm {
@@ -171,6 +177,14 @@ public class BenchmarkSetup {
 //                BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS
         };
     }
+    
+    /**
+     * Returns all suppression factors
+     * @return
+     */
+    public static double[] getSuppressionFactors() {    	
+    	return new double[] {0.0d, 0.05d, 0.1d, 1.0d};
+    }
 
     /**
      * Returns a configuration for the ARX framework
@@ -179,11 +193,11 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         config.setMetric(Metric.createEntropyMetric(true));
-        config.setMaxOutliers(0d);
+        config.setMaxOutliers(suppFactor);
         
         for (BenchmarkCriterion c : criteria) {
             switch (c) {

@@ -82,10 +82,11 @@ public class BenchmarkDriver {
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
+                          double suppFactor,
                           boolean warmup) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor);
 
         // Execute
         implementation.traverse();
@@ -105,10 +106,11 @@ public class BenchmarkDriver {
      */
     public TestConfiguration test(BenchmarkDataset dataset,
                                   BenchmarkCriterion[] criteria,
-                                  BenchmarkAlgorithm algorithm) throws IOException {
+                                  BenchmarkAlgorithm algorithm,
+                                  double suppFactor) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor);
 
         // Execute
         implementation.traverse();
@@ -130,10 +132,11 @@ public class BenchmarkDriver {
      */
     private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
-                                                         BenchmarkAlgorithm algorithm) throws IOException {
+                                                         BenchmarkAlgorithm algorithm,
+                                                         double suppFactor) throws IOException {
         // Prepare
         Data data = BenchmarkSetup.getData(dataset, criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, criteria);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, criteria);
         DataHandle handle = data.getHandle();
 
         // Encode

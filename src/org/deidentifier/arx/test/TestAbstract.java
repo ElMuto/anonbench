@@ -74,7 +74,8 @@ public abstract class TestAbstract extends TestCase {
             // Collect
             TestConfiguration result = driver.test(config.dataset, 
                                                    config.criteria, 
-                                                   algorithm);
+                                                   algorithm,
+                                                   BenchmarkSetup.getSuppressionFactors()[0]);
             // Check
             assertEquals(algorithm + ": Information loss doesn't match", config.informationLoss, result.informationLoss);
             assertTrue(algorithm + ": Transformation doesn't match", Arrays.equals(result.transformation, config.transformation));
