@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
+import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
 
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
@@ -42,9 +43,9 @@ public class BenchmarkMain {
     /** Repetitions */
     private static final int       REPETITIONS       = 1;
     /** The benchmark instance */
-    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { "Dataset", "Criteria" });
+    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { VARIABLES.DATASET.toString(), VARIABLES.CRITERIA.toString() });
     /** Label for minimum utility */
-    public static final int        INFO_LOSS    = BENCHMARK.addMeasure("Info Loss");
+    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(VARIABLES.INFO_LOSS.toString());
 
     static {
         BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));

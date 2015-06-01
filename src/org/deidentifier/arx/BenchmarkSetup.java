@@ -36,6 +36,27 @@ import org.deidentifier.arx.metric.Metric;
 public class BenchmarkSetup {
     
     static String RESULTS_FILE="results/results.csv";
+    
+    public static enum VARIABLES {
+        DATASET {
+            @Override
+            public String toString() {
+                return "Dataset";
+            }
+        },
+        CRITERIA {
+            @Override
+            public String toString() {
+                return "Criteria";
+            }
+        },
+        INFO_LOSS {
+            @Override
+            public String toString() {
+                return "Info Loss";
+            }
+        },
+    }
 
     public static enum BenchmarkAlgorithm {
         BFS {
