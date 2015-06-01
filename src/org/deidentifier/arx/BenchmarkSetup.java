@@ -140,12 +140,12 @@ public class BenchmarkSetup {
      */
     public static BenchmarkAlgorithm[] getAlgorithms() {
         return new BenchmarkAlgorithm[] { 
-//                BenchmarkAlgorithm.FLASH,
+                BenchmarkAlgorithm.FLASH,
 //                BenchmarkAlgorithm.OLA,
 //                BenchmarkAlgorithm.INCOGNITO,
 //                BenchmarkAlgorithm.DFS,
 //                BenchmarkAlgorithm.BFS,
-                BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS
+//                BenchmarkAlgorithm.INFORMATION_LOSS_BOUNDS
         };
     }
 
