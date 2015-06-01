@@ -131,6 +131,12 @@ public class BenchmarkSetup {
                 return "Ihis";
             }
         },
+        INFORMATION_LOSS_BOUNDS {
+            @Override
+            public String toString() {
+                return "Information Loss Bounds";
+            }
+        },
     }
 
     /**
