@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmBFS;
 import org.deidentifier.arx.algorithm.AlgorithmDFS;
@@ -79,7 +78,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public void anonymize(BenchmarkDataset dataset,
+    public void anonymize(QiConfiguredDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
                           double suppFactor,
@@ -91,7 +90,12 @@ public class BenchmarkDriver {
         // Execute
         implementation.traverse();
         if (!warmup) {
-            benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+            if (implementation.getGlobalOptimum() != null) {
+                benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+            } else {
+                System.out.println("No solution found");
+                benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND);
+            }
         }
     }
 
@@ -104,7 +108,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public TestConfiguration test(BenchmarkDataset dataset,
+    public TestConfiguration test(QiConfiguredDataset dataset,
                                   BenchmarkCriterion[] criteria,
                                   BenchmarkAlgorithm algorithm,
                                   double suppFactor) throws IOException {
@@ -130,12 +134,12 @@ public class BenchmarkDriver {
      * @return
      * @throws IOException
      */
-    private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
+    private AbstractBenchmarkAlgorithm getImplementation(QiConfiguredDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          BenchmarkAlgorithm algorithm,
                                                          double suppFactor) throws IOException {
         // Prepare
-        Data data = BenchmarkSetup.getData(dataset, criteria);
+        Data data = dataset.toArxData(criteria);
         ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, criteria);
         DataHandle handle = data.getHandle();
 

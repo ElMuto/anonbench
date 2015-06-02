@@ -20,8 +20,8 @@
 
 package org.deidentifier.arx.test;
 
+import org.deidentifier.arx.QiConfiguredDataset;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 
 /**
  * Represents a test case
@@ -31,7 +31,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
  */
 public class TestConfiguration {
 
-    public BenchmarkDataset     dataset;
+    public QiConfiguredDataset     dataset;
     public BenchmarkCriterion[] criteria;
     public String               informationLoss;
     public int[]                transformation;
@@ -46,7 +46,7 @@ public class TestConfiguration {
      * @param informationLoss
      * @param transformation
      */
-    public TestConfiguration(BenchmarkDataset dataset,
+    public TestConfiguration(QiConfiguredDataset dataset,
                              BenchmarkCriterion[] criteria,
                              String informationLoss,
                              int[] transformation) {
@@ -61,7 +61,7 @@ public class TestConfiguration {
         
         StringBuilder builder = new StringBuilder();
         builder.append("TestConfiguration(");
-        builder.append("BenchmarkDataset.").append(dataset.name());
+        builder.append("BenchmarkDataset.").append(dataset.toString());
         builder.append(", new BenchmarkCriterion[]{");
         for (int i=0; i<criteria.length; i++) {
             builder.append("BenchmarkCriterion.").append(criteria[i].name());

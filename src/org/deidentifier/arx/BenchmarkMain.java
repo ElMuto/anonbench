@@ -26,12 +26,10 @@ import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
 
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
-import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyzer;
 
 /**
  * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
@@ -41,9 +39,9 @@ import de.linearbits.subframe.analyzer.buffered.BufferedStandardDeviationAnalyze
 public class BenchmarkMain {
 
     /** Repetitions */
-    private static final int       REPETITIONS       = 1;
+    private static final int       REPETITIONS  = 1;
     /** The benchmark instance */
-    private static final Benchmark BENCHMARK         = new Benchmark(new String[] { VARIABLES.SUPPRESSION_FACTOR.toString(), VARIABLES.DATASET.toString(), VARIABLES.CRITERIA.toString() });
+    private static final Benchmark BENCHMARK    = new Benchmark(new String[] { VARIABLES.SUPPRESSION_FACTOR.toString(), VARIABLES.DATASET.toString(), VARIABLES.CRITERIA.toString() });
     /** Label for minimum utility */
     public static final int        INFO_LOSS    = BENCHMARK.addMeasure(VARIABLES.INFO_LOSS.toString());
 
@@ -59,39 +57,38 @@ public class BenchmarkMain {
      */
     public static void main(String[] args) throws IOException {
 
+        EvaluateCriteriaWithDifferentSuppressionValues();
+    }
+
+    private static void EvaluateCriteriaWithDifferentSuppressionValues() throws IOException {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
 
-        // For each algorithm
-        for (BenchmarkAlgorithm algorithm : BenchmarkSetup.getAlgorithms()) {
+        BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.FLASH;
 
-        	// for each suppression factor
-        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+        // for each suppression factor
+        for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-        		// For each dataset
-        		for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+            // For each dataset
+            for (QiConfiguredDataset data : BenchmarkSetup.getDatasets()) {
 
-        			// For each combination of criteria
-        			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+                // For each combination of criteria
+                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
-        				// Warmup run
-        				driver.anonymize(data, criteria, algorithm, suppFactor, true);
+                    // Print status info
+                    System.out.println("Running: " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
 
-        				// Print status info
-        				System.out.println("Running: " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+                    // Benchmark
+                    BENCHMARK.addRun(String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
 
-        				// Benchmark
-        				BENCHMARK.addRun(String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
+                    // Repeat
+                    for (int i = 0; i < REPETITIONS; i++) {
+                        driver.anonymize(data, criteria, algorithm, suppFactor, false);
+                    }
 
-        				// Repeat
-        				for (int i = 0; i < REPETITIONS; i++) {
-        					driver.anonymize(data, criteria, algorithm, suppFactor, false);
-        				}
-
-        				// Write results incrementally
-        				BENCHMARK.getResults().write(new File("results/results.csv"));
-        			}
-        		}
-        	}
+                    // Write results incrementally
+                    BENCHMARK.getResults().write(new File("results/results.csv"));
+                }
+            }
         }
     }
 }
