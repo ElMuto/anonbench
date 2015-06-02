@@ -38,6 +38,11 @@ public class BenchmarkSetup {
 
     static String RESULTS_FILE="results/results.csv";
     static double NO_SOULUTION_FOUND=-1d;
+    
+    
+    /**
+     * the metric used for our benchmarks
+     */
     static BenchmarkMetric metric = BenchmarkMetric.ENTROPY;
     
     /**
