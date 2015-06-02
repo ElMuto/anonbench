@@ -58,6 +58,8 @@ public class BenchmarkMain {
     public static void main(String[] args) throws IOException {
 
         EvaluateCriteriaWithDifferentSuppressionValues();
+        
+        System.out.println("done.");
     }
 
     private static void EvaluateCriteriaWithDifferentSuppressionValues() throws IOException {
