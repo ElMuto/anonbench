@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="heurakles-bech" default="release" basedir=".">
 
-	<property name="arx" value="C:\dev\workspace-arx\arx" />
-	<property name="subframe" value="C:\dev\workspace-arx\subframe" />
+	<!-- Helmut Zuhause -->
+	<property name="arx" value="E:\dev\workspace\arx" />
+	<property name="subframe" value="E:\dev\workspace\subframe" />
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">

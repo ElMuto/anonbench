@@ -1,6 +1,7 @@
 @echo off
 
-Set _path=C:\dev\workspace-arx\anonbench-fork
+Rem Helmut Zuhause
+Set _path=E:\dev\workspace\anonbench_fork
 
 Set _commandfile=%_path%\scripts\plink-commands.txt
 Set _benchmark_jar_name=pc-bench.jar
