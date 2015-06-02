@@ -38,7 +38,7 @@ public class BenchmarkSetup {
 
     static String RESULTS_FILE="results/results.csv";
     static double NO_SOULUTION_FOUND=-1d;
-    static BenchmarkMetric metric = BenchmarkMetric.LOSS;
+    static BenchmarkMetric metric = BenchmarkMetric.ENTROPY;
     
     /**
      * Returns all suppression factors
