@@ -37,15 +37,16 @@ import org.deidentifier.arx.QiConfiguredDataset.BenchmarkDatafile;;
 public class BenchmarkSetup {
 
     static String RESULTS_FILE="results/results.csv";
-    static double NO_SOULUTION_FOUND=-1.0d;
+    static double NO_SOULUTION_FOUND=-1d;
+    static BenchmarkMetric metric = BenchmarkMetric.LOSS;
     
     /**
      * Returns all suppression factors
      * @return
      */
     public static double[] getSuppressionFactors() {        
-//        return new double[] { 0.0d, 0.05d, 0.1d, 1.0d };
-        return new double[] { 0.0d };
+        return new double[] { 0.0d, 0.05d, 0.1d, 1.0d };
+//        return new double[] { 0.0d };
     }
 
     /**
@@ -54,11 +55,11 @@ public class BenchmarkSetup {
      */
     public static QiConfiguredDataset[] getDatasets() {
         return new QiConfiguredDataset[] { 
-//         new QiConfiguredDataset(BenchmarkDatafile.ADULT, null),
-//         new QiConfiguredDataset(BenchmarkDatafile.CUP, null),
-//         new QiConfiguredDataset(BenchmarkDatafile.FARS, null),
-//         new QiConfiguredDataset(BenchmarkDatafile.ATUS, null),
-//         new QiConfiguredDataset(BenchmarkDatafile.IHIS, null),
+         new QiConfiguredDataset(BenchmarkDatafile.ADULT, null),
+         new QiConfiguredDataset(BenchmarkDatafile.CUP, null),
+         new QiConfiguredDataset(BenchmarkDatafile.FARS, null),
+         new QiConfiguredDataset(BenchmarkDatafile.ATUS, null),
+         new QiConfiguredDataset(BenchmarkDatafile.IHIS, null),
          new QiConfiguredDataset(BenchmarkDatafile.ACS13, 10),
                                         };
     }
@@ -175,6 +176,21 @@ public class BenchmarkSetup {
             }
         },
     }
+    
+    private static enum BenchmarkMetric {
+        LOSS {
+            @Override
+            public String toString() {
+                return "Loss with geometric mean";
+            }
+        },
+        ENTROPY {
+            @Override
+            public String toString() {
+                return "Entropy";
+            }
+        }
+    }
 
     /**
      * Returns a configuration for the ARX framework
@@ -186,8 +202,18 @@ public class BenchmarkSetup {
     public static ARXConfiguration getConfiguration(QiConfiguredDataset dataset, double suppFactor, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
-//        config.setMetric(Metric.createEntropyMetric(true));
-        config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
+        
+        switch (metric) {
+        case ENTROPY:
+            config.setMetric(Metric.createEntropyMetric(true));
+            break;
+        case LOSS:
+            config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
+            break;
+        default:
+            throw new RuntimeException("Invalid benchmark metric");
+        }
+        
         config.setMaxOutliers(suppFactor);
         
         for (BenchmarkCriterion c : criteria) {
