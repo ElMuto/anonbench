@@ -94,7 +94,7 @@ public class BenchmarkDriver {
                 benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
             } else {
                 System.out.println("No solution found");
-                benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND);
+                benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
             }
         }
     }

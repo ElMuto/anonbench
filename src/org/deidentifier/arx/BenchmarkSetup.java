@@ -37,7 +37,8 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;;
 public class BenchmarkSetup {
 
     static String RESULTS_FILE="results/results.csv";
-    static double NO_SOULUTION_FOUND=-1d;
+    static double NO_SOULUTION_FOUND_DOUBLE_VAL=-1d;
+    static String NO_SOULUTION_FOUND_STRING_VAL="n.s.f.";
     
     
     /**

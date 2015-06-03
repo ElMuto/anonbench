@@ -35,6 +35,27 @@ import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
 
 public class BenchmarkAnalysis {
+    
+    private enum OutputFormat {
+        LATEX (".pdf", " & "),
+        CSV (".csv", ";");
+        
+        private final String suffix;
+        private final String separator;
+        
+        private OutputFormat (String suffix, String separator) {
+            this.suffix = suffix;
+            this.separator = separator;
+        }
+        
+        public String getSuffix() {
+            return this.suffix;
+        }
+
+        public String getSeparator() {
+            return separator;
+        }
+    }
 
     /**
      * Main
@@ -44,12 +65,13 @@ public class BenchmarkAnalysis {
      */
     public static void main(String[] args) throws IOException, ParseException {
 
-        summarizeCriteriaWithDifferentSuppressionValues();
+        summarizeCriteriaWithDifferentSuppressionValues(OutputFormat.LATEX);
         
     }
     
-    private static void summarizeCriteriaWithDifferentSuppressionValues() throws IOException, ParseException {
+    private static void summarizeCriteriaWithDifferentSuppressionValues(OutputFormat of) throws IOException, ParseException {
         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+        String separString = of.getSeparator();
 
        // put the string representation of the criteria combinations into an arry
        String[] criteriaLabels = new String[BenchmarkSetup.getCriteria().length];
@@ -58,20 +80,18 @@ public class BenchmarkAnalysis {
            criteriaLabels[i++] = Arrays.toString(criteria);
        }
        
-       // print header-line
-	   i = 0;
-	   String line="Suppression Factor;Dataset;";
-	   for (String critLabel : criteriaLabels) {
-		   line += critLabel;
-		   if (i != (criteriaLabels.length - 1)) {
-			   line += ";";
-		   }
-		   i++;
-	   }
-	   System.out.println(line);
+       if (OutputFormat.LATEX.equals(of)) {
+           System.out.println("\\documentclass{article}");
+           System.out.println("\\usepackage{diagbox}");
+           System.out.println("\\begin{document}");
+           System.out.println("\\oddsidemargin = 0 pt");
+       }
 	   
 	   // for each suppression factor
 	   for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+
+	       // print header-line
+	       System.out.println(buildLatexTableHeader(of, criteriaLabels));
 	       
 	       // for each dataset
 	       for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
@@ -93,7 +113,7 @@ public class BenchmarkAnalysis {
 
 	               if (selector.isSelected(csvLine)) {
 	                   Double val = Double.valueOf(csvline.get(VARIABLES.INFO_LOSS.toString(), "Arithmetic Mean"));
-	                   if (val != BenchmarkSetup.NO_SOULUTION_FOUND) {
+	                   if (val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL) {
 	                       if (minVal == null || val < minVal) {
 	                           minVal = val;
 	                       }
@@ -104,7 +124,7 @@ public class BenchmarkAnalysis {
 	               }
 	           }
 
-	           line = (String.valueOf(suppFactor) + ";" + dataset.toString());
+	           String line = (dataset.toString());
 	           for (String critLabel : criteriaLabels) {
 	               selector = file.getSelectorBuilder()
 	                       .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
@@ -124,13 +144,58 @@ public class BenchmarkAnalysis {
 
 	                   if (selector.isSelected(csvLine)) {
 	                       Double val = Double.valueOf(csvline.get(VARIABLES.INFO_LOSS.toString(), "Arithmetic Mean"));
-	                       Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND;
-	                       line += (";" + (new DecimalFormat("#.####")).format(normVal));
+	                       Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
+	                       String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("#.###").format(normVal) : BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
+	                       line += (separString + normString);
 	                   }
 	               }
 	           }
-	           System.out.println(line);
+	           System.out.println(OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line);
+	       }
+	       
+	       if (OutputFormat.LATEX == of) {  // print table footer
+               buildLatexTableFooter(new DecimalFormat("###").format(suppFactor * 100));
 	       }
 	   }
+	   if (OutputFormat.LATEX == of) {
+	       System.out.println("\\end{document}");
+	   }
+    }
+    
+    private static String buildLatexTableHeader(OutputFormat of, String[] criteriaLabels) {
+        String separString = of.getSeparator();
+        String header = "";
+        
+        if (OutputFormat.LATEX == of) {
+            header += "\\begin{center}\n";
+            header += "\\begin{table}[htb!]\n";
+            header += "\\begin{tabular}{ | l | l | c | c | c | c | c | c | c | c | c | c | c | }\n";
+            header += "\\hline\n";
+        }
+        
+
+        int i = 0;
+        header += "\\diagbox{data}{crit.}" + separString;
+        for (String critLabel : criteriaLabels) {
+            header += critLabel;
+            if (i != (criteriaLabels.length - 1)) {
+                header += separString;
+            }
+            i++;
+        }
+        
+        if (OutputFormat.LATEX.equals(of)) {
+            header += "\\\\ \\hline";
+        }
+        
+        return header;
+    }
+
+    private static void buildLatexTableFooter(String captionText) {
+        System.out.println("\\end{tabular}");
+        System.out.println("\\caption{ max. suppression factor " + captionText + " \\%}");
+        System.out.println("\\end{table}");
+        System.out.println("\\end{center}");
+        System.out.println("");
     }
 }
