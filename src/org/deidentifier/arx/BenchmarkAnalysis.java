@@ -127,7 +127,7 @@ public class BenchmarkAnalysis {
 	   for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 	       // print header-line
-	       result += buildLatexTableHeader(of, criteriaLabels);
+	       result += buildTableHeader(of, criteriaLabels);
 	       
 	       // for each dataset
 	       for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
@@ -199,7 +199,7 @@ public class BenchmarkAnalysis {
 	   return result;
     }
     
-    private static String buildLatexTableHeader(OutputFormat of, String[] criteriaLabels) {
+    private static String buildTableHeader(OutputFormat of, String[] criteriaLabels) {
         String separString = of.getSeparator();
         String header = "";
         
