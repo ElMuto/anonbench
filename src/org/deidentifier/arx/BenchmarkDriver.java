@@ -22,6 +22,7 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.deidentifier.arx.BenchmarkConfiguration.AnonConfiguration;
@@ -41,7 +42,6 @@ import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.MaterializedLattice;
 import org.deidentifier.arx.framework.lattice.VirtualLattice;
 
-import cern.colt.Arrays;
 import de.linearbits.subframe.Benchmark;
 
 /**
