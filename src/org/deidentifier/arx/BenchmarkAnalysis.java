@@ -20,8 +20,12 @@
 
 package org.deidentifier.arx;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -37,8 +41,8 @@ import de.linearbits.subframe.io.CSVLine;
 public class BenchmarkAnalysis {
     
     private enum OutputFormat {
-        LATEX (".pdf", " & "),
-        CSV (".csv", ";");
+        LATEX (".tex", " & "),
+        CSV   (".csv", ";");
         
         private final String suffix;
         private final String separator;
@@ -64,12 +68,44 @@ public class BenchmarkAnalysis {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-
-        summarizeCriteriaWithDifferentSuppressionValues(OutputFormat.LATEX);
+        OutputFormat of = OutputFormat.LATEX;
+//        OutputFormat of = OutputFormat.CSV;
         
+        try (Writer writer = new BufferedWriter(
+                    new OutputStreamWriter(
+                        new FileOutputStream(BenchmarkSetup.RESULTS_DIR + "/" + BenchmarkSetup.SUMMARY_FILE_STEM + of.getSuffix()), "utf-8"))) {
+            writer.write(summarizeCriteriaWithDifferentSuppressionValues(of));
+            writer.flush();
+            writer.close();
+        }
+        
+        if (OutputFormat.LATEX.equals(of)) {
+            ProcessBuilder b = new ProcessBuilder();
+            Process p;
+
+            if (new File(BenchmarkSetup.RESULTS_DIR + "/" + BenchmarkSetup.SUMMARY_FILE_STEM + ".tex").exists()) {
+                b.command("pdflatex", "-interaction=errorstopmode", "-quiet", "-output-directory=" + BenchmarkSetup.RESULTS_DIR + "/", BenchmarkSetup.SUMMARY_FILE_STEM + ".tex");
+                p = b.start();
+                StreamReader output = new StreamReader(p.getInputStream());
+                StreamReader error = new StreamReader(p.getErrorStream());
+                new Thread(output).start();
+                new Thread(error).start();
+                try {
+                    p.waitFor();
+                } catch (final InterruptedException e) {
+                    throw new IOException(e);
+                }
+
+                if (p.exitValue() != 0) {
+                    throw new IOException("Error executing pdflatex: " + error.getString() + System.lineSeparator() + output.getString());
+                }
+            }
+        }
     }
     
-    private static void summarizeCriteriaWithDifferentSuppressionValues(OutputFormat of) throws IOException, ParseException {
+    private static String summarizeCriteriaWithDifferentSuppressionValues(OutputFormat of) throws IOException, ParseException {
+        String result = "";
+        
         CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
         String separString = of.getSeparator();
 
@@ -81,17 +117,17 @@ public class BenchmarkAnalysis {
        }
        
        if (OutputFormat.LATEX.equals(of)) {
-           System.out.println("\\documentclass{article}");
-           System.out.println("\\usepackage{diagbox}");
-           System.out.println("\\begin{document}");
-           System.out.println("\\oddsidemargin = 0 pt");
+           result += "\\documentclass{article}\n";
+           result += "\\usepackage{diagbox}\n";
+           result += "\\begin{document}\n";
+           result += "\\oddsidemargin = 0 pt\n";
        }
 	   
 	   // for each suppression factor
 	   for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 	       // print header-line
-	       System.out.println(buildLatexTableHeader(of, criteriaLabels));
+	       result += buildLatexTableHeader(of, criteriaLabels);
 	       
 	       // for each dataset
 	       for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
@@ -150,16 +186,17 @@ public class BenchmarkAnalysis {
 	                   }
 	               }
 	           }
-	           System.out.println(OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line);
+	           result += ((OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line) + "\n");
 	       }
 	       
 	       if (OutputFormat.LATEX == of) {  // print table footer
-               buildLatexTableFooter(new DecimalFormat("###").format(suppFactor * 100));
+               result += buildLatexTableFooter(new DecimalFormat("###").format(suppFactor * 100));
 	       }
 	   }
 	   if (OutputFormat.LATEX == of) {
-	       System.out.println("\\end{document}");
-	   }
+	       result += "\\end{document}\n";
+	   }	   
+	   return result;
     }
     
     private static String buildLatexTableHeader(OutputFormat of, String[] criteriaLabels) {
@@ -175,7 +212,11 @@ public class BenchmarkAnalysis {
         
 
         int i = 0;
-        header += "\\diagbox{data}{crit.}" + separString;
+        
+        if (OutputFormat.LATEX.equals(of)) {
+            header += "\\diagbox{data}{crit.}";
+        }
+        header += separString + "\n";
         for (String critLabel : criteriaLabels) {
             header += critLabel;
             if (i != (criteriaLabels.length - 1)) {
@@ -188,14 +229,18 @@ public class BenchmarkAnalysis {
             header += "\\\\ \\hline";
         }
         
-        return header;
+        return header + "\n";
     }
 
-    private static void buildLatexTableFooter(String captionText) {
-        System.out.println("\\end{tabular}");
-        System.out.println("\\caption{ max. suppression factor " + captionText + " \\%}");
-        System.out.println("\\end{table}");
-        System.out.println("\\end{center}");
-        System.out.println("");
+    private static String buildLatexTableFooter(String captionText) {
+        String result = "";
+        
+        result += "\\end{tabular}\n";
+        result += "\\caption{ max. suppression factor " + captionText + " \\%}\n";
+        result += "\\end{table}\n";
+        result += "\\end{center}\n";
+        result += "";
+        
+        return result;
     }
 }
