@@ -78,7 +78,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public void anonymize(QiConfiguredDataset dataset,
+    public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
                           double suppFactor,
@@ -108,7 +108,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public TestConfiguration test(QiConfiguredDataset dataset,
+    public TestConfiguration test(BenchmarkDataset dataset,
                                   BenchmarkCriterion[] criteria,
                                   BenchmarkAlgorithm algorithm,
                                   double suppFactor) throws IOException {
@@ -134,7 +134,7 @@ public class BenchmarkDriver {
      * @return
      * @throws IOException
      */
-    private AbstractBenchmarkAlgorithm getImplementation(QiConfiguredDataset dataset,
+    private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          BenchmarkAlgorithm algorithm,
                                                          double suppFactor) throws IOException {

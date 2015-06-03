@@ -71,7 +71,7 @@ public class BenchmarkMain {
         for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
             // For each dataset
-            for (QiConfiguredDataset data : BenchmarkSetup.getDatasets()) {
+            for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
                 // For each combination of criteria
                 for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {

@@ -74,7 +74,7 @@ public class BenchmarkAnalysis {
 	   for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 	       
 	       // for each dataset
-	       for (QiConfiguredDataset dataset : BenchmarkSetup.getDatasets()) {
+	       for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 	           Selector<String[]> selector = file.getSelectorBuilder()
                        .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
                        .equals(String.valueOf(suppFactor))

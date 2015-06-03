@@ -18,7 +18,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
      * @author helmut spengler
      *
      */
-    public class QiConfiguredDataset {
+    public class BenchmarkDataset {
         private BenchmarkDatafile datafile = null;
         private Integer customQiCount = null;
                 
@@ -26,7 +26,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @param datafile
          * @param customQiCount
          */
-        public QiConfiguredDataset(BenchmarkDatafile datafile, Integer customQiCount) {
+        public BenchmarkDataset(BenchmarkDatafile datafile, Integer customQiCount) {
             this.datafile = datafile;
             this.customQiCount = customQiCount;
         }
@@ -332,7 +332,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @return
          * @throws IOException
          */
-        public DataSubset getResearchSubset(QiConfiguredDataset dataset) throws IOException {
+        public DataSubset getResearchSubset(BenchmarkDataset dataset) throws IOException {
             switch (dataset.getDatafile()) {
             case ADULT:
                 return DataSubset.create(dataset.toArxData(), Data.create("data/adult_subset.csv", ';'));

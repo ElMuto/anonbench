@@ -28,7 +28,7 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
-import org.deidentifier.arx.QiConfiguredDataset.BenchmarkDatafile;;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -58,14 +58,14 @@ public class BenchmarkSetup {
      * Returns all datasets
      * @return
      */
-    public static QiConfiguredDataset[] getDatasets() {
-        return new QiConfiguredDataset[] { 
-         new QiConfiguredDataset(BenchmarkDatafile.ADULT, null),
-         new QiConfiguredDataset(BenchmarkDatafile.CUP, null),
-         new QiConfiguredDataset(BenchmarkDatafile.FARS, null),
-         new QiConfiguredDataset(BenchmarkDatafile.ATUS, null),
-         new QiConfiguredDataset(BenchmarkDatafile.IHIS, null),
-         new QiConfiguredDataset(BenchmarkDatafile.ACS13, 10),
+    public static BenchmarkDataset[] getDatasets() {
+        return new BenchmarkDataset[] { 
+         new BenchmarkDataset(BenchmarkDatafile.ADULT, null),
+         new BenchmarkDataset(BenchmarkDatafile.CUP, null),
+         new BenchmarkDataset(BenchmarkDatafile.FARS, null),
+         new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
+         new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
+         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
                                         };
     }
 
@@ -204,7 +204,7 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(QiConfiguredDataset dataset, double suppFactor, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         
