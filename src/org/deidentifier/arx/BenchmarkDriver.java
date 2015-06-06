@@ -79,7 +79,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public void anonymize(QiConfiguredDataset dataset,
+    public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
                           double suppFactor,
@@ -96,7 +96,7 @@ public class BenchmarkDriver {
                 benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
             } else {
                 System.out.println("No solution found");
-                benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND);
+                benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
             }
         }
     }
@@ -110,7 +110,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public TestConfiguration test(QiConfiguredDataset dataset,
+    public TestConfiguration test(BenchmarkDataset dataset,
                                   BenchmarkCriterion[] criteria,
                                   BenchmarkAlgorithm algorithm,
                                   double suppFactor) throws IOException {
@@ -136,7 +136,7 @@ public class BenchmarkDriver {
      * @return
      * @throws IOException
      */
-    private AbstractBenchmarkAlgorithm getImplementation(QiConfiguredDataset dataset,
+    private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          BenchmarkAlgorithm algorithm,
                                                          double suppFactor,

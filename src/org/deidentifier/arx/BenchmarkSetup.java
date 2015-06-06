@@ -28,7 +28,7 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
-import org.deidentifier.arx.QiConfiguredDataset.BenchmarkDatafile;;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -36,8 +36,12 @@ import org.deidentifier.arx.QiConfiguredDataset.BenchmarkDatafile;;
  */
 public class BenchmarkSetup {
 
-    static String RESULTS_FILE="results/results.csv";
-    static double NO_SOULUTION_FOUND=-1d;
+    static String RESULTS_DIR = "results";
+    static String RESULTS_FILE_STEM = "results";
+    static String RESULTS_FILE= RESULTS_DIR + "/" + RESULTS_FILE_STEM + ".csv";
+    static String SUMMARY_FILE_STEM="results_summary";
+    static double NO_SOULUTION_FOUND_DOUBLE_VAL=-1d;
+    static String NO_SOULUTION_FOUND_STRING_VAL="n.s.f.";
     
     /**
      * Returns all metrics
@@ -67,14 +71,14 @@ public class BenchmarkSetup {
      * Returns all datasets
      * @return
      */
-    public static QiConfiguredDataset[] getDatasets() {
-        return new QiConfiguredDataset[] { 
-         new QiConfiguredDataset(BenchmarkDatafile.ADULT, null),
-         new QiConfiguredDataset(BenchmarkDatafile.CUP, null),
-         new QiConfiguredDataset(BenchmarkDatafile.FARS, null),
-         new QiConfiguredDataset(BenchmarkDatafile.ATUS, null),
-         new QiConfiguredDataset(BenchmarkDatafile.IHIS, null),
-         new QiConfiguredDataset(BenchmarkDatafile.ACS13, 10),
+    public static BenchmarkDataset[] getDatasets() {
+        return new BenchmarkDataset[] { 
+         new BenchmarkDataset(BenchmarkDatafile.ADULT, null),
+         new BenchmarkDataset(BenchmarkDatafile.CUP, null),
+         new BenchmarkDataset(BenchmarkDatafile.FARS, null),
+         new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
+         new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
+         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
                                         };
     }
 
@@ -243,7 +247,7 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(QiConfiguredDataset dataset, double suppFactor, BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor,  BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         
