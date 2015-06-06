@@ -7,7 +7,7 @@ Rem Helmut Zuhause
 Set _path=E:\dev\workspace\anonbench_fork
 
 Set _merge_host=PCluster-fed3
-Set _cluster_node=3
+Set _cluster_node=2
 
 
 Set _local_results_path=%_path%\results

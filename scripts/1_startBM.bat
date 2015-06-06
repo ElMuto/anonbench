@@ -6,12 +6,13 @@ Rem Set _path=C:\dev\workspace-arx\anonbench-fork
 Rem Helmut Zuhause
 Set _path=E:\dev\workspace\anonbench_fork
 
+Set _cluster_node=2
+Set _remote_dir=/home/imse/pc-bench-helmut
+
 Set _commandfile=%_path%\scripts\plink-commands.txt
 Set _benchmark_jar_name=pc-bench.jar
 Set _benchmark_jar_path=%_path%\%_benchmark_jar_name%
 Set _run_sh_path=%_path%\scripts\run.sh
-Set _cluster_node=3
-Set _remote_dir=/home/imse/pc-bench-helmut
 cd %_path%
 
 echo This batch file also deletes ALL JAR, CSV, LOG files and run.sh!

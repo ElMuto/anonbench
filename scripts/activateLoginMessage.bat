@@ -10,6 +10,6 @@ Set _path=E:\dev\workspace\anonbench_fork
 Set _messageFile=loginMessage.txt
 Set _remoteDir=/home/imse/
 
-pscp %_path%\scripts\%_messageFile% PCluster-fed3:%_remoteDir%/
+pscp %_path%\scripts\%_messageFile% PCluster-fed2:%_remoteDir%/
 
 pause
