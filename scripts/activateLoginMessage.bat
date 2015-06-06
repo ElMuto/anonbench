@@ -1,5 +1,12 @@
 @echo off
-Set _path=C:\dev\workspace-arx\anonbench-fork
+
+Rem Arbeit
+Rem Set _path=C:\dev\workspace-arx\anonbench-fork
+
+Rem Zuhause
+Set _path=E:\dev\workspace\anonbench_fork
+
+
 Set _messageFile=loginMessage.txt
 Set _remoteDir=/home/imse/
 
