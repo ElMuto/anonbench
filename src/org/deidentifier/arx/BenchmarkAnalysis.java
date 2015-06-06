@@ -92,7 +92,7 @@ public class BenchmarkAnalysis {
 	               String[] csvLine = csvline.getData();
 
 	               if (selector.isSelected(csvLine)) {
-	                   Double val = Double.valueOf(csvline.get(VARIABLES.INFO_LOSS.toString(), "Arithmetic Mean"));
+	                   Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
 	                   if (val != BenchmarkSetup.NO_SOULUTION_FOUND) {
 	                       if (minVal == null || val < minVal) {
 	                           minVal = val;
@@ -123,7 +123,7 @@ public class BenchmarkAnalysis {
 	                   String[] csvLine = csvline.getData();
 
 	                   if (selector.isSelected(csvLine)) {
-	                       Double val = Double.valueOf(csvline.get(VARIABLES.INFO_LOSS.toString(), "Arithmetic Mean"));
+	                       Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
 	                       Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND;
 	                       line += (";" + (new DecimalFormat("#.####")).format(normVal));
 	                   }

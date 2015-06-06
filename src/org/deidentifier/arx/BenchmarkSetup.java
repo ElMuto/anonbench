@@ -39,11 +39,20 @@ public class BenchmarkSetup {
     static String RESULTS_FILE="results/results.csv";
     static double NO_SOULUTION_FOUND=-1d;
     
-    
     /**
-     * the metric used for our benchmarks
+     * Returns all metrics
+     * @return
      */
-    static BenchmarkMetric metric = BenchmarkMetric.ENTROPY;
+    public static BenchmarkMetric[] getMetrics() {        
+        return new BenchmarkMetric[] {
+//        		BenchmarkMetric.LOSS,
+//        		BenchmarkMetric.ENTROPY,
+        		BenchmarkMetric.AECS,
+        		BenchmarkMetric.DISCERNABILITY,
+        		BenchmarkMetric.PRECISION,
+        		BenchmarkMetric.HEIGHT
+        		};
+    }
     
     /**
      * Returns all suppression factors
@@ -51,7 +60,7 @@ public class BenchmarkSetup {
      */
     public static double[] getSuppressionFactors() {        
         return new double[] { 0.0d, 0.05d, 0.1d, 0.5d, 1.0d };
-//        return new double[] { 0.0d };
+//        return new double[] { 0.1d };
     }
 
     /**
@@ -90,6 +99,12 @@ public class BenchmarkSetup {
     }
     
     public static enum VARIABLES {
+        UTLITY_METRIC {
+            @Override
+            public String toString() {
+                return "Utility Metric";
+            }
+        },
         DATASET {
             @Override
             public String toString() {
@@ -102,10 +117,10 @@ public class BenchmarkSetup {
                 return "Criteria";
             }
         },
-        INFO_LOSS {
+        UTILITY_VALUE {
             @Override
             public String toString() {
-                return "Info Loss";
+                return "Utility Value";
             }
         },
         SUPPRESSION_FACTOR {
@@ -182,11 +197,11 @@ public class BenchmarkSetup {
         },
     }
     
-    private static enum BenchmarkMetric {
+    static enum BenchmarkMetric {
         LOSS {
             @Override
             public String toString() {
-                return "Loss with geometric mean";
+                return "Loss";
             }
         },
         ENTROPY {
@@ -194,7 +209,31 @@ public class BenchmarkSetup {
             public String toString() {
                 return "Entropy";
             }
-        }
+        },
+        DISCERNABILITY {
+            @Override
+            public String toString() {
+                return "Discernability";
+            }
+        },
+        AECS {
+            @Override
+            public String toString() {
+                return "AECS";
+            }
+        },
+        PRECISION {
+            @Override
+            public String toString() {
+                return "Precision";
+            }
+        },
+        HEIGHT {
+            @Override
+            public String toString() {
+                return "Height";
+            }
+        },
     }
 
     /**
@@ -204,7 +243,7 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(QiConfiguredDataset dataset, double suppFactor, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(QiConfiguredDataset dataset, double suppFactor, BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         
@@ -214,6 +253,18 @@ public class BenchmarkSetup {
             break;
         case LOSS:
             config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
+            break;
+        case AECS:
+            config.setMetric(Metric.createAECSMetric());
+            break;
+        case DISCERNABILITY:
+            config.setMetric(Metric.createDiscernabilityMetric());
+            break;
+        case PRECISION:
+            config.setMetric(Metric.createPrecisionMetric());
+            break;
+        case HEIGHT:
+            config.setMetric(Metric.createHeightMetric());
             break;
         default:
             throw new RuntimeException("Invalid benchmark metric");

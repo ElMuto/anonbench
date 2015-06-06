@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
 import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
 
 import de.linearbits.subframe.Benchmark;
@@ -41,9 +42,15 @@ public class BenchmarkMain {
     /** Repetitions */
     private static final int       REPETITIONS  = 1;
     /** The benchmark instance */
-    private static final Benchmark BENCHMARK    = new Benchmark(new String[] { VARIABLES.SUPPRESSION_FACTOR.toString(), VARIABLES.DATASET.toString(), VARIABLES.CRITERIA.toString() });
+    private static final Benchmark BENCHMARK    = new Benchmark(new String[] {
+    		VARIABLES.UTLITY_METRIC.toString(),
+    		VARIABLES.SUPPRESSION_FACTOR.toString(),
+    		VARIABLES.DATASET.toString(),
+    		VARIABLES.CRITERIA.toString()
+    });
+    
     /** Label for minimum utility */
-    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(VARIABLES.INFO_LOSS.toString());
+    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(VARIABLES.UTILITY_VALUE.toString());
 
     static {
         BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
@@ -67,30 +74,34 @@ public class BenchmarkMain {
 
         BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.FLASH;
 
-        // for each suppression factor
-        for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+        // for each metric
+        for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
 
-            // For each dataset
-            for (QiConfiguredDataset data : BenchmarkSetup.getDatasets()) {
+        	// for each suppression factor
+        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-                // For each combination of criteria
-                for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+        		// For each dataset
+        		for (QiConfiguredDataset data : BenchmarkSetup.getDatasets()) {
 
-                    // Print status info
-                    System.out.println("Running: " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+        			// For each combination of criteria
+        			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
-                    // Benchmark
-                    BENCHMARK.addRun(String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
+        				// Print status info
+        				System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
 
-                    // Repeat
-                    for (int i = 0; i < REPETITIONS; i++) {
-                        driver.anonymize(data, criteria, algorithm, suppFactor, false);
-                    }
+        				// Benchmark
+        				BENCHMARK.addRun(metric.toString(), String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
 
-                    // Write results incrementally
-                    BENCHMARK.getResults().write(new File("results/results.csv"));
-                }
-            }
+        				// Repeat
+        				for (int i = 0; i < REPETITIONS; i++) {
+        					driver.anonymize(data, criteria, algorithm, suppFactor, metric, false);
+        				}
+
+        				// Write results incrementally
+        				BENCHMARK.getResults().write(new File("results/results.csv"));
+        			}
+        		}
+        	}
         }
     }
 }

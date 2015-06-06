@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmBFS;
 import org.deidentifier.arx.algorithm.AlgorithmDFS;
@@ -82,10 +83,11 @@ public class BenchmarkDriver {
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
                           double suppFactor,
+                          BenchmarkMetric metric,
                           boolean warmup) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor, metric);
 
         // Execute
         implementation.traverse();
@@ -114,7 +116,7 @@ public class BenchmarkDriver {
                                   double suppFactor) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor, BenchmarkMetric.LOSS);
 
         // Execute
         implementation.traverse();
@@ -137,10 +139,11 @@ public class BenchmarkDriver {
     private AbstractBenchmarkAlgorithm getImplementation(QiConfiguredDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          BenchmarkAlgorithm algorithm,
-                                                         double suppFactor) throws IOException {
+                                                         double suppFactor,
+                                                         BenchmarkMetric metric) throws IOException {
         // Prepare
         Data data = dataset.toArxData(criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, criteria);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, criteria);
         DataHandle handle = data.getHandle();
 
         // Encode
