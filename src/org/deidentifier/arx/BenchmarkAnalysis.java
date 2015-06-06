@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
 import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
 
 import de.linearbits.objectselector.Selector;
@@ -53,11 +54,11 @@ public class BenchmarkAnalysis {
         }
         
         public String getSuffix() {
-            return this.suffix;
+        	return this.suffix;
         }
 
         public String getSeparator() {
-            return separator;
+        	return separator;
         }
     }
 
@@ -68,131 +69,141 @@ public class BenchmarkAnalysis {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-        OutputFormat of = OutputFormat.LATEX;
-//        OutputFormat of = OutputFormat.CSV;
-        
-        try (Writer writer = new BufferedWriter(
-                    new OutputStreamWriter(
-                        new FileOutputStream(BenchmarkSetup.RESULTS_DIR + "/" + BenchmarkSetup.SUMMARY_FILE_STEM + of.getSuffix()), "utf-8"))) {
-            writer.write(summarizeCriteriaWithDifferentSuppressionValues(of));
-            writer.flush();
-            writer.close();
-        }
-        
-        if (OutputFormat.LATEX.equals(of)) {
-            ProcessBuilder b = new ProcessBuilder();
-            Process p;
+    	OutputFormat of = OutputFormat.LATEX;
+    	//        OutputFormat of = OutputFormat.CSV;
 
-            if (new File(BenchmarkSetup.RESULTS_DIR + "/" + BenchmarkSetup.SUMMARY_FILE_STEM + ".tex").exists()) {
-                b.command("pdflatex", "-interaction=errorstopmode", "-quiet", "-output-directory=" + BenchmarkSetup.RESULTS_DIR + "/", BenchmarkSetup.SUMMARY_FILE_STEM + ".tex");
-                p = b.start();
-                StreamReader output = new StreamReader(p.getInputStream());
-                StreamReader error = new StreamReader(p.getErrorStream());
-                new Thread(output).start();
-                new Thread(error).start();
-                try {
-                    p.waitFor();
-                } catch (final InterruptedException e) {
-                    throw new IOException(e);
-                }
+    	try (Writer writer = new BufferedWriter(
+    			new OutputStreamWriter(
+    					new FileOutputStream(BenchmarkSetup.RESULTS_DIR + "/" + BenchmarkSetup.SUMMARY_FILE_STEM + of.getSuffix()), "utf-8"))) {
+    		writer.write(summarizeCriteriaWithDifferentSuppressionValues(of));
+    		writer.flush();
+    		writer.close();
+    	}
 
-                if (p.exitValue() != 0) {
-                    throw new IOException("Error executing pdflatex: " + error.getString() + System.lineSeparator() + output.getString());
-                }
-            }
-        }
+    	if (OutputFormat.LATEX.equals(of)) {
+    		ProcessBuilder b = new ProcessBuilder();
+    		Process p;
+
+    		if (new File(BenchmarkSetup.RESULTS_DIR + "/" + BenchmarkSetup.SUMMARY_FILE_STEM + ".tex").exists()) {
+    			b.command("pdflatex", "-interaction=errorstopmode", "-quiet", "-output-directory=" + BenchmarkSetup.RESULTS_DIR + "/", BenchmarkSetup.SUMMARY_FILE_STEM + ".tex");
+    			p = b.start();
+    			StreamReader output = new StreamReader(p.getInputStream());
+    			StreamReader error = new StreamReader(p.getErrorStream());
+    			new Thread(output).start();
+    			new Thread(error).start();
+    			try {
+    				p.waitFor();
+    			} catch (final InterruptedException e) {
+    				throw new IOException(e);
+    			}
+
+    			if (p.exitValue() != 0) {
+    				throw new IOException("Error executing pdflatex: " + error.getString() + System.lineSeparator() + output.getString());
+    			}
+    		}
+    	}
     }
-    
+
     private static String summarizeCriteriaWithDifferentSuppressionValues(OutputFormat of) throws IOException, ParseException {
-        String result = "";
-        
-        CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-        String separString = of.getSeparator();
+    	String result = "";
 
-       // put the string representation of the criteria combinations into an arry
-       String[] criteriaLabels = new String[BenchmarkSetup.getCriteria().length];
-       int i= 0;
-       for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-           criteriaLabels[i++] = Arrays.toString(criteria);
-       }
-       
-       if (OutputFormat.LATEX.equals(of)) {
-           result += "\\documentclass{article}\n";
-           result += "\\usepackage{diagbox}\n";
-           result += "\\begin{document}\n";
-           result += "\\oddsidemargin = 0 pt\n";
-       }
-	   
-	   // for each suppression factor
-	   for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+    	CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
+    	String separString = of.getSeparator();
 
-	       // print header-line
-	       result += buildTableHeader(of, criteriaLabels);
-	       
-	       // for each dataset
-	       for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
-	           Selector<String[]> selector = file.getSelectorBuilder()
-                       .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
-                       .equals(String.valueOf(suppFactor))
-                       .and()
-	                   .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
-	                   .equals(dataset.toString())
-	                   .build();
+    	// put the string representation of the criteria combinations into an arry
+    	String[] criteriaLabels = new String[BenchmarkSetup.getCriteria().length];
+    	int i= 0;
+    	for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    		criteriaLabels[i++] = Arrays.toString(criteria);
+    	}
 
-	           // get min and max of the dataset
-	           Double minVal = null;
-	           Double maxVal = null;
-	           Iterator<CSVLine> iter = file.iterator();
-	           while (iter.hasNext()) {
-	               CSVLine csvline = iter.next();
-	               String[] csvLine = csvline.getData();
+    	if (OutputFormat.LATEX.equals(of)) {
+    		result += "\\documentclass{article}\n";
+    		result += "\\usepackage{diagbox}\n";
+    		result += "\\begin{document}\n";
+    		result += "\\oddsidemargin = 0 pt\n";
+    	}
 
-	               if (selector.isSelected(csvLine)) {
-	                   Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
-	                   if (val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL) {
-	                       if (minVal == null || val < minVal) {
-	                           minVal = val;
-	                       }
-	                       if (maxVal == null || val > maxVal) {
-	                           maxVal = val;
-	                       }
-	                   }
-	               }
-	           }
+    	// for each metric
+    	for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
 
-	           String line = (dataset.toString());
-	           for (String critLabel : criteriaLabels) {
-	               selector = file.getSelectorBuilder()
-	                       .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
-	                       .equals(String.valueOf(suppFactor))
-	                       .and()
-	                       .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
-	                       .equals(dataset.toString())
-	                       .and()
-	                       .field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString())
-	                       .equals(critLabel)
-	                       .build();
+    		// for each suppression factor
+    		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-	               iter = file.iterator();
-	               while (iter.hasNext()) {
-	                   CSVLine csvline = iter.next();
-	                   String[] csvLine = csvline.getData();
+    			// print header-line
+    			result += buildTableHeader(of, criteriaLabels);
 
-	                   if (selector.isSelected(csvLine)) {
-	                       Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
-	                       Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
-	                       String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("#.###").format(normVal) : BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
-	                       line += (separString + normString);
-	                   }
-	               }
-	           }
-	           result += ((OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line) + "\n");
-	       }
-	       
-	       if (OutputFormat.LATEX == of) {  // print table footer
-               result += buildLatexTableFooter(new DecimalFormat("###").format(suppFactor * 100));
-	       }
-	   }
+    			// for each dataset
+    			for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+    				Selector<String[]> selector = file.getSelectorBuilder()
+    						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
+    						.equals(String.valueOf(metric))
+    						.and()
+    						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
+    						.equals(String.valueOf(suppFactor))
+    						.and()
+    						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
+    						.equals(dataset.toString())
+    						.build();
+
+    				// get min and max of the dataset
+    				Double minVal = null;
+    				Double maxVal = null;
+    				Iterator<CSVLine> iter = file.iterator();
+    				while (iter.hasNext()) {
+    					CSVLine csvline = iter.next();
+    					String[] csvLine = csvline.getData();
+
+    					if (selector.isSelected(csvLine)) {
+    						Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+    						if (val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL) {
+    							if (minVal == null || val < minVal) {
+    								minVal = val;
+    							}
+    							if (maxVal == null || val > maxVal) {
+    								maxVal = val;
+    							}
+    						}
+    					}
+    				}
+
+    				String line = (dataset.toString());
+    				for (String critLabel : criteriaLabels) {
+    					selector = file.getSelectorBuilder()
+        						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
+        						.equals(String.valueOf(metric))
+        						.and()
+    							.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
+    							.equals(String.valueOf(suppFactor))
+    							.and()
+    							.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
+    							.equals(dataset.toString())
+    							.and()
+    							.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString())
+    							.equals(critLabel)
+    							.build();
+
+    					iter = file.iterator();
+    					while (iter.hasNext()) {
+    						CSVLine csvline = iter.next();
+    						String[] csvLine = csvline.getData();
+
+    						if (selector.isSelected(csvLine)) {
+    							Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+    							Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
+    							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("00.00").format(normVal * 100)  + " \\% ": BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
+    							line += (separString + normString);
+    						}
+    					}
+    				}
+    				result += ((OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line) + "\n");
+    			}
+
+    			if (OutputFormat.LATEX == of) {  // print table footer
+    				result += buildLatexTableFooter(metric.toString(), new DecimalFormat("###").format(suppFactor * 100));
+    			}
+    		}
+    	}
 	   if (OutputFormat.LATEX == of) {
 	       result += "\\end{document}\n";
 	   }	   
@@ -206,7 +217,7 @@ public class BenchmarkAnalysis {
         if (OutputFormat.LATEX == of) {
             header += "\\begin{center}\n";
             header += "\\begin{table}[htb!]\n";
-            header += "\\begin{tabular}{ | l | l | c | c | c | c | c | c | c | c | c | c | c | }\n";
+            header += "\\begin{tabular}{ | l | r | r | r | r | r | r | r | r | r | r | r | r | }\n";
             header += "\\hline\n";
         }
         
@@ -232,11 +243,11 @@ public class BenchmarkAnalysis {
         return header + "\n";
     }
 
-    private static String buildLatexTableFooter(String captionText) {
+    private static String buildLatexTableFooter(String metricString, String suppFactorString) {
         String result = "";
         
         result += "\\end{tabular}\n";
-        result += "\\caption{ max. suppression factor " + captionText + " \\%}\n";
+        result += "\\caption{ Utility-metric: " + metricString + " / Max. suppression factor: " + suppFactorString + " \\%}\n";
         result += "\\end{table}\n";
         result += "\\end{center}\n";
         result += "";
