@@ -40,6 +40,10 @@ import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
 
 public class BenchmarkAnalysis {
+
+//	private static String FONT_SIZE="scriptsize";
+//	private static String FONT_SIZE="footnotesize";
+	private static String FONT_SIZE="small";
     
     private enum OutputFormat {
         LATEX (".tex", " & "),
@@ -120,12 +124,26 @@ public class BenchmarkAnalysis {
     	if (OutputFormat.LATEX.equals(of)) {
     		result += "\\documentclass{article}\n";
     		result += "\\usepackage{diagbox}\n";
+    		result += "\\usepackage[font=" + FONT_SIZE + "]{caption}\n";
+    		result += "\\usepackage{geometry}\n";
+    		result += "\\usepackage[table]{xcolor}\n";
+    		result += "\\geometry{\n";
+    		result += "a4paper,\n";
+    		result += "total={210mm,297mm},\n";
+    		result += "left=20mm,\n";
+    		result += "right=20mm,\n";
+    		result += "top=5mm,\n";
+    		result += "bottom=5mm,\n";
+    		result += "}\n";
     		result += "\\begin{document}\n";
-    		result += "\\oddsidemargin = 0 pt\n";
     	}
 
     	// for each metric
     	for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
+    		
+    		if (OutputFormat.LATEX == of) {  // print table footer
+				result += "\\pagebreak\n";
+			}
 
     		// for each suppression factor
     		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -191,8 +209,19 @@ public class BenchmarkAnalysis {
     						if (selector.isSelected(csvLine)) {
     							Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
     							Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
-    							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("00.00").format(normVal * 100)  + " \\% ": BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
-    							line += (separString + normString);
+    							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("00").format(normVal * 100)  + " \\% ": BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
+    							String colorCode = "";
+    							if (OutputFormat.LATEX.equals(of)) { // color formatting of cells
+    								if (normVal.equals(0.0d)) {
+    									colorCode = "\\cellcolor{green!25}";
+    								} else if (normVal.equals(1.0d)) {
+    									colorCode = "\\cellcolor{red!25}";
+    								}else if (normVal.equals(BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL)) {
+    									colorCode = "\\cellcolor{black!50}";
+    								}
+    								normString = colorCode + normString;
+    							}
+      							line += (separString + normString);
     						}
     					}
     				}
@@ -217,6 +246,7 @@ public class BenchmarkAnalysis {
         if (OutputFormat.LATEX == of) {
             header += "\\begin{center}\n";
             header += "\\begin{table}[htb!]\n";
+            header += "\\begin{" + FONT_SIZE + "}\n";
             header += "\\begin{tabular}{ | l | r | r | r | r | r | r | r | r | r | r | r | r | }\n";
             header += "\\hline\n";
         }
@@ -247,7 +277,8 @@ public class BenchmarkAnalysis {
         String result = "";
         
         result += "\\end{tabular}\n";
-        result += "\\caption{ Utility-metric: " + metricString + " / Max. suppression factor: " + suppFactorString + " \\%}\n";
+        result += "\\caption{ Information-loss metric: " + metricString + " / Max. suppression factor: " + suppFactorString + " \\%}\n";
+        result += "\\end{" + FONT_SIZE + "}\n";
         result += "\\end{table}\n";
         result += "\\end{center}\n";
         result += "";
