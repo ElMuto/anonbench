@@ -192,8 +192,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                                         "race",
                                                         "salary-class",
                                                         "sex",
-                                                        "workclass",
-                                                        "occupation"}),
+                                                        "workclass" }),
                                         customQiCount);
             case ATUS:
                 return customizeQis ((new String[] {   "Age",
@@ -203,8 +202,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                                         "Marital status",
                                                         "Race",
                                                         "Region",
-                                                        "Sex",
-                                                        "Highest level of school completed"}),
+                                                        "Sex" }),
                                          customQiCount);
             case CUP:
                 return customizeQis ((new String[] {   "AGE",
@@ -213,8 +211,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                                         "MINRAMNT",
                                                         "NGIFTALL",
                                                         "STATE",
-                                                        "ZIP",
-                                                        "RAMNTALL"}),
+                                                        "ZIP" }),
                                         customQiCount);
             case FARS:
                 return customizeQis ((new String[] {   "iage",
@@ -223,8 +220,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                                         "ihispanic",
                                                         "iinjury",
                                                         "irace",
-                                                        "isex",
-                                                        "istatenum"}),
+                                                        "isex" }),
                                         customQiCount);
             case IHIS:
                 return customizeQis ((new String[] {   "AGE",
@@ -234,8 +230,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                                         "RACEA",
                                                         "REGION",
                                                         "SEX",
-                                                        "YEAR",
-                                                        "EDUC"}),
+                                                        "YEAR" }),
                                         customQiCount);
             case ACS13:
                 return customizeQis (ACS13_SEMANTIC_QI.getNames(), customQiCount);

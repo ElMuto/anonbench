@@ -50,7 +50,7 @@ public class BenchmarkSetup {
      */
     public static BenchmarkMetric[] getMetrics() {        
         return new BenchmarkMetric[] {
-        		BenchmarkMetric.LOSS,
+//        		BenchmarkMetric.LOSS,
         		BenchmarkMetric.ENTROPY,
         		BenchmarkMetric.AECS,
         		BenchmarkMetric.DISCERNABILITY,
