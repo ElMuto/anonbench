@@ -26,12 +26,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
-import org.deidentifier.arx.algorithm.AlgorithmBFS;
-import org.deidentifier.arx.algorithm.AlgorithmDFS;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
-import org.deidentifier.arx.algorithm.AlgorithmIncognito;
-import org.deidentifier.arx.algorithm.AlgorithmInformationLossBounds;
-import org.deidentifier.arx.algorithm.AlgorithmOLA;
 import org.deidentifier.arx.framework.check.INodeChecker;
 import org.deidentifier.arx.framework.check.NodeChecker;
 import org.deidentifier.arx.framework.data.DataManager;
@@ -183,28 +178,8 @@ public class BenchmarkDriver {
         // Create an algorithm instance
         AbstractBenchmarkAlgorithm implementation;
         switch (algorithm) {
-        case BFS:
-            implementation = new AlgorithmBFS(lattice, checker);
-            break;
-        case DFS:
-            implementation = new AlgorithmDFS(lattice, checker);
-            break;
         case FLASH:
             implementation = new AlgorithmFlash(lattice, checker, manager.getHierarchies());
-            break;
-        case INCOGNITO:
-            implementation = new AlgorithmIncognito(lattice, manager,
-                                                             config.getMetric(),
-                                                             config.getInternalConfiguration(),
-                                                             historySize,
-                                                             snapshotSizeDataset,
-                                                             snapshotSizeSnapshot);
-            break;
-        case OLA:
-            implementation = new AlgorithmOLA(lattice, checker);
-            break;
-        case INFORMATION_LOSS_BOUNDS:
-            implementation = new AlgorithmInformationLossBounds(lattice, checker);
             break;
         default:
             throw new RuntimeException("Invalid algorithm");
