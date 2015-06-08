@@ -209,7 +209,7 @@ public class BenchmarkAnalysis {
     						if (selector.isSelected(csvLine)) {
     							Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
     							Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
-    							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("00").format(normVal * 100)  + " \\% ": BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
+    							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
     							String colorCode = "";
     							if (OutputFormat.LATEX.equals(of)) { // color formatting of cells
     								if (normVal.equals(0.0d)) {
