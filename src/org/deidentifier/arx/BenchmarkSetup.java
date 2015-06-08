@@ -22,13 +22,14 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
+import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
-import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -200,6 +201,12 @@ public class BenchmarkSetup {
                 return "d";
             }
         },
+        INCLUSION {
+            @Override
+            public String toString() {
+                return "i";
+            }
+        },
     }
     
     static enum BenchmarkMetric {
@@ -281,6 +288,9 @@ public class BenchmarkSetup {
             switch (c) {
             case D_PRESENCE:
                 config.addCriterion(new DPresence(0.05d, 0.15d, dataset.getResearchSubset(dataset)));
+                break;
+            case INCLUSION:
+                config.addCriterion(new Inclusion(dataset.getResearchSubset(dataset)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(5));
