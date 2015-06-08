@@ -22,7 +22,6 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 
-import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
@@ -51,12 +50,12 @@ public class BenchmarkSetup {
      */
     public static BenchmarkMetric[] getMetrics() {        
         return new BenchmarkMetric[] {
-//        		BenchmarkMetric.LOSS,
+        		BenchmarkMetric.LOSS,
         		BenchmarkMetric.ENTROPY,
-//        		BenchmarkMetric.AECS,
-//        		BenchmarkMetric.DISCERNABILITY,
-//        		BenchmarkMetric.PRECISION,
-//        		BenchmarkMetric.HEIGHT
+        		BenchmarkMetric.AECS,
+        		BenchmarkMetric.DISCERNABILITY,
+        		BenchmarkMetric.PRECISION,
+        		BenchmarkMetric.HEIGHT
         		};
     }
     
@@ -65,9 +64,9 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppressionFactors() {        
-//        return new double[] { 0.0d, 0.05d, 0.1d, 0.5d, 1.0d };
+        return new double[] { 0.0d, 0.05d, 0.1d, 0.5d, 1.0d };
 //      return new double[] { 0.0d, 0.1d };
-      return new double[] { 0.0d };
+//      return new double[] { 0.0d };
     }
 
     /**
@@ -77,11 +76,11 @@ public class BenchmarkSetup {
     public static BenchmarkDataset[] getDatasets() {
         return new BenchmarkDataset[] { 
          new BenchmarkDataset(BenchmarkDatafile.ADULT, null),
-//         new BenchmarkDataset(BenchmarkDatafile.CUP, null),
-//         new BenchmarkDataset(BenchmarkDatafile.FARS, null),
-//         new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
-//         new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
-//         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
+         new BenchmarkDataset(BenchmarkDatafile.CUP, null),
+         new BenchmarkDataset(BenchmarkDatafile.FARS, null),
+         new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
+         new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
+         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
                                         };
     }
 
@@ -90,19 +89,19 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkCriterion[][] getCriteria() {
-        BenchmarkCriterion[][] result = new BenchmarkCriterion[11][];
-        result[0] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-        result[1] = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY };
-        result[2] = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
-        result[3] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE };
-        result[4] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY };
-        result[5] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS };
-        result[6] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE };
-        result[7] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY };
-        result[8] = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS };
-        result[9] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY };
-        result[10] = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS };
-        return result;
+        return new BenchmarkCriterion[][] {
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE },
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
+        };
     }
     
     public static enum VARIABLES {
@@ -256,7 +255,7 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(OldBenchmarkDataset dataset, double suppFactor,  BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor,  BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         
@@ -288,260 +287,26 @@ public class BenchmarkSetup {
         for (BenchmarkCriterion c : criteria) {
             switch (c) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, getResearchSubset(dataset)));
+                config.addCriterion(new DPresence(0.05d, 0.15d, dataset.getResearchSubset(dataset)));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(getResearchSubset(dataset)));
+                config.addCriterion(new Inclusion(dataset.getResearchSubset(dataset)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(5));
                 break;
             case L_DIVERSITY:
-                String sensitive = getSensitiveAttribute(dataset);
+                String sensitive = dataset.getSensitiveAttribute();
                 config.addCriterion(new RecursiveCLDiversity(sensitive, 4, 3));
                 break;
             case T_CLOSENESS:
-                sensitive = getSensitiveAttribute(dataset);
-                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, 0.2d, getHierarchy(dataset, sensitive)));
+                sensitive = dataset.getSensitiveAttribute();
+                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, 0.2d, dataset.loadHierarchy(sensitive)));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");
             }
         }
         return config;
-    }
-    
-    /**
-     * Returns the dataset
-     * @param dataset
-     * @return
-     * @throws IOException
-     */
-    public static Data getData(OldBenchmarkDataset dataset) throws IOException {
-        return getData(dataset, null);
-    }
-    
-    
-
-
-    public static enum OldBenchmarkDataset {
-        ADULT {
-            @Override
-            public String toString() {
-                return "Adult";
-            }
-        },
-        CUP {
-            @Override
-            public String toString() {
-                return "Cup";
-            }
-        },
-        FARS {
-            @Override
-            public String toString() {
-                return "Fars";
-            }
-        },
-        ATUS {
-            @Override
-            public String toString() {
-                return "Atus";
-            }
-        },
-        IHIS {
-            @Override
-            public String toString() {
-                return "Ihis";
-            }
-        },
-    }
-
-    /**
-     * Configures and returns the dataset 
-     * @param dataset
-     * @param criteria
-     * @return
-     * @throws IOException
-     */
-    @SuppressWarnings("incomplete-switch")
-    public static Data getData(OldBenchmarkDataset dataset, BenchmarkCriterion[] criteria) throws IOException {
-        Data data = null;
-        switch (dataset) {
-        case ADULT:
-            data = Data.create("data/adult.csv", ';');
-            break;
-        case ATUS:
-            data = Data.create("data/atus.csv", ';');
-            break;
-        case CUP:
-            data = Data.create("data/cup.csv", ';');
-            break;
-        case FARS:
-            data = Data.create("data/fars.csv", ';');
-            break;
-        case IHIS:
-            data = Data.create("data/ihis.csv", ';');
-            break;
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
-
-        if (criteria != null) {
-            for (String qi : getQuasiIdentifyingAttributes(dataset)) {
-                data.getDefinition().setAttributeType(qi, getHierarchy(dataset, qi));
-            }
-            for (BenchmarkCriterion c : criteria) {
-                switch (c) {
-                case L_DIVERSITY:
-                case T_CLOSENESS:
-                    String sensitive = getSensitiveAttribute(dataset);
-                    data.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
-                    break;
-                }
-            }
-        }
-
-        return data;
-    }
-    
-    /**
-     * Returns the generalization hierarchy for the dataset and attribute
-     * @param dataset
-     * @param attribute
-     * @return
-     * @throws IOException
-     */
-    public static Hierarchy getHierarchy(OldBenchmarkDataset dataset, String attribute) throws IOException {
-        switch (dataset) {
-        case ADULT:
-            return Hierarchy.create("hierarchies/adult_hierarchy_" + attribute + ".csv", ';');
-        case ATUS:
-            return Hierarchy.create("hierarchies/atus_hierarchy_" + attribute + ".csv", ';');
-        case CUP:
-            return Hierarchy.create("hierarchies/cup_hierarchy_" + attribute + ".csv", ';');
-        case FARS:
-            return Hierarchy.create("hierarchies/fars_hierarchy_" + attribute + ".csv", ';');
-        case IHIS:
-            return Hierarchy.create("hierarchies/ihis_hierarchy_" + attribute + ".csv", ';');
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
-    }
-
-    /**
-     * Returns the quasi-identifiers for the dataset
-     * @param dataset
-     * @return
-     */
-    public static String[] getQuasiIdentifyingAttributes(OldBenchmarkDataset dataset) {
-        switch (dataset) {
-        case ADULT:
-            return new String[] {   "age",
-                                    "education",
-                                    "marital-status",
-                                    "native-country",
-                                    "race",
-                                    "salary-class",
-                                    "sex",
-                                    "workclass" };
-        case ATUS:
-            return new String[] {   "Age",
-                                    "Birthplace",
-                                    "Citizenship status",
-                                    "Labor force status",
-                                    "Marital status",
-                                    "Race",
-                                    "Region",
-                                    "Sex" };
-        case CUP:
-            return new String[] {   "AGE",
-                                    "GENDER",
-                                    "INCOME",
-                                    "MINRAMNT",
-                                    "NGIFTALL",
-                                    "STATE",
-                                    "ZIP" };
-        case FARS:
-            return new String[] {   "iage",
-                                    "ideathday",
-                                    "ideathmon",
-                                    "ihispanic",
-                                    "iinjury",
-                                    "irace",
-                                    "isex" };
-        case IHIS:
-            return new String[] {   "AGE",
-                                    "MARSTAT",
-                                    "PERNUM",
-                                    "QUARTER",
-                                    "RACEA",
-                                    "REGION",
-                                    "SEX",
-                                    "YEAR" };
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
-    }
-
-    /**
-     * Returns the research subset for the dataset
-     * @param dataset
-     * @return
-     * @throws IOException
-     */
-    public static DataSubset getResearchSubset(OldBenchmarkDataset dataset) throws IOException {
-        switch (dataset) {
-        case ADULT:
-            return DataSubset.create(getData(dataset), Data.create("data/adult_subset.csv", ';'));
-        case ATUS:
-            return DataSubset.create(getData(dataset), Data.create("data/atus_subset.csv", ';'));
-        case CUP:
-            return DataSubset.create(getData(dataset), Data.create("data/cup_subset.csv", ';'));
-        case FARS:
-            return DataSubset.create(getData(dataset), Data.create("data/fars_subset.csv", ';'));
-        case IHIS:
-            return DataSubset.create(getData(dataset), Data.create("data/ihis_subset.csv", ';'));
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
-    }
-
-    /**
-     * Returns the sensitive attribute for the dataset
-     * @param dataset
-     * @return
-     */
-    public static String getSensitiveAttribute(OldBenchmarkDataset dataset) {
-        switch (dataset) {
-        case ADULT:
-            return "occupation";
-        case ATUS:
-            return "Highest level of school completed";
-        case CUP:
-            return "RAMNTALL";
-        case FARS:
-            return "istatenum";
-        case IHIS:
-            return "EDUC";
-        default:
-            throw new RuntimeException("Invalid dataset");
-        }
-    }
-    
-
-
-    /**
-     * Returns all datasets
-     * @return
-     */
-    public static OldBenchmarkDataset[] getOldDatasets() {
-        return new OldBenchmarkDataset[] { 
-         OldBenchmarkDataset.ADULT,
-         OldBenchmarkDataset.CUP,
-         OldBenchmarkDataset.FARS,
-         OldBenchmarkDataset.ATUS,
-         OldBenchmarkDataset.IHIS
-                                        };
     }
 }

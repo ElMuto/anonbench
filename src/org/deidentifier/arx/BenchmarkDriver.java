@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
-import org.deidentifier.arx.BenchmarkSetup.OldBenchmarkDataset;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.framework.check.INodeChecker;
@@ -35,6 +34,7 @@ import org.deidentifier.arx.framework.data.Dictionary;
 import org.deidentifier.arx.framework.lattice.Lattice;
 import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.Node;
+import org.deidentifier.arx.test.TestConfiguration;
 
 import de.linearbits.subframe.Benchmark;
 
@@ -74,7 +74,7 @@ public class BenchmarkDriver {
      * @param warmup
      * @throws IOException
      */
-    public void anonymize(OldBenchmarkDataset dataset,
+    public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           BenchmarkAlgorithm algorithm,
                           double suppFactor,
@@ -97,20 +97,47 @@ public class BenchmarkDriver {
     }
 
     /**
+     * Performs data anonymization and returns a TestConfiguration
+     * 
+     * @param dataset
+     * @param criteria
+     * @param algorithm
+     * @param warmup
+     * @throws IOException
+     */
+    public TestConfiguration test(BenchmarkDataset dataset,
+                                  BenchmarkCriterion[] criteria,
+                                  BenchmarkAlgorithm algorithm,
+                                  double suppFactor) throws IOException {
+
+        // Build implementation
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor, BenchmarkMetric.LOSS);
+
+        // Execute
+        implementation.traverse();
+        
+        // Collect
+        Node optimum = implementation.getGlobalOptimum();
+        String loss = String.valueOf(optimum.getInformationLoss().getValue());
+        int[] transformation = optimum.getTransformation();
+        
+        return new TestConfiguration(dataset, criteria, loss, transformation);
+    }
+
+    /**
      * @param dataset
      * @param criteria
      * @param algorithm
      * @return
      * @throws IOException
      */
-    private AbstractBenchmarkAlgorithm getImplementation(OldBenchmarkDataset dataset,
+    private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          BenchmarkAlgorithm algorithm,
                                                          double suppFactor,
                                                          BenchmarkMetric metric) throws IOException {
         // Prepare
-//        Data data = dataset.toArxData(criteria);
-        Data data = BenchmarkSetup.getData(dataset, criteria);
+        Data data = dataset.toArxData(criteria);
         ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, criteria);
         DataHandle handle = data.getHandle();
 
