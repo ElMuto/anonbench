@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
+import org.deidentifier.arx.BenchmarkSetup.OldBenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
 
 import de.linearbits.subframe.Benchmark;
@@ -81,14 +82,14 @@ public class BenchmarkMain {
         	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
         		
             // For each dataset
-            for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+            for (OldBenchmarkDataset data : BenchmarkSetup.getOldDatasets()) {
 
         			// For each combination of criteria
         			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
 
         				// Print status info
         				System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-
+        				
         				// Benchmark
         				BENCHMARK.addRun(metric.toString(), String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
 
