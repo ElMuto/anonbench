@@ -89,7 +89,7 @@ public class BenchmarkMain {
     				processCriteria(driver, algorithm, metric, suppFactor, data, criteria, false);
     			}
 
-    			// For each combination of non subset-based criteria
+    			// For each combination of subset-based criteria
     			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
     				processCriteria(driver, algorithm, metric, suppFactor, data, criteria, true);
     			}
