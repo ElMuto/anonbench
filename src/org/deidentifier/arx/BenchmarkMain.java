@@ -46,7 +46,8 @@ public class BenchmarkMain {
     		VARIABLES.UTLITY_METRIC.toString(),
     		VARIABLES.SUPPRESSION_FACTOR.toString(),
     		VARIABLES.DATASET.toString(),
-    		VARIABLES.CRITERIA.toString()
+    		VARIABLES.CRITERIA.toString(),
+    		VARIABLES.SUBSET_NATURE.toString(),
     });
     
     /** Label for minimum utility */
@@ -83,25 +84,36 @@ public class BenchmarkMain {
             // For each dataset
             for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
-        			// For each combination of criteria
-        			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
+    			// For each combination of non subset-based criteria
+    			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
+    				processCriteria(driver, algorithm, metric, suppFactor, data, criteria, false);
+    			}
 
-        				// Print status info
-        				System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-
-        				// Benchmark
-        				BENCHMARK.addRun(metric.toString(), String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria));
-
-        				// Repeat
-        				for (int i = 0; i < REPETITIONS; i++) {
-        					driver.anonymize(data, criteria, algorithm, suppFactor, metric, false);
-        				}
-
-        				// Write results incrementally
-        				BENCHMARK.getResults().write(new File("results/results.csv"));
-        			}
+    			// For each combination of non subset-based criteria
+    			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
+    				processCriteria(driver, algorithm, metric, suppFactor, data, criteria, true);
+    			}
         		}
         	}
         }
     }
+
+	private static void processCriteria(BenchmarkDriver driver,
+			BenchmarkAlgorithm algorithm, BenchmarkMetric metric,
+			double suppFactor, BenchmarkDataset data,
+			BenchmarkCriterion[] criteria, boolean subsetBased) throws IOException {
+		// Print status info
+		System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+
+		// Benchmark
+		BENCHMARK.addRun(metric.toString(), String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria), Boolean.toString(subsetBased));
+
+		// Repeat
+		for (int i = 0; i < REPETITIONS; i++) {
+			driver.anonymize(data, criteria, algorithm, suppFactor, metric, false);
+		}
+
+		// Write results incrementally
+		BENCHMARK.getResults().write(new File("results/results.csv"));
+	}
 }

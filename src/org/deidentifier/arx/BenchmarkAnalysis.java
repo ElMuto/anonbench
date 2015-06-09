@@ -115,10 +115,10 @@ public class BenchmarkAnalysis {
     	String separString = of.getSeparator();
 
     	// put the string representation of the criteria combinations into an arry
-    	String[] criteriaLabels = new String[BenchmarkSetup.getCriteria().length];
+    	String[] criteriaLabelsNonSubset = new String[BenchmarkSetup.getNonSubsetBasedCriteria().length];
     	int i= 0;
-    	for (BenchmarkCriterion[] criteria : BenchmarkSetup.getCriteria()) {
-    		criteriaLabels[i++] = Arrays.toString(criteria);
+    	for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
+    		criteriaLabelsNonSubset[i++] = Arrays.toString(criteria);
     	}
 
     	if (OutputFormat.LATEX.equals(of)) {
@@ -148,89 +148,7 @@ public class BenchmarkAnalysis {
     		// for each suppression factor
     		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-    			// print header-line
-    			result += buildTableHeader(of, criteriaLabels);
-
-    			// for each dataset
-    			for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
-    				Selector<String[]> selector = file.getSelectorBuilder()
-    						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
-    						.equals(String.valueOf(metric))
-    						.and()
-    						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
-    						.equals(String.valueOf(suppFactor))
-    						.and()
-    						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
-    						.equals(dataset.toString())
-    						.build();
-
-    				// get min and max of the dataset
-    				Double minVal = null;
-    				Double maxVal = null;
-    				Iterator<CSVLine> iter = file.iterator();
-    				while (iter.hasNext()) {
-    					CSVLine csvline = iter.next();
-    					String[] csvLine = csvline.getData();
-
-    					if (selector.isSelected(csvLine)) {
-    						Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
-    						if (val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL) {
-    							if (minVal == null || val < minVal) {
-    								minVal = val;
-    							}
-    							if (maxVal == null || val > maxVal) {
-    								maxVal = val;
-    							}
-    						}
-    					}
-    				}
-
-    				String line = (dataset.toString());
-    				for (String critLabel : criteriaLabels) {
-    					selector = file.getSelectorBuilder()
-        						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
-        						.equals(String.valueOf(metric))
-        						.and()
-    							.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
-    							.equals(String.valueOf(suppFactor))
-    							.and()
-    							.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
-    							.equals(dataset.toString())
-    							.and()
-    							.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString())
-    							.equals(critLabel)
-    							.build();
-
-    					iter = file.iterator();
-    					while (iter.hasNext()) {
-    						CSVLine csvline = iter.next();
-    						String[] csvLine = csvline.getData();
-
-    						if (selector.isSelected(csvLine)) {
-    							Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
-    							Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
-    							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
-    							String colorCode = "";
-    							if (OutputFormat.LATEX.equals(of)) { // color formatting of cells
-    								if (val.equals(minVal)) {
-    									colorCode = "\\cellcolor{green!25}";
-    								} else if (val.equals(maxVal)) {
-    									colorCode = "\\cellcolor{red!25}";
-    								}else if (normVal.equals(BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL)) {
-    									colorCode = "\\cellcolor{black!50}";
-    								}
-    								normString = colorCode + normString;
-    							}
-      							line += (separString + normString);
-    						}
-    					}
-    				}
-    				result += ((OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line) + "\n");
-    			}
-
-    			if (OutputFormat.LATEX == of) {  // print table footer
-    				result += buildLatexTableFooter(metric.toString(), new DecimalFormat("###").format(suppFactor * 100));
-    			}
+    			result = printTable(of, result, file, criteriaLabelsNonSubset, metric, suppFactor, false);
     		}
     	}
 	   if (OutputFormat.LATEX == of) {
@@ -238,6 +156,101 @@ public class BenchmarkAnalysis {
 	   }	   
 	   return result;
     }
+
+	private static String printTable(OutputFormat of, String result,
+			CSVFile file, String[] criteriaLabels,
+			BenchmarkMetric metric, double suppFactor, boolean subsetBased) throws ParseException {
+		// print header-line
+		result += buildTableHeader(of, criteriaLabels);
+
+		// for each dataset
+		for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+			Selector<String[]> selector = file.getSelectorBuilder()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
+					.equals(String.valueOf(metric))
+					.and()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
+					.equals(String.valueOf(suppFactor))
+					.and()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString())
+					.equals(Boolean.toString(subsetBased))
+					.and()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
+					.equals(dataset.toString())
+					.build();
+
+			// get min and max of the dataset
+			Double minVal = null;
+			Double maxVal = null;
+			Iterator<CSVLine> iter = file.iterator();
+			while (iter.hasNext()) {
+				CSVLine csvline = iter.next();
+				String[] csvLine = csvline.getData();
+
+				if (selector.isSelected(csvLine)) {
+					Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+					if (val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL) {
+						if (minVal == null || val < minVal) {
+							minVal = val;
+						}
+						if (maxVal == null || val > maxVal) {
+							maxVal = val;
+						}
+					}
+				}
+			}
+
+			String line = (dataset.toString());
+			for (String critLabel : criteriaLabels) {
+				selector = file.getSelectorBuilder()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
+						.equals(String.valueOf(metric))
+						.and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
+						.equals(String.valueOf(suppFactor))
+						.and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString())
+						.equals(Boolean.toString(subsetBased))
+						.and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
+						.equals(dataset.toString())
+						.and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString())
+						.equals(critLabel)
+						.build();
+
+				iter = file.iterator();
+				while (iter.hasNext()) {
+					CSVLine csvline = iter.next();
+					String[] csvLine = csvline.getData();
+
+					if (selector.isSelected(csvLine)) {
+						Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+						Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
+						String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
+						String colorCode = "";
+						if (OutputFormat.LATEX.equals(of)) { // color formatting of cells
+							if (val.equals(minVal)) {
+								colorCode = "\\cellcolor{green!25}";
+							} else if (val.equals(maxVal)) {
+								colorCode = "\\cellcolor{red!25}";
+							}else if (normVal.equals(BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL)) {
+								colorCode = "\\cellcolor{black!50}";
+							}
+							normString = colorCode + normString;
+						}
+						line += (of.getSeparator() + normString);
+					}
+				}
+			}
+			result += ((OutputFormat.LATEX.equals(of) ? line + " \\\\ \\hline" : line) + "\n");
+		}
+
+		if (OutputFormat.LATEX == of) {  // print table footer
+			result += buildLatexTableFooter(metric.toString(), new DecimalFormat("###").format(suppFactor * 100));
+		}
+		return result;
+	}
     
     private static String buildTableHeader(OutputFormat of, String[] criteriaLabels) {
         String separString = of.getSeparator();
@@ -247,7 +260,7 @@ public class BenchmarkAnalysis {
             header += "\\begin{center}\n";
             header += "\\begin{table}[htb!]\n";
             header += "\\begin{" + FONT_SIZE + "}\n";
-            header += "\\begin{tabular}{ | l | r | r | r | r | r | r | r | r | r | r | r | r | }\n";
+            header += "\\begin{tabular}{ | l | r | r | r | r | r | }\n";
             header += "\\hline\n";
         }
         

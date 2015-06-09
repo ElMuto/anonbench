@@ -169,6 +169,12 @@ public class BenchmarkSetup {
                 return "Suppression Factor";
             }
         },
+        SUBSET_NATURE {
+            @Override
+            public String toString() {
+                return "Subset Based";
+            }
+        },
     }
 
     public static enum BenchmarkAlgorithm {
