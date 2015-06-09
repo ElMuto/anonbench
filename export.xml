@@ -5,6 +5,10 @@
 	<property name="arx" value="E:\dev\workspace\arx" />
 	<property name="subframe" value="E:\dev\workspace\subframe" />
 
+	<!-- Helmut Arbeit -->
+	<!--property name="arx" value="C:\dev\workspace-arx\arx" />
+	<property name="subframe" value="C:\dev\workspace-arx\subframe" /-->
+
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">
     <or>
