@@ -327,20 +327,20 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @return
          * @throws IOException
          */
-        public DataSubset getResearchSubset(BenchmarkDataset dataset) throws IOException {
-            switch (dataset.getDatafile()) {
+        public DataSubset getResearchSubset() throws IOException {
+            switch (getDatafile()) {
             case ADULT:
-                return DataSubset.create(dataset.toArxData(), Data.create("data/adult_subset.csv", ';'));
+                return DataSubset.create(this.toArxData(), Data.create("data/adult_subset.csv", ';'));
             case ATUS:
-                return DataSubset.create(dataset.toArxData(), Data.create("data/atus_subset.csv", ';'));
+                return DataSubset.create(this.toArxData(), Data.create("data/atus_subset.csv", ';'));
             case CUP:
-                return DataSubset.create(dataset.toArxData(), Data.create("data/cup_subset.csv", ';'));
+                return DataSubset.create(this.toArxData(), Data.create("data/cup_subset.csv", ';'));
             case FARS:
-                return DataSubset.create(dataset.toArxData(), Data.create("data/fars_subset.csv", ';'));
+                return DataSubset.create(this.toArxData(), Data.create("data/fars_subset.csv", ';'));
             case IHIS:
-                return DataSubset.create(dataset.toArxData(), Data.create("data/ihis_subset.csv", ';'));
+                return DataSubset.create(this.toArxData(), Data.create("data/ihis_subset.csv", ';'));
             case ACS13:
-                return DataSubset.create(dataset.toArxData(), Data.create("data/ss13acs_subset.csv", ';'));
+                return DataSubset.create(this.toArxData(), Data.create("data/ss13acs_subset.csv", ';'));
             default:
                 throw new RuntimeException("Invalid dataset");
             }

@@ -64,9 +64,9 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppressionFactors() {        
-        return new double[] { 0.0d, 0.05d, 0.1d, 0.5d, 1.0d };
-//      return new double[] { 0.0d, 0.1d };
-//      return new double[] { 0.0d };
+        return new double[] { 0d, 0.05d, 0.1d, 0.5d, 1d };
+//      return new double[] { 0d, 0.05d, 0.1d };
+//      return new double[] { 0d };
     }
 
     /**
@@ -93,9 +93,15 @@ public class BenchmarkSetup {
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS },
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },
+                                           
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS},
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },                                           
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
@@ -287,10 +293,10 @@ public class BenchmarkSetup {
         for (BenchmarkCriterion c : criteria) {
             switch (c) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, dataset.getResearchSubset(dataset)));
+                config.addCriterion(new DPresence(0.05d, 0.15d, dataset.getResearchSubset()));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset(dataset)));
+                config.addCriterion(new Inclusion(dataset.getResearchSubset()));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(5));

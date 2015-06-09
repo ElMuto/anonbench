@@ -212,9 +212,9 @@ public class BenchmarkAnalysis {
     							String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
     							String colorCode = "";
     							if (OutputFormat.LATEX.equals(of)) { // color formatting of cells
-    								if (normVal.equals(0.0d)) {
+    								if (val.equals(minVal)) {
     									colorCode = "\\cellcolor{green!25}";
-    								} else if (normVal.equals(1.0d)) {
+    								} else if (val.equals(maxVal)) {
     									colorCode = "\\cellcolor{red!25}";
     								}else if (normVal.equals(BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL)) {
     									colorCode = "\\cellcolor{black!50}";
