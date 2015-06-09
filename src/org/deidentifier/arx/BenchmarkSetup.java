@@ -89,13 +89,41 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkCriterion[][] getCriteria() {
+        int nonSubsetLength = getNonSubsetBasedCriteria().length;
+        int subsetLength = getSubsetBasedCriteria().length;
+        
+        BenchmarkCriterion[][] allCriteria = new BenchmarkCriterion[nonSubsetLength + subsetLength][];
+        for (int i = 0; i < nonSubsetLength; i++) {
+            allCriteria[i] = getNonSubsetBasedCriteria()[i];
+        }
+        for (int i = 0; i < subsetLength; i++) {
+            allCriteria[nonSubsetLength + i] = getSubsetBasedCriteria()[i];
+        }
+        
+        return allCriteria;
+    }
+
+    /**
+     * Returns all non-subset-based sets of criteria
+     * @return
+     */
+    public static BenchmarkCriterion[][] getNonSubsetBasedCriteria() {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },
-                                           
+        };
+    }
+    
+
+    /**
+     * Returns all sets of subset based criteria
+     * @return
+     */
+    public static BenchmarkCriterion[][] getSubsetBasedCriteria() {
+        return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS},
