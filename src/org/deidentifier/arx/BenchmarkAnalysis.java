@@ -203,6 +203,8 @@ public class BenchmarkAnalysis {
 			// iterate over the different privacy criteria and fill cells
 			String line = (dataset.toString());
 			for (String critLabel : criteriaLabels) {
+
+			    // build selector
 				selector = file.getSelectorBuilder()
 						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
 						.equals(String.valueOf(metric))
@@ -220,6 +222,7 @@ public class BenchmarkAnalysis {
 						.equals(critLabel)
 						.build();
 
+				// find the entry in the CSV file, that we need to fill the cell
 				iter = file.iterator();
 				while (iter.hasNext()) {
 					CSVLine csvline = iter.next();
