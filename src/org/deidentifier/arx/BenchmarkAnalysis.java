@@ -200,6 +200,7 @@ public class BenchmarkAnalysis {
 				}
 			}
 
+			// iterate over the different privacy criteria and fill cells
 			String line = (dataset.toString());
 			for (String critLabel : criteriaLabels) {
 				selector = file.getSelectorBuilder()

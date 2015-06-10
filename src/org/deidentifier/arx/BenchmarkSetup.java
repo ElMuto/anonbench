@@ -85,25 +85,6 @@ public class BenchmarkSetup {
     }
 
     /**
-     * Returns all sets of criteria
-     * @return
-     */
-    public static BenchmarkCriterion[][] getCriteria() {
-        int nonSubsetLength = getNonSubsetBasedCriteria().length;
-        int subsetLength = getSubsetBasedCriteria().length;
-        
-        BenchmarkCriterion[][] allCriteria = new BenchmarkCriterion[nonSubsetLength + subsetLength][];
-        for (int i = 0; i < nonSubsetLength; i++) {
-            allCriteria[i] = getNonSubsetBasedCriteria()[i];
-        }
-        for (int i = 0; i < subsetLength; i++) {
-            allCriteria[nonSubsetLength + i] = getSubsetBasedCriteria()[i];
-        }
-        
-        return allCriteria;
-    }
-
-    /**
      * Returns all non-subset-based sets of criteria
      * @return
      */
@@ -173,45 +154,6 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Subset Based";
-            }
-        },
-    }
-
-    public static enum BenchmarkAlgorithm {
-        BFS {
-            @Override
-            public String toString() {
-                return "BFS";
-            }
-        },
-        DFS {
-            @Override
-            public String toString() {
-                return "DFS";
-            }
-        },
-        FLASH {
-            @Override
-            public String toString() {
-                return "Flash";
-            }
-        },
-        OLA {
-            @Override
-            public String toString() {
-                return "OLA";
-            }
-        },
-        INCOGNITO {
-            @Override
-            public String toString() {
-                return "Incognito";
-            }
-        },
-        INFORMATION_LOSS_BOUNDS {
-            @Override
-            public String toString() {
-                return "Information Loss Bounds";
             }
         },
     }

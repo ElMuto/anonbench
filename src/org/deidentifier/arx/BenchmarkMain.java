@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
 import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
@@ -73,8 +72,6 @@ public class BenchmarkMain {
     private static void EvaluateCriteriaWithDifferentSuppressionValues() throws IOException {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
 
-        BenchmarkAlgorithm algorithm = BenchmarkAlgorithm.FLASH;
-
         // for each metric
         for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
         	
@@ -86,12 +83,12 @@ public class BenchmarkMain {
 
     			// For each combination of non subset-based criteria
     			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
-    				processCriteria(driver, algorithm, metric, suppFactor, data, criteria, false);
+    				processCriteria(driver, metric, suppFactor, data, criteria, false);
     			}
 
     			// For each combination of subset-based criteria
     			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
-    				processCriteria(driver, algorithm, metric, suppFactor, data, criteria, true);
+    				processCriteria(driver, metric, suppFactor, data, criteria, true);
     			}
         		}
         	}
@@ -99,7 +96,7 @@ public class BenchmarkMain {
     }
 
 	private static void processCriteria(BenchmarkDriver driver,
-			BenchmarkAlgorithm algorithm, BenchmarkMetric metric,
+			BenchmarkMetric metric,
 			double suppFactor, BenchmarkDataset data,
 			BenchmarkCriterion[] criteria, boolean subsetBased) throws IOException {
 		// Print status info
@@ -110,7 +107,7 @@ public class BenchmarkMain {
 
 		// Repeat
 		for (int i = 0; i < REPETITIONS; i++) {
-			driver.anonymize(data, criteria, algorithm, suppFactor, metric, false);
+			driver.anonymize(data, criteria, suppFactor, metric, false);
 		}
 
 		// Write results incrementally

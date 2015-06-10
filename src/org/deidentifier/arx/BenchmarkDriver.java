@@ -22,7 +22,6 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkAlgorithm;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
@@ -34,7 +33,6 @@ import org.deidentifier.arx.framework.data.Dictionary;
 import org.deidentifier.arx.framework.lattice.Lattice;
 import org.deidentifier.arx.framework.lattice.LatticeBuilder;
 import org.deidentifier.arx.framework.lattice.Node;
-import org.deidentifier.arx.test.TestConfiguration;
 
 import de.linearbits.subframe.Benchmark;
 
@@ -76,13 +74,12 @@ public class BenchmarkDriver {
      */
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
-                          BenchmarkAlgorithm algorithm,
                           double suppFactor,
                           BenchmarkMetric metric,
                           boolean warmup) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor, metric);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, suppFactor, metric);
 
         // Execute
         implementation.traverse();
@@ -97,34 +94,6 @@ public class BenchmarkDriver {
     }
 
     /**
-     * Performs data anonymization and returns a TestConfiguration
-     * 
-     * @param dataset
-     * @param criteria
-     * @param algorithm
-     * @param warmup
-     * @throws IOException
-     */
-    public TestConfiguration test(BenchmarkDataset dataset,
-                                  BenchmarkCriterion[] criteria,
-                                  BenchmarkAlgorithm algorithm,
-                                  double suppFactor) throws IOException {
-
-        // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, algorithm, suppFactor, BenchmarkMetric.LOSS);
-
-        // Execute
-        implementation.traverse();
-        
-        // Collect
-        Node optimum = implementation.getGlobalOptimum();
-        String loss = String.valueOf(optimum.getInformationLoss().getValue());
-        int[] transformation = optimum.getTransformation();
-        
-        return new TestConfiguration(dataset, criteria, loss, transformation);
-    }
-
-    /**
      * @param dataset
      * @param criteria
      * @param algorithm
@@ -133,7 +102,6 @@ public class BenchmarkDriver {
      */
     private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
-                                                         BenchmarkAlgorithm algorithm,
                                                          double suppFactor,
                                                          BenchmarkMetric metric) throws IOException {
         // Prepare
@@ -160,14 +128,6 @@ public class BenchmarkDriver {
 
         // Build a node checker, for all algorithms but Incognito
         INodeChecker checker = null;
-        if (algorithm != BenchmarkAlgorithm.INCOGNITO){
-            checker = new NodeChecker(  manager,
-                                        config.getMetric(),
-                                        config.getInternalConfiguration(),
-                                        historySize,
-                                        snapshotSizeDataset,
-                                        snapshotSizeSnapshot);
-        }
 
         // Initialize the metric
         config.getMetric().initialize(handle.getDefinition(),
@@ -176,14 +136,6 @@ public class BenchmarkDriver {
                                       config);
 
         // Create an algorithm instance
-        AbstractBenchmarkAlgorithm implementation;
-        switch (algorithm) {
-        case FLASH:
-            implementation = new AlgorithmFlash(lattice, checker, manager.getHierarchies());
-            break;
-        default:
-            throw new RuntimeException("Invalid algorithm");
-        }
-        return implementation;
+        return new AlgorithmFlash(lattice, checker, manager.getHierarchies());
     }
 }
