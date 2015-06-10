@@ -12,6 +12,6 @@ Set _path=E:\dev\workspace\anonbench_fork
 Set _messageFile=loginMessage.txt
 Set _remoteDir=/home/imse/
 
-plink PCluster-fed3 rm -f %_remoteDir%/%_messageFile%
+plink PCluster-fed2 rm -f %_remoteDir%/%_messageFile%
 
 pause
