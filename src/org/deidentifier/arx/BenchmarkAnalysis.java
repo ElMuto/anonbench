@@ -41,9 +41,11 @@ import de.linearbits.subframe.io.CSVLine;
 
 public class BenchmarkAnalysis {
 
-//	private static String FONT_SIZE="scriptsize";
+    private static String FONT_SIZE_CAPTION="scriptsize";
+//    private static String FONT_SIZE="tiny";
+    private static String FONT_SIZE="scriptsize";
 //	private static String FONT_SIZE="footnotesize";
-	private static String FONT_SIZE="small";
+//	private static String FONT_SIZE="small";
     
     private enum OutputFormat {
         LATEX (".tex", " & "),
@@ -84,6 +86,7 @@ public class BenchmarkAnalysis {
     		writer.close();
     	}
 
+    	// convert Latex to PDF
     	if (OutputFormat.LATEX.equals(of)) {
     		ProcessBuilder b = new ProcessBuilder();
     		Process p;
@@ -106,25 +109,37 @@ public class BenchmarkAnalysis {
     			}
     		}
     	}
+    	System.out.println("done.");
     }
 
     private static String summarizeCriteriaWithDifferentSuppressionValues(OutputFormat of) throws IOException, ParseException {
     	String result = "";
-
     	CSVFile file = new CSVFile(new File(BenchmarkSetup.RESULTS_FILE));
-    	String separString = of.getSeparator();
+    	
+    	// build document header for Latex
+    	result = buildLatexDocumentHeader(of, result);
 
-    	// put the string representation of the criteria combinations into an arry
-    	String[] criteriaLabelsNonSubset = new String[BenchmarkSetup.getNonSubsetBasedCriteria().length];
-    	int i= 0;
-    	for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
-    		criteriaLabelsNonSubset[i++] = Arrays.toString(criteria);
+    	// for each metric
+    	for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
+
+    		// for each suppression factor
+    		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+
+                result = printTable(of, result, file, BenchmarkSetup.getNonSubsetBasedCriteria(), metric, suppFactor, false);
+                result = printTable(of, result, file, BenchmarkSetup.getSubsetBasedCriteria(), metric, suppFactor, true);
+    		}
     	}
+	   if (OutputFormat.LATEX == of) {
+	       result += "\\end{document}\n";
+	   }	   
+	   return result;
+    }
 
-    	if (OutputFormat.LATEX.equals(of)) {
+    private static String buildLatexDocumentHeader(OutputFormat of, String result) {
+        if (OutputFormat.LATEX.equals(of)) {
     		result += "\\documentclass{article}\n";
     		result += "\\usepackage{diagbox}\n";
-    		result += "\\usepackage[font=" + FONT_SIZE + "]{caption}\n";
+    		result += "\\usepackage[font=" + FONT_SIZE_CAPTION + "]{caption}\n";
     		result += "\\usepackage{geometry}\n";
     		result += "\\usepackage[table]{xcolor}\n";
     		result += "\\geometry{\n";
@@ -137,46 +152,30 @@ public class BenchmarkAnalysis {
     		result += "}\n";
     		result += "\\begin{document}\n";
     	}
-
-    	// for each metric
-    	for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
-    		
-    		if (OutputFormat.LATEX == of) {  // print table footer
-				result += "\\pagebreak\n";
-			}
-
-    		// for each suppression factor
-    		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-
-    			result = printTable(of, result, file, criteriaLabelsNonSubset, metric, suppFactor, false);
-    		}
-    	}
-	   if (OutputFormat.LATEX == of) {
-	       result += "\\end{document}\n";
-	   }	   
-	   return result;
+        return result;
     }
 
 	private static String printTable(OutputFormat of, String result,
-			CSVFile file, String[] criteriaLabels,
+			CSVFile file, BenchmarkCriterion[][] criteria,
 			BenchmarkMetric metric, double suppFactor, boolean subsetBased) throws ParseException {
+	    
+	    // construct the criteria labels used for selecting the relevant rows
+	    String[] criteriaLabels = new String[criteria.length];
+	    int i= 0;
+	    for (BenchmarkCriterion[] criteriaSetup : criteria) {
+	        criteriaLabels[i++] = Arrays.toString(criteriaSetup);
+	    }
+	    
 		// print header-line
 		result += buildTableHeader(of, criteriaLabels);
 
 		// for each dataset
 		for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 			Selector<String[]> selector = file.getSelectorBuilder()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
-					.equals(String.valueOf(metric))
-					.and()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
-					.equals(String.valueOf(suppFactor))
-					.and()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString())
-					.equals(Boolean.toString(subsetBased))
-					.and()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
-					.equals(dataset.toString())
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString()).equals(String.valueOf(metric)).and()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
+					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString()).equals(dataset.toString())
 					.build();
 
 			// get min and max of the dataset
@@ -206,20 +205,11 @@ public class BenchmarkAnalysis {
 
 			    // build selector
 				selector = file.getSelectorBuilder()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString())
-						.equals(String.valueOf(metric))
-						.and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString())
-						.equals(String.valueOf(suppFactor))
-						.and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString())
-						.equals(Boolean.toString(subsetBased))
-						.and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString())
-						.equals(dataset.toString())
-						.and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString())
-						.equals(critLabel)
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString()).equals(String.valueOf(metric)).and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString()).equals(dataset.toString()).and()
+						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString()).equals(critLabel)
 						.build();
 
 				// find the entry in the CSV file, that we need to fill the cell
@@ -264,7 +254,11 @@ public class BenchmarkAnalysis {
             header += "\\begin{center}\n";
             header += "\\begin{table}[htb!]\n";
             header += "\\begin{" + FONT_SIZE + "}\n";
-            header += "\\begin{tabular}{ | l | r | r | r | r | r | }\n";
+            header += "\\begin{tabular}{ | l | ";
+            for (String dummy : criteriaLabels) {
+                header += "r | ";
+            }
+            header += "}\n";
             header += "\\hline\n";
         }
         
