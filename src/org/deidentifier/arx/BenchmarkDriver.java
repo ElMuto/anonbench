@@ -127,7 +127,13 @@ public class BenchmarkDriver {
                                              manager.getMinLevels()).build();
 
         // Build a node checker, for all algorithms but Incognito
-        INodeChecker checker = null;
+        INodeChecker checker = new NodeChecker( 
+                                        manager,
+                                        config.getMetric(),
+                                        config.getInternalConfiguration(),
+                                        historySize,
+                                        snapshotSizeDataset,
+                                        snapshotSizeSnapshot);
 
         // Initialize the metric
         config.getMetric().initialize(handle.getDefinition(),
