@@ -243,7 +243,7 @@ public class BenchmarkSetup {
         
         switch (metric) {
         case ENTROPY:
-            config.setMetric(Metric.createEntropyMetric(true));
+            config.setMetric(Metric.createEntropyMetric());
             break;
         case LOSS:
             config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
