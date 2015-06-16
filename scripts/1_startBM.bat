@@ -4,7 +4,7 @@ Rem Helmut Arbeit
 Rem Set _path=C:\dev\workspace-arx\anonbench-fork
 
 Rem Helmut Zuhause
-Set _path=E:\dev\workspace\anonbench_fork
+Rem Set _path=E:\dev\workspace\anonbench_fork
 
 Set _cluster_node=2
 Set _remote_dir=/home/imse/pc-bench-helmut
