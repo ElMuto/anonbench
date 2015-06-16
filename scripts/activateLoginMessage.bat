@@ -1,10 +1,10 @@
 @echo off
 
 Rem Arbeit
-Rem Set _path=C:\dev\workspace-arx\anonbench-fork
+Set _path=C:\dev\workspace-arx\anonbench-fork
 
 Rem Zuhause
-Set _path=E:\dev\workspace\anonbench_fork
+Rem Set _path=E:\dev\workspace\anonbench_fork
 
 
 Set _messageFile=loginMessage.txt

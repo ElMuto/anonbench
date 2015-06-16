@@ -121,7 +121,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             if (criteria != null) {
                 for (BenchmarkCriterion c : criteria) {
                     switch (c) {
-                    case L_DIVERSITY:
+                    case L_DIVERSITY_RECURSIVE:
                     case T_CLOSENESS:
                         String sensitive = getSensitiveAttribute();
                         arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
