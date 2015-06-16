@@ -91,9 +91,9 @@ public class BenchmarkSetup {
     public static BenchmarkCriterion[][] getNonSubsetBasedCriteria() {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
-            new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },
         };
     }
@@ -106,15 +106,15 @@ public class BenchmarkSetup {
     public static BenchmarkCriterion[][] getSubsetBasedCriteria() {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS},
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },                                           
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
         };
     }
@@ -165,10 +165,22 @@ public class BenchmarkSetup {
                 return "k";
             }
         },
-        L_DIVERSITY {
+        L_DIVERSITY_DISTINCT {
             @Override
             public String toString() {
-                return "l";
+                return "ld";
+            }
+        },
+        L_DIVERSITY_ENTROPY {
+            @Override
+            public String toString() {
+                return "le";
+            }
+        },
+        L_DIVERSITY_RECURSIVE {
+            @Override
+            public String toString() {
+                return "lr";
             }
         },
         T_CLOSENESS {
@@ -277,7 +289,7 @@ public class BenchmarkSetup {
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(5));
                 break;
-            case L_DIVERSITY:
+            case L_DIVERSITY_RECURSIVE:
                 String sensitive = dataset.getSensitiveAttribute();
                 config.addCriterion(new RecursiveCLDiversity(sensitive, 4, 3));
                 break;
