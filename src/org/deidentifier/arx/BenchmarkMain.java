@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
-import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.BenchmarkSetup.PLOT_VARIABLES;
 
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
@@ -43,24 +43,24 @@ public class BenchmarkMain {
     
     /** The benchmark instance */
     private static final Benchmark BENCHMARK    = new Benchmark(new String[] {
-            VARIABLES.UTLITY_METRIC.toString(),
-            VARIABLES.SUPPRESSION_FACTOR.toString(),
-            VARIABLES.DATASET.toString(),
-            VARIABLES.CRITERIA.toString(),
-            VARIABLES.SUBSET_NATURE.toString(),
-            VARIABLES.PARAM_K.toString(),
-            VARIABLES.PARAM_L.toString(),
-            VARIABLES.PARAM_C.toString(),
-            VARIABLES.PARAM_T.toString(),
-            VARIABLES.PARAM_DMIN.toString(),
-            VARIABLES.PARAM_DMAX.toString(),
-            VARIABLES.SENS_ATTR.toString(),
+            PLOT_VARIABLES.UTLITY_MEASURE.toString(),
+            PLOT_VARIABLES.SUPPRESSION_FACTOR.toString(),
+            PLOT_VARIABLES.DATASET.toString(),
+            PLOT_VARIABLES.CRITERIA.toString(),
+            PLOT_VARIABLES.SUBSET_NATURE.toString(),
+            PLOT_VARIABLES.PARAM_K.toString(),
+            PLOT_VARIABLES.PARAM_L.toString(),
+            PLOT_VARIABLES.PARAM_C.toString(),
+            PLOT_VARIABLES.PARAM_T.toString(),
+            PLOT_VARIABLES.PARAM_DMIN.toString(),
+            PLOT_VARIABLES.PARAM_DMAX.toString(),
+            PLOT_VARIABLES.SENS_ATTR.toString(),
 //            VARIABLES.QI_SET.toString(),
 //            VARIABLES.SS_NUM.toString(),
     });
     
     /** Label for minimum utility */
-    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(VARIABLES.UTILITY_VALUE.toString());
+    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
 
     static {
         BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(REPETITIONS));
@@ -93,7 +93,7 @@ public class BenchmarkMain {
         String  sa = null;
 
         // for each metric
-        for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
+        for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
         	
         	// for each suppression factor
         	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -122,7 +122,7 @@ public class BenchmarkMain {
     private static void evaluate_k_anonymity() throws IOException {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
         // for each metric
-        for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
+        for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
             
             // for each suppression factor
             for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -146,7 +146,7 @@ public class BenchmarkMain {
     }
 
 	private static void processCriteria(BenchmarkDriver driver,
-			BenchmarkMetric metric,
+			BenchmarkMeasure metric,
 			double suppFactor, BenchmarkDataset data,
 			BenchmarkCriterion[] criteria, boolean subsetBased,
 			Integer k, Integer l, Integer c,

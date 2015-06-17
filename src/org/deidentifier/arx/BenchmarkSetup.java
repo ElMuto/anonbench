@@ -48,12 +48,11 @@ public class BenchmarkSetup {
      * Returns all metrics
      * @return
      */
-    public static BenchmarkMetric[] getMetrics() {        
-        return new BenchmarkMetric[] {
-        		BenchmarkMetric.LOSS,
-        		BenchmarkMetric.ENTROPY,
-        		BenchmarkMetric.AECS,
-//        		BenIGHT
+    public static BenchmarkMeasure[] getMeasures() {        
+        return new BenchmarkMeasure[] {
+        		BenchmarkMeasure.LOSS,
+        		BenchmarkMeasure.ENTROPY,
+        		BenchmarkMeasure.AECS,
         		};
     }
     
@@ -125,8 +124,8 @@ public class BenchmarkSetup {
         };
     }
     
-    public static enum VARIABLES {
-        UTLITY_METRIC {
+    public static enum PLOT_VARIABLES {
+        UTLITY_MEASURE {
             @Override
             public String toString() {
                 return "Utility Metric";
@@ -263,7 +262,7 @@ public class BenchmarkSetup {
         },
     }
     
-    static enum BenchmarkMetric {
+    static enum BenchmarkMeasure {
         LOSS {
             @Override
             public String toString() {
@@ -318,7 +317,7 @@ public class BenchmarkSetup {
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMetric metric,
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
                                                     Integer k, Integer l, Integer c,
                                                     Double t, Double dMin, Double dMax,
                                                     String sa,

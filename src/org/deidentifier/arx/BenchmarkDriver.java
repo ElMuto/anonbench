@@ -23,7 +23,7 @@ package org.deidentifier.arx;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
 import org.deidentifier.arx.algorithm.AlgorithmFlash;
 import org.deidentifier.arx.framework.check.INodeChecker;
@@ -75,7 +75,7 @@ public class BenchmarkDriver {
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           double suppFactor,
-                          BenchmarkMetric metric,
+                          BenchmarkMeasure metric,
                           Integer k, Integer l, Integer c,
                           Double t, Double dMin, Double dMax,
                           String sa,
@@ -106,7 +106,7 @@ public class BenchmarkDriver {
     private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          double suppFactor,
-                                                         BenchmarkMetric metric,
+                                                         BenchmarkMeasure metric,
                                                          Integer k, Integer l, Integer c,
                                                          Double t, Double dMin, Double dMax,
                                                          String sa) throws IOException {
