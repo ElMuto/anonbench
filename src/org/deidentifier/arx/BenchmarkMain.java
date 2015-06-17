@@ -40,13 +40,23 @@ public class BenchmarkMain {
 
     /** Repetitions */
     private static final int       REPETITIONS  = 1;
+    
     /** The benchmark instance */
     private static final Benchmark BENCHMARK    = new Benchmark(new String[] {
-    		VARIABLES.UTLITY_METRIC.toString(),
-    		VARIABLES.SUPPRESSION_FACTOR.toString(),
-    		VARIABLES.DATASET.toString(),
-    		VARIABLES.CRITERIA.toString(),
-    		VARIABLES.SUBSET_NATURE.toString(),
+            VARIABLES.UTLITY_METRIC.toString(),
+            VARIABLES.SUPPRESSION_FACTOR.toString(),
+            VARIABLES.DATASET.toString(),
+            VARIABLES.CRITERIA.toString(),
+            VARIABLES.SUBSET_NATURE.toString(),
+            VARIABLES.PARAM_K.toString(),
+            VARIABLES.PARAM_L.toString(),
+            VARIABLES.PARAM_C.toString(),
+            VARIABLES.PARAM_T.toString(),
+            VARIABLES.PARAM_DMIN.toString(),
+            VARIABLES.PARAM_DMAX.toString(),
+            VARIABLES.SENS_ATTR.toString(),
+//            VARIABLES.QI_SET.toString(),
+//            VARIABLES.SS_NUM.toString(),
     });
     
     /** Label for minimum utility */
@@ -64,13 +74,23 @@ public class BenchmarkMain {
      */
     public static void main(String[] args) throws IOException {
 
-        EvaluateCriteriaWithDifferentSuppressionValues();
+//        evaluateCriteriaWithDifferentSuppressionValues();
+        evaluate_k_anonymity();
         
         System.out.println("done.");
     }
 
-    private static void EvaluateCriteriaWithDifferentSuppressionValues() throws IOException {
+    private static void evaluateCriteriaWithDifferentSuppressionValues() throws IOException {
         BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
+        
+        // values for k, l, etc
+        Integer k = 5;
+        Integer l = 4;
+        Integer c = 3;
+        Double  t = 0.2d;
+        Double  dMin = 0.05d;
+        Double  dMax = 0.15d;
+        String  sa = null;
 
         // for each metric
         for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
@@ -83,31 +103,70 @@ public class BenchmarkMain {
 
     			// For each combination of non subset-based criteria
     			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
-    				processCriteria(driver, metric, suppFactor, data, criteria, false);
+                    // Print status info
+                    System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+    				processCriteria(driver, metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, sa);
     			}
 
     			// For each combination of subset-based criteria
     			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
-    				processCriteria(driver, metric, suppFactor, data, criteria, true);
+                    // Print status info
+                    System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+    				processCriteria(driver, metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, sa);
     			}
         		}
         	}
         }
     }
+    
+    private static void evaluate_k_anonymity() throws IOException {
+        BenchmarkDriver driver = new BenchmarkDriver(BENCHMARK);
+        // for each metric
+        for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
+            
+            // for each suppression factor
+            for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+                
+            // For each dataset
+            for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+
+                // For each combination of non subset-based criteria
+                for (int k : BenchmarkSetup.get_k_values()) {
+
+                    // Print status info
+                    System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / k = " + k);
+                    processCriteria(driver, metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
+                                    k, null, null, 
+                                    null, null, null,
+                                    null);
+                }
+            }
+        }
+    }
+    }
 
 	private static void processCriteria(BenchmarkDriver driver,
 			BenchmarkMetric metric,
 			double suppFactor, BenchmarkDataset data,
-			BenchmarkCriterion[] criteria, boolean subsetBased) throws IOException {
-		// Print status info
-		System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+			BenchmarkCriterion[] criteria, boolean subsetBased,
+			Integer k, Integer l, Integer c,
+			Double t, Double dMin, Double dMax,
+			String _sa
+			) throws IOException {
 
 		// Benchmark
-		BENCHMARK.addRun(metric.toString(), String.valueOf(suppFactor), data.toString(), Arrays.toString(criteria), Boolean.toString(subsetBased));
+		BENCHMARK.addRun(metric.toString(),
+		                 String.valueOf(suppFactor),
+		                 data.toString(),
+		                 Arrays.toString(criteria),
+		                 Boolean.toString(subsetBased),
+		                 k != null ? k.toString() : "", l != null ? l.toString() : "", c != null ? c.toString() : "",
+		                 t != null ? t.toString() : "", dMin != null ? dMin.toString() : "", dMax != null ? dMax.toString() : "",
+		                 _sa != null ? _sa.toString() : "");
 
 		// Repeat
 		for (int i = 0; i < REPETITIONS; i++) {
-			driver.anonymize(data, criteria, suppFactor, metric, false);
+			driver.anonymize(data, criteria, suppFactor, metric, k, l, c, t, dMin, dMax, _sa, false);
 		}
 
 		// Write results incrementally

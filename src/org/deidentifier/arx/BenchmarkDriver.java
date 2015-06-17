@@ -76,10 +76,13 @@ public class BenchmarkDriver {
                           BenchmarkCriterion[] criteria,
                           double suppFactor,
                           BenchmarkMetric metric,
+                          Integer k, Integer l, Integer c,
+                          Double t, Double dMin, Double dMax,
+                          String sa,
                           boolean warmup) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, suppFactor, metric);
+        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, suppFactor, metric, k, l, c, t, dMin, dMax, sa);
 
         // Execute
         implementation.traverse();
@@ -103,10 +106,13 @@ public class BenchmarkDriver {
     private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
                                                          BenchmarkCriterion[] criteria,
                                                          double suppFactor,
-                                                         BenchmarkMetric metric) throws IOException {
+                                                         BenchmarkMetric metric,
+                                                         Integer k, Integer l, Integer c,
+                                                         Double t, Double dMin, Double dMax,
+                                                         String sa) throws IOException {
         // Prepare
         Data data = dataset.toArxData(criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, criteria);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, criteria);
         DataHandle handle = data.getHandle();
 
         // Encode

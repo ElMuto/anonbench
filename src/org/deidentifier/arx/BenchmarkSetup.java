@@ -53,9 +53,7 @@ public class BenchmarkSetup {
         		BenchmarkMetric.LOSS,
         		BenchmarkMetric.ENTROPY,
         		BenchmarkMetric.AECS,
-        		BenchmarkMetric.DISCERNABILITY,
-        		BenchmarkMetric.PRECISION,
-        		BenchmarkMetric.HEIGHT
+//        		BenIGHT
         		};
     }
     
@@ -119,6 +117,14 @@ public class BenchmarkSetup {
         };
     }
     
+    public static int[] get_k_values() {
+        return new int[] {
+                          2, 3, 4, 5, 6, 7, 8, 9, 10,
+                          15, 20, 25, 30, 35, 45, 50,
+                          60, 70, 80, 90, 100
+        };
+    }
+    
     public static enum VARIABLES {
         UTLITY_METRIC {
             @Override
@@ -154,6 +160,60 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Subset Based";
+            }
+        },
+        PARAM_K {
+            @Override
+            public String toString() {
+                return "k";
+            }
+        },
+        PARAM_L {
+            @Override
+            public String toString() {
+                return "l";
+            }
+        },
+        PARAM_C {
+            @Override
+            public String toString() {
+                return "c";
+            }
+        },
+        PARAM_T {
+            @Override
+            public String toString() {
+                return "t";
+            }
+        },
+        PARAM_DMIN {
+            @Override
+            public String toString() {
+                return "dMin";
+            }
+        },
+        PARAM_DMAX {
+            @Override
+            public String toString() {
+                return "dMax";
+            }
+        },
+        SENS_ATTR {
+            @Override
+            public String toString() {
+                return "Sens. Attr.";
+            }
+        },
+        QI_SET {
+            @Override
+            public String toString() {
+                return "QIs";
+            }
+        },
+        SS_NUM {
+            @Override
+            public String toString() {
+                return "Subset-Nr";
             }
         },
     }
@@ -245,11 +305,24 @@ public class BenchmarkSetup {
     /**
      * Returns a configuration for the ARX framework
      * @param dataset
+     * @param suppFactor
+     * @param metric
+     * @param k
+     * @param l
+     * @param c
+     * @param t
+     * @param dMin
+     * @param dMax
+     * @param sa
      * @param criteria
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor,  BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMetric metric,
+                                                    Integer k, Integer l, Integer c,
+                                                    Double t, Double dMin, Double dMax,
+                                                    String sa,
+                                                    BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         
@@ -278,24 +351,25 @@ public class BenchmarkSetup {
         
         config.setMaxOutliers(suppFactor);
         
-        for (BenchmarkCriterion c : criteria) {
-            switch (c) {
+        // use default senstitve attribute from dataset, if necessary
+        String sensitive = sa != null ? sa : dataset.getSensitiveAttribute();
+        
+        for (BenchmarkCriterion crit : criteria) {
+            switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, dataset.getResearchSubset()));
+                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset()));
                 break;
             case INCLUSION:
                 config.addCriterion(new Inclusion(dataset.getResearchSubset()));
                 break;
             case K_ANONYMITY:
-                config.addCriterion(new KAnonymity(5));
+                config.addCriterion(new KAnonymity(k));
                 break;
             case L_DIVERSITY_RECURSIVE:
-                String sensitive = dataset.getSensitiveAttribute();
-                config.addCriterion(new RecursiveCLDiversity(sensitive, 4, 3));
+                config.addCriterion(new RecursiveCLDiversity(sensitive, l, c));
                 break;
             case T_CLOSENESS:
-                sensitive = dataset.getSensitiveAttribute();
-                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, 0.2d, dataset.loadHierarchy(sensitive)));
+                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, t, dataset.loadHierarchy(sensitive)));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");
