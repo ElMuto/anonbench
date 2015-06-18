@@ -55,8 +55,8 @@ public class BenchmarkMain {
             PLOT_VARIABLES.PARAM_DMIN.toString(),
             PLOT_VARIABLES.PARAM_DMAX.toString(),
             PLOT_VARIABLES.SENS_ATTR.toString(),
-//            VARIABLES.QI_SET.toString(),
-//            VARIABLES.SS_NUM.toString(),
+            PLOT_VARIABLES.QI_SET.toString(),
+            PLOT_VARIABLES.SS_NUM.toString(),
     });
     
     /** Label for minimum utility */
@@ -91,6 +91,7 @@ public class BenchmarkMain {
         Double  dMin = 0.05d;
         Double  dMax = 0.15d;
         String  sa = null;
+        Integer ssNum = null;
 
         // for each metric
         for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
@@ -105,14 +106,14 @@ public class BenchmarkMain {
                     for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
                         // Print status info
                         System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-                        processCriteria(driver, metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, sa);
+                        processCriteria(driver, metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, sa, ssNum);
                     }
 
                     // For each combination of subset-based criteria
                     for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
                         // Print status info
                         System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-                        processCriteria(driver, metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, sa);
+                        processCriteria(driver, metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, sa, ssNum);
                     }
                 }
             }
@@ -131,14 +132,14 @@ public class BenchmarkMain {
             for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
                 // For each combination of non subset-based criteria
-                for (int k = 2; k <= 100; k++) {
+                for (int k = 2; k <= 100; k += 10) {
 
                     // Print status info
                     System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / k = " + k);
                     processCriteria(driver, metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
                                     k, null, null, 
                                     null, null, null,
-                                    null);
+                                    null, null);
                 }
             }
         }
@@ -151,7 +152,7 @@ public class BenchmarkMain {
 			BenchmarkCriterion[] criteria, boolean subsetBased,
 			Integer k, Integer l, Integer c,
 			Double t, Double dMin, Double dMax,
-			String _sa
+			String sa, Integer ssNum
 			) throws IOException {
 
 		// Benchmark
@@ -162,11 +163,13 @@ public class BenchmarkMain {
 		                 Boolean.toString(subsetBased),
 		                 k != null ? k.toString() : "", l != null ? l.toString() : "", c != null ? c.toString() : "",
 		                 t != null ? t.toString() : "", dMin != null ? dMin.toString() : "", dMax != null ? dMax.toString() : "",
-		                 _sa != null ? _sa.toString() : "");
+		                 sa != null ? sa.toString() : "",
+		                 Arrays.toString(data.getQuasiIdentifyingAttributes()),
+		                 ssNum != null ? ssNum.toString() : "");
 
 		// Repeat
 		for (int i = 0; i < REPETITIONS; i++) {
-			driver.anonymize(data, criteria, suppFactor, metric, k, l, c, t, dMin, dMax, _sa, false);
+			driver.anonymize(data, criteria, suppFactor, metric, k, l, c, t, dMin, dMax, sa, false);
 		}
 
 		// Write results incrementally
