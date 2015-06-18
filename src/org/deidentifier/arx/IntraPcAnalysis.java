@@ -47,6 +47,7 @@ import de.linearbits.subframe.graph.Function;
 import de.linearbits.subframe.graph.Labels;
 import de.linearbits.subframe.graph.Plot;
 import de.linearbits.subframe.graph.PlotHistogramClustered;
+import de.linearbits.subframe.graph.PlotLinesClustered;
 import de.linearbits.subframe.graph.Point3D;
 import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
@@ -56,7 +57,7 @@ import de.linearbits.subframe.render.LaTeX;
 import de.linearbits.subframe.render.PlotGroup;
 import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 
-public class BenchmarkAnalysis {
+public class IntraPcAnalysis {
         
     private static String FONT_SIZE_CAPTION="scriptsize";
 //    private static String FONT_SIZE="tiny";

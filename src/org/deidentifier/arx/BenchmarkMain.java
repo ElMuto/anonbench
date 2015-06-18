@@ -94,28 +94,28 @@ public class BenchmarkMain {
 
         // for each metric
         for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
-        	
-        	// for each suppression factor
-        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-        		
-            // For each dataset
-            for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
-    			// For each combination of non subset-based criteria
-    			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
-                    // Print status info
-                    System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-    				processCriteria(driver, metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, sa);
-    			}
+            // for each suppression factor
+            for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-    			// For each combination of subset-based criteria
-    			for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
-                    // Print status info
-                    System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-    				processCriteria(driver, metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, sa);
-    			}
-        		}
-        	}
+                // For each dataset
+                for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+
+                    // For each combination of non subset-based criteria
+                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
+                        // Print status info
+                        System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+                        processCriteria(driver, metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, sa);
+                    }
+
+                    // For each combination of subset-based criteria
+                    for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
+                        // Print status info
+                        System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
+                        processCriteria(driver, metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, sa);
+                    }
+                }
+            }
         }
     }
     
@@ -131,7 +131,7 @@ public class BenchmarkMain {
             for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
                 // For each combination of non subset-based criteria
-                for (int k : BenchmarkSetup.get_k_values()) {
+                for (int k = 2; k <= 100; k++) {
 
                     // Print status info
                     System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / k = " + k);
