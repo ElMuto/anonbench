@@ -116,6 +116,7 @@ public class IntraPcAnalysis {
         params.logY = false;
         params.ratio = 0.3d;
         params.colorize = true;
+        params.lineStyle = GnuPlotParams.LineStyle.STEPS;
         
         // Return
         return new PlotGroup(value_type.toLowerCase() + " for measure \""+measure+"\" and suppression factor " + suppFactor, plots, params, 1.0d);
