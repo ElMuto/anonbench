@@ -23,7 +23,7 @@ package org.deidentifier.arx;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
 import de.linearbits.subframe.Benchmark;
 
@@ -57,13 +57,16 @@ public class BenchmarkDriver {
     public void anonymize(BenchmarkDataset dataset,
                           BenchmarkCriterion[] criteria,
                           double suppFactor,
-                          BenchmarkMetric metric,
+                          BenchmarkMeasure metric,
+                          Integer k, Integer l, Integer c,
+                          Double t, Double dMin, Double dMax,
+                          String sa,
                           boolean warmup) throws IOException {
 
         // Build implementation
         // Prepare
         Data data = dataset.toArxData(criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, criteria);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, criteria);
         
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXResult result = anonymizer.anonymize(data, config);

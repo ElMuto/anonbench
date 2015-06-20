@@ -121,7 +121,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             if (criteria != null) {
                 for (BenchmarkCriterion c : criteria) {
                     switch (c) {
-                    case L_DIVERSITY:
+                    case L_DIVERSITY_RECURSIVE:
                     case T_CLOSENESS:
                         String sensitive = getSensitiveAttribute();
                         arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
@@ -182,7 +182,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @param dataset
          * @return
          */
-        private String[] getQuasiIdentifyingAttributes() {
+        String[] getQuasiIdentifyingAttributes() {
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",

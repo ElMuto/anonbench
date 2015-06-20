@@ -22,25 +22,43 @@ package org.deidentifier.arx;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
-import org.deidentifier.arx.BenchmarkSetup.VARIABLES;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.BenchmarkSetup;
 
 import de.linearbits.objectselector.Selector;
+import de.linearbits.subframe.analyzer.Analyzer;
+import de.linearbits.subframe.analyzer.buffered.BufferedGeometricMeanAnalyzer;
+import de.linearbits.subframe.graph.Field;
+import de.linearbits.subframe.graph.Function;
+import de.linearbits.subframe.graph.Labels;
+import de.linearbits.subframe.graph.Plot;
+import de.linearbits.subframe.graph.PlotHistogramClustered;
+import de.linearbits.subframe.graph.PlotLinesClustered;
+import de.linearbits.subframe.graph.Point3D;
+import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
+import de.linearbits.subframe.render.GnuPlotParams;
+import de.linearbits.subframe.render.LaTeX;
+import de.linearbits.subframe.render.PlotGroup;
+import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 
-public class BenchmarkAnalysis {
-
+public class InterPcAnalysis {
+        
     private static String FONT_SIZE_CAPTION="scriptsize";
 //    private static String FONT_SIZE="tiny";
     private static String FONT_SIZE="scriptsize";
@@ -75,7 +93,15 @@ public class BenchmarkAnalysis {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	OutputFormat of = OutputFormat.LATEX;
+    	analyzeInterCriteriaComparison();
+    	System.out.println("done.");
+    }
+
+    private static void analyzeInterCriteriaComparison() throws IOException,
+                                                        ParseException,
+                                                        UnsupportedEncodingException,
+                                                        FileNotFoundException {
+        OutputFormat of = OutputFormat.LATEX;
     	//        OutputFormat of = OutputFormat.CSV;
 
     	try (Writer writer = new BufferedWriter(
@@ -109,7 +135,6 @@ public class BenchmarkAnalysis {
     			}
     		}
     	}
-    	System.out.println("done.");
     }
 
     private static String summarizeCriteriaWithDifferentSuppressionValues(OutputFormat of) throws IOException, ParseException {
@@ -120,7 +145,7 @@ public class BenchmarkAnalysis {
     	result = buildLatexDocumentHeader(of, result);
 
     	// for each metric
-    	for (BenchmarkMetric metric : BenchmarkSetup.getMetrics()) {
+    	for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
 
     		// for each suppression factor
     		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -157,7 +182,7 @@ public class BenchmarkAnalysis {
 
 	private static String printTable(OutputFormat of, String result,
 			CSVFile file, BenchmarkCriterion[][] criteria,
-			BenchmarkMetric metric, double suppFactor, boolean subsetBased) throws ParseException {
+			BenchmarkMeasure metric, double suppFactor, boolean subsetBased) throws ParseException {
 	    
 	    // construct the criteria labels used for selecting the relevant rows
 	    String[] criteriaLabels = new String[criteria.length];
@@ -172,10 +197,10 @@ public class BenchmarkAnalysis {
 		// for each dataset
 		for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 			Selector<String[]> selector = file.getSelectorBuilder()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString()).equals(String.valueOf(metric)).and()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
-					.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString()).equals(dataset.toString())
+					.field(BenchmarkSetup.PLOT_VARIABLES.UTLITY_MEASURE.toString()).equals(String.valueOf(metric)).and()
+					.field(BenchmarkSetup.PLOT_VARIABLES.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
+					.field(BenchmarkSetup.PLOT_VARIABLES.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
+					.field(BenchmarkSetup.PLOT_VARIABLES.DATASET.toString()).equals(dataset.toString())
 					.build();
 
 			// get min and max of the dataset
@@ -187,7 +212,7 @@ public class BenchmarkAnalysis {
 				String[] csvLine = csvline.getData();
 
 				if (selector.isSelected(csvLine)) {
-					Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+					Double val = Double.valueOf(csvline.get(BenchmarkSetup.PLOT_VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
 					if (val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL) {
 						if (minVal == null || val < minVal) {
 							minVal = val;
@@ -205,11 +230,11 @@ public class BenchmarkAnalysis {
 
 			    // build selector
 				selector = file.getSelectorBuilder()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.UTLITY_METRIC.toString()).equals(String.valueOf(metric)).and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.DATASET.toString()).equals(dataset.toString()).and()
-						.field(org.deidentifier.arx.BenchmarkSetup.VARIABLES.CRITERIA.toString()).equals(critLabel)
+						.field(BenchmarkSetup.PLOT_VARIABLES.UTLITY_MEASURE.toString()).equals(String.valueOf(metric)).and()
+						.field(BenchmarkSetup.PLOT_VARIABLES.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
+						.field(BenchmarkSetup.PLOT_VARIABLES.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
+						.field(BenchmarkSetup.PLOT_VARIABLES.DATASET.toString()).equals(dataset.toString()).and()
+						.field(BenchmarkSetup.PLOT_VARIABLES.CRITERIA.toString()).equals(critLabel)
 						.build();
 
 				// find the entry in the CSV file, that we need to fill the cell
@@ -219,7 +244,7 @@ public class BenchmarkAnalysis {
 					String[] csvLine = csvline.getData();
 
 					if (selector.isSelected(csvLine)) {
-						Double val = Double.valueOf(csvline.get(VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+						Double val = Double.valueOf(csvline.get(BenchmarkSetup.PLOT_VARIABLES.UTILITY_VALUE.toString(), "Arithmetic Mean"));
 						Double normVal = val != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL;
 						String normString = normVal != BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_SOULUTION_FOUND_STRING_VAL;
 						String colorCode = "";

@@ -48,14 +48,11 @@ public class BenchmarkSetup {
      * Returns all metrics
      * @return
      */
-    public static BenchmarkMetric[] getMetrics() {        
-        return new BenchmarkMetric[] {
-        		BenchmarkMetric.LOSS,
-        		BenchmarkMetric.ENTROPY,
-        		BenchmarkMetric.AECS,
-        		BenchmarkMetric.DISCERNABILITY,
-        		BenchmarkMetric.PRECISION,
-        		BenchmarkMetric.HEIGHT
+    public static BenchmarkMeasure[] getMeasures() {        
+        return new BenchmarkMeasure[] {
+        		BenchmarkMeasure.LOSS,
+        		BenchmarkMeasure.ENTROPY,
+        		BenchmarkMeasure.AECS,
         		};
     }
     
@@ -91,9 +88,9 @@ public class BenchmarkSetup {
     public static BenchmarkCriterion[][] getNonSubsetBasedCriteria() {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
-            new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },
         };
     }
@@ -106,21 +103,29 @@ public class BenchmarkSetup {
     public static BenchmarkCriterion[][] getSubsetBasedCriteria() {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS},
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },                                           
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
         };
     }
     
-    public static enum VARIABLES {
-        UTLITY_METRIC {
+    public static int[] get_k_values() {
+        return new int[] {
+                          2, 3, 4, 5, 6, 7, 8, 9, 10,
+                          15, 20, 25, 30, 35, 45, 50,
+                          60, 70, 80, 90, 100
+        };
+    }
+    
+    public static enum PLOT_VARIABLES {
+        UTLITY_MEASURE {
             @Override
             public String toString() {
                 return "Utility Metric";
@@ -156,6 +161,60 @@ public class BenchmarkSetup {
                 return "Subset Based";
             }
         },
+        PARAM_K {
+            @Override
+            public String toString() {
+                return "k";
+            }
+        },
+        PARAM_L {
+            @Override
+            public String toString() {
+                return "l";
+            }
+        },
+        PARAM_C {
+            @Override
+            public String toString() {
+                return "c";
+            }
+        },
+        PARAM_T {
+            @Override
+            public String toString() {
+                return "t";
+            }
+        },
+        PARAM_DMIN {
+            @Override
+            public String toString() {
+                return "dMin";
+            }
+        },
+        PARAM_DMAX {
+            @Override
+            public String toString() {
+                return "dMax";
+            }
+        },
+        SENS_ATTR {
+            @Override
+            public String toString() {
+                return "Sens. Attr.";
+            }
+        },
+        QI_SET {
+            @Override
+            public String toString() {
+                return "QIs";
+            }
+        },
+        SS_NUM {
+            @Override
+            public String toString() {
+                return "Subset-Nr";
+            }
+        },
     }
 
     public static enum BenchmarkCriterion {
@@ -165,7 +224,19 @@ public class BenchmarkSetup {
                 return "k";
             }
         },
-        L_DIVERSITY {
+        L_DIVERSITY_DISTINCT {
+            @Override
+            public String toString() {
+                return "ld";
+            }
+        },
+        L_DIVERSITY_ENTROPY {
+            @Override
+            public String toString() {
+                return "le";
+            }
+        },
+        L_DIVERSITY_RECURSIVE {
             @Override
             public String toString() {
                 return "l";
@@ -191,7 +262,7 @@ public class BenchmarkSetup {
         },
     }
     
-    static enum BenchmarkMetric {
+    static enum BenchmarkMeasure {
         LOSS {
             @Override
             public String toString() {
@@ -233,17 +304,30 @@ public class BenchmarkSetup {
     /**
      * Returns a configuration for the ARX framework
      * @param dataset
+     * @param suppFactor
+     * @param metric
+     * @param k
+     * @param l
+     * @param c
+     * @param t
+     * @param dMin
+     * @param dMax
+     * @param sa
      * @param criteria
      * @return
      * @throws IOException
      */
-    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, double suppFactor,  BenchmarkMetric metric, BenchmarkCriterion... criteria) throws IOException {
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
+                                                    Integer k, Integer l, Integer c,
+                                                    Double t, Double dMin, Double dMax,
+                                                    String sa,
+                                                    BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
         
         switch (metric) {
         case ENTROPY:
-            config.setMetric(Metric.createEntropyMetric(true));
+            config.setMetric(Metric.createEntropyMetric());
             break;
         case LOSS:
             config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
@@ -266,24 +350,25 @@ public class BenchmarkSetup {
         
         config.setMaxOutliers(suppFactor);
         
-        for (BenchmarkCriterion c : criteria) {
-            switch (c) {
+        // use default senstitve attribute from dataset, if necessary
+        String sensitive = sa != null ? sa : dataset.getSensitiveAttribute();
+        
+        for (BenchmarkCriterion crit : criteria) {
+            switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(0.05d, 0.15d, dataset.getResearchSubset()));
+                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset()));
                 break;
             case INCLUSION:
                 config.addCriterion(new Inclusion(dataset.getResearchSubset()));
                 break;
             case K_ANONYMITY:
-                config.addCriterion(new KAnonymity(5));
+                config.addCriterion(new KAnonymity(k));
                 break;
-            case L_DIVERSITY:
-                String sensitive = dataset.getSensitiveAttribute();
-                config.addCriterion(new RecursiveCLDiversity(sensitive, 4, 3));
+            case L_DIVERSITY_RECURSIVE:
+                config.addCriterion(new RecursiveCLDiversity(sensitive, l, c));
                 break;
             case T_CLOSENESS:
-                sensitive = dataset.getSensitiveAttribute();
-                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, 0.2d, dataset.loadHierarchy(sensitive)));
+                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, t, dataset.loadHierarchy(sensitive)));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");

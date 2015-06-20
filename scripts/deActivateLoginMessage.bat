@@ -4,7 +4,7 @@ Rem Arbeit
 Rem Set _path=C:\dev\workspace-arx\anonbench-fork
 
 Rem Zuhause
-Set _path=E:\dev\workspace\anonbench_fork
+rem Set _path=E:\dev\workspace\anonbench_fork
 
 
 
