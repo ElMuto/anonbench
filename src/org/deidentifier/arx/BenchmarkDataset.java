@@ -183,7 +183,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @param dataset
          * @return
          */
-        String[] getQuasiIdentifyingAttributes() {
+        public String[] getQuasiIdentifyingAttributes() {
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",

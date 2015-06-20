@@ -20,16 +20,10 @@
 
 package org.deidentifier.arx;
 
-import java.io.IOException;
-
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
-import org.deidentifier.arx.criteria.DPresence;
-import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
-import org.deidentifier.arx.criteria.Inclusion;
-import org.deidentifier.arx.criteria.KAnonymity;
-import org.deidentifier.arx.criteria.RecursiveCLDiversity;
-import org.deidentifier.arx.metric.Metric;
-import org.deidentifier.arx.metric.Metric.AggregateFunction;
+
+import de.linearbits.subframe.Benchmark;
+import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -37,12 +31,37 @@ import org.deidentifier.arx.metric.Metric.AggregateFunction;
  */
 public class BenchmarkSetup {
 
-    static String RESULTS_DIR = "results";
-    static String RESULTS_FILE_STEM = "results";
-    static String RESULTS_FILE= RESULTS_DIR + "/" + RESULTS_FILE_STEM + ".csv";
-    static String SUMMARY_FILE_STEM="results_summary";
-    static double NO_SOULUTION_FOUND_DOUBLE_VAL=-1d;
-    static String NO_SOULUTION_FOUND_STRING_VAL="n.s.f.";
+	/** The benchmark instance */
+	public static final Benchmark BENCHMARK    = new Benchmark(new String[] {
+			PLOT_VARIABLES.UTLITY_MEASURE.toString(),
+			PLOT_VARIABLES.SUPPRESSION_FACTOR.toString(),
+			PLOT_VARIABLES.DATASET.toString(),
+			PLOT_VARIABLES.CRITERIA.toString(),
+			PLOT_VARIABLES.SUBSET_NATURE.toString(),
+			PLOT_VARIABLES.PARAM_K.toString(),
+			PLOT_VARIABLES.PARAM_L.toString(),
+			PLOT_VARIABLES.PARAM_C.toString(),
+			PLOT_VARIABLES.PARAM_T.toString(),
+			PLOT_VARIABLES.PARAM_DMIN.toString(),
+			PLOT_VARIABLES.PARAM_DMAX.toString(),
+			PLOT_VARIABLES.SENS_ATTR.toString(),
+			PLOT_VARIABLES.QI_SET.toString(),
+			PLOT_VARIABLES.SS_NUM.toString(),
+	});
+
+	/** Label for minimum utility */
+	public static final int        INFO_LOSS    = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
+
+	static {
+		BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
+	}
+
+    public static final String RESULTS_DIR = "results";
+    public static final String RESULTS_FILE_STEM = "results";
+    public static final String RESULTS_FILE= RESULTS_DIR + "/" + RESULTS_FILE_STEM + ".csv";
+    public static final String SUMMARY_FILE_STEM="results_summary";
+    public static final double NO_SOULUTION_FOUND_DOUBLE_VAL=-1d;
+    public static final String NO_SOULUTION_FOUND_STRING_VAL="n.s.f.";
     
     /**
      * Returns all metrics
@@ -262,7 +281,7 @@ public class BenchmarkSetup {
         },
     }
     
-    static enum BenchmarkMeasure {
+    public static enum BenchmarkMeasure {
         LOSS {
             @Override
             public String toString() {
@@ -299,78 +318,5 @@ public class BenchmarkSetup {
                 return "Height";
             }
         },
-    }
-
-    /**
-     * Returns a configuration for the ARX framework
-     * @param dataset
-     * @param suppFactor
-     * @param metric
-     * @param k
-     * @param l
-     * @param c
-     * @param t
-     * @param dMin
-     * @param dMax
-     * @param sa
-     * @param criteria
-     * @return
-     * @throws IOException
-     */
-    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
-                                                    Integer k, Integer l, Integer c,
-                                                    Double t, Double dMin, Double dMax,
-                                                    String sa,
-                                                    BenchmarkCriterion... criteria) throws IOException {
-        
-        ARXConfiguration config = ARXConfiguration.create();
-        
-        switch (metric) {
-        case ENTROPY:
-            config.setMetric(Metric.createEntropyMetric());
-            break;
-        case LOSS:
-            config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
-            break;
-        case AECS:
-            config.setMetric(Metric.createAECSMetric());
-            break;
-        case DISCERNABILITY:
-            config.setMetric(Metric.createDiscernabilityMetric());
-            break;
-        case PRECISION:
-            config.setMetric(Metric.createPrecisionMetric());
-            break;
-        case HEIGHT:
-            config.setMetric(Metric.createHeightMetric());
-            break;
-        default:
-            throw new RuntimeException("Invalid benchmark metric");
-        }
-        
-        config.setMaxOutliers(suppFactor);
-        
-        for (BenchmarkCriterion crit : criteria) {
-            switch (crit) {
-            case D_PRESENCE:
-                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset()));
-                break;
-            case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset()));
-                break;
-            case K_ANONYMITY:
-                config.addCriterion(new KAnonymity(k));
-                break;
-            case L_DIVERSITY_RECURSIVE:
-                config.addCriterion(new RecursiveCLDiversity(sa, l, c));
-                break;
-            case T_CLOSENESS:
-                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
-                break;
-            default:
-                throw new RuntimeException("Invalid criterion");
-            }
-        }
-        return config;
     }
 }

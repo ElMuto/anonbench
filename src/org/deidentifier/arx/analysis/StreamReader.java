@@ -1,4 +1,4 @@
-package org.deidentifier.arx;
+package org.deidentifier.arx.analysis;
 
 import java.io.IOException;
 import java.io.InputStream;

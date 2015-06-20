@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.deidentifier.arx;
+package org.deidentifier.arx.analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,6 +35,7 @@ import java.util.Iterator;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup;
 
 import de.linearbits.objectselector.Selector;
