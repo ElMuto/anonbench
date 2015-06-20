@@ -30,32 +30,16 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.BenchmarkSetup;
 
 import de.linearbits.objectselector.Selector;
-import de.linearbits.subframe.analyzer.Analyzer;
-import de.linearbits.subframe.analyzer.buffered.BufferedGeometricMeanAnalyzer;
-import de.linearbits.subframe.graph.Field;
-import de.linearbits.subframe.graph.Function;
-import de.linearbits.subframe.graph.Labels;
-import de.linearbits.subframe.graph.Plot;
-import de.linearbits.subframe.graph.PlotHistogramClustered;
-import de.linearbits.subframe.graph.PlotLinesClustered;
-import de.linearbits.subframe.graph.Point3D;
-import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
-import de.linearbits.subframe.render.GnuPlotParams;
-import de.linearbits.subframe.render.LaTeX;
-import de.linearbits.subframe.render.PlotGroup;
-import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 
 public class InterPcAnalysis {
         
@@ -280,7 +264,7 @@ public class InterPcAnalysis {
             header += "\\begin{table}[htb!]\n";
             header += "\\begin{" + FONT_SIZE + "}\n";
             header += "\\begin{tabular}{ | l | ";
-            for (String dummy : criteriaLabels) {
+            for (@SuppressWarnings("unused") String dummy : criteriaLabels) {
                 header += "r | ";
             }
             header += "}\n";

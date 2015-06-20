@@ -350,9 +350,6 @@ public class BenchmarkSetup {
         
         config.setMaxOutliers(suppFactor);
         
-        // use default senstitve attribute from dataset, if necessary
-        String sensitive = sa != null ? sa : dataset.getSensitiveAttribute();
-        
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
             case D_PRESENCE:
@@ -365,10 +362,10 @@ public class BenchmarkSetup {
                 config.addCriterion(new KAnonymity(k));
                 break;
             case L_DIVERSITY_RECURSIVE:
-                config.addCriterion(new RecursiveCLDiversity(sensitive, l, c));
+                config.addCriterion(new RecursiveCLDiversity(sa, l, c));
                 break;
             case T_CLOSENESS:
-                config.addCriterion(new HierarchicalDistanceTCloseness(sensitive, t, dataset.loadHierarchy(sensitive)));
+                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");

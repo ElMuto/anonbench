@@ -70,62 +70,11 @@ public class BenchmarkDriver {
         
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXResult result = anonymizer.anonymize(data, config);
-        DataHandle output = result.getOutput().getView();
-        
-        
-//        DataHandle handle = data.getHandle();
-//
-//        // Encode
-//        final String[] header = ((DataHandleInput) handle).header;
-//        final int[][] dataArray = ((DataHandleInput) handle).data;
-//        final Dictionary dictionary = ((DataHandleInput) handle).dictionary;
-//        final DataManager manager = new DataManager(header,
-//                                                    dataArray,
-//                                                    dictionary,
-//                                                    data.getDefinition(),
-//                                                    config.getCriteria());
-//
-//        // Initialize
-//        config.initialize(manager);
-//
-//        // Build or clean the lattice
-//        Lattice lattice = new LatticeBuilder(manager.getMaxLevels(),
-//                                             manager.getMinLevels()).build();
-//
-//        // Build a node checker, for all algorithms but Incognito
-//        INodeChecker checker = null;
-//
-//        // Initialize the metric
-//        config.getMetric().initialize(handle.getDefinition(),
-//                                      manager.getDataQI(),
-//                                      manager.getHierarchies(),
-//                                      config);
-//
-//
-//        // Execute
-//        implementation.traverse();
-//        if (!warmup) {
-            if (result.getGlobalOptimum() != null) {
-//                benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
-                benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()));
-            } else {
-                System.out.println("No solution found");
-                benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
-            }
-//        }
-//    }
-//
-//    /**
-//     * @param dataset
-//     * @param criteria
-//     * @param algorithm
-//     * @return
-//     * @throws IOException
-//     */
-//    private ARXAnonymizer getImplementation(BenchmarkDataset dataset,
-//                                                         BenchmarkCriterion[] criteria,
-//                                                         double suppFactor,
-//                                                         BenchmarkMetric metric) throws IOException {
-//return null;
+        if (result.getGlobalOptimum() != null) {
+        	benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()));
+        } else {
+        	System.out.println("No solution found");
+        	benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
+        }
     }
 }
