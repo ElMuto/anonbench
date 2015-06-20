@@ -102,7 +102,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
         }
 
         public Data toArxData() throws IOException {
-            return toArxData(null);
+            return toArxData(null/*, null*/);
         }
         
         /**
@@ -113,7 +113,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @throws IOException
          */
         @SuppressWarnings("incomplete-switch")
-		public Data toArxData(BenchmarkCriterion[] criteria) throws IOException {
+		public Data toArxData(BenchmarkCriterion[] criteria/*, Integer ssNum*/) throws IOException {
 
             Data arxData = Data.create("data/" + datafile.getBaseStringForFilename() + ".csv", ';');
             for (String qi : getQuasiIdentifyingAttributes()) {
@@ -322,29 +322,20 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             }
         }
 
-        /**
-         * Returns the research subset for the dataset
-         * @param dataset
+        /** Returns the research subset for the dataset
+         * @param ssNum
          * @return
          * @throws IOException
          */
-        public DataSubset getResearchSubset() throws IOException {
-            switch (getDatafile()) {
-            case ADULT:
-                return DataSubset.create(this.toArxData(), Data.create("data/adult_subset.csv", ';'));
-            case ATUS:
-                return DataSubset.create(this.toArxData(), Data.create("data/atus_subset.csv", ';'));
-            case CUP:
-                return DataSubset.create(this.toArxData(), Data.create("data/cup_subset.csv", ';'));
-            case FARS:
-                return DataSubset.create(this.toArxData(), Data.create("data/fars_subset.csv", ';'));
-            case IHIS:
-                return DataSubset.create(this.toArxData(), Data.create("data/ihis_subset.csv", ';'));
-            case ACS13:
-                return DataSubset.create(this.toArxData(), Data.create("data/ss13acs_subset.csv", ';'));
-            default:
-                throw new RuntimeException("Invalid dataset");
-            }
+        public DataSubset getResearchSubset(Integer ssNum) throws IOException {
+        	String filename;
+        	String baseName = getDatafile().baseStringForFilename;
+        	if (ssNum == null) {
+        		filename = "data/" + baseName + "_subset.csv";        		
+        	} else {
+        		filename = "data/subsets_" + baseName + "/" + baseName + "_subset_" + ssNum + ".csv";       
+        	}
+        	return DataSubset.create(this.toArxData(), Data.create(filename, ';'));
         }
 
         /**

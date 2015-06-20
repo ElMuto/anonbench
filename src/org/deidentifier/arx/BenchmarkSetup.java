@@ -70,7 +70,7 @@ public class BenchmarkSetup {
     public static BenchmarkMeasure[] getMeasures() {        
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
-        		BenchmarkMeasure.ENTROPY,
+//        		BenchmarkMeasure.ENTROPY,
         		BenchmarkMeasure.AECS,
         		};
     }
@@ -140,6 +140,21 @@ public class BenchmarkSetup {
                           2, 3, 4, 5, 6, 7, 8, 9, 10,
                           15, 20, 25, 30, 35, 45, 50,
                           60, 70, 80, 90, 100
+        };
+    }
+    
+    public static double[][] get_d_values() {
+        return new double[][] {
+        		new double[] {0d,   0.05},
+        		new double[] {0d,   0.07},
+        		new double[] {0d,   0.1},
+        		new double[] {0d,   0.2},
+        		new double[] {0d,   0.5},
+        		new double[] {0d,   0.7},
+        		new double[] {0.05, 0.2},
+        		new double[] {0.05, 0.7},
+        		new double[] {0.1,  0.2},
+        		new double[] {0.1,  0.7},
         };
     }
     

@@ -59,7 +59,7 @@ public class BenchmarkDriver {
     private static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
                                                     Integer k, Integer l, Integer c,
                                                     Double t, Double dMin, Double dMax,
-                                                    String sa,
+                                                    String sa, Integer ssNum,
                                                     BenchmarkCriterion... criteria) throws IOException {
         
         ARXConfiguration config = ARXConfiguration.create();
@@ -92,10 +92,10 @@ public class BenchmarkDriver {
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset()));
+                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(ssNum)));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset()));
+                config.addCriterion(new Inclusion(dataset.getResearchSubset(ssNum)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(k));
@@ -115,6 +115,22 @@ public class BenchmarkDriver {
     
 
 
+	/**
+	 * @param metric
+	 * @param suppFactor
+	 * @param dataset
+	 * @param criteria
+	 * @param subsetBased
+	 * @param k
+	 * @param l
+	 * @param c
+	 * @param t
+	 * @param dMin
+	 * @param dMax
+	 * @param sa
+	 * @param ssNum
+	 * @throws IOException
+	 */
 	public static void anonymize(
 			BenchmarkMeasure metric,
 			double suppFactor, BenchmarkDataset dataset,
@@ -124,8 +140,8 @@ public class BenchmarkDriver {
 			String sa, Integer ssNum
 			) throws IOException {
 
-        Data arxData = dataset.toArxData(criteria);
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, criteria);
+        Data arxData = dataset.toArxData(criteria/*, ssNum*/);
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, criteria);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 
 		// Benchmark
