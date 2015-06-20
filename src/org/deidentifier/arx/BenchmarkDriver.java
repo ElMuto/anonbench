@@ -24,15 +24,6 @@ import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMetric;
-import org.deidentifier.arx.algorithm.AbstractBenchmarkAlgorithm;
-import org.deidentifier.arx.algorithm.AlgorithmFlash;
-import org.deidentifier.arx.framework.check.INodeChecker;
-import org.deidentifier.arx.framework.check.NodeChecker;
-import org.deidentifier.arx.framework.data.DataManager;
-import org.deidentifier.arx.framework.data.Dictionary;
-import org.deidentifier.arx.framework.lattice.Lattice;
-import org.deidentifier.arx.framework.lattice.LatticeBuilder;
-import org.deidentifier.arx.framework.lattice.Node;
 
 import de.linearbits.subframe.Benchmark;
 
@@ -41,15 +32,6 @@ import de.linearbits.subframe.Benchmark;
  * @author Fabian Prasser
  */
 public class BenchmarkDriver {
-
-    /** Snapshot size. */
-    private final double    snapshotSizeDataset  = 0.2d;
-
-    /** Snapshot size snapshot */
-    private final double    snapshotSizeSnapshot = 0.8d;
-
-    /** History size. */
-    private final int       historySize          = 200;
 
     /** The benchmark instance */
     private final Benchmark benchmark;
@@ -79,63 +61,68 @@ public class BenchmarkDriver {
                           boolean warmup) throws IOException {
 
         // Build implementation
-        AbstractBenchmarkAlgorithm implementation = getImplementation(dataset, criteria, suppFactor, metric);
-
-        // Execute
-        implementation.traverse();
-        if (!warmup) {
-            if (implementation.getGlobalOptimum() != null) {
-                benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+        // Prepare
+        Data data = dataset.toArxData(criteria);
+        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, criteria);
+        
+        ARXAnonymizer anonymizer = new ARXAnonymizer();
+        ARXResult result = anonymizer.anonymize(data, config);
+        DataHandle output = result.getOutput().getView();
+        
+        
+//        DataHandle handle = data.getHandle();
+//
+//        // Encode
+//        final String[] header = ((DataHandleInput) handle).header;
+//        final int[][] dataArray = ((DataHandleInput) handle).data;
+//        final Dictionary dictionary = ((DataHandleInput) handle).dictionary;
+//        final DataManager manager = new DataManager(header,
+//                                                    dataArray,
+//                                                    dictionary,
+//                                                    data.getDefinition(),
+//                                                    config.getCriteria());
+//
+//        // Initialize
+//        config.initialize(manager);
+//
+//        // Build or clean the lattice
+//        Lattice lattice = new LatticeBuilder(manager.getMaxLevels(),
+//                                             manager.getMinLevels()).build();
+//
+//        // Build a node checker, for all algorithms but Incognito
+//        INodeChecker checker = null;
+//
+//        // Initialize the metric
+//        config.getMetric().initialize(handle.getDefinition(),
+//                                      manager.getDataQI(),
+//                                      manager.getHierarchies(),
+//                                      config);
+//
+//
+//        // Execute
+//        implementation.traverse();
+//        if (!warmup) {
+            if (result.getGlobalOptimum() != null) {
+//                benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(implementation.getGlobalOptimum().getInformationLoss().toString()));
+                benchmark.addValue(BenchmarkMain.INFO_LOSS, Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()));
             } else {
                 System.out.println("No solution found");
                 benchmark.addValue(BenchmarkMain.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
             }
-        }
-    }
-
-    /**
-     * @param dataset
-     * @param criteria
-     * @param algorithm
-     * @return
-     * @throws IOException
-     */
-    private AbstractBenchmarkAlgorithm getImplementation(BenchmarkDataset dataset,
-                                                         BenchmarkCriterion[] criteria,
-                                                         double suppFactor,
-                                                         BenchmarkMetric metric) throws IOException {
-        // Prepare
-        Data data = dataset.toArxData(criteria);
-        ARXConfiguration config = BenchmarkSetup.getConfiguration(dataset, suppFactor, metric, criteria);
-        DataHandle handle = data.getHandle();
-
-        // Encode
-        final String[] header = ((DataHandleInput) handle).header;
-        final int[][] dataArray = ((DataHandleInput) handle).data;
-        final Dictionary dictionary = ((DataHandleInput) handle).dictionary;
-        final DataManager manager = new DataManager(header,
-                                                    dataArray,
-                                                    dictionary,
-                                                    data.getDefinition(),
-                                                    config.getCriteria());
-
-        // Initialize
-        config.initialize(manager);
-
-        // Build or clean the lattice
-        Lattice lattice = new LatticeBuilder(manager.getMaxLevels(),
-                                             manager.getMinLevels()).build();
-
-        // Build a node checker, for all algorithms but Incognito
-        INodeChecker checker = null;
-
-        // Initialize the metric
-        config.getMetric().initialize(handle.getDefinition(),
-                                      manager.getDataQI(),
-                                      manager.getHierarchies(),
-                                      config);
-
-        // Create an algorithm instance
-        return new AlgorithmFlash(lattice, checker, manager.getHierarchies());
+//        }
+//    }
+//
+//    /**
+//     * @param dataset
+//     * @param criteria
+//     * @param algorithm
+//     * @return
+//     * @throws IOException
+//     */
+//    private ARXAnonymizer getImplementation(BenchmarkDataset dataset,
+//                                                         BenchmarkCriterion[] criteria,
+//                                                         double suppFactor,
+//                                                         BenchmarkMetric metric) throws IOException {
+//return null;
     }
 }
