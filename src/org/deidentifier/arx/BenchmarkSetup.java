@@ -70,8 +70,8 @@ public class BenchmarkSetup {
     public static BenchmarkMeasure[] getMeasures() {        
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
-//        		BenchmarkMeasure.ENTROPY,
         		BenchmarkMeasure.AECS,
+//        		BenchmarkMeasure.ENTROPY,
         		};
     }
     
@@ -90,13 +90,13 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkDataset[] getDatasets() {
-        return new BenchmarkDataset[] { 
+        return new BenchmarkDataset[] {
+         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
          new BenchmarkDataset(BenchmarkDatafile.ADULT, null),
          new BenchmarkDataset(BenchmarkDatafile.CUP, null),
          new BenchmarkDataset(BenchmarkDatafile.FARS, null),
          new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
          new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
-         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
                                         };
     }
 
