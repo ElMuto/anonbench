@@ -71,7 +71,8 @@ public class BenchmarkSetup {
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
         		BenchmarkMeasure.AECS,
-//        		BenchmarkMeasure.ENTROPY,
+        		BenchmarkMeasure.ENTROPY,
+        		BenchmarkMeasure.DISCERNABILITY,
         		};
     }
     
@@ -81,8 +82,8 @@ public class BenchmarkSetup {
      */
     public static double[] getSuppressionFactors() {        
         return new double[] { 0d, 0.05d, 0.1d, 0.5d, 1d };
-//      return new double[] { 0d, 0.05d, 0.1d };
-//      return new double[] { 0d };
+//      return new double[] { 0.1, 1d };
+//      return new double[] { 0.1 };
     }
 
     /**

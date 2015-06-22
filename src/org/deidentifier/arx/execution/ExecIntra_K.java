@@ -59,7 +59,7 @@ public class ExecIntra_K {
 				for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
 
 					// For each combination of non subset-based criteria
-					for (int k = 2; k <= 100; k += 10) {
+					for (int k = 2; k <= 100; k ++) {
 
 						// Print status info
 						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / k = " + k);
