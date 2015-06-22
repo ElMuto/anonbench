@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DPresence;
+import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -57,7 +58,7 @@ public class BenchmarkDriver {
      * @throws IOException
      */
     private static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
-                                                    Integer k, Integer l, Integer c,
+                                                    Integer k, Integer l, Double c,
                                                     Double t, Double dMin, Double dMax,
                                                     String sa, Integer ssNum,
                                                     BenchmarkCriterion... criteria) throws IOException {
@@ -100,8 +101,14 @@ public class BenchmarkDriver {
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(k));
                 break;
+            case L_DIVERSITY_DISTINCT:
+                config.addCriterion(new DistinctLDiversity(sa, l));
+                break;
+            case L_DIVERSITY_ENTROPY:
+                config.addCriterion(new org.deidentifier.arx.criteria.EntropyLDiversity(sa, l));
+                break;
             case L_DIVERSITY_RECURSIVE:
-                config.addCriterion(new RecursiveCLDiversity(sa, l, c));
+                config.addCriterion(new RecursiveCLDiversity(sa, c, l));
                 break;
             case T_CLOSENESS:
                 config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
@@ -135,7 +142,7 @@ public class BenchmarkDriver {
 			BenchmarkMeasure metric,
 			double suppFactor, BenchmarkDataset dataset,
 			BenchmarkCriterion[] criteria, boolean subsetBased,
-			Integer k, Integer l, Integer c,
+			Integer k, Integer l, Double c,
 			Double t, Double dMin, Double dMax,
 			String sa, Integer ssNum
 			) throws IOException {
