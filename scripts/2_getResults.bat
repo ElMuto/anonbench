@@ -6,7 +6,6 @@ Rem Set _path=C:\dev\workspace-arx\anonbench-fork
 Rem Helmut Zuhause
 Rem Set _path=E:\dev\workspace\anonbench_fork
 
-Set _merge_host=PCluster-fed3
 Set _cluster_node=2
 
 
