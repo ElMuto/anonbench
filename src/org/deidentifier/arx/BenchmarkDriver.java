@@ -150,6 +150,7 @@ public class BenchmarkDriver {
         Data arxData = dataset.toArxData(criteria/*, ssNum*/);
         ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, criteria);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
+        anonymizer.setMaxTransformations(200000);
 
 		// Benchmark
 		BenchmarkSetup.BENCHMARK.addRun(metric.toString(),
