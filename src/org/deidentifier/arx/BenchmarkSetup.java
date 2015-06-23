@@ -91,14 +91,19 @@ public class BenchmarkSetup {
      * @return
      */
     public static BenchmarkDataset[] getDatasets() {
-        return new BenchmarkDataset[] {
-         new BenchmarkDataset(BenchmarkDatafile.ACS13, 10),
-         new BenchmarkDataset(BenchmarkDatafile.ADULT, null),
-         new BenchmarkDataset(BenchmarkDatafile.CUP, null),
-         new BenchmarkDataset(BenchmarkDatafile.FARS, null),
-         new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
-         new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
-                                        };
+        
+        BenchmarkDataset[] datasetArr = new BenchmarkDataset[getDatafiles().length];
+        for (int i = 0; i < getDatafiles().length; i++) {
+            
+            BenchmarkDatafile datafile = getDatafiles()[i];
+            
+            Integer numQis = null;
+            if (BenchmarkDatafile.ACS13.equals(datafile)) numQis = 8;
+            
+            datasetArr[i] = new BenchmarkDataset(datafile, numQis);
+        }
+        
+        return datasetArr;
     }
 
     /**
@@ -108,11 +113,11 @@ public class BenchmarkSetup {
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
          BenchmarkDatafile.ACS13,
-//         BenchmarkDatafile.ADULT,
-//         BenchmarkDatafile.CUP,
-//         BenchmarkDatafile.FARS,
-//         BenchmarkDatafile.ATUS,
-//         BenchmarkDatafile.IHIS,
+         BenchmarkDatafile.ADULT,
+         BenchmarkDatafile.CUP,
+         BenchmarkDatafile.FARS,
+         BenchmarkDatafile.ATUS,
+         BenchmarkDatafile.IHIS,
                                         };
     }
 
