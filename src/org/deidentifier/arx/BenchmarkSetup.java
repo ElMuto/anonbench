@@ -72,6 +72,7 @@ public class BenchmarkSetup {
         		BenchmarkMeasure.LOSS,
         		BenchmarkMeasure.AECS,
 //        		BenchmarkMeasure.ENTROPY,
+//        		BenchmarkMeasure.DISCERNABILITY,
         		};
     }
     
@@ -81,8 +82,8 @@ public class BenchmarkSetup {
      */
     public static double[] getSuppressionFactors() {        
         return new double[] { 0d, 0.05d, 0.1d, 0.5d, 1d };
-//      return new double[] { 0d, 0.05d, 0.1d };
-//      return new double[] { 0d };
+//      return new double[] { 0.1, 1d };
+//      return new double[] { 0.1 };
     }
 
     /**
@@ -97,6 +98,21 @@ public class BenchmarkSetup {
          new BenchmarkDataset(BenchmarkDatafile.FARS, null),
          new BenchmarkDataset(BenchmarkDatafile.ATUS, null),
          new BenchmarkDataset(BenchmarkDatafile.IHIS, null),
+                                        };
+    }
+
+    /**
+     * Returns all datasets
+     * @return
+     */
+    public static BenchmarkDatafile[] getDatafiles() {
+        return new BenchmarkDatafile[] {
+         BenchmarkDatafile.ACS13,
+//         BenchmarkDatafile.ADULT,
+//         BenchmarkDatafile.CUP,
+//         BenchmarkDatafile.FARS,
+//         BenchmarkDatafile.ATUS,
+//         BenchmarkDatafile.IHIS,
                                         };
     }
 

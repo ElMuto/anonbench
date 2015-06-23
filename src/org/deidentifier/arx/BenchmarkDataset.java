@@ -21,7 +21,19 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
     public class BenchmarkDataset {
         private BenchmarkDatafile datafile = null;
         private Integer customQiCount = null;
-                
+        private String sensitiveAttribute;
+        
+        /**
+         * @param datafile
+         * @param customQiCount
+         * @param sensitiveAttribute
+         */
+        public BenchmarkDataset(BenchmarkDatafile datafile, Integer customQiCount, String sensitiveAttribute) {
+            this.datafile = datafile;
+            this.customQiCount = customQiCount;
+            this.sensitiveAttribute = sensitiveAttribute;
+        }
+
         /**
          * @param datafile
          * @param customQiCount
@@ -29,6 +41,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
         public BenchmarkDataset(BenchmarkDatafile datafile, Integer customQiCount) {
             this.datafile = datafile;
             this.customQiCount = customQiCount;
+            this.sensitiveAttribute = getDefaultSensitiveAttribute(datafile);
         }
 
         public BenchmarkDatafile getDatafile() {
@@ -122,6 +135,8 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             if (criteria != null) {
                 for (BenchmarkCriterion c : criteria) {
                     switch (c) {
+                    case L_DIVERSITY_DISTINCT:
+                    case L_DIVERSITY_ENTROPY:
                     case L_DIVERSITY_RECURSIVE:
                     case T_CLOSENESS:
                         String sensitive = getSensitiveAttribute();
@@ -187,50 +202,50 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",
-                                                        "education",
                                                         "marital-status",
-                                                        "native-country",
                                                         "race",
-                                                        "salary-class",
                                                         "sex",
+                                                        "education",
+                                                        "native-country",
+                                                        "salary-class",
                                                         "workclass" }),
                                         customQiCount);
             case ATUS:
                 return customizeQis ((new String[] {   "Age",
+                                                       "Race",
+                                                       "Region",
+                                                       "Sex",
                                                         "Birthplace",
                                                         "Citizenship status",
                                                         "Labor force status",
-                                                        "Marital status",
-                                                        "Race",
-                                                        "Region",
-                                                        "Sex" }),
+                                                        "Marital status" }),
                                          customQiCount);
             case CUP:
                 return customizeQis ((new String[] {   "AGE",
                                                         "GENDER",
+                                                        "STATE",
+                                                        "ZIP",
                                                         "INCOME",
                                                         "MINRAMNT",
-                                                        "NGIFTALL",
-                                                        "STATE",
-                                                        "ZIP" }),
+                                                        "NGIFTALL" }),
                                         customQiCount);
             case FARS:
                 return customizeQis ((new String[] {   "iage",
+                                                       "ihispanic",
+                                                       "irace",
+                                                       "isex",
                                                         "ideathday",
                                                         "ideathmon",
-                                                        "ihispanic",
-                                                        "iinjury",
-                                                        "irace",
-                                                        "isex" }),
+                                                        "iinjury" }),
                                         customQiCount);
             case IHIS:
                 return customizeQis ((new String[] {   "AGE",
+                                                       "RACEA",
+                                                       "REGION",
+                                                       "SEX",
                                                         "MARSTAT",
                                                         "PERNUM",
                                                         "QUARTER",
-                                                        "RACEA",
-                                                        "REGION",
-                                                        "SEX",
                                                         "YEAR" }),
                                         customQiCount);
             case ACS13:
@@ -248,13 +263,13 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             AGEP(HierarchyType.INTERVAL), // height 10
             CIT(HierarchyType.ORDER), // height 06
             COW(HierarchyType.ORDER), // height 06
+            FER(HierarchyType.ORDER), // height 02
             DDRS(HierarchyType.ORDER), // height 05
             DEAR(HierarchyType.ORDER), // height 05
             DEYE(HierarchyType.ORDER), // height 05
             DOUT(HierarchyType.ORDER), // height 04
             DPHY(HierarchyType.ORDER), // height 04
             DREM(HierarchyType.ORDER), // height 03
-            FER(HierarchyType.ORDER), // height 02
             GCL(HierarchyType.ORDER), // height 02
             HINS1(HierarchyType.ORDER), // height 02
             HINS2(HierarchyType.ORDER), // height 02
@@ -339,11 +354,11 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
         }
 
         /**
-         * Returns the sensitive attribute for the dataset
+         * Returns the default sensitive attribute for the dataset
          * @param dataset
          * @return
          */
-        public String getSensitiveAttribute() {
+        private String getDefaultSensitiveAttribute(BenchmarkDatafile datafile) {
             switch (datafile) {
             case ADULT:
                 return "occupation";
@@ -358,6 +373,57 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             case ACS13:
                 return "SCHG";
 //                return "INTP"; //nok - (464 eindeutige Werte)
+            default:
+                throw new RuntimeException("Invalid dataset");
+            }
+        }
+
+        /**
+         * Returns the sensitive attribute for the dataset
+         * @param dataset
+         * @return
+         */
+        public String getSensitiveAttribute() {
+            return sensitiveAttribute;
+        }
+
+        /**
+         * Returns the sensitive attribute for the dataset
+         * @param dataset
+         * @return
+         */
+        public static String[] getSensitiveAttributeCandidates(BenchmarkDatafile datafile) {
+            switch (datafile) {
+            case ADULT:
+                return new String[] { "occupation",
+                                      "education", 
+                                      "salary-class", 
+                                      "workclass" };
+            case ATUS:
+                return new String[] { "Highest level of school completed",
+                                      "Birthplace", 
+                                      "Citizenship status", 
+                                      "Labor force status" };
+            case CUP:
+                return new String[] { "RAMNTALL",
+                                      "INCOME", 
+                                      "MINRAMNT", 
+                                      "NGIFTALL" };
+            case FARS:
+                return new String[] { "istatenum",
+                                      "ideathday", 
+                                      "ideathmon", 
+                                      "iinjury" };
+            case IHIS:
+                return new String[] { "EDUC",
+                                      "MARSTAT", 
+                                      "PERNUM", 
+                                      "QUARTER" };
+            case ACS13:
+                return new String[] { "SCHG",
+                                      "DDRS", 
+                                      "DEAR", 
+                                      "DEYE" };
             default:
                 throw new RuntimeException("Invalid dataset");
             }

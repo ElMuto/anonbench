@@ -54,7 +54,7 @@ public class ExecInterPc {
 		// values for k, l, etc
 		Integer k = 5;
 		Integer l = 4;
-		Integer c = 3;
+		Double c = 3d;
 		Double  t = 0.2d;
 		Double  dMin = 0.05d;
 		Double  dMax = 0.15d;
