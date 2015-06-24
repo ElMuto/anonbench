@@ -176,9 +176,23 @@ public class BenchmarkDriver {
         
         if (printDatasetStats) {
             System.out.println("    Lattice Size: " + result.getLattice().getSize());
+            printStats(arxData.getHandle());
         }
 
 		// Write results incrementally
 		BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
+	}
+
+
+
+	private static void printStats(DataHandle handle) {
+		for (int i = 0;  i < handle.getNumColumns(); i++) {
+			System.out.println("    Column[" + i + "]: [ ");
+			double[] freqs = handle.getStatistics().getFrequencyDistribution(i).frequency;
+//			System.out.println(freqs[i]);
+//			if (i != handle.getNumColumns() -1) System.out.println(", ");
+		}
+		System.out.println(" ]");
+		
 	}
 }

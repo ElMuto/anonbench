@@ -55,7 +55,7 @@ public class CollectDatasetStats {
         // For each dataset
         for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
-            BenchmarkDataset data = new BenchmarkDataset(datafile, 10);
+            BenchmarkDataset data = new BenchmarkDataset(datafile, 4);
 
             System.out.println("Getting stats for dataset " + data.toString());
             BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
