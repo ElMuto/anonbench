@@ -71,7 +71,7 @@ public class ExecIntra_L {
                             BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT }, false,
                                                       null, l, null, 
                                                       null, null, null,
-                                                      sa, null);
+                                                      sa, null, false);
                         }
 
                         // entropy l-diversity
@@ -81,7 +81,7 @@ public class ExecIntra_L {
                             BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY }, false,
                                                       null, l, null, 
                                                       null, null, null,
-                                                      sa, null);
+                                                      sa, null, false);
                         }
 
                         // recursive c,l-diversity
@@ -92,7 +92,7 @@ public class ExecIntra_L {
                                 BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, false,
                                                           null, l, c, 
                                                           null, null, null,
-                                                          sa, null);
+                                                          sa, null, false);
                             }
                         }
                     }

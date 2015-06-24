@@ -23,6 +23,7 @@ package org.deidentifier.arx.execution;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkDataset;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -33,46 +34,34 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * 
  * @author Fabian Prasser
  */
-public class ExecIntra_D {
+public class CollectDatasetStats {
 
-	/**
-	 * Main entry point
-	 * 
-	 * @param args
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws IOException {
+    /**
+     * Main entry point
+     * 
+     * @param args
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
 
-		evaluate_d_presence();
-		System.out.println("done.");
-	}
+        collectStats();
+    }
 
-	private static void evaluate_d_presence() throws IOException {
-		
-		// for each metric
-		for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
+    private static void collectStats() throws IOException {
 
-			// for each suppression factor
-			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+        BenchmarkMeasure metric = BenchmarkSetup.getMeasures()[0];
+        double suppFactor = BenchmarkSetup.getSuppressionFactors()[0];
 
-				// For each dataset
-				for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+        // For each dataset
+        for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
-					// For each combination of non subset-based criteria
-					for (double[] dParams : BenchmarkSetup.get_d_values()) {
-						
-						for (int ssNum = 1; ssNum <= 100; ssNum++) {
+            BenchmarkDataset data = new BenchmarkDataset(datafile, 10);
 
-							// Print status info
-							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
-							BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE }, false,
-									null, null, null, 
-									null, dParams[0], dParams[1],
-									null, ssNum, false);
-						}
-					}
-				}
-			}
-		}
-	}
+            System.out.println("Getting stats for dataset " + data.toString());
+            BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
+                                      5, null, null, 
+                                      null, null, null,
+                                      null, null, true);
+        }
+    }
 }

@@ -66,7 +66,7 @@ public class ExecIntra_K {
 						BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
 								k, null, null, 
 								null, null, null,
-								null, null);
+								null, null, false);
 					}
 				}
 			}

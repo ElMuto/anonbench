@@ -136,6 +136,7 @@ public class BenchmarkDriver {
 	 * @param dMax
 	 * @param sa
 	 * @param ssNum
+	 * @param printDatasetStats TODO
 	 * @throws IOException
 	 */
 	public static void anonymize(
@@ -144,13 +145,13 @@ public class BenchmarkDriver {
 			BenchmarkCriterion[] criteria, boolean subsetBased,
 			Integer k, Integer l, Double c,
 			Double t, Double dMin, Double dMax,
-			String sa, Integer ssNum
+			String sa, Integer ssNum, boolean printDatasetStats
 			) throws IOException {
 
         Data arxData = dataset.toArxData(criteria/*, ssNum*/);
         ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, criteria);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
-        anonymizer.setMaxTransformations(200000);
+        anonymizer.setMaxTransformations(210000);
 
 		// Benchmark
 		BenchmarkSetup.BENCHMARK.addRun(metric.toString(),
@@ -171,6 +172,10 @@ public class BenchmarkDriver {
         } else {
         	System.out.println("No solution found");
         	BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
+        }
+        
+        if (printDatasetStats) {
+            System.out.println("    Lattice Size: " + result.getLattice().getSize());
         }
 
 		// Write results incrementally
