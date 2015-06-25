@@ -289,7 +289,7 @@ public class BenchmarkSetup {
         NUM_VALUES {
             @Override
             public String toString() {
-                return "Number of distinct values";
+                return "Number of distinct SA values";
             }
         },
         VARIANCE {
