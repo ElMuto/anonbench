@@ -35,7 +35,6 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
-import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -149,7 +148,7 @@ public class BenchmarkDriver {
 			BenchmarkCriterion[] criteria, boolean subsetBased,
 			Integer k, Integer l, Double c,
 			Double t, Double dMin, Double dMax,
-			String sa, Integer ssNum, boolean printDatasetStats
+			String sa, Integer ssNum
 			) throws IOException {
 
         Data arxData = dataset.toArxData(criteria/*, ssNum*/);
@@ -171,51 +170,105 @@ public class BenchmarkDriver {
         
         ARXResult result = anonymizer.anonymize(arxData, config);
         
-        if (result.getGlobalOptimum() != null) {
-        	BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()));
-        } else {
-        	System.out.println("No solution found");
-        	BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
+        AttributeStatistics attrStats = null;
+        Double numValues = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double variance = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double skewness = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double kurtosis = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double frequencyVariance = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        
+        if (sa != null) {
+            attrStats = processSA(dataset, arxData.getHandle(), sa, 0);
+            if (attrStats.getNumValues() != null) numValues = attrStats.getNumValues().doubleValue();    
+            if (attrStats.getVariance() != null) variance = attrStats.getVariance();    
+            if (attrStats.getSkewness() != null) skewness = attrStats.getSkewness();    
+            if (attrStats.getKurtosis() != null) kurtosis = attrStats.getKurtosis();    
+            if (attrStats.getFrequencyVariance() != null) frequencyVariance = attrStats.getFrequencyVariance();            
         }
         
-        if (printDatasetStats) printAnonymizationStats(dataset, result);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, result.getGlobalOptimum() != null ?
+                Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()) :
+                BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, numValues);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.VARIANCE, variance);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SKEWNESS, skewness);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.KUROTSIS, kurtosis);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_VARI, frequencyVariance);
 
 		// Write results incrementally
 		BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
 	}
-
-	private static void printAnonymizationStats(BenchmarkDataset dataset, ARXResult result) throws IOException {
-        System.out.println("Lattice Size for dataset " + dataset + " was "+ result.getLattice().getSize());
-	}
 	
-	public static void printDatasetStats(BenchmarkDatafile datafile) throws IOException {
+	/**
+	 * @param datafile
+	 * @param printDetails
+	 * @throws IOException
+	 */
+	public static void printDatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {
 
-        System.out.println("Getting stats for dataset " + datafile.toString());
+	    if (verbosity >= 1) System.out.println("Getting stats for dataset " + datafile.toString());
 	    BenchmarkDataset dataset;
 	    if (BenchmarkDatafile.ACS13.equals(datafile)) {
 	        dataset = new BenchmarkDataset(datafile, 30);} else {
 	            dataset = new BenchmarkDataset(datafile, null);
 	        }
 	    
-        System.out.println("  Default QIs");
-        DataHandle handle = dataset.toArxData().getHandle();
+	    DataHandle handle = dataset.toArxData().getHandle();
+	    if (verbosity >= 1) System.out.println("  Default QIs");
         for (String sa : dataset.getQuasiIdentifyingAttributes()) {
-            String[] values = handle.getStatistics().getDistinctValues(handle.getColumnIndexOf(sa));
-            double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
-            double variance = StatUtils.variance(freqs);
-            System.out.println("    " + sa + ": " + values.length + " different values, variance is " + variance);
-            System.out.println("      " + Arrays.toString(values));
-            System.out.println("      " + Arrays.toString(freqs));
+            processSA(dataset, handle, sa, verbosity);
         }
         
 
-        System.out.println("  Default SA");
+        if (verbosity >= 1)  System.out.println("  Default SA");
         String sa = dataset.getSensitiveAttribute();
-        String[] values = handle.getStatistics().getDistinctValues(handle.getColumnIndexOf(sa));
-        double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
-        double variance = StatUtils.variance(freqs);
-        System.out.println("    " + sa + ": " + values.length + " different values, variance is " + variance);
-        System.out.println("      " + Arrays.toString(values));
-        System.out.println("      " + Arrays.toString(freqs));
+        processSA(dataset, handle, sa, verbosity);
 	}
+
+
+
+    private static AttributeStatistics processSA(BenchmarkDataset dataset, DataHandle handle, String sa, int verbosity) throws IOException {
+        Integer numValues = null;
+        Double  variance = null;
+        Double  skewness = null;
+        Double  kurtosis = null;
+        Double  frequencyVariance = null;
+        
+        String[] values = handle.getStatistics().getDistinctValues(handle.getColumnIndexOf(sa));
+        numValues = values.length;
+        if (verbosity >= 1) System.out.print("    " + sa + ": " + values.length + " different values");
+        if (
+                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(sa.toString()) ||
+                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "INTP".equals(sa.toString()) ||
+                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "INCOME".equals(sa.toString()) ||
+                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "MINRAMNT".equals(sa.toString()) ||
+                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "NGIFTALL".equals(sa.toString()) ||
+                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "RAMNTALL".equals(sa.toString()) ||
+                BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "ideathday".equals(sa.toString()) ||
+                BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "YEAR".equals(sa.toString())
+                ) {
+            DescriptiveStatistics stats = new DescriptiveStatistics();
+            for (int i = 0; i < values.length; i++) {
+                stats.addValue(Double.parseDouble(values[i]));
+            }
+            
+            variance = stats.getVariance();
+            skewness = stats.getSkewness();
+            kurtosis = stats.getKurtosis();
+            if (verbosity >= 1) {
+                System.out.println("\n      variance = " + variance);
+                System.out.println(  "      skewness = " + skewness);
+                System.out.println(  "      kurtosis = " + kurtosis);
+            }
+        } else {
+            double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
+            frequencyVariance = StatUtils.variance(freqs);
+            if (verbosity >= 1) System.out.println(", variance of frequencies = " + frequencyVariance);
+            if (verbosity >= 2) {
+                System.out.println("      " + Arrays.toString(values));
+                System.out.println("      " + Arrays.toString(freqs));
+            }
+        }
+        return new AttributeStatistics(numValues, frequencyVariance, variance, skewness, kurtosis);
+    }
 }

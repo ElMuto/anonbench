@@ -49,19 +49,29 @@ public class BenchmarkSetup {
 			PLOT_VARIABLES.SS_NUM.toString(),
 	});
 
-	/** Label for minimum utility */
-	public static final int        INFO_LOSS    = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
+	/** Label for info-loss */
+    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
+    public static final int        NUM_VALUES    = BENCHMARK.addMeasure(PLOT_VARIABLES.NUM_VALUES.toString());
+    public static final int        VARIANCE    = BENCHMARK.addMeasure(PLOT_VARIABLES.VARIANCE.toString());
+    public static final int        SKEWNESS    = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
+    public static final int        KUROTSIS    = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
+    public static final int        FREQ_VARI    = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_VARI.toString());
 
 	static {
-		BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(NUM_VALUES, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(VARIANCE, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(FREQ_VARI, new BufferedArithmeticMeanAnalyzer(1));
 	}
 
     public static final String RESULTS_DIR = "results";
     public static final String RESULTS_FILE_STEM = "results";
     public static final String RESULTS_FILE= RESULTS_DIR + "/" + RESULTS_FILE_STEM + ".csv";
     public static final String SUMMARY_FILE_STEM="results_summary";
-    public static final double NO_SOULUTION_FOUND_DOUBLE_VAL=-1d;
-    public static final String NO_SOULUTION_FOUND_STRING_VAL="n.s.f.";
+    public static final double NO_RESULT_FOUND_DOUBLE_VAL=Double.POSITIVE_INFINITY;
+    public static final String NO_RESULT_FOUND_STRING_VAL="n.s.f.";
     
     /**
      * Returns all metrics
@@ -268,6 +278,42 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Subset-Nr";
+            }
+        },
+        LATTICE_SIZE {
+            @Override
+            public String toString() {
+                return "Lattice-Size";
+            }
+        },
+        NUM_VALUES {
+            @Override
+            public String toString() {
+                return "Number of distinct values";
+            }
+        },
+        VARIANCE {
+            @Override
+            public String toString() {
+                return "Variance";
+            }
+        },
+        SKEWNESS {
+            @Override
+            public String toString() {
+                return "Skewness";
+            }
+        },
+        KUROTSIS {
+            @Override
+            public String toString() {
+                return "Kurtosis";
+            }
+        },
+        FREQ_VARI {
+            @Override
+            public String toString() {
+                return "Variance of frequencies";
             }
         },
     }

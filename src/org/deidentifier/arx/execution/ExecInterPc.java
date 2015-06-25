@@ -73,14 +73,14 @@ public class ExecInterPc {
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
 						// Print status info
 						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-						BenchmarkDriver.anonymize(metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, data.getSensitiveAttribute(), ssNum, false);
+						BenchmarkDriver.anonymize(metric, suppFactor, data, criteria, false, k, l, c, t, dMin, dMax, data.getSensitiveAttribute(), ssNum);
 					}
 
 					// For each combination of subset-based criteria
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
 						// Print status info
 						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / " + Arrays.toString(criteria));
-						BenchmarkDriver.anonymize(metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, data.getSensitiveAttribute(), ssNum, false);
+						BenchmarkDriver.anonymize(metric, suppFactor, data, criteria, true, k, l, c, t, dMin, dMax, data.getSensitiveAttribute(), ssNum);
 					}
 				}
 			}

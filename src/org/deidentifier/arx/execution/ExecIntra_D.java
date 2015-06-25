@@ -68,7 +68,7 @@ public class ExecIntra_D {
 							BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE }, false,
 									null, null, null, 
 									null, dParams[0], dParams[1],
-									null, ssNum, false);
+									null, ssNum);
 						}
 					}
 				}

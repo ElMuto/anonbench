@@ -44,10 +44,15 @@ public class CollectDatasetStats {
      */
     public static void main(String[] args) throws IOException {
 
-        collectStats(true);
+        collectStats(false, 2);
     }
 
-    private static void collectStats(boolean calcLatticeSize) throws IOException {
+    /**
+     * @param calcLatticeSize
+     * @param printDetails
+     * @throws IOException
+     */
+    private static void collectStats(boolean calcLatticeSize, int verbosity) throws IOException {
 
         BenchmarkMeasure metric = BenchmarkSetup.getMeasures()[0];
         double suppFactor = BenchmarkSetup.getSuppressionFactors()[0];
@@ -60,9 +65,9 @@ public class CollectDatasetStats {
             BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
                                       5, null, null, 
                                       null, null, null,
-                                      null, null, true);
+                                      null, null);
             } 
-            BenchmarkDriver.printDatasetStats(datafile);
+            BenchmarkDriver.printDatasetStats(datafile, verbosity);
         }
     }
 }

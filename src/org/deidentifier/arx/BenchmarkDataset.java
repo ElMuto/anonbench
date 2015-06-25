@@ -263,6 +263,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             AGEP(HierarchyType.INTERVAL), // height 10
             CIT(HierarchyType.ORDER), // height 06
             COW(HierarchyType.ORDER), // height 06
+            SEX(HierarchyType.ORDER), // height 02
             FER(HierarchyType.ORDER), // height 02
             DOUT(HierarchyType.ORDER), // height 04
             DPHY(HierarchyType.ORDER), // height 04
@@ -284,7 +285,6 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             PWGTP(HierarchyType.INTERVAL), // height 03
             RELP(HierarchyType.ORDER), // height 04
             SCHL(HierarchyType.ORDER), // height 02
-            SEX(HierarchyType.ORDER), // height 02
             INTP(HierarchyType.INTERVAL), // height 02
             SCHG(HierarchyType.ORDER), // height 02
             DDRS(HierarchyType.ORDER), // height 05
@@ -420,10 +420,10 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                       "PERNUM", 
                                       "QUARTER" };
             case ACS13:
-                return new String[] { "SCHG",
-                                      "DDRS", 
-                                      "DEAR", 
-                                      "DEYE" };
+                return new String[] { "INTP",
+                                      "SCHG", 
+                                      "SCHL", 
+                                      "PWGT" };
             default:
                 throw new RuntimeException("Invalid dataset");
             }
