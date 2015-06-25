@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DPresence;
@@ -34,6 +35,9 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
+import org.apache.commons.math3.stat.Frequency;
+import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  * This class implements the main benchmark driver
@@ -174,25 +178,44 @@ public class BenchmarkDriver {
         	BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, BenchmarkSetup.NO_SOULUTION_FOUND_DOUBLE_VAL);
         }
         
-        if (printDatasetStats) {
-            System.out.println("    Lattice Size: " + result.getLattice().getSize());
-            printStats(arxData.getHandle());
-        }
+        if (printDatasetStats) printAnonymizationStats(dataset, result);
 
 		// Write results incrementally
 		BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
 	}
 
+	private static void printAnonymizationStats(BenchmarkDataset dataset, ARXResult result) throws IOException {
+        System.out.println("Lattice Size for dataset " + dataset + " was "+ result.getLattice().getSize());
+	}
+	
+	public static void printDatasetStats(BenchmarkDatafile datafile) throws IOException {
 
+        System.out.println("Getting stats for dataset " + datafile.toString());
+	    BenchmarkDataset dataset;
+	    if (BenchmarkDatafile.ACS13.equals(datafile)) {
+	        dataset = new BenchmarkDataset(datafile, 30);} else {
+	            dataset = new BenchmarkDataset(datafile, null);
+	        }
+	    
+        System.out.println("  Default QIs");
+        DataHandle handle = dataset.toArxData().getHandle();
+        for (String sa : dataset.getQuasiIdentifyingAttributes()) {
+            String[] values = handle.getStatistics().getDistinctValues(handle.getColumnIndexOf(sa));
+            double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
+            double variance = StatUtils.variance(freqs);
+            System.out.println("    " + sa + ": " + values.length + " different values, variance is " + variance);
+            System.out.println("      " + Arrays.toString(values));
+            System.out.println("      " + Arrays.toString(freqs));
+        }
+        
 
-	private static void printStats(DataHandle handle) {
-		for (int i = 0;  i < handle.getNumColumns(); i++) {
-			System.out.println("    Column[" + i + "]: [ ");
-			double[] freqs = handle.getStatistics().getFrequencyDistribution(i).frequency;
-//			System.out.println(freqs[i]);
-//			if (i != handle.getNumColumns() -1) System.out.println(", ");
-		}
-		System.out.println(" ]");
-		
+        System.out.println("  Default SA");
+        String sa = dataset.getSensitiveAttribute();
+        String[] values = handle.getStatistics().getDistinctValues(handle.getColumnIndexOf(sa));
+        double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
+        double variance = StatUtils.variance(freqs);
+        System.out.println("    " + sa + ": " + values.length + " different values, variance is " + variance);
+        System.out.println("      " + Arrays.toString(values));
+        System.out.println("      " + Arrays.toString(freqs));
 	}
 }

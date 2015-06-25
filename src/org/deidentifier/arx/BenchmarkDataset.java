@@ -264,9 +264,6 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             CIT(HierarchyType.ORDER), // height 06
             COW(HierarchyType.ORDER), // height 06
             FER(HierarchyType.ORDER), // height 02
-            DDRS(HierarchyType.ORDER), // height 05
-            DEAR(HierarchyType.ORDER), // height 05
-            DEYE(HierarchyType.ORDER), // height 05
             DOUT(HierarchyType.ORDER), // height 04
             DPHY(HierarchyType.ORDER), // height 04
             DREM(HierarchyType.ORDER), // height 03
@@ -286,10 +283,13 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             MIL(HierarchyType.ORDER), // height 02
             PWGTP(HierarchyType.INTERVAL), // height 03
             RELP(HierarchyType.ORDER), // height 04
-            SCHG(HierarchyType.ORDER), // height 02
             SCHL(HierarchyType.ORDER), // height 02
             SEX(HierarchyType.ORDER), // height 02
             INTP(HierarchyType.INTERVAL), // height 02
+            SCHG(HierarchyType.ORDER), // height 02
+            DDRS(HierarchyType.ORDER), // height 05
+            DEAR(HierarchyType.ORDER), // height 05
+            DEYE(HierarchyType.ORDER), // height 05
             ;
 
             private enum HierarchyType {

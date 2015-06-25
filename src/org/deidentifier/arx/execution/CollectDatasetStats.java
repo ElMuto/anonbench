@@ -44,24 +44,25 @@ public class CollectDatasetStats {
      */
     public static void main(String[] args) throws IOException {
 
-        collectStats();
+        collectStats(true);
     }
 
-    private static void collectStats() throws IOException {
+    private static void collectStats(boolean calcLatticeSize) throws IOException {
 
         BenchmarkMeasure metric = BenchmarkSetup.getMeasures()[0];
         double suppFactor = BenchmarkSetup.getSuppressionFactors()[0];
 
-        // For each dataset
+        // For each datafile
         for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
+            if (calcLatticeSize) {
             BenchmarkDataset data = new BenchmarkDataset(datafile, 4);
-
-            System.out.println("Getting stats for dataset " + data.toString());
             BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
                                       5, null, null, 
                                       null, null, null,
                                       null, null, true);
+            } 
+            BenchmarkDriver.printDatasetStats(datafile);
         }
     }
 }
