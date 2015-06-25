@@ -340,7 +340,7 @@ public class BenchmarkSetup {
         L_DIVERSITY_RECURSIVE {
             @Override
             public String toString() {
-                return "l";
+                return "lr";
             }
         },
         T_CLOSENESS {

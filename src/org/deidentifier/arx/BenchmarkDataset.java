@@ -420,10 +420,10 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                       "PERNUM", 
                                       "QUARTER" };
             case ACS13:
-                return new String[] { "INTP",
+                return new String[] { "PWGTP",
                                       "SCHG", 
                                       "SCHL", 
-                                      "PWGT" };
+                                      "INTP" };
             default:
                 throw new RuntimeException("Invalid dataset");
             }
