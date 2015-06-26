@@ -7,13 +7,31 @@ public class AttributeStatistics {
     private final Double variance;
     private final Double skewness;
     private final Double kurtosis;
+    private final Double deviation;
+    private final Double deviation_rel;
+    private final Double deviation_norm;
     
-    public AttributeStatistics (Integer numValues, Double frequencyVariance, Double variance, Double skewness, Double kurtosis) {
+    /**
+     * @param numValues
+     * @param frequencyVariance
+     * @param variance
+     * @param skewness
+     * @param kurtosis
+     * @param deviation
+     * @param deviation_rel
+     * @param deviation_norm
+     */
+    public AttributeStatistics (Integer numValues, Double frequencyVariance,
+                                Double variance, Double skewness, Double kurtosis,
+                                Double deviation, Double deviation_rel, Double deviation_norm) {
         this.numValues = numValues;
         this.frequencyVariance = frequencyVariance;
         this.variance = variance;
         this.skewness = skewness;
         this.kurtosis = kurtosis;
+        this.deviation = deviation;
+        this.deviation_rel = deviation_rel;
+        this.deviation_norm = deviation_norm;
     }
     
     public Integer getNumValues() {
@@ -34,5 +52,17 @@ public class AttributeStatistics {
 
     public Double getKurtosis() {
         return kurtosis;
+    }
+
+    public Double getDeviation() {
+        return deviation;
+    }
+
+    public Double getDeviation_rel() {
+        return deviation_rel;
+    }
+
+    public Double getDeviation_norm() {
+        return deviation_norm;
     }
 }

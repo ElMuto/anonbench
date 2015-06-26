@@ -170,68 +170,43 @@ public class BenchmarkDriver {
         
         ARXResult result = anonymizer.anonymize(arxData, config);
         
-        AttributeStatistics attrStats = null;
-        Double numValues = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        Double variance = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        Double skewness = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        Double kurtosis = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        Double frequencyVariance = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        
-        if (sa != null) {
-            attrStats = processSA(dataset, arxData.getHandle(), sa, 0);
-            if (attrStats.getNumValues() != null) numValues = attrStats.getNumValues().doubleValue();    
-            if (attrStats.getVariance() != null) variance = attrStats.getVariance();    
-            if (attrStats.getSkewness() != null) skewness = attrStats.getSkewness();    
-            if (attrStats.getKurtosis() != null) kurtosis = attrStats.getKurtosis();    
-            if (attrStats.getFrequencyVariance() != null) frequencyVariance = attrStats.getFrequencyVariance();            
-        }
+        AttributeStatistics attrStats = null;        
+        if (sa != null) attrStats = processSA(dataset, arxData.getHandle(), sa, 0);
         
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, result.getGlobalOptimum() != null ?
                 Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()) :
                 BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, numValues);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.VARIANCE, variance);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SKEWNESS, skewness);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.KUROTSIS, kurtosis);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_VARI, frequencyVariance);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?
+                attrStats.getNumValues().doubleValue() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.VARIANCE, sa != null && attrStats.getVariance() != null ?
+                attrStats.getVariance() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SKEWNESS, sa != null && attrStats.getSkewness() != null ?
+                attrStats.getSkewness() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.KUROTSIS, sa != null && attrStats.getKurtosis() != null ?
+                attrStats.getKurtosis() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DEVI, sa != null && attrStats.getDeviation() != null ?
+                attrStats.getDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DEVI_REL, sa != null && attrStats.getDeviation_rel() != null ?
+                attrStats.getDeviation_rel() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DEVI_NORM, sa != null && attrStats.getDeviation_norm() != null ?
+                attrStats.getDeviation_norm() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_VARI, sa != null && attrStats.getFrequencyVariance() != null ?
+                attrStats.getFrequencyVariance() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
 
 		// Write results incrementally
 		BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
 	}
-	
-	/**
-	 * @param datafile
-	 * @param printDetails
-	 * @throws IOException
-	 */
-	public static void printDatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {
-
-	    if (verbosity >= 1) System.out.println("Getting stats for dataset " + datafile.toString());
-	    BenchmarkDataset dataset;
-	    if (BenchmarkDatafile.ACS13.equals(datafile)) {
-	        dataset = new BenchmarkDataset(datafile, 30);} else {
-	            dataset = new BenchmarkDataset(datafile, null);
-	        }
-	    
-	    DataHandle handle = dataset.toArxData().getHandle();
-	    if (verbosity >= 1) System.out.println("  Default QIs");
-        for (String sa : dataset.getQuasiIdentifyingAttributes()) {
-            processSA(dataset, handle, sa, verbosity);
-        }
-        
-
-        if (verbosity >= 1)  System.out.println("  Default SA");
-        String sa = dataset.getSensitiveAttribute();
-        processSA(dataset, handle, sa, verbosity);
-	}
 
 
 
-    private static AttributeStatistics processSA(BenchmarkDataset dataset, DataHandle handle, String sa, int verbosity) throws IOException {
+    public static AttributeStatistics processSA(BenchmarkDataset dataset, DataHandle handle, String sa, int verbosity) throws IOException {
         Integer numValues = null;
         Double  variance = null;
         Double  skewness = null;
         Double  kurtosis = null;
+        Double  deviation = null;
+        Double  deviation_rel = null;
+        Double  deviation_norm = null;
         Double  frequencyVariance = null;
         
         String[] values = handle.getStatistics().getDistinctValues(handle.getColumnIndexOf(sa));
@@ -255,10 +230,16 @@ public class BenchmarkDriver {
             variance = stats.getVariance();
             skewness = stats.getSkewness();
             kurtosis = stats.getKurtosis();
+            deviation = stats.getStandardDeviation();
+            deviation_rel = deviation / stats.getMean();
+            deviation_norm = deviation / (stats.getMax() - stats.getMin());
             if (verbosity >= 1) {
-                System.out.println("\n      variance = " + variance);
-                System.out.println(  "      skewness = " + skewness);
-                System.out.println(  "      kurtosis = " + kurtosis);
+                System.out.println("\n      variance        = " + variance);
+                System.out.println(  "      skewness        = " + skewness);
+                System.out.println(  "      kurtosis        = " + kurtosis);
+                System.out.println(  "      deviation       = " + deviation);
+                System.out.println(  "      deviation_rel   = " + deviation_rel);
+                System.out.println(  "      deviation_norm  = " + deviation_norm);
             }
         } else {
             double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
@@ -269,6 +250,6 @@ public class BenchmarkDriver {
                 System.out.println("      " + Arrays.toString(freqs));
             }
         }
-        return new AttributeStatistics(numValues, frequencyVariance, variance, skewness, kurtosis);
+        return new AttributeStatistics(numValues, frequencyVariance, variance, skewness, kurtosis, deviation, deviation_rel, deviation_norm);
     }
 }

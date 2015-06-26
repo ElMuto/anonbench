@@ -50,12 +50,15 @@ public class BenchmarkSetup {
 	});
 
 	/** Label for info-loss */
-    public static final int        INFO_LOSS    = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
-    public static final int        NUM_VALUES    = BENCHMARK.addMeasure(PLOT_VARIABLES.NUM_VALUES.toString());
-    public static final int        VARIANCE    = BENCHMARK.addMeasure(PLOT_VARIABLES.VARIANCE.toString());
-    public static final int        SKEWNESS    = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
-    public static final int        KUROTSIS    = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
-    public static final int        FREQ_VARI    = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_VARI.toString());
+    public static final int        INFO_LOSS  = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
+    public static final int        NUM_VALUES = BENCHMARK.addMeasure(PLOT_VARIABLES.NUM_VALUES.toString());
+    public static final int        VARIANCE   = BENCHMARK.addMeasure(PLOT_VARIABLES.VARIANCE.toString());
+    public static final int        SKEWNESS   = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
+    public static final int        KUROTSIS   = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
+    public static final int        FREQ_VARI  = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_VARI.toString());
+    public static final int        DEVI       = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI.toString());
+    public static final int        DEVI_REL   = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_REL.toString());
+    public static final int        DEVI_NORM  = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_NORM.toString());
 
 	static {
         BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
@@ -64,6 +67,9 @@ public class BenchmarkSetup {
         BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(FREQ_VARI, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(DEVI, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(DEVI_REL, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(DEVI_NORM, new BufferedArithmeticMeanAnalyzer(1));
 	}
 
     public static final String RESULTS_DIR = "results";
@@ -314,6 +320,24 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Variance of frequencies";
+            }
+        },
+        DEVI {
+            @Override
+            public String toString() {
+                return "Deviation";
+            }
+        },
+        DEVI_REL {
+            @Override
+            public String toString() {
+                return "Relative deviation";
+            }
+        },
+        DEVI_NORM {
+            @Override
+            public String toString() {
+                return "Normalized deviation";
             }
         },
     }

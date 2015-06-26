@@ -26,6 +26,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -44,12 +45,12 @@ public class CollectDatasetStats {
      */
     public static void main(String[] args) throws IOException {
 
-        collectStats(false, 2);
+        collectStats(false, 1);
     }
 
     /**
      * @param calcLatticeSize
-     * @param printDetails
+     * @param verbosity <UL><LI>0: no output</LI><LI>1: loud</LI><LI>2: louder</LI></UL>
      * @throws IOException
      */
     private static void collectStats(boolean calcLatticeSize, int verbosity) throws IOException {
@@ -67,7 +68,33 @@ public class CollectDatasetStats {
                                       null, null, null,
                                       null, null);
             } 
-            BenchmarkDriver.printDatasetStats(datafile, verbosity);
+            printDatasetStats(datafile, verbosity);
         }
+    }
+    
+    /**
+     * @param datafile
+     * @param printDetails
+     * @throws IOException
+     */
+    public static void printDatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {
+
+        if (verbosity >= 1) System.out.println("Getting stats for dataset " + datafile.toString());
+        BenchmarkDataset dataset;
+        if (BenchmarkDatafile.ACS13.equals(datafile)) {
+            dataset = new BenchmarkDataset(datafile, 30);} else {
+                dataset = new BenchmarkDataset(datafile, null);
+            }
+        
+        DataHandle handle = dataset.toArxData().getHandle();
+        if (verbosity >= 1) System.out.println("  Default QIs");
+        for (String sa : dataset.getQuasiIdentifyingAttributes()) {
+            BenchmarkDriver.processSA(dataset, handle, sa, verbosity);
+        }
+        
+
+        if (verbosity >= 1)  System.out.println("  Default SA");
+        String sa = dataset.getSensitiveAttribute();
+        BenchmarkDriver.processSA(dataset, handle, sa, verbosity);
     }
 }
