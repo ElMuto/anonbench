@@ -68,7 +68,7 @@ public class ExecIntra_L {
                         // distinct l-diversity
                         BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT };
                         Data arxData = dataset.toArxData(criteria);
-                        for (int l : new int[] { 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100 }) {
+                        for (int l = 2; l <= 100 ; l++) {
                             // Print status info
                             System.out.println("Running distinct l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
                             BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
@@ -80,7 +80,7 @@ public class ExecIntra_L {
                         // entropy l-diversity
                         criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY };
                         arxData = dataset.toArxData(criteria);
-                        for (int l : new int[] { 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100 }) {
+                        for (int l = 2; l <= 100 ; l++) {
                             // Print status info
                             System.out.println("Running entropy l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
                             BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY },
@@ -92,7 +92,7 @@ public class ExecIntra_L {
                         // recursive c,l-diversity
                         criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE };
                         arxData = dataset.toArxData(criteria);
-                        for (int l : new int[] { 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100 }) {
+                        for (int l = 2; l <= 100 ; l += 2) {
                             for (double c : new double[] { 0.5, 1.0, 1.5d, 2d, 3d, 5d }) {
                                 // Print status info
                                 System.out.println("Running recursive (cl)-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
