@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.Data;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -56,17 +57,19 @@ public class ExecIntra_K {
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 				// For each dataset
-				for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 
 					// For each combination of non subset-based criteria
 					for (int k = 2; k <= 100; k ++) {
 
 						// Print status info
-						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / k = " + k);
-						BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
-								k, null, null, 
+						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
+                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
+                        Data arxData = dataset.toArxData(criteria);
+ 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
+								false, k, null, 
 								null, null, null,
-								null, null);
+								null, null, null);
 					}
 				}
 			}

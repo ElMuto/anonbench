@@ -26,6 +26,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -62,11 +63,13 @@ public class CollectDatasetStats {
         for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
             if (calcLatticeSize) {
-            BenchmarkDataset data = new BenchmarkDataset(datafile, 4);
-            BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
-                                      5, null, null, 
+            BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4);
+            BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
+            Data arxData = dataset.toArxData(criteria);
+            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
+                                      false, 5, null, 
                                       null, null, null,
-                                      null, null);
+                                      null, null, null);
             } 
             printDatasetStats(datafile, verbosity);
         }

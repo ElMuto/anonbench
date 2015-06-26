@@ -115,7 +115,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
         }
 
         public Data toArxData() throws IOException {
-            return toArxData(null/*, null*/);
+            return toArxData(null);
         }
         
         /**
@@ -126,7 +126,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          * @throws IOException
          */
         @SuppressWarnings("incomplete-switch")
-		public Data toArxData(BenchmarkCriterion[] criteria/*, Integer ssNum*/) throws IOException {
+		public Data toArxData(BenchmarkCriterion[] criteria) throws IOException {
 
             Data arxData = Data.create("data/" + datafile.getBaseStringForFilename() + ".csv", ';');
             for (String qi : getQuasiIdentifyingAttributes()) {

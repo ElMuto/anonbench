@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.Data;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -56,7 +57,7 @@ public class ExecIntra_D {
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 				// For each dataset
-				for (BenchmarkDataset data : BenchmarkSetup.getDatasets()) {
+				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 
 					// For each combination of non subset-based criteria
 					for (double[] dParams : BenchmarkSetup.get_d_values()) {
@@ -64,11 +65,13 @@ public class ExecIntra_D {
 						for (int ssNum = 1; ssNum <= 100; ssNum++) {
 
 							// Print status info
-							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
-							BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE }, false,
-									null, null, null, 
-									null, dParams[0], dParams[1],
-									null, ssNum);
+							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
+	                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE };
+	                        Data arxData = dataset.toArxData(criteria);
+	 							BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
+									false, null, null, 
+									null, null, dParams[0],
+									dParams[1], null, ssNum);
 						}
 					}
 				}

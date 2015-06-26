@@ -49,27 +49,26 @@ public class BenchmarkSetup {
 			PLOT_VARIABLES.SS_NUM.toString(),
 	});
 
-	/** Label for info-loss */
-    public static final int        INFO_LOSS  = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
-    public static final int        NUM_VALUES = BENCHMARK.addMeasure(PLOT_VARIABLES.NUM_VALUES.toString());
-    public static final int        VARIANCE   = BENCHMARK.addMeasure(PLOT_VARIABLES.VARIANCE.toString());
-    public static final int        SKEWNESS   = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
-    public static final int        KUROTSIS   = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
-    public static final int        FREQ_VARI  = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_VARI.toString());
-    public static final int        DEVI       = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI.toString());
-    public static final int        DEVI_REL   = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_REL.toString());
-    public static final int        DEVI_NORM  = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_NORM.toString());
+    public static final int INFO_LOSS            = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
+    public static final int NUM_VALUES           = BENCHMARK.addMeasure(PLOT_VARIABLES.NUM_VALUES.toString());
+    public static final int SKEWNESS             = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
+    public static final int KUROTSIS             = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
+    public static final int FREQ_VARI            = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_VARI.toString());  // variance of the frequencies
+    public static final int DEVIATION            = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI.toString());
+    public static final int VARIATION_COEFF      = BENCHMARK.addMeasure(PLOT_VARIABLES.VARI_COEFF.toString());
+    public static final int NORMALIZED_DEVIATION = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_NORM.toString());
+    public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(PLOT_VARIABLES.QUARTI_COEFF.toString());
 
 	static {
         BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(NUM_VALUES, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(VARIANCE, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(VARIATION_COEFF, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(NORMALIZED_DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(FREQ_VARI, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(DEVI, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(DEVI_REL, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(DEVI_NORM, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(QUARTIL_COEFF, new BufferedArithmeticMeanAnalyzer(1));
 	}
 
     public static final String RESULTS_DIR = "results";
@@ -338,6 +337,18 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Normalized deviation";
+            }
+        },
+        VARI_COEFF {
+            @Override
+            public String toString() {
+                return "Coefficient of variation";
+            }
+        },
+        QUARTI_COEFF {
+            @Override
+            public String toString() {
+                return "Quartile coefficient of dispersion";
             }
         },
     }

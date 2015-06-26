@@ -26,6 +26,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.Data;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -62,37 +63,43 @@ public class ExecIntra_L {
                     // for each sensitive attribute candidate
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-                        BenchmarkDataset data = new BenchmarkDataset(datafile, 4, sa);
+                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, sa);
 
                         // distinct l-diversity
+                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT };
+                        Data arxData = dataset.toArxData(criteria);
                         for (int l : new int[] { 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100 }) {
                             // Print status info
-                            System.out.println("Running distinct l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / SA = " + sa + " / l = " + l);
-                            BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT }, false,
-                                                      null, l, null, 
+                            System.out.println("Running distinct l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
+                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
+                                                      false, null, l, 
                                                       null, null, null,
-                                                      sa, null);
+                                                      null, sa, null);
                         }
 
                         // entropy l-diversity
+                        criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY };
+                        arxData = dataset.toArxData(criteria);
                         for (int l : new int[] { 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100 }) {
                             // Print status info
-                            System.out.println("Running entropy l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / SA = " + sa + " / l = " + l);
-                            BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY }, false,
-                                                      null, l, null, 
+                            System.out.println("Running entropy l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
+                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY },
+                                                      false, null, l, 
                                                       null, null, null,
-                                                      sa, null);
+                                                      null, sa, null);
                         }
 
                         // recursive c,l-diversity
+                        criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE };
+                        arxData = dataset.toArxData(criteria);
                         for (int l : new int[] { 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100 }) {
                             for (double c : new double[] { 0.5, 1.0, 1.5d, 2d, 3d, 5d }) {
                                 // Print status info
-                                System.out.println("Running recursive (cl)-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + data.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
-                                BenchmarkDriver.anonymize(metric, suppFactor, data, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, false,
-                                                          null, l, c, 
-                                                          null, null, null,
-                                                          sa, null);
+                                System.out.println("Running recursive (cl)-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
+                                BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
+                                                          false, null, l, 
+                                                          c, null, null,
+                                                          null, sa, null);
                             }
                         }
                     }
