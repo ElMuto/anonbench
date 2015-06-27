@@ -3,7 +3,7 @@ package org.deidentifier.arx;
 public class AttributeStatistics {
 
     private final Integer numValues;
-    private final Double frequencyVariance;
+    private final Double frequencyDeviation;
     private final Double variance;
     private final Double skewness;
     private final Double kurtosis;
@@ -17,7 +17,7 @@ public class AttributeStatistics {
     
     /**
      * @param numValues
-     * @param frequencyVariance
+     * @param frequencyDeviation
      * @param variance
      * @param skewness
      * @param kurtosis
@@ -30,7 +30,7 @@ public class AttributeStatistics {
      * @param median
      */
     public AttributeStatistics(Integer numValues,
-                               Double frequencyVariance,
+                               Double frequencyDeviation,
                                Double variance,
                                Double skewness,
                                Double kurtosis,
@@ -42,7 +42,7 @@ public class AttributeStatistics {
                                Double mean_geom,
                                Double median) {
         this.numValues = numValues;
-        this.frequencyVariance = frequencyVariance;
+        this.frequencyDeviation = frequencyDeviation;
         this.variance = variance;
         this.skewness = skewness;
         this.kurtosis = kurtosis;
@@ -59,8 +59,8 @@ public class AttributeStatistics {
         return numValues;
     }
 
-    public Double getFrequencyVariance() {
-        return frequencyVariance;
+    public Double getFrequencyDeviation() {
+        return frequencyDeviation;
     }
 
     public Double getVariance() {

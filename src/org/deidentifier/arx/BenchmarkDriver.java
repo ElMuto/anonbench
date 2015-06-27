@@ -193,8 +193,8 @@ public class BenchmarkDriver {
                 attrStats.getVariance_coeff() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NORMALIZED_DEVIATION, sa != null && attrStats.getDeviation_norm() != null ?
                 attrStats.getDeviation_norm() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_VARI, sa != null && attrStats.getFrequencyVariance() != null ?
-                attrStats.getFrequencyVariance() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_DEVI, sa != null && attrStats.getFrequencyDeviation() != null ?
+                attrStats.getFrequencyDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.QUARTIL_COEFF, sa != null && attrStats.getQuartil_coeff() != null ?
                 attrStats.getQuartil_coeff() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
 
@@ -212,7 +212,7 @@ public class BenchmarkDriver {
             return statsCache.get(statsKey);
         } else {
             Integer numValues = null;
-            Double  frequencyVariance = null;
+            Double  frequencyDeviation = null;
             Double  variance = null;
             Double  skewness = null;
             Double  kurtosis = null;
@@ -273,16 +273,25 @@ public class BenchmarkDriver {
                     System.out.println(  "      median         = " + median);
                 }
             } else {
+            	
+            	// get the frequencies of attribute instatiations
                 double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
-                frequencyVariance = StatUtils.variance(freqs);
-                if (verbosity >= 1) System.out.println(", variance of frequencies = " + frequencyVariance);
+                
+                // initialize stats package and read values
+                DescriptiveStatistics stats = new DescriptiveStatistics();
+                for (int i = 0; i < freqs.length; i++) {
+                    stats.addValue(freqs[i]);
+                }
+                frequencyDeviation = stats.getStandardDeviation();
+                
+                if (verbosity >= 1) System.out.println(", variance of frequencies = " + frequencyDeviation);
                 if (verbosity >= 2) {
                     System.out.println("      " + Arrays.toString(distinctValues));
                     System.out.println("      " + Arrays.toString(freqs));
                 }
             }
             
-            statsCache.put(statsKey, new AttributeStatistics(numValues, frequencyVariance,
+            statsCache.put(statsKey, new AttributeStatistics(numValues, frequencyDeviation,
                                            variance, skewness, kurtosis,
                                            deviation, variance_coeff, deviation_norm,
                                            quartil_coeff, mean_arith,
