@@ -7,7 +7,7 @@ public class AttributeStatistics {
     private final Double variance;
     private final Double skewness;
     private final Double kurtosis;
-    private final Double deviation;
+    private final Double standDeviation;
     private final Double variance_coeff;
     private final Double deviation_norm;
     private final Double quartil_coeff;
@@ -21,7 +21,7 @@ public class AttributeStatistics {
      * @param variance
      * @param skewness
      * @param kurtosis
-     * @param deviation
+     * @param standDeviation
      * @param variance_coeff
      * @param deviation_norm
      * @param quartil_coeff
@@ -34,7 +34,7 @@ public class AttributeStatistics {
                                Double variance,
                                Double skewness,
                                Double kurtosis,
-                               Double deviation,
+                               Double standDeviation,
                                Double variance_coeff,
                                Double deviation_norm,
                                Double quartil_coeff,
@@ -46,7 +46,7 @@ public class AttributeStatistics {
         this.variance = variance;
         this.skewness = skewness;
         this.kurtosis = kurtosis;
-        this.deviation = deviation;
+        this.standDeviation = standDeviation;
         this.variance_coeff = variance_coeff;
         this.deviation_norm = deviation_norm;
         this.quartil_coeff = quartil_coeff;
@@ -75,8 +75,8 @@ public class AttributeStatistics {
         return kurtosis;
     }
 
-    public Double getDeviation() {
-        return deviation;
+    public Double getStandDeviation() {
+        return standDeviation;
     }
 
     public Double getVariance_coeff() {

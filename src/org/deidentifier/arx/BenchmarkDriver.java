@@ -36,7 +36,6 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
-import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -187,8 +186,8 @@ public class BenchmarkDriver {
                 attrStats.getSkewness() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.KUROTSIS, sa != null && attrStats.getKurtosis() != null ?
                 attrStats.getKurtosis() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DEVIATION, sa != null && attrStats.getDeviation() != null ?
-                attrStats.getDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.STAND_DEVIATION, sa != null && attrStats.getStandDeviation() != null ?
+                attrStats.getStandDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.VARIATION_COEFF, sa != null && attrStats.getVariance_coeff() != null ?
                 attrStats.getVariance_coeff() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NORMALIZED_DEVIATION, sa != null && attrStats.getDeviation_norm() != null ?
@@ -216,7 +215,7 @@ public class BenchmarkDriver {
             Double  variance = null;
             Double  skewness = null;
             Double  kurtosis = null;
-            Double  deviation = null;
+            Double  standDeviation = null;
             Double  deviation_norm = null;
             Double  variance_coeff = null;
             Double  quartil_coeff = null;
@@ -250,9 +249,9 @@ public class BenchmarkDriver {
                 variance = stats.getVariance();
                 skewness = stats.getSkewness();
                 kurtosis = stats.getKurtosis();
-                deviation = stats.getStandardDeviation();
-                variance_coeff = deviation / stats.getMean();
-                deviation_norm = deviation / (stats.getMax() - stats.getMin());
+                standDeviation = stats.getStandardDeviation();
+                variance_coeff = standDeviation / stats.getMean();
+                deviation_norm = standDeviation / (stats.getMax() - stats.getMin());
                 mean_arith = stats.getMean();
                 mean_geom = stats.getGeometricMean();
                 quartil_coeff = (stats.getPercentile(75) - stats.getPercentile(25)) / (stats.getPercentile(75) + stats.getPercentile(25));
@@ -261,16 +260,16 @@ public class BenchmarkDriver {
 
                 // print
                 if (verbosity >= 1) {
-                    System.out.println("\n      variance       = " + variance);
-                    System.out.println(  "      skewness       = " + skewness);
-                    System.out.println(  "      kurtosis       = " + kurtosis);
-                    System.out.println(  "      deviation      = " + deviation);
-                    System.out.println(  "      variance_coeff = " + variance_coeff);
-                    System.out.println(  "      deviation_norm = " + deviation_norm);
-                    System.out.println(  "      quartil_coeff  = " + quartil_coeff);
-                    System.out.println(  "      mean_arith     = " + mean_arith);
-                    System.out.println(  "      mean_geom      = " + mean_geom);
-                    System.out.println(  "      median         = " + median);
+                    System.out.println("\n      variance          = " + variance);
+                    System.out.println(  "      skewness          = " + skewness);
+                    System.out.println(  "      kurtosis          = " + kurtosis);
+                    System.out.println(  "      stand. dev.       = " + standDeviation);
+                    System.out.println(  "      variance_coeff    = " + variance_coeff);
+                    System.out.println(  "      stand. dev. norm. = " + deviation_norm);
+                    System.out.println(  "      quartil coeff.    = " + quartil_coeff);
+                    System.out.println(  "      arith. mean       = " + mean_arith);
+                    System.out.println(  "      geom. mean        = " + mean_geom);
+                    System.out.println(  "      median            = " + median);
                 }
             } else {
             	
@@ -293,7 +292,7 @@ public class BenchmarkDriver {
             
             statsCache.put(statsKey, new AttributeStatistics(numValues, frequencyDeviation,
                                            variance, skewness, kurtosis,
-                                           deviation, variance_coeff, deviation_norm,
+                                           standDeviation, variance_coeff, deviation_norm,
                                            quartil_coeff, mean_arith,
                                            mean_geom, median));
             

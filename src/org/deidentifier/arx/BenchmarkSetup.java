@@ -54,7 +54,7 @@ public class BenchmarkSetup {
     public static final int SKEWNESS             = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
     public static final int KUROTSIS             = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
     public static final int FREQ_DEVI            = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_DEVI.toString());  // standard deviation of the frequencies
-    public static final int DEVIATION            = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI.toString());
+    public static final int STAND_DEVIATION      = BENCHMARK.addMeasure(PLOT_VARIABLES.STAND_DEVI.toString());
     public static final int VARIATION_COEFF      = BENCHMARK.addMeasure(PLOT_VARIABLES.VARI_COEFF.toString());
     public static final int NORMALIZED_DEVIATION = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_NORM.toString());
     public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(PLOT_VARIABLES.QUARTI_COEFF.toString());
@@ -64,7 +64,7 @@ public class BenchmarkSetup {
         BENCHMARK.addAnalyzer(NUM_VALUES, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(STAND_DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(VARIATION_COEFF, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(NORMALIZED_DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(FREQ_DEVI, new BufferedArithmeticMeanAnalyzer(1));
@@ -321,10 +321,10 @@ public class BenchmarkSetup {
                 return "Standard deviation of frequencies";
             }
         },
-        DEVI {
+        STAND_DEVI {
             @Override
             public String toString() {
-                return "Deviation";
+                return "Standard deviation";
             }
         },
         DEVI_REL {
@@ -336,7 +336,7 @@ public class BenchmarkSetup {
         DEVI_NORM {
             @Override
             public String toString() {
-                return "Normalized deviation";
+                return "Normalized standard deviation";
             }
         },
         VARI_COEFF {
