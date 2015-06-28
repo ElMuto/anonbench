@@ -283,7 +283,7 @@ public class BenchmarkDriver {
                 }
                 frequencyDeviation = stats.getStandardDeviation();
                 
-                if (verbosity >= 1) System.out.println(", variance of frequencies = " + frequencyDeviation);
+                if (verbosity >= 1) System.out.println(", std. deviation of frequencies = " + frequencyDeviation);
                 if (verbosity >= 2) {
                     System.out.println("      " + Arrays.toString(distinctValues));
                     System.out.println("      " + Arrays.toString(freqs));
