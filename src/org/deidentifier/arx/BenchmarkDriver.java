@@ -38,6 +38,8 @@ import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import com.sun.org.apache.bcel.internal.generic.LNEG;
+
 /**
  * This class implements the main benchmark driver
  * @author Fabian Prasser
@@ -228,21 +230,28 @@ public class BenchmarkDriver {
             numValues = distinctValues.length;
             if (verbosity >= 1) System.out.print("    " + sa + ": " + distinctValues.length + " different values");
             if (
+                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(sa.toString()) ||
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(sa.toString()) ||
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "INTP".equals(sa.toString()) ||
                     BenchmarkDatafile.ADULT.equals(dataset.getDatafile()) && "age".equals(sa.toString()) ||
+                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "AGE".equals(sa.toString()) ||
                     BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "INCOME".equals(sa.toString()) ||
                     BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "MINRAMNT".equals(sa.toString()) ||
                     BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "NGIFTALL".equals(sa.toString()) ||
                     BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "RAMNTALL".equals(sa.toString()) ||
+                    BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "iage".equals(sa.toString()) ||
                     BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "ideathday".equals(sa.toString()) ||
+                    BenchmarkDatafile.ATUS.equals(dataset.getDatafile()) && "Age".equals(sa.toString()) ||
+                    BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "AGE".equals(sa.toString()) ||
                     BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "YEAR".equals(sa.toString())
                     ) {
 
                 // initialize stats package and read values
                 DescriptiveStatistics stats = new DescriptiveStatistics();
                 for (int rowNum = 0; rowNum < handle.getNumRows(); rowNum++) {
-                    stats.addValue(Double.parseDouble(handle.getValue(rowNum, saColIndex)));
+                    try {
+                        stats.addValue(Double.parseDouble(handle.getValue(rowNum, saColIndex)));
+                    } catch (java.lang.NumberFormatException e) {}
                 }
 
                 // calculate stats
@@ -260,13 +269,12 @@ public class BenchmarkDriver {
 
                 // print
                 if (verbosity >= 1) {
-                    System.out.println("\n      variance          = " + variance);
+                    System.out.println("\n      stand. dev.       = " + standDeviation);
+                    System.out.println(  "      stand. dev. norm. = " + deviation_norm);
+                    System.out.println(  "      variance_coeff    = " + variance_coeff);
+                    System.out.println(  "      quartil coeff.    = " + quartil_coeff);
                     System.out.println(  "      skewness          = " + skewness);
                     System.out.println(  "      kurtosis          = " + kurtosis);
-                    System.out.println(  "      stand. dev.       = " + standDeviation);
-                    System.out.println(  "      variance_coeff    = " + variance_coeff);
-                    System.out.println(  "      stand. dev. norm. = " + deviation_norm);
-                    System.out.println(  "      quartil coeff.    = " + quartil_coeff);
                     System.out.println(  "      arith. mean       = " + mean_arith);
                     System.out.println(  "      geom. mean        = " + mean_geom);
                     System.out.println(  "      median            = " + median);
@@ -276,14 +284,25 @@ public class BenchmarkDriver {
             	// get the frequencies of attribute instatiations
                 double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
                 
-                // initialize stats package and read values
+                // initialize stats package and read values for calculating standard deviation
                 DescriptiveStatistics stats = new DescriptiveStatistics();
                 for (int i = 0; i < freqs.length; i++) {
                     stats.addValue(freqs[i]);
                 }
                 frequencyDeviation = stats.getStandardDeviation();
                 
-                if (verbosity >= 1) System.out.println(", std. deviation of frequencies = " + frequencyDeviation);
+                // calculate entropy
+                double entropy = 0d;
+                double log2 = Math.log(2d);
+                for (int i = 0; i < freqs.length; i++) {
+                    entropy += freqs[i] * Math.log(freqs[i]) / log2;
+                }
+                entropy *= -1d;
+                
+                if (verbosity >= 1) {
+                    System.out.println("\n      entropy                       = " + entropy);
+                    System.out.println(  "      std. deviation of frequencies = " + frequencyDeviation);
+                }
                 if (verbosity >= 2) {
                     System.out.println("      " + Arrays.toString(distinctValues));
                     System.out.println("      " + Arrays.toString(freqs));
