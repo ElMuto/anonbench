@@ -45,7 +45,7 @@ import de.linearbits.subframe.render.LaTeX;
 import de.linearbits.subframe.render.PlotGroup;
 import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 
-public class IntraPcAnalysis {
+public class Analyze_K {
 
     /**
      * Main
