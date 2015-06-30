@@ -127,13 +127,11 @@ public class BenchmarkDriver {
         return config;
     }
 
-
-
     /**
      * @param metric
      * @param suppFactor
      * @param dataset
-     * @param arxData TODO
+     * @param arxData
      * @param criteria
      * @param subsetBased
      * @param k
@@ -144,7 +142,6 @@ public class BenchmarkDriver {
      * @param dMax
      * @param sa
      * @param ssNum
-     * @param printDatasetStats TODO
      * @throws IOException
      */
     public static void anonymize(
@@ -156,7 +153,6 @@ public class BenchmarkDriver {
                                  Double dMax, String sa, Integer ssNum
             ) throws IOException {
 
-//        Data oldArxData = dataset.toArxData(criteria);
         ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, criteria);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         anonymizer.setMaxTransformations(210000);
@@ -177,11 +173,14 @@ public class BenchmarkDriver {
 
         AttributeStatistics attrStats = null;
         DataHandle handle = arxData.getHandle();
-        if (sa != null) attrStats = processSA(dataset, handle, sa, 0);
+        if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
 
+        // put info-loss into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, result.getGlobalOptimum() != null ?
                 Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()) :
                     BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        
+        // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?
                 attrStats.getNumValues().doubleValue() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SKEWNESS, sa != null && attrStats.getSkewness() != null ?
@@ -207,8 +206,16 @@ public class BenchmarkDriver {
 
 
 
-    public static AttributeStatistics processSA(BenchmarkDataset dataset, DataHandle handle, String sa, int verbosity) throws IOException {
-        String statsKey = dataset.toString() + "-" + sa;
+    /**
+     * @param dataset
+     * @param handle
+     * @param attr
+     * @param verbosity
+     * @return
+     * @throws IOException
+     */
+    public static AttributeStatistics analyzeAttribute(BenchmarkDataset dataset, DataHandle handle, String attr, int verbosity) throws IOException {
+        String statsKey = dataset.toString() + "-" + attr;
         if (statsCache.containsKey(statsKey)) {
             return statsCache.get(statsKey);
         } else {
@@ -225,33 +232,33 @@ public class BenchmarkDriver {
             Double  mean_geom = null; // done
             Double  median = null; // done
 
-            int saColIndex = handle.getColumnIndexOf(sa);
-            String[] distinctValues = handle.getStatistics().getDistinctValues(saColIndex);
+            int attrColIndex = handle.getColumnIndexOf(attr);
+            String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
             numValues = distinctValues.length;
-            if (verbosity >= 1) System.out.print("    " + sa + ": " + distinctValues.length + " different values");
+            if (verbosity >= 1) System.out.println("    " + attr + " (domain size: " + distinctValues.length + ")");
             if (
-                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(sa.toString()) ||
-                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(sa.toString()) ||
-                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "INTP".equals(sa.toString()) ||
-                    BenchmarkDatafile.ADULT.equals(dataset.getDatafile()) && "age".equals(sa.toString()) ||
-                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "AGE".equals(sa.toString()) ||
-                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "INCOME".equals(sa.toString()) ||
-                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "MINRAMNT".equals(sa.toString()) ||
-                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "NGIFTALL".equals(sa.toString()) ||
-                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "RAMNTALL".equals(sa.toString()) ||
-                    BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "iage".equals(sa.toString()) ||
-                    BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "ideathday".equals(sa.toString()) ||
-                    BenchmarkDatafile.ATUS.equals(dataset.getDatafile()) && "Age".equals(sa.toString()) ||
-                    BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "AGE".equals(sa.toString()) ||
-                    BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "YEAR".equals(sa.toString())
+                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
+                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(attr.toString()) ||
+                    BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "INTP".equals(attr.toString()) ||
+                    BenchmarkDatafile.ADULT.equals(dataset.getDatafile()) && "age".equals(attr.toString()) ||
+                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "AGE".equals(attr.toString()) ||
+                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "INCOME".equals(attr.toString()) ||
+                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "MINRAMNT".equals(attr.toString()) ||
+                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "NGIFTALL".equals(attr.toString()) ||
+                    BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "RAMNTALL".equals(attr.toString()) ||
+                    BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "iage".equals(attr.toString()) ||
+                    BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "ideathday".equals(attr.toString()) ||
+                    BenchmarkDatafile.ATUS.equals(dataset.getDatafile()) && "Age".equals(attr.toString()) ||
+                    BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "AGE".equals(attr.toString()) ||
+                    BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "YEAR".equals(attr.toString())
                     ) {
 
                 // initialize stats package and read values
                 DescriptiveStatistics stats = new DescriptiveStatistics();
                 for (int rowNum = 0; rowNum < handle.getNumRows(); rowNum++) {
                     try {
-                        stats.addValue(Double.parseDouble(handle.getValue(rowNum, saColIndex)));
-                    } catch (java.lang.NumberFormatException e) {}
+                        stats.addValue(Double.parseDouble(handle.getValue(rowNum, attrColIndex)));
+                    } catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
                 }
 
                 // calculate stats
@@ -268,21 +275,21 @@ public class BenchmarkDriver {
                 handle.getStatistics().getSummaryStatistics(false);
 
                 // print
-                if (verbosity >= 1) {
-                    System.out.println("\n      stand. dev.       = " + standDeviation);
-                    System.out.println(  "      stand. dev. norm. = " + deviation_norm);
-                    System.out.println(  "      variance_coeff    = " + variance_coeff);
-                    System.out.println(  "      quartil coeff.    = " + quartil_coeff);
-                    System.out.println(  "      skewness          = " + skewness);
-                    System.out.println(  "      kurtosis          = " + kurtosis);
-                    System.out.println(  "      arith. mean       = " + mean_arith);
-                    System.out.println(  "      geom. mean        = " + mean_geom);
-                    System.out.println(  "      median            = " + median);
+                if (verbosity >= 2) {
+                    System.out.println("      stand. dev.       = " + standDeviation);
+                    System.out.println("      stand. dev. norm. = " + deviation_norm);
+                    System.out.println("      variance_coeff    = " + variance_coeff);
+                    System.out.println("      quartil coeff.    = " + quartil_coeff);
+                    System.out.println("      skewness          = " + skewness);
+                    System.out.println("      kurtosis          = " + kurtosis);
+                    System.out.println("      arith. mean       = " + mean_arith);
+                    System.out.println("      geom. mean        = " + mean_geom);
+                    System.out.println("      median            = " + median);
                 }
             } else {
             	
             	// get the frequencies of attribute instatiations
-                double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(sa)).frequency;
+                double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
                 
                 // initialize stats package and read values for calculating standard deviation
                 DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -299,11 +306,11 @@ public class BenchmarkDriver {
                 }
                 entropy *= -1d;
                 
-                if (verbosity >= 1) {
-                    System.out.println("\n      entropy                       = " + entropy);
-                    System.out.println(  "      std. deviation of frequencies = " + frequencyDeviation);
-                }
                 if (verbosity >= 2) {
+                    System.out.println("      entropy                       = " + entropy);
+                    System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
+                }
+                if (verbosity >= 3) {
                     System.out.println("      " + Arrays.toString(distinctValues));
                     System.out.println("      " + Arrays.toString(freqs));
                 }

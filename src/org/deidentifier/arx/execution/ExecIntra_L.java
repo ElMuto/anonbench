@@ -68,11 +68,11 @@ public class ExecIntra_L {
                         // distinct l-diversity
                         BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT };
                         Data arxData = dataset.toArxData(criteria);
-                        for (int l = 2; l <= 100 ; l++) {
+                        for (int l = 2; l <= 20 ; l++) {
                             // Print status info
                             System.out.println("Running distinct l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
                             BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
-                                                      false, null, l, 
+                                                      true, null, l, 
                                                       null, null, null,
                                                       null, sa, null);
                         }
@@ -80,11 +80,11 @@ public class ExecIntra_L {
                         // entropy l-diversity
                         criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY };
                         arxData = dataset.toArxData(criteria);
-                        for (int l = 2; l <= 100 ; l++) {
+                        for (int l = 2; l <= 20 ; l++) {
                             // Print status info
                             System.out.println("Running entropy l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
-                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY },
-                                                      false, null, l, 
+                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
+                                                      true, null, l, 
                                                       null, null, null,
                                                       null, sa, null);
                         }
@@ -92,12 +92,17 @@ public class ExecIntra_L {
                         // recursive c,l-diversity
                         criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE };
                         arxData = dataset.toArxData(criteria);
-                        for (int l = 2; l <= 100 ; l += 2) {
-                            for (double c : new double[] { 0.5, 1.0, 1.5d, 2d, 3d, 5d }) {
+                        for (int l = 2; l <= 100 ; l ++) {
+                            for (double c : new double[] { 0.25, 0.5, 0.75, 1d,
+                                                           1.25, 1.5, 1.75, 2d,
+                                                           2.25, 2.5, 2.75, 3d,
+                                                           3.25, 3.5, 3.75, 4d,
+                                                           4.25, 4.5, 4.75, 5d,
+                                                           5.25, 5.5, 5.75, 6d,}) {
                                 // Print status info
                                 System.out.println("Running recursive (cl)-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
-                                BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-                                                          false, null, l, 
+                                BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
+                                                          true, null, l, 
                                                           c, null, null,
                                                           null, sa, null);
                             }
