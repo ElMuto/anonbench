@@ -72,7 +72,7 @@ public class ExecIntra_L {
                             // Print status info
                             System.out.println("Running distinct l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
                             BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
-                                                      false, null, l, 
+                                                      true, null, l, 
                                                       null, null, null,
                                                       null, sa, null);
                         }
@@ -83,8 +83,8 @@ public class ExecIntra_L {
                         for (int l = 2; l <= 100 ; l++) {
                             // Print status info
                             System.out.println("Running entropy l-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
-                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY },
-                                                      false, null, l, 
+                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
+                                                      true, null, l, 
                                                       null, null, null,
                                                       null, sa, null);
                         }
@@ -96,8 +96,8 @@ public class ExecIntra_L {
                             for (double c : new double[] { 0.5, 1.0, 1.5d, 2d, 3d, 5d }) {
                                 // Print status info
                                 System.out.println("Running recursive (cl)-diversity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
-                                BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-                                                          false, null, l, 
+                                BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
+                                                          true, null, l, 
                                                           c, null, null,
                                                           null, sa, null);
                             }

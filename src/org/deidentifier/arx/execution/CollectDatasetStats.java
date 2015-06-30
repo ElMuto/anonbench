@@ -71,7 +71,8 @@ public class CollectDatasetStats {
                                       null, null, null,
                                       null, null, null);
             } 
-            printDatasetStats(datafile, verbosity);
+//            printFullDatasetStats(datafile, verbosity);
+            print_l_diversity_DatasetStats(datafile, verbosity);
         }
     }
     
@@ -80,24 +81,53 @@ public class CollectDatasetStats {
      * @param printDetails
      * @throws IOException
      */
-    public static void printDatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {
+    public static void printFullDatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {
 
-        if (verbosity >= 1) System.out.println("Getting stats for dataset " + datafile.toString());
+        if (verbosity >= 1) System.out.println("Full stats for dataset " + datafile.toString());
+        
         BenchmarkDataset dataset;
         if (BenchmarkDatafile.ACS13.equals(datafile)) {
-            dataset = new BenchmarkDataset(datafile, 30);} else {
+            dataset = new BenchmarkDataset(datafile, 30);
+        } else {
                 dataset = new BenchmarkDataset(datafile, null);
-            }
+        }    
         
-        DataHandle handle = dataset.toArxData().getHandle();
-        if (verbosity >= 1) System.out.println("  Default QIs");
-        for (String sa : dataset.getQuasiIdentifyingAttributes()) {
-            BenchmarkDriver.processSA(dataset, handle, sa, verbosity);
-        }
-        
+        if (verbosity >= 1) {
+            System.out.println("  Default QIs");
+            DataHandle handle = dataset.toArxData().getHandle();
+            for (String attr : dataset.getQuasiIdentifyingAttributes()) {
+                BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
+            }        
 
-        if (verbosity >= 1)  System.out.println("  Default SA");
-        String sa = dataset.getSensitiveAttribute();
-        BenchmarkDriver.processSA(dataset, handle, sa, verbosity);
+            if (verbosity >= 1)  System.out.println("  Default SA");
+            String sa = dataset.getSensitiveAttribute();
+            BenchmarkDriver.analyzeAttribute(dataset, handle, sa, verbosity);
+        }
+    }
+    
+    /**
+     * @param datafile
+     * @param printDetails
+     * @throws IOException
+     */
+    public static void print_l_diversity_DatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {
+
+        if (verbosity >= 1) System.out.println("l-diversity stats for dataset " + datafile.toString());
+        BenchmarkDataset dataset;
+        
+        dataset = new BenchmarkDataset(datafile, 4);        
+        DataHandle handle = dataset.toArxData().getHandle();
+
+        if (verbosity >= 1) {
+            System.out.println("  QIs");
+            for (String attr : dataset.getQuasiIdentifyingAttributes()) {
+                BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
+            }        
+
+            System.out.println("  Sensitive attribute candidates");
+            for (String attr : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+                BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
+            }      
+        }
     }
 }

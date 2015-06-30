@@ -33,31 +33,31 @@ public class BenchmarkSetup {
 
 	/** The benchmark instance */
 	public static final Benchmark BENCHMARK    = new Benchmark(new String[] {
-			PLOT_VARIABLES.UTLITY_MEASURE.toString(),
-			PLOT_VARIABLES.SUPPRESSION_FACTOR.toString(),
-			PLOT_VARIABLES.DATASET.toString(),
-			PLOT_VARIABLES.CRITERIA.toString(),
-			PLOT_VARIABLES.SUBSET_NATURE.toString(),
-			PLOT_VARIABLES.PARAM_K.toString(),
-			PLOT_VARIABLES.PARAM_L.toString(),
-			PLOT_VARIABLES.PARAM_C.toString(),
-			PLOT_VARIABLES.PARAM_T.toString(),
-			PLOT_VARIABLES.PARAM_DMIN.toString(),
-			PLOT_VARIABLES.PARAM_DMAX.toString(),
-			PLOT_VARIABLES.SENS_ATTR.toString(),
-			PLOT_VARIABLES.QI_SET.toString(),
-			PLOT_VARIABLES.SS_NUM.toString(),
+			COLUMNS.UTLITY_MEASURE.toString(),
+			COLUMNS.SUPPRESSION_FACTOR.toString(),
+			COLUMNS.DATASET.toString(),
+			COLUMNS.CRITERIA.toString(),
+			COLUMNS.SUBSET_NATURE.toString(),
+			COLUMNS.PARAM_K.toString(),
+			COLUMNS.PARAM_L.toString(),
+			COLUMNS.PARAM_C.toString(),
+			COLUMNS.PARAM_T.toString(),
+			COLUMNS.PARAM_DMIN.toString(),
+			COLUMNS.PARAM_DMAX.toString(),
+			COLUMNS.SENS_ATTR.toString(),
+			COLUMNS.QI_SET.toString(),
+			COLUMNS.SS_NUM.toString(),
 	});
 
-    public static final int INFO_LOSS            = BENCHMARK.addMeasure(PLOT_VARIABLES.UTILITY_VALUE.toString());
-    public static final int NUM_VALUES           = BENCHMARK.addMeasure(PLOT_VARIABLES.NUM_VALUES.toString());
-    public static final int SKEWNESS             = BENCHMARK.addMeasure(PLOT_VARIABLES.SKEWNESS.toString());
-    public static final int KUROTSIS             = BENCHMARK.addMeasure(PLOT_VARIABLES.KUROTSIS.toString());
-    public static final int FREQ_DEVI            = BENCHMARK.addMeasure(PLOT_VARIABLES.FREQ_DEVI.toString());  // standard deviation of the frequencies
-    public static final int STAND_DEVIATION      = BENCHMARK.addMeasure(PLOT_VARIABLES.STAND_DEVI.toString());
-    public static final int VARIATION_COEFF      = BENCHMARK.addMeasure(PLOT_VARIABLES.VARI_COEFF.toString());
-    public static final int NORMALIZED_DEVIATION = BENCHMARK.addMeasure(PLOT_VARIABLES.DEVI_NORM.toString());
-    public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(PLOT_VARIABLES.QUARTI_COEFF.toString());
+    public static final int INFO_LOSS            = BENCHMARK.addMeasure(COLUMNS.UTILITY_VALUE.toString());
+    public static final int NUM_VALUES           = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
+    public static final int SKEWNESS             = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
+    public static final int KUROTSIS             = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
+    public static final int FREQ_DEVI            = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies
+    public static final int STAND_DEVIATION      = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
+    public static final int VARIATION_COEFF      = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
+    public static final int NORMALIZED_DEVIATION = BENCHMARK.addMeasure(COLUMNS.DEVI_NORM.toString());
+    public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
 
 	static {
         BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
@@ -194,7 +194,7 @@ public class BenchmarkSetup {
         };
     }
     
-    public static enum PLOT_VARIABLES {
+    public static enum COLUMNS {
         UTLITY_MEASURE {
             @Override
             public String toString() {
