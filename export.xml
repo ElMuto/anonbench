@@ -71,7 +71,7 @@
       <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
       <manifest>
-        <attribute name="Main-Class" value="org.deidentifier.arx.BenchmarkMain" />
+        <attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_T" />
       </manifest>
     </jar>
     <delete dir="build" failonerror="true" />
