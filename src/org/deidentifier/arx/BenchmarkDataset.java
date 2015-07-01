@@ -414,9 +414,9 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                       "workclass" };
             case ATUS:
                 return new String[] { "Highest level of school completed",
-//                                      "Birthplace", 
-//                                      "Citizenship status", 
-//                                      "Labor force status" 
+                                      "Birthplace", 
+                                      "Citizenship status", 
+                                      "Labor force status" 
                                       };
             case CUP:
                 return new String[] { "RAMNTALL",
@@ -425,7 +425,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                                       "NGIFTALL" };
             case FARS:
                 return new String[] { "istatenum",
-//                                      "ideathday", 
+                                      "ideathday", 
                                       "ideathmon", 
                                       "iinjury" };
             case IHIS:
