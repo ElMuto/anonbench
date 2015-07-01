@@ -71,7 +71,7 @@ public class Analyze_K {
 
         for (BenchmarkSetup.BenchmarkMeasure measure : BenchmarkSetup.getMeasures()) {
             for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-                groups.add(getGroup(file, measure.toString(), String.valueOf(suppFactor), BenchmarkSetup.COLUMNS.UTILITY_VALUE.toString(), BenchmarkCriterion.K_ANONYMITY.toString()));
+                groups.add(getGroup(file, measure.toString(), String.valueOf(suppFactor), BenchmarkSetup.COLUMNS.IL_VALUE.toString(), BenchmarkCriterion.K_ANONYMITY.toString()));
             }
         }
         LaTeX.plot(groups, "results/results");
@@ -157,7 +157,7 @@ public class Analyze_K {
 
         // Select data for the given algorithm
         Selector<String[]> selector = file.getSelectorBuilder()
-                                          .field(BenchmarkSetup.COLUMNS.UTLITY_MEASURE.toString()).equals(measure).and()
+                                          .field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(measure).and()
                                           .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
                                           .field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(dataset)
                                           .build();

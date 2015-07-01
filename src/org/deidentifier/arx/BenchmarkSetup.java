@@ -33,7 +33,7 @@ public class BenchmarkSetup {
 
 	/** The benchmark instance */
 	public static final Benchmark BENCHMARK    = new Benchmark(new String[] {
-			COLUMNS.UTLITY_MEASURE.toString(),
+			COLUMNS.IL_MEASURE.toString(),
 			COLUMNS.SUPPRESSION_FACTOR.toString(),
 			COLUMNS.DATASET.toString(),
 			COLUMNS.CRITERIA.toString(),
@@ -49,7 +49,7 @@ public class BenchmarkSetup {
 			COLUMNS.SS_NUM.toString(),
 	});
 
-    public static final int INFO_LOSS            = BENCHMARK.addMeasure(COLUMNS.UTILITY_VALUE.toString());
+    public static final int INFO_LOSS            = BENCHMARK.addMeasure(COLUMNS.IL_VALUE.toString());
     public static final int NUM_VALUES           = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS             = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS             = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -195,10 +195,10 @@ public class BenchmarkSetup {
     }
     
     public static enum COLUMNS {
-        UTLITY_MEASURE {
+        IL_MEASURE {
             @Override
             public String toString() {
-                return "Utility Metric";
+                return "Information-loss measure";
             }
         },
         DATASET {
@@ -213,10 +213,10 @@ public class BenchmarkSetup {
                 return "Criteria";
             }
         },
-        UTILITY_VALUE {
+        IL_VALUE {
             @Override
             public String toString() {
-                return "Utility Value";
+                return "Information-loss value";
             }
         },
         SUPPRESSION_FACTOR {

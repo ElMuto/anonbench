@@ -182,7 +182,7 @@ public class Analyze_Mulit {
 		// for each dataset
 		for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 			Selector<String[]> selector = file.getSelectorBuilder()
-					.field(BenchmarkSetup.COLUMNS.UTLITY_MEASURE.toString()).equals(String.valueOf(metric)).and()
+					.field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(String.valueOf(metric)).and()
 					.field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
 					.field(BenchmarkSetup.COLUMNS.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
 					.field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(dataset.toString())
@@ -197,7 +197,7 @@ public class Analyze_Mulit {
 				String[] csvLine = csvline.getData();
 
 				if (selector.isSelected(csvLine)) {
-					Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+					Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.IL_VALUE.toString(), "Arithmetic Mean"));
 					if (val != BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL) {
 						if (minVal == null || val < minVal) {
 							minVal = val;
@@ -215,7 +215,7 @@ public class Analyze_Mulit {
 
 			    // build selector
 				selector = file.getSelectorBuilder()
-						.field(BenchmarkSetup.COLUMNS.UTLITY_MEASURE.toString()).equals(String.valueOf(metric)).and()
+						.field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(String.valueOf(metric)).and()
 						.field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
 						.field(BenchmarkSetup.COLUMNS.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
 						.field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(dataset.toString()).and()
@@ -229,7 +229,7 @@ public class Analyze_Mulit {
 					String[] csvLine = csvline.getData();
 
 					if (selector.isSelected(csvLine)) {
-						Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.UTILITY_VALUE.toString(), "Arithmetic Mean"));
+						Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.IL_VALUE.toString(), "Arithmetic Mean"));
 						Double normVal = val != BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
 						String normString = normVal != BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_RESULT_FOUND_STRING_VAL;
 						String colorCode = "";
