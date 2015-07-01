@@ -38,7 +38,6 @@ import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import com.sun.org.apache.bcel.internal.generic.LNEG;
 
 /**
  * This class implements the main benchmark driver
