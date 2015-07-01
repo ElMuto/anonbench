@@ -21,6 +21,7 @@
 package org.deidentifier.arx.execution;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
@@ -28,12 +29,13 @@ import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
+
 /**
  * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
  * 
  * @author Fabian Prasser
  */
-public class ExecIntra_D {
+public class Exec_Multi {
 
 	/**
 	 * Main entry point
@@ -43,12 +45,21 @@ public class ExecIntra_D {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		evaluate_d_presence();
+		evaluateCriteriaWithDifferentSuppressionValues();
 		System.out.println("done.");
 	}
 
-	private static void evaluate_d_presence() throws IOException {
-		
+	private static void evaluateCriteriaWithDifferentSuppressionValues() throws IOException {
+
+		// values for k, l, etc
+		Integer k = 5;
+		Integer l = 4;
+		Double c = 3d;
+		Double  t = 0.2d;
+		Double  dMin = 0.05d;
+		Double  dMax = 0.15d;
+		Integer ssNum = null;
+
 		// for each metric
 		for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
 
@@ -59,17 +70,17 @@ public class ExecIntra_D {
 				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 
 					// For each combination of non subset-based criteria
-					for (double[] dParams : BenchmarkSetup.get_d_values()) {
-						
-						for (int ssNum = 1; ssNum <= 100; ssNum++) {
+					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
+						// Print status info
+						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
+						BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+					}
 
-							// Print status info
-							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
-	 							BenchmarkDriver.anonymize(metric, suppFactor, dataset, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE }, false,
-									null, null, null, 
-									null, dParams[0], dParams[1],
-									null, ssNum);
-						}
+					// For each combination of subset-based criteria
+					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
+						// Print status info
+						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
+						BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 				}
 			}

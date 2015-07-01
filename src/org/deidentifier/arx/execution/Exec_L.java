@@ -34,7 +34,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * 
  * @author Fabian Prasser
  */
-public class ExecIntra_L {
+public class Exec_L {
 
     /**
      * Main entry point

@@ -33,7 +33,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * 
  * @author Fabian Prasser
  */
-public class ExecIntra_K {
+public class Exec_D {
 
 	/**
 	 * Main entry point
@@ -43,11 +43,11 @@ public class ExecIntra_K {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		evaluate_k_anonymity();
+		evaluate_d_presence();
 		System.out.println("done.");
 	}
 
-	private static void evaluate_k_anonymity() throws IOException {
+	private static void evaluate_d_presence() throws IOException {
 		
 		// for each metric
 		for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
@@ -59,14 +59,17 @@ public class ExecIntra_K {
 				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
 
 					// For each combination of non subset-based criteria
-					for (int k = 2; k <= 100; k ++) {
+					for (double[] dParams : BenchmarkSetup.get_d_values()) {
+						
+						for (int ssNum = 1; ssNum <= 100; ssNum++) {
 
-						// Print status info
-						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
- 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
-								k, null, null, 
-								null, null, null,
-								null, null);
+							// Print status info
+							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
+	 							BenchmarkDriver.anonymize(metric, suppFactor, dataset, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE }, false,
+									null, null, null, 
+									null, dParams[0], dParams[1],
+									null, ssNum);
+						}
 					}
 				}
 			}
