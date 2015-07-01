@@ -130,7 +130,6 @@ public class BenchmarkDriver {
      * @param metric
      * @param suppFactor
      * @param dataset
-     * @param arxData
      * @param criteria
      * @param subsetBased
      * @param k
@@ -146,10 +145,10 @@ public class BenchmarkDriver {
     public static void anonymize(
                                  BenchmarkMeasure metric,
                                  double suppFactor, BenchmarkDataset dataset,
-                                 Data arxData, BenchmarkCriterion[] criteria,
-                                 boolean subsetBased, Integer k, Integer l,
-                                 Double c, Double t, Double dMin,
-                                 Double dMax, String sa, Integer ssNum
+                                 BenchmarkCriterion[] criteria, boolean subsetBased,
+                                 Integer k, Integer l, Double c,
+                                 Double t, Double dMin, Double dMax,
+                                 String sa, Integer ssNum
             ) throws IOException {
 
         ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, criteria);
@@ -168,10 +167,10 @@ public class BenchmarkDriver {
                                         Arrays.toString(dataset.getQuasiIdentifyingAttributes()),
                                         ssNum != null ? ssNum.toString() : "");
 
-        ARXResult result = anonymizer.anonymize(arxData, config);
+        ARXResult result = anonymizer.anonymize(dataset.toArxData(criteria), config);
 
         AttributeStatistics attrStats = null;
-        DataHandle handle = arxData.getHandle();
+        DataHandle handle = dataset.getHandle(criteria);
         if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
 
         // put info-loss into results-file

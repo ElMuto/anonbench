@@ -26,7 +26,6 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -65,11 +64,10 @@ public class CollectDatasetStats {
             if (calcLatticeSize) {
             BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4);
             BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-            Data arxData = dataset.toArxData(criteria);
-            BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria,
-                                      false, 5, null, 
+            BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, false,
+                                      5, null, null, 
                                       null, null, null,
-                                      null, null, null);
+                                      null, null);
             } 
 //            printFullDatasetStats(datafile, verbosity);
             print_l_diversity_DatasetStats(datafile, verbosity);
@@ -94,7 +92,7 @@ public class CollectDatasetStats {
         
         if (verbosity >= 1) {
             System.out.println("  Default QIs");
-            DataHandle handle = dataset.toArxData().getHandle();
+            DataHandle handle = dataset.toArxData(null).getHandle();
             for (String attr : dataset.getQuasiIdentifyingAttributes()) {
                 BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
             }        
@@ -116,7 +114,7 @@ public class CollectDatasetStats {
         BenchmarkDataset dataset;
         
         dataset = new BenchmarkDataset(datafile, 4);        
-        DataHandle handle = dataset.toArxData().getHandle();
+        DataHandle handle = dataset.toArxData(null).getHandle();
 
         if (verbosity >= 1) {
             System.out.println("  QIs");

@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.Data;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -74,16 +73,14 @@ public class ExecInterPc {
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
 						// Print status info
 						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
-			            Data arxData = dataset.toArxData(criteria);
-						BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 
 					// For each combination of subset-based criteria
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
 						// Print status info
 						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
-                        Data arxData = dataset.toArxData(criteria);
-						BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, criteria, true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 				}
 			}

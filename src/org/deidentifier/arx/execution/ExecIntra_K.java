@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.Data;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -64,12 +63,10 @@ public class ExecIntra_K {
 
 						// Print status info
 						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
-                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-                        Data arxData = dataset.toArxData(criteria);
- 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, arxData, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
-								false, k, null, 
+ 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
+								k, null, null, 
 								null, null, null,
-								null, null, null);
+								null, null);
 					}
 				}
 			}

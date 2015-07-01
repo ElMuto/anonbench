@@ -22,6 +22,8 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
         private BenchmarkDatafile datafile = null;
         private Integer customQiCount = null;
         private String sensitiveAttribute;
+        private Data arxData = null;
+        private DataHandle handle = null;
         
         /**
          * @param datafile
@@ -113,10 +115,6 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                 return baseStringForFilename;
             }
         }
-
-        public Data toArxData() throws IOException {
-            return toArxData(null);
-        }
         
         /**
          * Configures and returns the dataset as <code>org.deidentifier.arx.Data</code>
@@ -127,25 +125,30 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
          */
         @SuppressWarnings("incomplete-switch")
 		public Data toArxData(BenchmarkCriterion[] criteria) throws IOException {
+            
+            if (this.arxData == null) {
 
-            Data arxData = Data.create("data/" + datafile.getBaseStringForFilename() + ".csv", ';');
-            for (String qi : getQuasiIdentifyingAttributes()) {
-                arxData.getDefinition().setAttributeType(qi, loadHierarchy(qi));
-            }
-            if (criteria != null) {
-                for (BenchmarkCriterion c : criteria) {
-                    switch (c) {
-                    case L_DIVERSITY_DISTINCT:
-                    case L_DIVERSITY_ENTROPY:
-                    case L_DIVERSITY_RECURSIVE:
-                    case T_CLOSENESS:
-                        String sensitive = getSensitiveAttribute();
-                        arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
-                        break;
+                this.arxData = Data.create("data/" + datafile.getBaseStringForFilename() + ".csv", ';');
+                for (String qi : getQuasiIdentifyingAttributes()) {
+                    this.arxData.getDefinition().setAttributeType(qi, loadHierarchy(qi));
+                }
+                if (criteria != null) {
+                    for (BenchmarkCriterion c : criteria) {
+                        switch (c) {
+                        case L_DIVERSITY_DISTINCT:
+                        case L_DIVERSITY_ENTROPY:
+                        case L_DIVERSITY_RECURSIVE:
+                        case T_CLOSENESS:
+                            String sensitive = getSensitiveAttribute();
+                            this.arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
+                            break;
+                        }
                     }
                 }
+                if (this.handle == null) setHandle(arxData.getHandle());
             }
-            return arxData;
+            
+            return this.arxData;
         }
 
         /**
@@ -291,7 +294,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
             DEAR(HierarchyType.ORDER), // height 05
             DEYE(HierarchyType.ORDER), // height 05
             ;
-
+            
             private enum HierarchyType {
                 INTERVAL, // interval based
                 ORDER // order based
@@ -336,6 +339,16 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
                 return names;
             }
         }
+        
+        public DataHandle getHandle(BenchmarkCriterion[] criteria) throws IOException {
+            if (this.handle == null) toArxData(criteria);
+            
+            return handle;
+        }
+
+        private void setHandle(DataHandle handle) {
+            this.handle = handle;
+        }
 
         /** Returns the research subset for the dataset
          * @param ssNum
@@ -350,7 +363,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
         	} else {
         		filename = "data/subsets_" + baseName + "/" + baseName + "_subset_" + ssNum + ".csv";       
         	}
-        	return DataSubset.create(this.toArxData(), Data.create(filename, ';'));
+        	return DataSubset.create(this.toArxData(null), Data.create(filename, ';'));
         }
 
         /**
