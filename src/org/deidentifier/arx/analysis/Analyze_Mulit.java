@@ -42,7 +42,7 @@ import de.linearbits.objectselector.Selector;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.io.CSVLine;
 
-public class InterPcAnalysis {
+public class Analyze_Mulit {
         
     private static String FONT_SIZE_CAPTION="scriptsize";
 //    private static String FONT_SIZE="tiny";
