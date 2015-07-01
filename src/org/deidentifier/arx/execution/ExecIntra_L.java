@@ -92,7 +92,7 @@ public class ExecIntra_L {
                         // recursive c,l-diversity
                         criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE };
                         arxData = dataset.toArxData(criteria);
-                        for (int l = 2; l <= 100 ; l ++) {
+                        for (int l = 2; l <= 20 ; l ++) {
                             for (double c : new double[] { 0.25, 0.5, 0.75, 1d,
                                                            1.25, 1.5, 1.75, 2d,
                                                            2.25, 2.5, 2.75, 3d,
