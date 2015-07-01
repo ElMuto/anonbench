@@ -234,6 +234,18 @@ public class BenchmarkDriver {
             String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
             numValues = distinctValues.length;
             if (verbosity >= 1) System.out.println("    " + attr + " (domain size: " + distinctValues.length + ")");
+            
+            // get the frequencies of attribute instantiations
+            double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
+            
+            // calculate entropy
+            double entropy = 0d;
+            double log2 = Math.log(2d);
+            for (int i = 0; i < freqs.length; i++) {
+                entropy += freqs[i] * Math.log(freqs[i]) / log2;
+            }
+            entropy *= -1d;
+            
             if (
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(attr.toString()) ||
@@ -270,8 +282,7 @@ public class BenchmarkDriver {
                 mean_geom = stats.getGeometricMean();
                 quartil_coeff = (stats.getPercentile(75) - stats.getPercentile(25)) / (stats.getPercentile(75) + stats.getPercentile(25));
                 median = stats.getPercentile(50);
-                handle.getStatistics().getSummaryStatistics(false);
-
+                
                 // print
                 if (verbosity >= 2) {
                     System.out.println("      stand. dev.       = " + standDeviation);
@@ -283,11 +294,9 @@ public class BenchmarkDriver {
                     System.out.println("      arith. mean       = " + mean_arith);
                     System.out.println("      geom. mean        = " + mean_geom);
                     System.out.println("      median            = " + median);
+                    System.out.println("      entropy           = " + entropy);
                 }
             } else {
-            	
-            	// get the frequencies of attribute instatiations
-                double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
                 
                 // initialize stats package and read values for calculating standard deviation
                 DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -296,17 +305,9 @@ public class BenchmarkDriver {
                 }
                 frequencyDeviation = stats.getStandardDeviation();
                 
-                // calculate entropy
-                double entropy = 0d;
-                double log2 = Math.log(2d);
-                for (int i = 0; i < freqs.length; i++) {
-                    entropy += freqs[i] * Math.log(freqs[i]) / log2;
-                }
-                entropy *= -1d;
-                
                 if (verbosity >= 2) {
-                    System.out.println("      entropy                       = " + entropy);
                     System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
+                    System.out.println("      entropy                       = " + entropy);
                 }
                 if (verbosity >= 3) {
                     System.out.println("      " + Arrays.toString(distinctValues));

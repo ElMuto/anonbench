@@ -45,7 +45,7 @@ public class CollectDatasetStats {
      */
     public static void main(String[] args) throws IOException {
 
-        collectStats(false, 1);
+        collectStats(false, 2);
     }
 
     /**
