@@ -62,12 +62,11 @@ public class CollectDatasetStats {
         for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
             if (calcLatticeSize) {
-            BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4);
-            BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-            BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, false,
-                                      5, null, null, 
+            BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, null);
+            BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, 5,
+                                      null, null, null, 
                                       null, null, null,
-                                      null, null);
+                                      null);
             } 
 //            printFullDatasetStats(datafile, verbosity);
             print_l_diversity_DatasetStats(datafile, verbosity);
@@ -85,14 +84,14 @@ public class CollectDatasetStats {
         
         BenchmarkDataset dataset;
         if (BenchmarkDatafile.ACS13.equals(datafile)) {
-            dataset = new BenchmarkDataset(datafile, 30);
+            dataset = new BenchmarkDataset(datafile, 30, null);
         } else {
-                dataset = new BenchmarkDataset(datafile, null);
+                dataset = new BenchmarkDataset(datafile, null, null);
         }    
         
         if (verbosity >= 1) {
             System.out.println("  Default QIs");
-            DataHandle handle = dataset.toArxData(null).getHandle();
+            DataHandle handle = dataset.getHandle();
             for (String attr : dataset.getQuasiIdentifyingAttributes()) {
                 BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
             }        
@@ -113,8 +112,9 @@ public class CollectDatasetStats {
         if (verbosity >= 1) System.out.println("l-diversity stats for dataset " + datafile.toString());
         BenchmarkDataset dataset;
         
-        dataset = new BenchmarkDataset(datafile, 4);        
-        DataHandle handle = dataset.toArxData(null).getHandle();
+        
+        dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY });        
+        DataHandle handle = dataset.getHandle();
 
         if (verbosity >= 1) {
             System.out.println("  QIs");

@@ -62,19 +62,18 @@ public class Exec_T {
                     // for each sensitive attribute candidate
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, sa);
-
                         // distinct l-diversity
                         BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
+                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, criteria,sa);
                         double tStart = 0d;
                         for (int i = 1; i <= 100 ; i ++) {
                             double t = tStart + ((double) i / 100d);
                             // Print status info
                             System.out.println("Running t-closeness: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / t = " + t);
-                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, true,
-                                                      null, null, null, 
-                                                      t, null, null,
-                                                      sa, null);
+                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, true, null,
+                                                      null, null, t, 
+                                                      null, null, sa,
+                                                      null);
                         }
                     }
                 }

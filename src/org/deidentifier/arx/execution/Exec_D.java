@@ -56,7 +56,7 @@ public class Exec_D {
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 				// For each dataset
-				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets(new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE })) {
 
 					// For each combination of non subset-based criteria
 					for (double[] dParams : BenchmarkSetup.get_d_values()) {
@@ -65,10 +65,10 @@ public class Exec_D {
 
 							// Print status info
 							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
-	 							BenchmarkDriver.anonymize(metric, suppFactor, dataset, new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE }, false,
+	 							BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, null,
 									null, null, null, 
-									null, dParams[0], dParams[1],
-									null, ssNum);
+									dParams[0], dParams[1], null,
+									ssNum);
 						}
 					}
 				}

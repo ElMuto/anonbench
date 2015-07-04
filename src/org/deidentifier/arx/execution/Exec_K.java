@@ -56,17 +56,17 @@ public class Exec_K {
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 				// For each dataset
-				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets(new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY })) {
 
 					// For each combination of non subset-based criteria
 					for (int k = 2; k <= 100; k ++) {
 
 						// Print status info
 						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
- 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, false,
-								k, null, null, 
+ 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, k,
+								null, null, null, 
 								null, null, null,
-								null, null);
+								null);
 					}
 				}
 			}

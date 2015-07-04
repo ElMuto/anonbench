@@ -26,6 +26,7 @@ import java.util.Arrays;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -67,20 +68,22 @@ public class Exec_Multi {
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 				// For each dataset
-				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+				for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
 					// For each combination of non subset-based criteria
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
 						// Print status info
-						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
-						BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + datafile.toString() + " / " + Arrays.toString(criteria));
+						BenchmarkDataset dataset = new BenchmarkDataset(datafile, null, criteria);
+						BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 
 					// For each combination of subset-based criteria
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
 						// Print status info
+						BenchmarkDataset dataset = new BenchmarkDataset(datafile, null, criteria);
 						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
-						BenchmarkDriver.anonymize(metric, suppFactor, dataset, criteria, true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						BenchmarkDriver.anonymize(metric, suppFactor, new BenchmarkDataset(datafile, null, criteria), true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 				}
 			}

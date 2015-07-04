@@ -117,7 +117,7 @@ public class BenchmarkDriver {
                 config.addCriterion(new RecursiveCLDiversity(sa, c, l));
                 break;
             case T_CLOSENESS:
-                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
+                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.getHierarchy(sa)));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");
@@ -130,7 +130,6 @@ public class BenchmarkDriver {
      * @param metric
      * @param suppFactor
      * @param dataset
-     * @param criteria
      * @param subsetBased
      * @param k
      * @param l
@@ -145,13 +144,13 @@ public class BenchmarkDriver {
     public static void anonymize(
                                  BenchmarkMeasure metric,
                                  double suppFactor, BenchmarkDataset dataset,
-                                 BenchmarkCriterion[] criteria, boolean subsetBased,
-                                 Integer k, Integer l, Double c,
-                                 Double t, Double dMin, Double dMax,
-                                 String sa, Integer ssNum
+                                 boolean subsetBased, Integer k,
+                                 Integer l, Double c, Double t,
+                                 Double dMin, Double dMax, String sa,
+                                 Integer ssNum
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, criteria);
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         anonymizer.setMaxTransformations(210000);
 
@@ -159,7 +158,7 @@ public class BenchmarkDriver {
         BenchmarkSetup.BENCHMARK.addRun(metric.toString(),
                                         String.valueOf(suppFactor),
                                         dataset.toString(),
-                                        Arrays.toString(criteria),
+                                        Arrays.toString(dataset.getCriteria()),
                                         Boolean.toString(subsetBased),
                                         k != null ? k.toString() : "", l != null ? l.toString() : "", c != null ? c.toString() : "",
                                         t != null ? t.toString() : "", dMin != null ? dMin.toString() : "", dMax != null ? dMax.toString() : "",
@@ -167,14 +166,14 @@ public class BenchmarkDriver {
                                         Arrays.toString(dataset.getQuasiIdentifyingAttributes()),
                                         ssNum != null ? ssNum.toString() : "");
 
-        ARXResult result = anonymizer.anonymize(dataset.toArxData(criteria), config);
+        ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 
         AttributeStatistics attrStats = null;
-        DataHandle handle = dataset.getHandle(criteria);
+        DataHandle handle = dataset.getHandle();
         if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
 
         // put info-loss into results-file
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS, result.getGlobalOptimum() != null ?
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, result.getGlobalOptimum() != null ?
                 Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()) :
                     BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         

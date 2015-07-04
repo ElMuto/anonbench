@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup;
@@ -93,9 +94,9 @@ public class Analyze_K {
         Series3D series = null;
 
         // Collect data for all datasets
-        for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+        for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
-            Series3D _series = getSeries(file, measure, suppFactor, dataset.toString(), value_type, focus);
+            Series3D _series = getSeries(file, measure, suppFactor, datafile.toString(), value_type, focus);
             if (series == null) series = _series;
             else series.append(_series);
         }

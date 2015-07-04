@@ -49,7 +49,7 @@ public class BenchmarkSetup {
 			COLUMNS.SS_NUM.toString(),
 	});
 
-    public static final int INFO_LOSS            = BENCHMARK.addMeasure(COLUMNS.IL_VALUE.toString());
+    public static final int INFO_LOSS_ABS            = BENCHMARK.addMeasure(COLUMNS.IL_VALUE.toString());
     public static final int NUM_VALUES           = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS             = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS             = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -60,7 +60,7 @@ public class BenchmarkSetup {
     public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
 
 	static {
-        BENCHMARK.addAnalyzer(INFO_LOSS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(NUM_VALUES, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
@@ -105,7 +105,7 @@ public class BenchmarkSetup {
      * Returns all datasets
      * @return
      */
-    public static BenchmarkDataset[] getDatasets() {
+    public static BenchmarkDataset[] getDatasets(BenchmarkCriterion[] criteria) {
         
         BenchmarkDataset[] datasetArr = new BenchmarkDataset[getDatafiles().length];
         for (int i = 0; i < getDatafiles().length; i++) {
@@ -115,7 +115,7 @@ public class BenchmarkSetup {
             Integer numQis = null;
             if (BenchmarkDatafile.ACS13.equals(datafile)) numQis = 8;
             
-            datasetArr[i] = new BenchmarkDataset(datafile, numQis);
+            datasetArr[i] = new BenchmarkDataset(datafile, numQis, criteria);
         }
         
         return datasetArr;
@@ -127,12 +127,12 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-         BenchmarkDatafile.ACS13,
          BenchmarkDatafile.ADULT,
          BenchmarkDatafile.CUP,
          BenchmarkDatafile.FARS,
          BenchmarkDatafile.ATUS,
          BenchmarkDatafile.IHIS,
+         BenchmarkDatafile.ACS13,
                                         };
     }
 

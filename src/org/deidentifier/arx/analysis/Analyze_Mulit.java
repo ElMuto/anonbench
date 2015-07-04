@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.BenchmarkDataset;
@@ -180,12 +181,12 @@ public class Analyze_Mulit {
 		result += buildTableHeader(of, criteriaLabels);
 
 		// for each dataset
-		for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets()) {
+		for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 			Selector<String[]> selector = file.getSelectorBuilder()
 					.field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(String.valueOf(metric)).and()
 					.field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
 					.field(BenchmarkSetup.COLUMNS.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
-					.field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(dataset.toString())
+					.field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(datafile.toString())
 					.build();
 
 			// get min and max of the dataset
@@ -210,7 +211,7 @@ public class Analyze_Mulit {
 			}
 
 			// iterate over the different privacy criteria and fill cells
-			String line = (dataset.toString());
+			String line = (datafile.toString());
 			for (String critLabel : criteriaLabels) {
 
 			    // build selector
@@ -218,7 +219,7 @@ public class Analyze_Mulit {
 						.field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(String.valueOf(metric)).and()
 						.field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(String.valueOf(suppFactor)).and()
 						.field(BenchmarkSetup.COLUMNS.SUBSET_NATURE.toString()).equals(Boolean.toString(subsetBased)).and()
-						.field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(dataset.toString()).and()
+						.field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(datafile.toString()).and()
 						.field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(critLabel)
 						.build();
 
