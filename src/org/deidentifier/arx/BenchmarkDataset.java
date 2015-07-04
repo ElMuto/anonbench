@@ -121,12 +121,6 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         	return criteria;
         }
 
-
-        /**
-         * Returns the quasi-identifiers for the dataset
-         * @param dataset
-         * @return
-         */
         public String[] getQuasiIdentifyingAttributes() {
             switch (datafile) {
             case ADULT:
@@ -196,7 +190,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @return
          */
         public Hierarchy getHierarchy(String attribute) {
-        	return this.arxData.getDefinition().getHierarchyObject(attribute);
+        	return this.inputDataDef.getHierarchyObject(attribute);
         }
         
         /**
