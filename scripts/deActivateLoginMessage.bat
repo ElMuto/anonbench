@@ -1,17 +1,11 @@
 @echo off
 
-Rem Arbeit
-Rem Set _path=C:\dev\workspace-arx\anonbench-fork
+Set NODE_NUM=2
 
-Rem Zuhause
-rem Set _path=E:\dev\workspace\anonbench_fork
-
-
-
-
+Set _path=%LOCAL_DEV_PATH%
 Set _messageFile=loginMessage.txt
 Set _remoteDir=/home/imse/
 
-plink PCluster-fed2 rm -f %_remoteDir%/%_messageFile%
+plink PCluster-fed%NODE_NUM% rm -f %_remoteDir%/%_messageFile%
 
 pause

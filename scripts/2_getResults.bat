@@ -1,13 +1,8 @@
 @echo off
 
-Rem Helmut Arbeit
-Rem Set _path=C:\dev\workspace-arx\anonbench-fork
+Set _path=%LOCAL_DEV_PATH%
 
-Rem Helmut Zuhause
-Rem Set _path=E:\dev\workspace\anonbench_fork
-
-Set _cluster_node=2
-
+Set _cluster_node=4
 
 Set _local_results_path=%_path%\results
 pscp PCluster-fed%_cluster_node%:/home/imse/pc-bench-helmut/results/results.csv %_local_results_path%\results_node%_cluster_node%.csv

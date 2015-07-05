@@ -1,10 +1,6 @@
 @echo off
 
-Rem Helmut Arbeit
-Set _path=C:\dev\workspace-arx\anonbench-fork
-
-Rem Helmut Zuhause
-Rem Set _path=E:\dev\workspace\anonbench_fork
+Set _path=%LOCAL_DEV_PATH%
 
 Set _cluster_node=2
 Set _remote_dir=/home/imse/pc-bench-helmut
