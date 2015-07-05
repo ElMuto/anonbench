@@ -2,8 +2,9 @@
 <project name="heurakles-bech" default="release" basedir=".">
 
 	<!-- Helmut Zuhause -->
-	<!--property name="arx" value="E:\dev\workspace\arx" />
-	<property name="subframe" value="E:\dev\workspace\subframe" /-->
+	<property name="arx" value="E:\dev\workspace\arx" />
+	<property name="subframe" value="E:\dev\workspace\subframe_fork" />
+	<property name="utility" value="E:\dev\workspace\utility" />
 
 	<!-- Helmut Arbeit -->
 	<!--property name="arx" value="C:\dev\workspace-arx\arx" />
@@ -49,6 +50,7 @@
       <classpath>
         <path path="${subframe}/bin/" />
         <path path="${arx}/bin/" />
+        <path path="${utility}/bin/" />
         <path path="src/" />
         <fileset refid="lib.jars" />
       </classpath>
@@ -67,11 +69,13 @@
 
       <fileset dir="${subframe}/bin/" defaultexcludes="no" />
       <fileset dir="${arx}/bin/" defaultexcludes="no" />
+      <fileset dir="${utility}/bin/" defaultexcludes="no" />
 
       <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
       <manifest>
-        <attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_T" />
+    	<!-- attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_D" /-->
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_L" />
       </manifest>
     </jar>
     <delete dir="build" failonerror="true" />
