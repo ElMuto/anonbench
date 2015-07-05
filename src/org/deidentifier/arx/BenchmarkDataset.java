@@ -3,6 +3,7 @@ package org.deidentifier.arx;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -72,7 +73,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                 }
             }
             Map<String, String[][]> hierarchies = converter.toMap(inputDataDef);
-            String[] header                     = inputDataDef.getQuasiIdentifyingAttributes().toArray(new String[inputDataDef.getQuasiIdentifyingAttributes().size()]);
+            String[] header                     = getQuasiIdentifyingAttributes();
             
             // Compute for input
             this.minAecs = new UtilityMeasureAECS().evaluate(inputArray).getUtility();
@@ -90,6 +91,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
 
             String inFormat =  "%13.2f";
             String outFormat = "%16.2f";
+            System.out.println();
             System.out.println(datafile + " " + Arrays.toString(header));
             System.out.println("  AECS: min = " + String.format(inFormat, minAecs) + " / max = " + String.format(outFormat, maxAecs));
             System.out.println("  Disc: min = " + String.format(inFormat, minDisc) + " / max = " + String.format(outFormat, maxDisc));
@@ -120,8 +122,13 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         public BenchmarkCriterion[] getCriteria() {
         	return criteria;
         }
+        
+        public String [] getQuasiIdentifyingAttributes() {
+        	Set<String> qis = this.inputDataDef.getQuasiIdentifyingAttributes();
+        	return qis.toArray(new String[qis.size()]);
+        }
 
-        private String[] getQuasiIdentifyingAttributes() {
+        private String[] _getQuasiIdentifyingAttributes() {
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",
@@ -344,7 +351,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
 					arxData = null;
 					System.err.println("Unable to load dataset from file " + path);
 				}
-                for (String qi : getQuasiIdentifyingAttributes()) {
+                for (String qi : _getQuasiIdentifyingAttributes()) {
                     arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
                     arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
                 }

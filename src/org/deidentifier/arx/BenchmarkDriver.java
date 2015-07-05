@@ -62,7 +62,7 @@ public class BenchmarkDriver {
     	this.benchmarkMeasure = benchmarkMeasure;
     	this.converter = new DataConverter();;
         String[][] inputArray = dataset.getInputArray();
-		String[] header = dataset.getInputDataDef().getQuasiIdentifyingAttributes().toArray(new String[dataset.getInputDataDef().getQuasiIdentifyingAttributes().size()]);
+		String[] header = dataset.getQuasiIdentifyingAttributes();
 		Map<String, String[][]> hierarchies =this. converter.toMap(dataset.getInputDataDef());
 
         switch (benchmarkMeasure) {
@@ -198,7 +198,7 @@ public class BenchmarkDriver {
                                         k != null ? k.toString() : "", l != null ? l.toString() : "", c != null ? c.toString() : "",
                                         t != null ? t.toString() : "", dMin != null ? dMin.toString() : "", dMax != null ? dMax.toString() : "",
                                         sa != null ? sa.toString() : "",
-                                        Arrays.toString(dataset.getInputDataDef().getQuasiIdentifyingAttributes().toArray(new String[dataset.getInputDataDef().getQuasiIdentifyingAttributes().size()])),
+                                        Arrays.toString(dataset.getQuasiIdentifyingAttributes()),
                                         ssNum != null ? ssNum.toString() : "");
 
         ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
@@ -224,10 +224,12 @@ public class BenchmarkDriver {
 
 
         
-        // put info-losess into results-fil
+        // put info-losess into results-file
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, il_abs);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL, il_rel);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN, dataset.getMinInfoLoss(measure));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, dataset.getMaxInfoLoss(measure));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?

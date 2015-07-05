@@ -23,7 +23,7 @@ package org.deidentifier.arx;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 
 import de.linearbits.subframe.Benchmark;
-import de.linearbits.subframe.analyzer.buffered.BufferedArithmeticMeanAnalyzer;
+import de.linearbits.subframe.analyzer.ValueBuffer;
 
 /**
  * This class encapsulates most of the parameters of a benchmark run
@@ -49,9 +49,11 @@ public class BenchmarkSetup {
 			COLUMNS.SS_NUM.toString(),
 	});
 
+    public static final int INFO_LOSS_ARX        = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
     public static final int INFO_LOSS_ABS        = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
     public static final int INFO_LOSS_REL        = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
-    public static final int INFO_LOSS_ARX        = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
+    public static final int INFO_LOSS_MIN        = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
+    public static final int INFO_LOSS_MAX        = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
     public static final int NUM_VALUES           = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS             = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS             = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -62,17 +64,19 @@ public class BenchmarkSetup {
     public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
 
 	static {
-        BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(INFO_LOSS_REL, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(NUM_VALUES, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(STAND_DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(VARIATION_COEFF, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(NORMALIZED_DEVIATION, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(FREQ_DEVI, new BufferedArithmeticMeanAnalyzer(1));
-        BENCHMARK.addAnalyzer(QUARTIL_COEFF, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new ValueBuffer());
+        BENCHMARK.addAnalyzer(INFO_LOSS_REL, new ValueBuffer());
+        BENCHMARK.addAnalyzer(INFO_LOSS_MIN, new ValueBuffer());
+        BENCHMARK.addAnalyzer(INFO_LOSS_MAX, new ValueBuffer());
+        BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new ValueBuffer());
+        BENCHMARK.addAnalyzer(NUM_VALUES, new ValueBuffer());
+        BENCHMARK.addAnalyzer(SKEWNESS, new ValueBuffer());
+        BENCHMARK.addAnalyzer(KUROTSIS, new ValueBuffer());
+        BENCHMARK.addAnalyzer(STAND_DEVIATION, new ValueBuffer());
+        BENCHMARK.addAnalyzer(VARIATION_COEFF, new ValueBuffer());
+        BENCHMARK.addAnalyzer(NORMALIZED_DEVIATION, new ValueBuffer());
+        BENCHMARK.addAnalyzer(FREQ_DEVI, new ValueBuffer());
+        BENCHMARK.addAnalyzer(QUARTIL_COEFF, new ValueBuffer());
 	}
 
     public static final String RESULTS_DIR = "results";
@@ -90,8 +94,6 @@ public class BenchmarkSetup {
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
         		BenchmarkMeasure.AECS,
-//        		BenchmarkMeasure.ENTROPY,
-//        		BenchmarkMeasure.DISCERNABILITY,
         		};
     }
     
@@ -101,8 +103,6 @@ public class BenchmarkSetup {
      */
     public static double[] getSuppressionFactors() {        
         return new double[] { 0d, 0.05d, 0.1d, 0.5d, 1d };
-//      return new double[] { 0.1, 1d };
-//      return new double[] { 0.1 };
     }
 
     /**
@@ -131,12 +131,12 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
+         BenchmarkDatafile.ACS13,
          BenchmarkDatafile.ADULT,
          BenchmarkDatafile.CUP,
          BenchmarkDatafile.FARS,
          BenchmarkDatafile.ATUS,
          BenchmarkDatafile.IHIS,
-         BenchmarkDatafile.ACS13,
                                         };
     }
 
@@ -172,14 +172,6 @@ public class BenchmarkSetup {
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
-        };
-    }
-    
-    public static int[] get_k_values() {
-        return new int[] {
-                          2, 3, 4, 5, 6, 7, 8, 9, 10,
-                          15, 20, 25, 30, 35, 45, 50,
-                          60, 70, 80, 90, 100
         };
     }
     
@@ -220,13 +212,25 @@ public class BenchmarkSetup {
         IL_ABS_VALUE {
             @Override
             public String toString() {
-                return "Information-loss absolut value";
+                return "Information-loss absolut value from utility framework";
             }
         },
         IL_REL_VALUE {
             @Override
             public String toString() {
-                return "Information-loss relative value";
+                return "Information-loss relative value from utility framework";
+            }
+        },
+        IL_MIN {
+            @Override
+            public String toString() {
+                return "Minimum information loss for dataset";
+            }
+        },
+        IL_MAX {
+            @Override
+            public String toString() {
+                return "Maximum information loss for dataset";
             }
         },
         IL_ARX_VALUE {

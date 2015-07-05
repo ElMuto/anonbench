@@ -93,7 +93,7 @@ public class CollectDatasetStats {
         if (verbosity >= 1) {
             System.out.println("  Default QIs");
             DataHandle handle = dataset.getHandle();
-            for (String attr : dataset.getInputDataDef().getQuasiIdentifyingAttributes()) {
+            for (String attr : dataset.getQuasiIdentifyingAttributes()) {
                 BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
             }        
 
@@ -119,7 +119,7 @@ public class CollectDatasetStats {
 
         if (verbosity >= 1) {
             System.out.println("  QIs");
-            for (String attr : dataset.getInputDataDef().getQuasiIdentifyingAttributes()) {
+            for (String attr : dataset.getQuasiIdentifyingAttributes()) {
                 BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
             }        
 
