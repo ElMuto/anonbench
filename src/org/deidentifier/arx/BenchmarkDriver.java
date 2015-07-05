@@ -152,7 +152,7 @@ public class BenchmarkDriver {
                 config.addCriterion(new RecursiveCLDiversity(sa, c, l));
                 break;
             case T_CLOSENESS:
-                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.getHierarchy(sa)));
+                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");

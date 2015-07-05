@@ -128,63 +128,6 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         	return qis.toArray(new String[qis.size()]);
         }
 
-        private String[] _getQuasiIdentifyingAttributes() {
-            switch (datafile) {
-            case ADULT:
-                return customizeQis ((new String[] {    "age",
-                                                        "marital-status",
-                                                        "race",
-                                                        "sex",
-                                                        "education",
-                                                        "native-country",
-                                                        "salary-class",
-                                                        "workclass" }),
-                                        customQiCount);
-            case ATUS:
-                return customizeQis ((new String[] {   "Age",
-                                                       "Race",
-                                                       "Region",
-                                                       "Sex",
-                                                        "Birthplace",
-                                                        "Citizenship status",
-                                                        "Labor force status",
-                                                        "Marital status" }),
-                                         customQiCount);
-            case CUP:
-                return customizeQis ((new String[] {   "AGE",
-                                                        "GENDER",
-                                                        "STATE",
-                                                        "ZIP",
-                                                        "INCOME",
-                                                        "MINRAMNT",
-                                                        "NGIFTALL" }),
-                                        customQiCount);
-            case FARS:
-                return customizeQis ((new String[] {   "iage",
-                                                       "ihispanic",
-                                                       "irace",
-                                                       "isex",
-                                                        "ideathday",
-                                                        "ideathmon",
-                                                        "iinjury" }),
-                                        customQiCount);
-            case IHIS:
-                return customizeQis ((new String[] {   "AGE",
-                                                       "RACEA",
-                                                       "REGION",
-                                                       "SEX",
-                                                        "MARSTAT",
-                                                        "PERNUM",
-                                                        "QUARTER",
-                                                        "YEAR" }),
-                                        customQiCount);
-            case ACS13:
-                return customizeQis (ACS13_SEMANTIC_QI.getNames(), customQiCount);
-            default:
-                throw new RuntimeException("Invalid dataset");
-            }
-        }
-
         /**
          * @return the number of QIs used in the dataset
          */
@@ -197,7 +140,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @return
          */
         public Hierarchy getHierarchy(String attribute) {
-        	return this.inputDataDef.getHierarchyObject(attribute);
+        	return loadHierarchy(attribute);
         }
         
         /**
@@ -332,6 +275,27 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         public String toString() {
             return datafile.toString();
         }
+
+        /**
+         * Returns the generalization hierarchy for the dataset and attribute
+         * @param dataset
+         * @param attribute
+         * @return
+         * @throws IOException
+         */
+        Hierarchy loadHierarchy(String attribute) {
+            if (!datafile.equals(BenchmarkDatafile.ACS13)) {
+            	String path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
+                try {
+					return Hierarchy.create(path, ';');
+				} catch (IOException e) {
+					System.err.println("Unable to load hierarchy from file " + path);
+					return null;
+				}
+            } else {
+                return loadACS13Hierarchy("hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_", attribute);
+            }
+        }
         
         /**
          * Configures and returns the dataset as <code>org.deidentifier.arx.Data</code>
@@ -351,7 +315,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
 					arxData = null;
 					System.err.println("Unable to load dataset from file " + path);
 				}
-                for (String qi : _getQuasiIdentifyingAttributes()) {
+                for (String qi : getQuasiIdentifyingAttributesPrivate()) {
                     arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
                     arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
                 }
@@ -370,27 +334,6 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                 }           
             
             return arxData;
-        }
-
-        /**
-         * Returns the generalization hierarchy for the dataset and attribute
-         * @param dataset
-         * @param attribute
-         * @return
-         * @throws IOException
-         */
-        private Hierarchy loadHierarchy(String attribute) {
-            if (!datafile.equals(BenchmarkDatafile.ACS13)) {
-            	String path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
-                try {
-					return Hierarchy.create(path, ';');
-				} catch (IOException e) {
-					System.err.println("Unable to load hierarchy from file " + path);
-					return null;
-				}
-            } else {
-                return loadACS13Hierarchy("hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_", attribute);
-            }
         }
 
         private static Hierarchy loadACS13Hierarchy(String fileBaseName, String attribute) {
@@ -441,6 +384,63 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         
         private static String[] customizeQis(String[] qis, Integer customQiCount) {
             return customQiCount == null ? qis : Arrays.copyOf(qis, customQiCount);
+        }
+
+        private String[] getQuasiIdentifyingAttributesPrivate() {
+            switch (datafile) {
+            case ADULT:
+                return customizeQis ((new String[] {    "age",
+                                                        "marital-status",
+                                                        "race",
+                                                        "sex",
+                                                        "education",
+                                                        "native-country",
+                                                        "salary-class",
+                                                        "workclass" }),
+                                        customQiCount);
+            case ATUS:
+                return customizeQis ((new String[] {   "Age",
+                                                       "Race",
+                                                       "Region",
+                                                       "Sex",
+                                                        "Birthplace",
+                                                        "Citizenship status",
+                                                        "Labor force status",
+                                                        "Marital status" }),
+                                         customQiCount);
+            case CUP:
+                return customizeQis ((new String[] {   "AGE",
+                                                        "GENDER",
+                                                        "STATE",
+                                                        "ZIP",
+                                                        "INCOME",
+                                                        "MINRAMNT",
+                                                        "NGIFTALL" }),
+                                        customQiCount);
+            case FARS:
+                return customizeQis ((new String[] {   "iage",
+                                                       "ihispanic",
+                                                       "irace",
+                                                       "isex",
+                                                        "ideathday",
+                                                        "ideathmon",
+                                                        "iinjury" }),
+                                        customQiCount);
+            case IHIS:
+                return customizeQis ((new String[] {   "AGE",
+                                                       "RACEA",
+                                                       "REGION",
+                                                       "SEX",
+                                                        "MARSTAT",
+                                                        "PERNUM",
+                                                        "QUARTER",
+                                                        "YEAR" }),
+                                        customQiCount);
+            case ACS13:
+                return customizeQis (ACS13_SEMANTIC_QI.getNames(), customQiCount);
+            default:
+                throw new RuntimeException("Invalid dataset");
+            }
         }
 
         /**
