@@ -50,7 +50,7 @@ public class Exec_D {
 	private static void evaluate_d_presence() throws IOException {
 		
 		// for each metric
-		for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
+		for (BenchmarkMeasure benchmarkMeasure : BenchmarkSetup.getMeasures()) {
 
 			// for each suppression factor
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -58,14 +58,16 @@ public class Exec_D {
 				// For each dataset
 				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets(new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE })) {
 
+		            BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
+
 					// For each combination of non subset-based criteria
 					for (double[] dParams : BenchmarkSetup.get_d_values()) {
 						
 						for (int ssNum = 1; ssNum <= 100; ssNum++) {
 
 							// Print status info
-							System.out.println("Running d-Presence: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
-	 							BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, null,
+							System.out.println("Running d-Presence: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / d = [" + dParams[0] + ", " + dParams[1] + "], subset-num = " + ssNum);
+	 							driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, null,
 									null, null, null, 
 									dParams[0], dParams[1], null,
 									ssNum);

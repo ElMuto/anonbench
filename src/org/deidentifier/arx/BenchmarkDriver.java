@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -36,6 +37,13 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
+import org.deidentifier.arx.utility.DataConverter;
+import org.deidentifier.arx.utility.UtilityMeasure;
+import org.deidentifier.arx.utility.UtilityMeasureAECS;
+import org.deidentifier.arx.utility.UtilityMeasureDiscernibility;
+import org.deidentifier.arx.utility.UtilityMeasureLoss;
+import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
+import org.deidentifier.arx.utility.UtilityMeasurePrecision;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 
@@ -44,10 +52,37 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  * @author Fabian Prasser
  */
 public class BenchmarkDriver {
-
     private final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
+    
+    private final UtilityMeasure<Double> measure;
+    private final DataConverter converter;
+    private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
 
-    /**
+    public BenchmarkDriver(BenchmarkSetup.BenchmarkMeasure benchmarkMeasure, BenchmarkDataset dataset) {
+    	this.benchmarkMeasure = benchmarkMeasure;
+    	this.converter = new DataConverter();;
+        String[][] inputArray = dataset.getInputArray();
+		String[] header = dataset.getInputDataDef().getQuasiIdentifyingAttributes().toArray(new String[dataset.getInputDataDef().getQuasiIdentifyingAttributes().size()]);
+		Map<String, String[][]> hierarchies =this. converter.toMap(dataset.getInputDataDef());
+
+        switch (benchmarkMeasure) {
+		case AECS:
+		this.	measure = new UtilityMeasureAECS();
+			break;
+		case DISCERNABILITY:			this.	measure = new UtilityMeasureDiscernibility();
+			break;
+		case ENTROPY:			this.	measure = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray);
+			break;
+		case LOSS:			this.	measure = new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
+			break;
+		case PRECISION:			this.measure = 	new UtilityMeasurePrecision<Double>(header, hierarchies);
+			break;
+		default:
+			throw new RuntimeException("Invalid measure");
+        }
+	}
+
+	/**
      * Returns a configuration for the ARX framework
      * @param dataset
      * @param suppFactor
@@ -127,7 +162,7 @@ public class BenchmarkDriver {
     }
 
     /**
-     * @param metric
+     * @param measure
      * @param suppFactor
      * @param dataset
      * @param subsetBased
@@ -141,8 +176,8 @@ public class BenchmarkDriver {
      * @param ssNum
      * @throws IOException
      */
-    public static void anonymize(
-                                 BenchmarkMeasure metric,
+    public void anonymize(
+                                 BenchmarkMeasure measure,
                                  double suppFactor, BenchmarkDataset dataset,
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
@@ -150,12 +185,12 @@ public class BenchmarkDriver {
                                  Integer ssNum
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, metric, k, l, c, t, dMin, dMax, sa, ssNum, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         anonymizer.setMaxTransformations(210000);
 
         // Benchmark
-        BenchmarkSetup.BENCHMARK.addRun(metric.toString(),
+        BenchmarkSetup.BENCHMARK.addRun(measure.toString(),
                                         String.valueOf(suppFactor),
                                         dataset.toString(),
                                         Arrays.toString(dataset.getCriteria()),
@@ -163,7 +198,7 @@ public class BenchmarkDriver {
                                         k != null ? k.toString() : "", l != null ? l.toString() : "", c != null ? c.toString() : "",
                                         t != null ? t.toString() : "", dMin != null ? dMin.toString() : "", dMax != null ? dMax.toString() : "",
                                         sa != null ? sa.toString() : "",
-                                        Arrays.toString(dataset.getQuasiIdentifyingAttributes()),
+                                        Arrays.toString(dataset.getInputDataDef().getQuasiIdentifyingAttributes().toArray(new String[dataset.getInputDataDef().getQuasiIdentifyingAttributes().size()])),
                                         ssNum != null ? ssNum.toString() : "");
 
         ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
@@ -172,10 +207,27 @@ public class BenchmarkDriver {
         DataHandle handle = dataset.getHandle();
         if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
 
-        // put info-loss into results-file
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, result.getGlobalOptimum() != null ?
-                Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString()) :
-                    BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        Double il_arx;
+        Double il_abs;
+        Double il_rel;
+        if (result.getGlobalOptimum() != null) {
+            String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
+            
+            il_abs = this.measure.evaluate(outputArray).getUtility();
+            il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
+            il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
+
+            if (il_rel > 1d || il_rel < 0d) throw new RuntimeException("Invalid value for il_rel: " + il_rel);
+        } else {
+        	il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        }
+
+
+        
+        // put info-losess into results-fil
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, il_abs);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL, il_rel);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?

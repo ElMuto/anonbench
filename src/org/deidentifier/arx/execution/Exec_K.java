@@ -50,7 +50,7 @@ public class Exec_K {
 	private static void evaluate_k_anonymity() throws IOException {
 		
 		// for each metric
-		for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
+		for (BenchmarkMeasure benchmarkMeasure : BenchmarkSetup.getMeasures()) {
 
 			// for each suppression factor
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -58,12 +58,14 @@ public class Exec_K {
 				// For each dataset
 				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets(new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY })) {
 
+		            BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
+
 					// For each combination of non subset-based criteria
 					for (int k = 2; k <= 100; k ++) {
 
 						// Print status info
-						System.out.println("Running k-Anonymity: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
- 						BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, k,
+						System.out.println("Running k-Anonymity: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
+ 						driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, k,
 								null, null, null, 
 								null, null, null,
 								null);

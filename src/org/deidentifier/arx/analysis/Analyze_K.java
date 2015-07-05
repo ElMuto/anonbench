@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup;
 
 import de.linearbits.objectselector.Selector;
@@ -72,7 +71,7 @@ public class Analyze_K {
 
         for (BenchmarkSetup.BenchmarkMeasure measure : BenchmarkSetup.getMeasures()) {
             for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-                groups.add(getGroup(file, measure.toString(), String.valueOf(suppFactor), BenchmarkSetup.COLUMNS.IL_VALUE.toString(), BenchmarkCriterion.K_ANONYMITY.toString()));
+                groups.add(getGroup(file, measure.toString(), String.valueOf(suppFactor), BenchmarkSetup.COLUMNS.IL_ABS_VALUE.toString(), BenchmarkCriterion.K_ANONYMITY.toString()));
             }
         }
         LaTeX.plot(groups, "results/results");

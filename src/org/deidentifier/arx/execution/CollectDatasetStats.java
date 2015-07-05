@@ -55,7 +55,7 @@ public class CollectDatasetStats {
      */
     private static void collectStats(boolean calcLatticeSize, int verbosity) throws IOException {
 
-        BenchmarkMeasure metric = BenchmarkSetup.getMeasures()[0];
+        BenchmarkMeasure measure = BenchmarkSetup.getMeasures()[0];
         double suppFactor = BenchmarkSetup.getSuppressionFactors()[0];
 
         // For each datafile
@@ -63,7 +63,8 @@ public class CollectDatasetStats {
 
             if (calcLatticeSize) {
             BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, null);
-            BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, 5,
+            BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+            driver.anonymize(measure, suppFactor, dataset, false, 5,
                                       null, null, null, 
                                       null, null, null,
                                       null);
@@ -92,7 +93,7 @@ public class CollectDatasetStats {
         if (verbosity >= 1) {
             System.out.println("  Default QIs");
             DataHandle handle = dataset.getHandle();
-            for (String attr : dataset.getQuasiIdentifyingAttributes()) {
+            for (String attr : dataset.getInputDataDef().getQuasiIdentifyingAttributes()) {
                 BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
             }        
 
@@ -118,7 +119,7 @@ public class CollectDatasetStats {
 
         if (verbosity >= 1) {
             System.out.println("  QIs");
-            for (String attr : dataset.getQuasiIdentifyingAttributes()) {
+            for (String attr : dataset.getInputDataDef().getQuasiIdentifyingAttributes()) {
                 BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
             }        
 

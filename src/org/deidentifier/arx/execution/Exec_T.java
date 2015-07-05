@@ -51,7 +51,7 @@ public class Exec_T {
     private static void evaluate_t_closeness() throws IOException {
 
         // for each metric
-        for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
+        for (BenchmarkMeasure benchmarkMeasure : BenchmarkSetup.getMeasures()) {
 
             // for each suppression factor
             for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -65,12 +65,13 @@ public class Exec_T {
                         // distinct l-diversity
                         BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
                         BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, criteria,sa);
+                        BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
                         double tStart = 0d;
                         for (int i = 1; i <= 100 ; i ++) {
                             double t = tStart + ((double) i / 100d);
                             // Print status info
-                            System.out.println("Running t-closeness: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / t = " + t);
-                            BenchmarkDriver.anonymize(metric, suppFactor, dataset, true, null,
+                            System.out.println("Running t-closeness: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / t = " + t);
+                            driver.anonymize(benchmarkMeasure, suppFactor, dataset, true, null,
                                                       null, null, t, 
                                                       null, null, sa,
                                                       null);

@@ -36,7 +36,6 @@ import java.util.Iterator;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkSetup;
 
 import de.linearbits.objectselector.Selector;
@@ -198,7 +197,7 @@ public class Analyze_Mulit {
 				String[] csvLine = csvline.getData();
 
 				if (selector.isSelected(csvLine)) {
-					Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.IL_VALUE.toString(), "Arithmetic Mean"));
+					Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.IL_ABS_VALUE.toString(), "Arithmetic Mean"));
 					if (val != BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL) {
 						if (minVal == null || val < minVal) {
 							minVal = val;
@@ -230,7 +229,7 @@ public class Analyze_Mulit {
 					String[] csvLine = csvline.getData();
 
 					if (selector.isSelected(csvLine)) {
-						Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.IL_VALUE.toString(), "Arithmetic Mean"));
+						Double val = Double.valueOf(csvline.get(BenchmarkSetup.COLUMNS.IL_ABS_VALUE.toString(), "Arithmetic Mean"));
 						Double normVal = val != BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL ? (val - minVal) / (maxVal - minVal) : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
 						String normString = normVal != BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL ? new DecimalFormat("0.0000").format(normVal): BenchmarkSetup.NO_RESULT_FOUND_STRING_VAL;
 						String colorCode = "";

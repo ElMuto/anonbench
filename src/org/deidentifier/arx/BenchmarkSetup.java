@@ -49,7 +49,9 @@ public class BenchmarkSetup {
 			COLUMNS.SS_NUM.toString(),
 	});
 
-    public static final int INFO_LOSS_ABS            = BENCHMARK.addMeasure(COLUMNS.IL_VALUE.toString());
+    public static final int INFO_LOSS_ABS        = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
+    public static final int INFO_LOSS_REL        = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
+    public static final int INFO_LOSS_ARX        = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
     public static final int NUM_VALUES           = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS             = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS             = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -61,6 +63,8 @@ public class BenchmarkSetup {
 
 	static {
         BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(INFO_LOSS_REL, new BufferedArithmeticMeanAnalyzer(1));
+        BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(NUM_VALUES, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(SKEWNESS, new BufferedArithmeticMeanAnalyzer(1));
         BENCHMARK.addAnalyzer(KUROTSIS, new BufferedArithmeticMeanAnalyzer(1));
@@ -213,10 +217,22 @@ public class BenchmarkSetup {
                 return "Criteria";
             }
         },
-        IL_VALUE {
+        IL_ABS_VALUE {
             @Override
             public String toString() {
-                return "Information-loss value";
+                return "Information-loss absolut value";
+            }
+        },
+        IL_REL_VALUE {
+            @Override
+            public String toString() {
+                return "Information-loss relative value";
+            }
+        },
+        IL_ARX_VALUE {
+            @Override
+            public String toString() {
+                return "Information-loss value from ARX framework";
             }
         },
         SUPPRESSION_FACTOR {

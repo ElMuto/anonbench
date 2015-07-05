@@ -72,7 +72,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                 }
             }
             Map<String, String[][]> hierarchies = converter.toMap(inputDataDef);
-            String[] header                     = getQuasiIdentifyingAttributes();
+            String[] header                     = inputDataDef.getQuasiIdentifyingAttributes().toArray(new String[inputDataDef.getQuasiIdentifyingAttributes().size()]);
             
             // Compute for input
             this.minAecs = new UtilityMeasureAECS().evaluate(inputArray).getUtility();
@@ -121,7 +121,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         	return criteria;
         }
 
-        public String[] getQuasiIdentifyingAttributes() {
+        private String[] getQuasiIdentifyingAttributes() {
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",
@@ -194,11 +194,38 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         }
         
         /**
+         * @return
+         */
+        public String[][] getInputArray() {
+			return inputArray;
+		}
+
+		/**
+		 * @return
+		 */
+		public DataDefinition getInputDataDef() {
+			return inputDataDef;
+		}
+
+		/**
          * @param measure
          * @return
          */
         public double getMinInfoLoss(BenchmarkSetup.BenchmarkMeasure measure) {
-        	return 0;
+        	switch(measure) {
+			case AECS:
+				return this.minAecs;
+			case DISCERNABILITY:
+				return this.minDisc;
+			case ENTROPY:
+				return this.minEntr;
+			case LOSS:
+				return this.minLoss;
+			case PRECISION:
+				return this.minPrec;
+			default:
+				throw new RuntimeException("Invalid measure");
+        	}
         }
         
         /**
@@ -206,7 +233,20 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @return
          */
         public double getMaxInfoLoss(BenchmarkSetup.BenchmarkMeasure measure) {
-        	return 0;
+        	switch(measure) {
+			case AECS:
+				return this.maxAecs;
+			case DISCERNABILITY:
+				return this.maxDisc;
+			case ENTROPY:
+				return this.maxEntr;
+			case LOSS:
+				return this.maxLoss;
+			case PRECISION:
+				return this.maxPrec;
+			default:
+				throw new RuntimeException("Invalid measure");
+        	}
         }
         
         public DataHandle getHandle() throws IOException {

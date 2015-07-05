@@ -62,28 +62,30 @@ public class Exec_Multi {
 		Integer ssNum = null;
 
 		// for each metric
-		for (BenchmarkMeasure metric : BenchmarkSetup.getMeasures()) {
+		for (BenchmarkMeasure benchmarkMeasure : BenchmarkSetup.getMeasures()) {
 
 			// for each suppression factor
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
 				// For each dataset
 				for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
-
+					
 					// For each combination of non subset-based criteria
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getNonSubsetBasedCriteria()) {
 						// Print status info
-						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + datafile.toString() + " / " + Arrays.toString(criteria));
+						System.out.println("Running: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + datafile.toString() + " / " + Arrays.toString(criteria));
 						BenchmarkDataset dataset = new BenchmarkDataset(datafile, null, criteria);
-						BenchmarkDriver.anonymize(metric, suppFactor, dataset, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
+						driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 
 					// For each combination of subset-based criteria
 					for (BenchmarkCriterion[] criteria : BenchmarkSetup.getSubsetBasedCriteria()) {
 						// Print status info
 						BenchmarkDataset dataset = new BenchmarkDataset(datafile, null, criteria);
-						System.out.println("Running: " + metric.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
-						BenchmarkDriver.anonymize(metric, suppFactor, new BenchmarkDataset(datafile, null, criteria), true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						System.out.println("Running: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
+						BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
+						driver.anonymize(benchmarkMeasure, suppFactor, new BenchmarkDataset(datafile, null, criteria), true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
 					}
 				}
 			}
