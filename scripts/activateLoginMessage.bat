@@ -1,8 +1,8 @@
 @echo off
 
-Set NODE_NUM=2
+Set NODE_NUM=3
 
-Set _path=%LOCAL_DEV_PATH%
+Set _path=%WORKSPACE_PATH%\anonbench_fork
 Set _messageFile=loginMessage.txt
 Set _remoteDir=/home/imse/
 

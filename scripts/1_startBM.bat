@@ -1,8 +1,8 @@
 @echo off
 
-Set _path=%LOCAL_DEV_PATH%
+Set _path=%WORKSPACE_PATH%\anonbench_fork
 
-Set _cluster_node=2
+Set _cluster_node=3
 Set _remote_dir=/home/imse/pc-bench-helmut
 
 Set _commandfile=%_path%\scripts\plink-commands.txt
