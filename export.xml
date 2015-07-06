@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="heurakles-bech" default="release" basedir=".">
 
-	<!-- Helmut Zuhause -->
-	<property name="arx" value="E:\dev\workspace\arx" />
-	<property name="subframe" value="E:\dev\workspace\subframe_fork" />
-	<property name="utility" value="E:\dev\workspace\utility" />
-
-	<!-- Helmut Arbeit -->
-	<!--property name="arx" value="C:\dev\workspace-arx\arx" />
-	<property name="subframe" value="C:\dev\workspace-arx\subframe" /-->
+  <property environment="env"/>
+  
+  <property name="arx" value="${env.WORKSPACE_PATH}\arx" />
+  <property name="subframe" value="${env.WORKSPACE_PATH}\subframe-fork" />
+  <property name="utility" value="${env.WORKSPACE_PATH}\utility" />
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">

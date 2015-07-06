@@ -1,6 +1,6 @@
 @echo off
 
-Set _path=%WORKSPACE_PATH%\anonbench_fork
+Set _path=%WORKSPACE_PATH%\anonbench-fork
 
 Set _cluster_node=3
 
