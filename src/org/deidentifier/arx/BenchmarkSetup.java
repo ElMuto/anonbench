@@ -113,13 +113,7 @@ public class BenchmarkSetup {
         
         BenchmarkDataset[] datasetArr = new BenchmarkDataset[getDatafiles().length];
         for (int i = 0; i < getDatafiles().length; i++) {
-            
-            BenchmarkDatafile datafile = getDatafiles()[i];
-            
-            Integer numQis = null;
-            if (BenchmarkDatafile.ACS13.equals(datafile)) numQis = 8;
-            
-            datasetArr[i] = new BenchmarkDataset(datafile, numQis, criteria);
+            datasetArr[i] = new BenchmarkDataset(getDatafiles()[i], BenchmarkDatafile.ACS13.equals(getDatafiles()[i]) ? 8 : null, criteria);
         }
         
         return datasetArr;
