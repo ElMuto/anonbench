@@ -63,8 +63,7 @@ public class Exec_L {
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
                         // distinct l-diversity
-                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT };
-                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, criteria, sa);
+                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT }, sa);
                         BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
                         for (int l = 2; l <= 20 ; l++) {
                             // Print status info
@@ -76,7 +75,7 @@ public class Exec_L {
                         }
 
                         // entropy l-diversity
-                        criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY };
+                        dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY }, sa);
                         for (int l = 2; l <= 20 ; l++) {
                             // Print status info
                             System.out.println("Running entropy l-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
@@ -87,7 +86,7 @@ public class Exec_L {
                         }
 
                         // recursive c,l-diversity
-                        criteria = new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE };
+                        dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
                         for (int l = 2; l <= 20 ; l ++) {
                             for (double c : new double[] { 0.25, 0.5, 0.75, 1d,
                                                            1.25, 1.5, 1.75, 2d,
