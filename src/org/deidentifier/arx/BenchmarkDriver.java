@@ -242,12 +242,12 @@ public class BenchmarkDriver {
                 attrStats.getStandDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.VARIATION_COEFF, sa != null && attrStats.getVariance_coeff() != null ?
                 attrStats.getVariance_coeff() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NORMALIZED_DEVIATION, sa != null && attrStats.getDeviation_norm() != null ?
-                attrStats.getDeviation_norm() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_DEVI, sa != null && attrStats.getFrequencyDeviation() != null ?
-                attrStats.getFrequencyDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_DEVI, sa != null ?
+                (attrStats.getFrequencyDeviation() != null ?attrStats.getFrequencyDeviation() : attrStats.getDeviation_norm()) : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.QUARTIL_COEFF, sa != null && attrStats.getQuartil_coeff() != null ?
                 attrStats.getQuartil_coeff() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.ENTROPY, sa != null ?
+                attrStats.getEntropy() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
 
         // Write results incrementally
         BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
@@ -372,7 +372,7 @@ public class BenchmarkDriver {
                                            variance, skewness, kurtosis,
                                            standDeviation, variance_coeff, deviation_norm,
                                            quartil_coeff, mean_arith,
-                                           mean_geom, median));
+                                           mean_geom, median, entropy));
             
             return statsCache.get(statsKey);
         }

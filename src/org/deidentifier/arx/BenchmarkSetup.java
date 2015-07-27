@@ -49,19 +49,19 @@ public class BenchmarkSetup {
 			COLUMNS.SS_NUM.toString(),
 	});
 
-    public static final int INFO_LOSS_ARX        = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
-    public static final int INFO_LOSS_ABS        = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
-    public static final int INFO_LOSS_REL        = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
-    public static final int INFO_LOSS_MIN        = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
-    public static final int INFO_LOSS_MAX        = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
-    public static final int NUM_VALUES           = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
-    public static final int SKEWNESS             = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
-    public static final int KUROTSIS             = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
-    public static final int FREQ_DEVI            = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies
-    public static final int STAND_DEVIATION      = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
-    public static final int VARIATION_COEFF      = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
-    public static final int NORMALIZED_DEVIATION = BENCHMARK.addMeasure(COLUMNS.DEVI_NORM.toString());
-    public static final int QUARTIL_COEFF        = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
+    public static final int INFO_LOSS_ARX   = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
+    public static final int INFO_LOSS_ABS   = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
+    public static final int INFO_LOSS_REL   = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
+    public static final int INFO_LOSS_MIN   = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
+    public static final int INFO_LOSS_MAX   = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
+    public static final int NUM_VALUES      = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
+    public static final int SKEWNESS        = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
+    public static final int KUROTSIS        = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
+    public static final int FREQ_DEVI       = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies of normalized standard deviation
+    public static final int STAND_DEVIATION = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
+    public static final int VARIATION_COEFF = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
+    public static final int QUARTIL_COEFF   = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
+    public static final int ENTROPY         = BENCHMARK.addMeasure(COLUMNS.ENTROPY.toString());
 
 	static {
         BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new ValueBuffer());
@@ -74,9 +74,9 @@ public class BenchmarkSetup {
         BENCHMARK.addAnalyzer(KUROTSIS, new ValueBuffer());
         BENCHMARK.addAnalyzer(STAND_DEVIATION, new ValueBuffer());
         BENCHMARK.addAnalyzer(VARIATION_COEFF, new ValueBuffer());
-        BENCHMARK.addAnalyzer(NORMALIZED_DEVIATION, new ValueBuffer());
         BENCHMARK.addAnalyzer(FREQ_DEVI, new ValueBuffer());
         BENCHMARK.addAnalyzer(QUARTIL_COEFF, new ValueBuffer());
+        BENCHMARK.addAnalyzer(ENTROPY, new ValueBuffer());
 	}
 
     public static final String RESULTS_DIR = "results";
@@ -336,7 +336,7 @@ public class BenchmarkSetup {
         FREQ_DEVI {
             @Override
             public String toString() {
-                return "Standard deviation of frequencies";
+                return "Standard dev of frequs or normalized dev";
             }
         },
         STAND_DEVI {
@@ -367,6 +367,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Quartile coefficient of dispersion";
+            }
+        },
+        ENTROPY {
+            @Override
+            public String toString() {
+                return "Entropy";
             }
         },
     }

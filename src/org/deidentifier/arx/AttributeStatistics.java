@@ -14,6 +14,7 @@ public class AttributeStatistics {
     private final Double mean_arith;
     private final Double mean_geom;
     private final Double median;
+    private final Double entropy;
     
     /**
      * @param numValues
@@ -40,7 +41,8 @@ public class AttributeStatistics {
                                Double quartil_coeff,
                                Double mean_arith,
                                Double mean_geom,
-                               Double median) {
+                               Double median,
+                               Double entropy) {
         this.numValues = numValues;
         this.frequencyDeviation = frequencyDeviation;
         this.variance = variance;
@@ -53,6 +55,7 @@ public class AttributeStatistics {
         this.mean_arith = mean_arith;
         this.mean_geom = mean_geom;
         this.median = median;
+        this.entropy = entropy;
     }
 
     public Integer getNumValues() {
@@ -101,5 +104,9 @@ public class AttributeStatistics {
 
     public Double getMedian() {
         return median;
+    }
+
+    public Double getEntropy() {
+        return entropy;
     }
 }
