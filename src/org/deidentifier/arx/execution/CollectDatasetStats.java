@@ -60,6 +60,17 @@ public class CollectDatasetStats {
 
         BenchmarkMeasure measure = BenchmarkSetup.getMeasures()[0];
         double suppFactor = BenchmarkSetup.getSuppressionFactors()[0];
+        
+        // init CSV file
+        PrintWriter writer = new PrintWriter("results/l-diversity_stats.csv", "UTF-8");
+        Field[] asFields = new AttributeStatistics(null, null, null, null, null, null, null, null, null, null, null, null, null).getClass().getFields();
+        String[] fieldNames = new String[asFields.length];
+        writer.print("Dataset;Attribute-Type;Attribute-Name");
+        for (int i = 0; i < asFields.length; i++) {
+            fieldNames[i] = asFields[i].getName();
+            writer.print(";" + fieldNames[i]);
+        }
+        writer.print("\n");
 
         // For each datafile
         for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
@@ -72,9 +83,11 @@ public class CollectDatasetStats {
                                  null, null, null,
                                  null);
             } 
+            
 //            printFullDatasetStats(datafile, verbosity);
-            print_l_diversity_DatasetStats(datafile, verbosity);
+            print_l_diversity_DatasetStats(datafile, verbosity, writer, fieldNames);
         }
+        writer.close();
     }
     
     /**
@@ -108,22 +121,12 @@ public class CollectDatasetStats {
     
     /**
      * @param datafile
+     * @param writer TODO
      * @param printDetails
      * @throws IOException
      */
-    public static void print_l_diversity_DatasetStats(BenchmarkDatafile datafile, int verbosity) throws IOException {        
-        PrintWriter writer = new PrintWriter("results/l-diversity_stats.csv", "UTF-8");
+    public static void print_l_diversity_DatasetStats(BenchmarkDatafile datafile, int verbosity, PrintWriter writer, String[] fieldNames) throws IOException {        
         if (verbosity >= 1) System.out.println("l-diversity stats for dataset " + datafile.toString());
-        
-        // print header of CSV file
-        Field[] asFields = new AttributeStatistics(null, null, null, null, null, null, null, null, null, null, null, null, null).getClass().getFields();
-        String[] fieldNames = new String[asFields.length];
-        writer.print("Dataset;Attribute-Type;Attribute-Name");
-        for (int i = 0; i < asFields.length; i++) {
-            fieldNames[i] = asFields[i].getName();
-            writer.print(";" + fieldNames[i]);
-        }
-        writer.print("\n");
         
         BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY });        
         DataHandle handle = dataset.getHandle();
@@ -132,34 +135,28 @@ public class CollectDatasetStats {
             System.out.println("  QIs");
             for (String attr : dataset.getQuasiIdentifyingAttributes()) {
                 AttributeStatistics as = BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
-                writer.print(dataset + ";QI;" + attr);
-                for (String fieldName : fieldNames) {
-                    try {
-                        writer.print(";" + as.getClass().getField(fieldName).get(as));
-                    } catch (NoSuchFieldException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (SecurityException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (IllegalArgumentException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-                writer.print("\n");
+                writeCsvLine(writer, fieldNames, dataset, "QI", attr, as);
             }        
 
             System.out.println("  Sensitive attribute candidates");
             for (String attr : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
                 AttributeStatistics as = BenchmarkDriver.analyzeAttribute(dataset, handle, attr, verbosity);
-                writer.print(dataset + ";SA-candidate;" + attr);
-                writer.print("\n");
+                writeCsvLine(writer, fieldNames, dataset, "SA-candidate", attr, as);
             }      
         }
-        writer.close();
+    }
+
+    private static void
+            writeCsvLine(PrintWriter writer, String[] fieldNames, BenchmarkDataset dataset, String attrType, String attrName, AttributeStatistics as) {
+        writer.print(dataset + ";" + attrType + ";" + attrName);
+        for (String fieldName : fieldNames) {
+            try {
+                writer.print(";" + as.getClass().getField(fieldName).get(as));
+            } catch (NoSuchFieldException|SecurityException|IllegalArgumentException|IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } 
+        }
+        writer.print("\n");
     }
 }
