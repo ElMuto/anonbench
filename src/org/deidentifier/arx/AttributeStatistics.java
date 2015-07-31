@@ -2,19 +2,19 @@ package org.deidentifier.arx;
 
 public class AttributeStatistics {
 
-    private final Integer numValues;
-    private final Double frequencyDeviation;
-    private final Double variance;
-    private final Double skewness;
-    private final Double kurtosis;
-    private final Double standDeviation;
-    private final Double variance_coeff;
-    private final Double deviation_norm;
-    private final Double quartil_coeff;
-    private final Double mean_arith;
-    private final Double mean_geom;
-    private final Double median;
-    private final Double entropy;
+    public final Integer numValues;
+    public final Double frequencyDeviation;
+    public final Double variance;
+    public final Double skewness;
+    public final Double kurtosis;
+    public final Double standDeviation;
+    public final Double variance_coeff;
+    public final Double deviation_norm;
+    public final Double quartil_coeff;
+    public final Double mean_arith;
+    public final Double mean_geom;
+    public final Double median;
+    public final Double entropy;
     
     /**
      * @param numValues
