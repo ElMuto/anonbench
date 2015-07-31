@@ -63,7 +63,8 @@ public class CollectDatasetStats {
         
         // init CSV file
         PrintWriter writer = new PrintWriter("results/l-diversity_stats.csv", "UTF-8");
-        Field[] asFields = new AttributeStatistics(null, null, null, null, null, null, null, null, null, null, null, null, null).getClass().getFields();
+        Field[] asFields = null;
+        try { asFields = Class.forName("org.deidentifier.arx.AttributeStatistics").getFields(); } catch (SecurityException|ClassNotFoundException e) { e.printStackTrace(); }
         String[] fieldNames = new String[asFields.length];
         writer.print("Dataset;Attribute-Type;Attribute-Name");
         for (int i = 0; i < asFields.length; i++) {
