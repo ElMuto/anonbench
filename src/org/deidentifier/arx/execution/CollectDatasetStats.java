@@ -82,7 +82,7 @@ public class CollectDatasetStats {
                 driver.anonymize(measure, suppFactor, dataset, false, 5,
                                  null, null, null, 
                                  null, null, null,
-                                 null);
+                                 null, null);
             } 
             
 //            printFullDatasetStats(datafile, verbosity);

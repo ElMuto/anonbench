@@ -93,7 +93,7 @@ public class BenchmarkSetup {
     public static BenchmarkMeasure[] getMeasures() {        
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
-        		BenchmarkMeasure.AECS,
+//        		BenchmarkMeasure.AECS,
         		};
     }
     
@@ -102,7 +102,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppressionFactors() {        
-        return new double[] { 0d, 0.05d, 0.1d, 0.5d, 1d };
+        return new double[] { 0d, 0.05d };
     }
 
     /**
@@ -129,12 +129,12 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-         BenchmarkDatafile.ACS13,
+//         BenchmarkDatafile.ACS13,
          BenchmarkDatafile.ADULT,
          BenchmarkDatafile.CUP,
-         BenchmarkDatafile.FARS,
-         BenchmarkDatafile.ATUS,
-         BenchmarkDatafile.IHIS,
+//         BenchmarkDatafile.FARS,
+//         BenchmarkDatafile.ATUS,
+//         BenchmarkDatafile.IHIS,
                                         };
     }
 

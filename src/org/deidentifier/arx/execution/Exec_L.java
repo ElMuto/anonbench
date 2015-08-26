@@ -62,44 +62,18 @@ public class Exec_L {
                     // for each sensitive attribute candidate
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-                        // distinct l-diversity
-                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_DISTINCT }, sa);
-                        BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-                        for (int l = 2; l <= 20 ; l++) {
-                            // Print status info
-                            System.out.println("Running distinct l-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
-                            driver.anonymize(measure, suppFactor, dataset, true, null,
-                                                      l, null, null, 
-                                                      null, null, sa,
-                                                      null);
-                        }
-
-                        // entropy l-diversity
-                        dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_ENTROPY }, sa);
-                        for (int l = 2; l <= 20 ; l++) {
-                            // Print status info
-                            System.out.println("Running entropy l-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / l = " + l);
-                            driver.anonymize(measure, suppFactor, dataset, true, null,
-                                                      l, null, null, 
-                                                      null, null, sa,
-                                                      null);
-                        }
-
+                        Integer customQiCount = 4;
                         // recursive c,l-diversity
-                        dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
-                        for (int l = 2; l <= 20 ; l ++) {
-                            for (double c : new double[] { 0.25, 0.5, 0.75, 1d,
-                                                           1.25, 1.5, 1.75, 2d,
-                                                           2.25, 2.5, 2.75, 3d,
-                                                           3.25, 3.5, 3.75, 4d,
-                                                           4.25, 4.5, 4.75, 5d,
-                                                           5.25, 5.5, 5.75, 6d,}) {
+                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, customQiCount, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
+                        BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+                        for (int l = 3; l <= 3 ; l ++) {
+                            for (double c : new double[] { 4d }) {
                                 // Print status info
                                 System.out.println("Running recursive (cl)-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
                                 driver.anonymize(measure, suppFactor, dataset, true, null,
                                                           l, c, null, 
                                                           null, null, sa,
-                                                          null);
+                                                          null, customQiCount);
                             }
                         }
                     }

@@ -70,7 +70,7 @@ public class Exec_D {
 	 							driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, null,
 									null, null, null, 
 									dParams[0], dParams[1], null,
-									ssNum);
+									ssNum, null);
 						}
 					}
 				}

@@ -27,9 +27,12 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
      * @author helmut spengler
      *
      */
+    /**
+     * @author spengler
+     *
+     */
     public class BenchmarkDataset {
         private final BenchmarkDatafile datafile;
-        private final Integer customQiCount;
         private final String sensitiveAttribute;
         private final BenchmarkCriterion[] criteria;
         
@@ -46,6 +49,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         private final double minEntr; private final double maxEntr;
         private final double minPrec; private final double maxPrec;
 
+
         /**
          * @param datafile
          * @param customQiCount
@@ -54,11 +58,10 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          */
         public BenchmarkDataset(BenchmarkDatafile datafile, Integer customQiCount, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
             this.datafile = datafile;
-            this.customQiCount = customQiCount;
             this.sensitiveAttribute = sensitiveAttribute;
             this.criteria = criteria;
             
-            this.arxData = toArxData(criteria);
+            this.arxData = toArxData(customQiCount, criteria);
             this.inputHandle = arxData.getHandle();
             this.inputDataDef = inputHandle.getDefinition();
             
@@ -126,13 +129,6 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         public String [] getQuasiIdentifyingAttributes() {
         	Set<String> qis = this.inputDataDef.getQuasiIdentifyingAttributes();
         	return qis.toArray(new String[qis.size()]);
-        }
-
-        /**
-         * @return the number of QIs used in the dataset
-         */
-        public Integer getCustomQiCount() {
-            return customQiCount;
         }
         
         /**
@@ -203,12 +199,14 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             return inputHandle;
         }
 
+ 
         /** Returns the research subset for the dataset
+         * @param customQiCount
          * @param ssNum
          * @return
          * @throws IOException
          */
-        public DataSubset getResearchSubset(Integer ssNum) throws IOException {
+        public DataSubset getResearchSubset(Integer customQiCount, Integer ssNum) throws IOException {
         	String filename;
         	String baseName = getDatafile().baseStringForFilename;
         	if (ssNum == null) {
@@ -216,7 +214,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         	} else {
         		filename = "data/subsets_" + baseName + "/" + baseName + "_subset_" + ssNum + ".csv";       
         	}
-        	return DataSubset.create(this.toArxData(null), Data.create(filename, ';'));
+        	return DataSubset.create(this.toArxData(customQiCount, null), Data.create(filename, ';'));
         }
 
         /**
@@ -297,15 +295,16 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             }
         }
         
+
         /**
          * Configures and returns the dataset as <code>org.deidentifier.arx.Data</code>
-         * @param dataset
+         * 
+         * @param customQiCount
          * @param criteria
          * @return
-         * @throws IOException
          */
         @SuppressWarnings("incomplete-switch")
-		private Data toArxData(BenchmarkCriterion[] criteria) {
+		private Data toArxData(Integer customQiCount, BenchmarkCriterion[] criteria) {
         	Data arxData;
 
             	String path = "data/" + datafile.getBaseStringForFilename() + ".csv";
@@ -315,7 +314,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
 					arxData = null;
 					System.err.println("Unable to load dataset from file " + path);
 				}
-                for (String qi : getQuasiIdentifyingAttributesPrivate()) {
+                for (String qi : getQuasiIdentifyingAttributesPrivate(customQiCount)) {
                     arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
                     arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
                 }
@@ -386,7 +385,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             return customQiCount == null ? qis : Arrays.copyOf(qis, customQiCount);
         }
 
-        private String[] getQuasiIdentifyingAttributesPrivate() {
+        private String[] getQuasiIdentifyingAttributesPrivate(Integer customQiCount) {
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",

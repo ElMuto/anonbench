@@ -76,7 +76,7 @@ public class Exec_Multi {
 						System.out.println("Running: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + datafile.toString() + " / " + Arrays.toString(criteria));
 						BenchmarkDataset dataset = new BenchmarkDataset(datafile, null, criteria);
 						BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
-						driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum, null);
 					}
 
 					// For each combination of subset-based criteria
@@ -85,7 +85,7 @@ public class Exec_Multi {
 						BenchmarkDataset dataset = new BenchmarkDataset(datafile, null, criteria);
 						System.out.println("Running: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / " + Arrays.toString(criteria));
 						BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
-						driver.anonymize(benchmarkMeasure, suppFactor, new BenchmarkDataset(datafile, null, criteria), true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum);
+						driver.anonymize(benchmarkMeasure, suppFactor, new BenchmarkDataset(datafile, null, criteria), true, k, l, c, t, dMin, dMax, dataset.getSensitiveAttribute(), ssNum, null);
 					}
 				}
 			}

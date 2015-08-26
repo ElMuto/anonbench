@@ -85,16 +85,17 @@ public class BenchmarkDriver {
 	/**
      * Returns a configuration for the ARX framework
      * @param dataset
-     * @param suppFactor
-     * @param metric
-     * @param k
-     * @param l
-     * @param c
-     * @param t
-     * @param dMin
-     * @param dMax
-     * @param sa
-     * @param criteria
+	 * @param suppFactor
+	 * @param metric
+	 * @param k
+	 * @param l
+	 * @param c
+	 * @param t
+	 * @param dMin
+	 * @param dMax
+	 * @param sa
+	 * @param customQiCount TODO
+	 * @param criteria
      * @return
      * @throws IOException
      */
@@ -102,7 +103,7 @@ public class BenchmarkDriver {
                                                      Integer k, Integer l, Double c,
                                                      Double t, Double dMin, Double dMax,
                                                      String sa, Integer ssNum,
-                                                     BenchmarkCriterion... criteria) throws IOException {
+                                                     Integer customQiCount, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
 
@@ -134,10 +135,10 @@ public class BenchmarkDriver {
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(ssNum)));
+                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(customQiCount, ssNum)));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset(ssNum)));
+                config.addCriterion(new Inclusion(dataset.getResearchSubset(customQiCount, ssNum)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(k));
@@ -174,6 +175,7 @@ public class BenchmarkDriver {
      * @param dMax
      * @param sa
      * @param ssNum
+     * @param customQiCount TODO
      * @throws IOException
      */
     public void anonymize(
@@ -182,10 +184,10 @@ public class BenchmarkDriver {
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
                                  Double dMin, Double dMax, String sa,
-                                 Integer ssNum
+                                 Integer ssNum, Integer customQiCount
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, customQiCount, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         anonymizer.setMaxTransformations(210000);
 
