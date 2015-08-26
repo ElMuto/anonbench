@@ -25,6 +25,8 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.QiConfig;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -55,22 +57,24 @@ public class Exec_K {
 			// for each suppression factor
 			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-				// For each dataset
-				for (BenchmarkDataset dataset : BenchmarkSetup.getDatasets(new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY })) {
+				// For each datafile
+			    for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
+			        for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
+			            BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY });
+			            BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
 
-		            BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
+			            // For each combination of non subset-based criteria
+			            for (int k = 3; k <= 3; k ++) {
 
-					// For each combination of non subset-based criteria
-					for (int k = 2; k <= 100; k ++) {
-
-						// Print status info
-						System.out.println("Running k-Anonymity: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
- 						driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, k,
-								null, null, null, 
-								null, null, null,
-								null, null);
-					}
-				}
+			                // Print status info
+			                System.out.println("Running k-Anonymity: " + benchmarkMeasure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / k = " + k);
+			                driver.anonymize(benchmarkMeasure, suppFactor, dataset, false, k,
+			                                 null, null, null, 
+			                                 null, null, null,
+			                                 null, qiConf);
+			            }
+			        }
+			    }
 			}
 		}
 	}
