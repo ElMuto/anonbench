@@ -103,7 +103,7 @@ public class BenchmarkDriver {
                                                      Integer k, Integer l, Double c,
                                                      Double t, Double dMin, Double dMax,
                                                      String sa, Integer ssNum,
-                                                     Integer customQiCount, BenchmarkCriterion... criteria) throws IOException {
+                                                     QiConfig qiConf, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
 
@@ -135,10 +135,10 @@ public class BenchmarkDriver {
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(customQiCount, ssNum)));
+                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(qiConf, ssNum)));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset(customQiCount, ssNum)));
+                config.addCriterion(new Inclusion(dataset.getResearchSubset(qiConf, ssNum)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(k));
@@ -184,10 +184,10 @@ public class BenchmarkDriver {
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
                                  Double dMin, Double dMax, String sa,
-                                 Integer ssNum, Integer customQiCount
+                                 Integer ssNum, QiConfig qiConf
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, customQiCount, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, qiConf, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         anonymizer.setMaxTransformations(210000);
 

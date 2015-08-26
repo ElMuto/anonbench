@@ -32,6 +32,7 @@ import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.QiConfig;
 
 /**
  * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
@@ -77,7 +78,7 @@ public class CollectDatasetStats {
         for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
             if (calcLatticeSize) {
-                BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, null);
+                BenchmarkDataset dataset = new BenchmarkDataset(datafile, new QiConfig(4), null);
                 BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
                 driver.anonymize(measure, suppFactor, dataset, false, 5,
                                  null, null, null, 
@@ -102,7 +103,7 @@ public class CollectDatasetStats {
         
         BenchmarkDataset dataset;
         if (BenchmarkDatafile.ACS13.equals(datafile)) {
-            dataset = new BenchmarkDataset(datafile, 30, null);
+            dataset = new BenchmarkDataset(datafile, new QiConfig(30), null);
         } else {
                 dataset = new BenchmarkDataset(datafile, null, null);
         }    
@@ -129,7 +130,7 @@ public class CollectDatasetStats {
     public static void print_l_diversity_DatasetStats(BenchmarkDatafile datafile, int verbosity, PrintWriter writer, String[] fieldNames) throws IOException {        
         if (verbosity >= 1) System.out.println("l-diversity stats for dataset " + datafile.toString());
         
-        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY });        
+        BenchmarkDataset dataset = new BenchmarkDataset(datafile, new QiConfig(4), new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY });        
         DataHandle handle = dataset.getHandle();
 
         if (verbosity >= 1) {

@@ -26,6 +26,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.QiConfig;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -64,7 +65,7 @@ public class Exec_T {
 
                         // distinct l-diversity
                         BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
-                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, 4, criteria,sa);
+                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, new QiConfig(4), criteria,sa);
                         BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
                         double tStart = 0d;
                         for (int i = 1; i <= 100 ; i ++) {

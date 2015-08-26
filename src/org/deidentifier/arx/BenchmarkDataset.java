@@ -56,12 +56,12 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @param criteria
          * @param sensitiveAttribute
          */
-        public BenchmarkDataset(BenchmarkDatafile datafile, Integer customQiCount, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
+        public BenchmarkDataset(BenchmarkDatafile datafile, QiConfig qiConf, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
             this.datafile = datafile;
             this.sensitiveAttribute = sensitiveAttribute;
             this.criteria = criteria;
             
-            this.arxData = toArxData(customQiCount, criteria);
+            this.arxData = toArxData(qiConf, criteria);
             this.inputHandle = arxData.getHandle();
             this.inputDataDef = inputHandle.getDefinition();
             
@@ -69,7 +69,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             DataConverter converter = new DataConverter();            
             this.inputArray = converter.toArray(inputHandle, inputDataDef);
             
-            this.outputArray = new String[this.inputArray.length][customQiCount != null ? customQiCount : getQuasiIdentifyingAttributes().length];
+            this.outputArray = new String[this.inputArray.length][qiConf != null ? qiConf.getNumQis() : getQuasiIdentifyingAttributes().length];
             for (int i = 0; i < this.inputArray.length; i++) {
                 for (int j = 0; j < this.inputArray[0].length; j++) {
                 	this.outputArray[i][j] = "*";
@@ -110,8 +110,8 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @param customQiCount
          * @param criteria
          */
-        public BenchmarkDataset(BenchmarkDatafile datafile, Integer customQiCount, BenchmarkCriterion[] criteria) {
-        	this(datafile, customQiCount, criteria, getDefaultSensitiveAttribute(datafile));
+        public BenchmarkDataset(BenchmarkDatafile datafile, QiConfig qiConf, BenchmarkCriterion[] criteria) {
+        	this(datafile, qiConf, criteria, getDefaultSensitiveAttribute(datafile));
         }
 
         public BenchmarkDatafile getDatafile() {
@@ -206,7 +206,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @return
          * @throws IOException
          */
-        public DataSubset getResearchSubset(Integer customQiCount, Integer ssNum) throws IOException {
+        public DataSubset getResearchSubset(QiConfig qiConf, Integer ssNum) throws IOException {
         	String filename;
         	String baseName = getDatafile().baseStringForFilename;
         	if (ssNum == null) {
@@ -214,7 +214,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
         	} else {
         		filename = "data/subsets_" + baseName + "/" + baseName + "_subset_" + ssNum + ".csv";       
         	}
-        	return DataSubset.create(this.toArxData(customQiCount, null), Data.create(filename, ';'));
+        	return DataSubset.create(this.toArxData(qiConf, null), Data.create(filename, ';'));
         }
 
         /**
@@ -304,7 +304,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @return
          */
         @SuppressWarnings("incomplete-switch")
-		private Data toArxData(Integer customQiCount, BenchmarkCriterion[] criteria) {
+		private Data toArxData(QiConfig qiConf, BenchmarkCriterion[] criteria) {
         	Data arxData;
 
             	String path = "data/" + datafile.getBaseStringForFilename() + ".csv";
@@ -314,7 +314,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
 					arxData = null;
 					System.err.println("Unable to load dataset from file " + path);
 				}
-                for (String qi : getQuasiIdentifyingAttributesPrivate(customQiCount)) {
+                for (String qi : getQuasiIdentifyingAttributesPrivate(qiConf)) {
                     arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
                     arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
                 }
@@ -381,11 +381,11 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             }
         }
         
-        private static String[] customizeQis(String[] qis, Integer customQiCount) {
-            return customQiCount == null ? qis : Arrays.copyOf(qis, customQiCount);
+        private static String[] customizeQis(String[] qis, QiConfig qiConf) {
+            return qiConf == null ? qis : Arrays.copyOf(qis, qiConf.getNumQis());
         }
 
-        private String[] getQuasiIdentifyingAttributesPrivate(Integer customQiCount) {
+        private String[] getQuasiIdentifyingAttributesPrivate(QiConfig qiConf) {
             switch (datafile) {
             case ADULT:
                 return customizeQis ((new String[] {    "age",
@@ -396,7 +396,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                                         "native-country",
                                                         "salary-class",
                                                         "workclass" }),
-                                        customQiCount);
+                                                        qiConf);
             case ATUS:
                 return customizeQis ((new String[] {   "Age",
                                                        "Race",
@@ -406,7 +406,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                                         "Citizenship status",
                                                         "Labor force status",
                                                         "Marital status" }),
-                                         customQiCount);
+                                                        qiConf);
             case CUP:
                 return customizeQis ((new String[] {   "AGE",
                                                         "GENDER",
@@ -415,7 +415,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                                         "INCOME",
                                                         "MINRAMNT",
                                                         "NGIFTALL" }),
-                                        customQiCount);
+                                                        qiConf);
             case FARS:
                 return customizeQis ((new String[] {   "iage",
                                                        "ihispanic",
@@ -424,7 +424,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                                         "ideathday",
                                                         "ideathmon",
                                                         "iinjury" }),
-                                        customQiCount);
+                                                        qiConf);
             case IHIS:
                 return customizeQis ((new String[] {   "AGE",
                                                        "RACEA",
@@ -434,9 +434,9 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                                         "PERNUM",
                                                         "QUARTER",
                                                         "YEAR" }),
-                                        customQiCount);
+                                                        qiConf);
             case ACS13:
-                return customizeQis (ACS13_SEMANTIC_QI.getNames(), customQiCount);
+                return customizeQis (ACS13_SEMANTIC_QI.getNames(), qiConf);
             default:
                 throw new RuntimeException("Invalid dataset");
             }

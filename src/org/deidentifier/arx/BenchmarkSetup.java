@@ -115,7 +115,7 @@ public class BenchmarkSetup {
         for (int i = 0; i < getDatafiles().length; i++) {
             datasetArr[i] = new BenchmarkDataset(
                                     getDatafiles()[i],
-                                    BenchmarkDatafile.ACS13.equals(getDatafiles()[i]) ? 8 : null,
+                                    BenchmarkDatafile.ACS13.equals(getDatafiles()[i]) ? new QiConfig(8) : null,
                                     criteria
                                 );
         }

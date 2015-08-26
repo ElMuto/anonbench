@@ -26,6 +26,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.QiConfig;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
@@ -62,9 +63,9 @@ public class Exec_L {
                     // for each sensitive attribute candidate
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-                        Integer customQiCount = 4;
+                        QiConfig qiConf = new QiConfig(4);
                         // recursive c,l-diversity
-                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, customQiCount, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
+                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
                         BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
                         for (int l = 3; l <= 3 ; l ++) {
                             for (double c : new double[] { 4d }) {
@@ -73,7 +74,7 @@ public class Exec_L {
                                 driver.anonymize(measure, suppFactor, dataset, true, null,
                                                           l, c, null, 
                                                           null, null, sa,
-                                                          null, customQiCount);
+                                                          null, qiConf);
                             }
                         }
                     }
