@@ -54,6 +54,7 @@ public class BenchmarkSetup {
     public static final int INFO_LOSS_REL   = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
     public static final int INFO_LOSS_MIN   = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
     public static final int INFO_LOSS_MAX   = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
+    public static final int SOLUTION_RATIO  = BENCHMARK.addMeasure(COLUMNS.SOLUTION_RATIO.toString());
     public static final int NUM_VALUES      = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS        = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS        = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -62,13 +63,15 @@ public class BenchmarkSetup {
     public static final int VARIATION_COEFF = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
     public static final int QUARTIL_COEFF   = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
     public static final int ENTROPY         = BENCHMARK.addMeasure(COLUMNS.ENTROPY.toString());
+    public static final int EFD_SCORE       = BENCHMARK.addMeasure(COLUMNS.EFD_SCORE.toString());
 
 	static {
+        BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_REL, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_MIN, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_MAX, new ValueBuffer());
-        BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new ValueBuffer());
+        BENCHMARK.addAnalyzer(SOLUTION_RATIO, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUM_VALUES, new ValueBuffer());
         BENCHMARK.addAnalyzer(SKEWNESS, new ValueBuffer());
         BENCHMARK.addAnalyzer(KUROTSIS, new ValueBuffer());
@@ -77,6 +80,7 @@ public class BenchmarkSetup {
         BENCHMARK.addAnalyzer(FREQ_DEVI, new ValueBuffer());
         BENCHMARK.addAnalyzer(QUARTIL_COEFF, new ValueBuffer());
         BENCHMARK.addAnalyzer(ENTROPY, new ValueBuffer());
+        BENCHMARK.addAnalyzer(EFD_SCORE, new ValueBuffer());
 	}
 
     public static final String RESULTS_DIR = "results";
@@ -93,7 +97,7 @@ public class BenchmarkSetup {
     public static BenchmarkMeasure[] getMeasures() {        
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
-//        		BenchmarkMeasure.AECS,
+        		BenchmarkMeasure.AECS,
         		};
     }
     
@@ -122,6 +126,21 @@ public class BenchmarkSetup {
         
         return datasetArr;
     }
+    
+    public static QiConfig[] getQiConfigPowerSet() {
+        int[][] powerSet = { { 1          }, { 2       }, { 3       }, { 4       },
+                             { 1, 2       }, { 1, 3    }, { 1, 4    }, { 2, 3    }, { 2, 4 }, { 3, 4 },
+                             { 2, 3, 4    }, { 1, 3, 4 }, { 1, 2, 4 }, { 1, 2, 3 },
+                             { 1, 2, 3, 4 }
+        };
+        
+        QiConfig[] qiConfigPowerSet = new QiConfig[powerSet.length];
+        for (int i = 0; i < powerSet.length; i++) {
+            qiConfigPowerSet[i] = new QiConfig(powerSet[i]);
+        }
+        
+        return qiConfigPowerSet;
+    }
 
     /**
      * Returns all datasets
@@ -129,12 +148,12 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-//         BenchmarkDatafile.ACS13,
+         BenchmarkDatafile.ACS13,
          BenchmarkDatafile.ADULT,
-         BenchmarkDatafile.CUP,
-//         BenchmarkDatafile.FARS,
-//         BenchmarkDatafile.ATUS,
-//         BenchmarkDatafile.IHIS,
+//         BenchmarkDatafile.CUP, // hat nur intervallskalierte Attribute
+         BenchmarkDatafile.FARS,
+         BenchmarkDatafile.ATUS,
+         BenchmarkDatafile.IHIS,
                                         };
     }
 
@@ -235,6 +254,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Information-loss value from ARX framework";
+            }
+        },
+        SOLUTION_RATIO {
+            @Override
+            public String toString() {
+                return "Quotient of found solutions and lattice size";
             }
         },
         SUPPRESSION_FACTOR {
@@ -373,6 +398,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Entropy";
+            }
+        },
+        EFD_SCORE {
+            @Override
+            public String toString() {
+                return "Product of Entropy and Standard dev of frequs";
             }
         },
     }

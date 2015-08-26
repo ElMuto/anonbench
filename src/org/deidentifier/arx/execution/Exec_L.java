@@ -63,19 +63,18 @@ public class Exec_L {
                     // for each sensitive attribute candidate
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-//                        QiConfig qiConf = new QiConfig(4);
-                        QiConfig qiConf = new QiConfig(new int[] {1, 2, 3, 4});
-                        // recursive c,l-diversity
-                        BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
-                        BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-                        for (int l = 3; l <= 3 ; l ++) {
-                            for (double c : new double[] { 4d }) {
-                                // Print status info
-                                System.out.println("Running recursive (cl)-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
-                                driver.anonymize(measure, suppFactor, dataset, true, null,
-                                                          l, c, null, 
-                                                          null, null, sa,
-                                                          null, qiConf);
+                        for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
+                            BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
+                            BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+                            for (int l = 3; l <= 3 ; l ++) {
+                                for (double c : new double[] { 4d }) {
+                                    // Print status info
+                                    System.out.println("Running recursive (cl)-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
+                                    driver.anonymize(measure, suppFactor, dataset, true, null,
+                                                     l, c, null, 
+                                                     null, null, sa,
+                                                     null, qiConf);
+                                }
                             }
                         }
                     }

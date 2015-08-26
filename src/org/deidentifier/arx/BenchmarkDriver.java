@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.deidentifier.arx.ARXLattice.ARXNode;
+import org.deidentifier.arx.ARXLattice.Anonymity;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -226,12 +228,15 @@ public class BenchmarkDriver {
 
 
         
-        // put info-losess into results-file
+        // put info-losses into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, il_abs);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL, il_rel);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN, dataset.getMinInfoLoss(measure));
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, dataset.getMaxInfoLoss(measure));
+        
+        // report solution ratio
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SOLUTION_RATIO, calculateSolutionRatio(result));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?
@@ -250,11 +255,27 @@ public class BenchmarkDriver {
                 attrStats.getQuartil_coeff() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.ENTROPY, sa != null ?
                 attrStats.getEntropy() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.EFD_SCORE, sa != null  && attrStats.getFrequencyDeviation() != null ?
+                attrStats.getEntropy() * attrStats.getFrequencyDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
 
         // Write results incrementally
         BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
         
         handle.release();
+    }
+
+    private double calculateSolutionRatio(ARXResult result) {
+        int numSolutions = 0;
+        ARXLattice lattice = result.getLattice();
+        for (ARXNode[] level : lattice.getLevels()) {
+            for (ARXNode node : level) {
+                if (Anonymity.ANONYMOUS.equals(node.getAnonymity())) {
+                    numSolutions++;
+                }
+            }
+        }
+        
+        return ((double) numSolutions) / ((double) lattice.getSize());
     }
 
 

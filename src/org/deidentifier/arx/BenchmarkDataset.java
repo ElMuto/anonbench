@@ -245,13 +245,15 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                       "Labor force status" 
                                       };
             case CUP:
-                return new String[] { "RAMNTALL",
-                                      "INCOME", 
-                                      "MINRAMNT", 
-                                      "NGIFTALL" };
+                return new String[] { 
+//                                      "RAMNTALL", // interval-scale
+//                                      "INCOME",   // interval-scale
+//                                      "MINRAMNT", // interval-scale
+//                                      "NGIFTALL"  // interval-scale
+                                      };
             case FARS:
                 return new String[] { "istatenum",
-                                      "ideathday", 
+//                                      "ideathday",  // interval-scale
                                       "ideathmon", 
                                       "iinjury" };
             case IHIS:
@@ -261,9 +263,10 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                       "QUARTER" };
             case ACS13:
                 return new String[] { "SCHL",
-                                      "PWGTP",
+//                                      "PWGTP", // interval-scale
                                       "SCHG",
-                                      "INTP" };
+//                                      "INTP"   // interval-scale
+                                      };
             default:
                 throw new RuntimeException("Invalid dataset");
             }
@@ -392,7 +395,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             } else {
                 for (int i = 0; i < numQis; i++) {
                     int qiIndex = qiConf.getActiveQis()[i];
-                    if (qiIndex >= allQis.length) throw new RuntimeException("qiIndex (" + qiIndex + ") exceeds number of available QIs (" + allQis.length + ")");
+                    if (qiIndex > allQis.length) throw new RuntimeException("qiIndex (" + qiIndex + ") exceeds number of available QIs (" + allQis.length + ")");
                     qiArray[i] = allQis[qiIndex-1];
                 }
             }
