@@ -63,7 +63,8 @@ public class Exec_L {
                     // for each sensitive attribute candidate
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-                        QiConfig qiConf = new QiConfig(4);
+//                        QiConfig qiConf = new QiConfig(4);
+                        QiConfig qiConf = new QiConfig(new int[] {1, 2, 3, 4});
                         // recursive c,l-diversity
                         BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
                         BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);

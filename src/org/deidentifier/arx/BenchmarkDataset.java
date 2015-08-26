@@ -381,8 +381,22 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             }
         }
         
-        private static String[] customizeQis(String[] qis, QiConfig qiConf) {
-            return qiConf == null ? qis : Arrays.copyOf(qis, qiConf.getNumQis());
+        private static String[] customizeQis(String[] allQis, QiConfig qiConf) {
+            if (qiConf == null) return allQis;
+            
+            int numQis = qiConf.getNumQis();
+            String[] qiArray = new String[numQis];
+            
+            if (qiConf.getActiveQis() == null) {
+                qiArray = Arrays.copyOf(allQis, numQis);
+            } else {
+                for (int i = 0; i < numQis; i++) {
+                    int qiIndex = qiConf.getActiveQis()[i];
+                    if (qiIndex >= allQis.length) throw new RuntimeException("qiIndex (" + qiIndex + ") exceeds number of available QIs (" + allQis.length + ")");
+                    qiArray[i] = allQis[qiIndex-1];
+                }
+            }
+            return qiArray;
         }
 
         private String[] getQuasiIdentifyingAttributesPrivate(QiConfig qiConf) {
