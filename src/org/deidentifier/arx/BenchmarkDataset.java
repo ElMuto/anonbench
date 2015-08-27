@@ -253,7 +253,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                       };
             case FARS:
                 return new String[] { "istatenum",
-//                                      "ideathday",  // interval-scale
+                                      "ideathday",
                                       "ideathmon", 
                                       "iinjury" };
             case IHIS:

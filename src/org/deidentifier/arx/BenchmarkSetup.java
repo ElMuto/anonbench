@@ -97,7 +97,7 @@ public class BenchmarkSetup {
     public static BenchmarkMeasure[] getMeasures() {        
         return new BenchmarkMeasure[] {
         		BenchmarkMeasure.LOSS,
-        		BenchmarkMeasure.AECS,
+//        		BenchmarkMeasure.AECS,
         		};
     }
     
