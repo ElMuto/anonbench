@@ -361,7 +361,7 @@ public class BenchmarkSetup {
         FREQ_DEVI {
             @Override
             public String toString() {
-                return "Standard dev of frequs or normalized dev";
+                return "Standard dev of frequs";
             }
         },
         STAND_DEVI {
