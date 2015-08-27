@@ -24,30 +24,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
 
 import de.linearbits.objectselector.Selector;
-import de.linearbits.subframe.analyzer.Analyzer;
-import de.linearbits.subframe.analyzer.buffered.BufferedGeometricMeanAnalyzer;
 import de.linearbits.subframe.graph.Field;
-import de.linearbits.subframe.graph.Labels;
-import de.linearbits.subframe.graph.Plot;
-import de.linearbits.subframe.graph.PlotLinesClustered;
 import de.linearbits.subframe.graph.Point2D;
-import de.linearbits.subframe.graph.Point3D;
 import de.linearbits.subframe.graph.Series2D;
-import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
-import de.linearbits.subframe.render.GnuPlotParams;
-import de.linearbits.subframe.render.LaTeX;
-import de.linearbits.subframe.render.PlotGroup;
-import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 
 public class Analyze_L {
 
@@ -72,57 +57,64 @@ public class Analyze_L {
         CSVFile file = new CSVFile(new File("results/results.csv"));
 
 
-//        for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-            for (double suppFactor : new Double[] { 0d }){
-                String suppFactorString = String.valueOf(suppFactor);
-                for (String attrProp : new String[] {COLUMNS.ENTROPY.toString()/*, COLUMNS.EFD_SCORE.toString(), COLUMNS.FREQ_DEVI.toString()*/}) {
-                    for (String measure : new String[] {COLUMNS.SOLUTION_RATIO.toString()/*, COLUMNS.IL_REL_VALUE.toString()*/}) {
-                        Series2D _series = getSeries(file, suppFactorString, attrProp, measure);
-                        
-                        String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp + " measure" + measure + ".csv";
-                        PrintWriter writer = new PrintWriter(pointsFileName, "UTF-8");
-                        for (Point2D point : _series.getData()) {
-                            writer.println(point.x + ";" + point.y);
-                        }
-                        writer.close();
 
-                        String gnuPlotFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp + " measure" + measure + ".plg";
-                        String pdfFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp + " measure" + measure + ".pdf";
-                        String titleString = "suppression: " + suppFactorString;
-                        writer = new PrintWriter(gnuPlotFileName, "UTF-8");
-                        writer.println("set term pdf enhanced font 'Verdana,6'");
-                        writer.println("set output \"" + pdfFileName + "\"");
-                        writer.println("set datafile separator \";\"");
-                        writer.println("set xlabel \"" + attrProp + "\"");
-                        writer.println("set ylabel \"" + measure + "\"");
-                        writer.println("set grid");
-                        writer.println("set title \"" + titleString + "\"");
-                        writer.println("plot '" + pointsFileName + "' with dots notitle");
-                        writer.close();
+        String gnuPlotFileName = "results/commads.plg";
+        String pdfFileName = "results/analysis_loss_c4_l3.pdf";
+        PrintWriter commandWriter = new PrintWriter(gnuPlotFileName, "UTF-8");
+        commandWriter.println("set term pdf enhanced font 'Verdana,4'");
+        commandWriter.println("set output \"" + pdfFileName + "\"");
+        commandWriter.println("set datafile separator \";\"");
+        commandWriter.println("set grid");
+        commandWriter.println("set multiplot title 'Loss / recursive-(c,l)-diversity mit c=4, l=3'");
+        commandWriter.println("set size 0.4,0.4");
 
-                        ProcessBuilder b = new ProcessBuilder();
-                        Process p;
-                        if (new File(pointsFileName).exists() && new File(gnuPlotFileName).exists()) {
-                            b.command("gnuplot", gnuPlotFileName);
-                            p = b.start();
-                            StreamReader output = new StreamReader(p.getInputStream());
-                            StreamReader error = new StreamReader(p.getErrorStream());
-                            new Thread(output).start();
-                            new Thread(error).start();
-                            try {
-                                p.waitFor();
-                            } catch (final InterruptedException e) {
-                                throw new IOException(e);
-                            }
 
-                            if (p.exitValue() != 0) {
-                                throw new IOException("Error executing gnuplot: " + error.getString() + System.lineSeparator() + output.getString());
-                            }
-                        } else {
-                            System.err.println("Files not existent");
-                        }
-                    }
+        for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
+            String suppFactorString = String.valueOf(suppFactor);
+            for (String attrProp : new String[] {COLUMNS.ENTROPY.toString(), COLUMNS.FREQ_DEVI.toString()}) {
+                String measure  = COLUMNS.SOLUTION_RATIO.toString();
+                Series2D _series = getSeries(file, suppFactorString, attrProp, measure);
+
+                String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp + " measure" + measure + ".csv";
+                PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
+                for (Point2D point : _series.getData()) {
+                    pointsWriter.println(point.x + ";" + point.y);
                 }
+                pointsWriter.close();
+                commandWriter.println();              
+                String originX = suppFactor == 0d ? "0.0" : "0.5";
+                String originY = COLUMNS.ENTROPY.toString().equals(attrProp) ? "0.0" : "0.5";
+                String origin = originX + "," + originY;
+                commandWriter.println("set title 'suppression: " + suppFactorString + "'");
+                commandWriter.println("set origin " + origin);
+                commandWriter.println("set xlabel \"" + attrProp + "\"");
+                commandWriter.println("set ylabel \"" + measure + "\"");
+                commandWriter.println("plot '" + pointsFileName + "' with dots notitle");
+            }
+        }
+        commandWriter.println("unset multiplot");
+            commandWriter.close();
+
+            ProcessBuilder b = new ProcessBuilder();
+            Process p;
+            if (new File(gnuPlotFileName).exists()) {
+                b.command("gnuplot", gnuPlotFileName);
+                p = b.start();
+                StreamReader output = new StreamReader(p.getInputStream());
+                StreamReader error = new StreamReader(p.getErrorStream());
+                new Thread(output).start();
+                new Thread(error).start();
+                try {
+                    p.waitFor();
+                } catch (final InterruptedException e) {
+                    throw new IOException(e);
+                }
+
+                if (p.exitValue() != 0) {
+                    throw new IOException("Error executing gnuplot: " + error.getString() + System.lineSeparator() + output.getString());
+                }
+            } else {
+                System.err.println("Files not existent");
             }
     }
     private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure) {
