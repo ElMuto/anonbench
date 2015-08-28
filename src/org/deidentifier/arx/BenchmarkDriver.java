@@ -203,6 +203,7 @@ public class BenchmarkDriver {
                                         t != null ? t.toString() : "", dMin != null ? dMin.toString() : "", dMax != null ? dMax.toString() : "",
                                         sa != null ? sa.toString() : "",
                                         Arrays.toString(dataset.getQuasiIdentifyingAttributes()),
+                                        String.valueOf(dataset.getQuasiIdentifyingAttributes().length),
                                         ssNum != null ? ssNum.toString() : "");
 
         ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);

@@ -31,7 +31,7 @@ import de.linearbits.subframe.analyzer.ValueBuffer;
  */
 public class BenchmarkSetup {
 
-	/** The benchmark instance */
+	/** The benchmark instance - datapoints */
 	public static final Benchmark BENCHMARK    = new Benchmark(new String[] {
 			COLUMNS.IL_MEASURE.toString(),
 			COLUMNS.SUPPRESSION_FACTOR.toString(),
@@ -45,10 +45,12 @@ public class BenchmarkSetup {
 			COLUMNS.PARAM_DMIN.toString(),
 			COLUMNS.PARAM_DMAX.toString(),
 			COLUMNS.SENS_ATTR.toString(),
-			COLUMNS.QI_SET.toString(),
+            COLUMNS.QI_SET.toString(),
+            COLUMNS.NUM_QIS.toString(),
 			COLUMNS.SS_NUM.toString(),
 	});
 
+	/* measures */
     public static final int INFO_LOSS_ARX   = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
     public static final int INFO_LOSS_ABS   = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
     public static final int INFO_LOSS_REL   = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
@@ -320,6 +322,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "QIs";
+            }
+        },
+        NUM_QIS {
+            @Override
+            public String toString() {
+                return "Number of QIs";
             }
         },
         SS_NUM {

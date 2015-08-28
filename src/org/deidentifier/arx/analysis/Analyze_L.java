@@ -56,6 +56,13 @@ public class Analyze_L {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));
 
+        String col1 = "'red'";
+        String col2 = "'green'";
+        String col3 = "'blue'";
+        String col4 = "'magenta'";
+        
+        double yOffset = 0.42;
+        double ySpacing = 0.03;
 
 
         String gnuPlotFileName = "results/commads.plg";
@@ -65,31 +72,54 @@ public class Analyze_L {
         commandWriter.println("set output \"" + pdfFileName + "\"");
         commandWriter.println("set datafile separator \";\"");
         commandWriter.println("set grid");
+        commandWriter.println("set style line 1 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col1);
+        commandWriter.println("set style line 2 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col2);
+        commandWriter.println("set style line 3 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col3);
+        commandWriter.println("set style line 4 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col4);
         commandWriter.println("set multiplot title 'Loss / recursive-(c,l)-diversity mit c=4, l=3'");
         commandWriter.println("set size 0.4,0.4");
+        commandWriter.println("set yrange [0:1]");
+        
+        commandWriter.println("set label '1 QI'  at screen " + (yOffset + (0d * ySpacing)) + ", screen 0.95 textcolor rgb " + col1);
+        commandWriter.println("set label '2 QIs' at screen " + (yOffset + (1d * ySpacing)) + ", screen 0.95 textcolor rgb " + col2);
+        commandWriter.println("set label '3 QIs' at screen " + (yOffset + (2d * ySpacing)) + ", screen 0.95 textcolor rgb " + col3);
+        commandWriter.println("set label '4 QIs' at screen " + (yOffset + (3d * ySpacing)) + ", screen 0.95 textcolor rgb " + col4);
 
 
         for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
             String suppFactorString = String.valueOf(suppFactor);
             for (String attrProp : new String[] {COLUMNS.ENTROPY.toString(), COLUMNS.FREQ_DEVI.toString()}) {
                 String measure  = COLUMNS.SOLUTION_RATIO.toString();
-                Series2D _series = getSeries(file, suppFactorString, attrProp, measure);
-
-                String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp + " measure" + measure + ".csv";
-                PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
-                for (Point2D point : _series.getData()) {
-                    pointsWriter.println(point.x + ";" + point.y);
-                }
-                pointsWriter.close();
                 commandWriter.println();              
                 String originX = suppFactor == 0d ? "0.0" : "0.5";
-                String originY = COLUMNS.ENTROPY.toString().equals(attrProp) ? "0.0" : "0.5";
+                String originY;
+                String xRange;
+                if (COLUMNS.FREQ_DEVI.toString().equals(attrProp)) {
+                    originY = "0.5";
+                    xRange = "[0:0.4]";
+                } else {
+                    originY = "0.0";
+                    xRange = "[0:5.5]";
+                }
+                commandWriter.println("set xrange " + xRange);
                 String origin = originX + "," + originY;
                 commandWriter.println("set title 'suppression: " + suppFactorString + "'");
                 commandWriter.println("set origin " + origin);
                 commandWriter.println("set xlabel \"" + attrProp + "\"");
                 commandWriter.println("set ylabel \"" + measure + "\"");
-                commandWriter.println("plot '" + pointsFileName + "' with dots notitle");
+                for (int numQis = 1; numQis <= 4; numQis++) {
+                    String lineStyle = "ls " + String.valueOf(numQis);
+                    Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis);
+
+                    String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
+                            " measure" + measure + " numQis" + numQis + ".csv";
+                    PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
+                    for (Point2D point : _series.getData()) {
+                        pointsWriter.println(point.x + ";" + point.y);
+                    }
+                    pointsWriter.close();
+                    commandWriter.println("plot '" + pointsFileName + "' " + lineStyle + " notitle");
+                }
             }
         }
         commandWriter.println("unset multiplot");
@@ -117,12 +147,13 @@ public class Analyze_L {
                 System.err.println("Files not existent");
             }
     }
-    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure) {
+    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis) {
         // Select data for the given algorithm
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
-                                              .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor)
+                                              .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
+                                              .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis))
                                               .build();
         } catch (ParseException e) {
             e.printStackTrace();
