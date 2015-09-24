@@ -64,11 +64,13 @@ public class Analyze_L {
         double yOffset = 0.42;
         double ySpacing = 0.03;
 
-
         String gnuPlotFileName = "results/commads.plg";
-        String pdfFileName = "results/analysis_loss_c4_l3.pdf";
+        String pdfFileName = "results/analysis_loss_c4_l3_colQiCount.pdf";
+        
+        
+        
         PrintWriter commandWriter = new PrintWriter(gnuPlotFileName, "UTF-8");
-        commandWriter.println("set term pdf enhanced font 'Verdana,4'");
+        commandWriter.println("set term pdf enhanced font ',5'");
         commandWriter.println("set output \"" + pdfFileName + "\"");
         commandWriter.println("set datafile separator \";\"");
         commandWriter.println("set grid");
@@ -123,32 +125,40 @@ public class Analyze_L {
             }
         }
         commandWriter.println("unset multiplot");
-            commandWriter.close();
+        commandWriter.close();
 
-            ProcessBuilder b = new ProcessBuilder();
-            Process p;
-            if (new File(gnuPlotFileName).exists()) {
-                b.command("gnuplot", gnuPlotFileName);
-                p = b.start();
-                StreamReader output = new StreamReader(p.getInputStream());
-                StreamReader error = new StreamReader(p.getErrorStream());
-                new Thread(output).start();
-                new Thread(error).start();
-                try {
-                    p.waitFor();
-                } catch (final InterruptedException e) {
-                    throw new IOException(e);
-                }
-
-                if (p.exitValue() != 0) {
-                    throw new IOException("Error executing gnuplot: " + error.getString() + System.lineSeparator() + output.getString());
-                }
-            } else {
-                System.err.println("Files not existent");
+        ProcessBuilder b = new ProcessBuilder();
+        Process p;
+        if (new File(gnuPlotFileName).exists()) {
+            b.command("gnuplot", gnuPlotFileName);
+            p = b.start();
+            StreamReader output = new StreamReader(p.getInputStream());
+            StreamReader error = new StreamReader(p.getErrorStream());
+            new Thread(output).start();
+            new Thread(error).start();
+            try {
+                p.waitFor();
+            } catch (final InterruptedException e) {
+                throw new IOException(e);
             }
+
+            if (p.exitValue() != 0) {
+                throw new IOException("Error executing gnuplot: " + error.getString() + System.lineSeparator() + output.getString());
+            }
+        } else {
+            System.err.println("Files not existent");
+        }
     }
+    
+    /** return a a series of points, selected by the parameters supplied
+     * @param file
+     * @param suppFactor
+     * @param attrProp
+     * @param measure
+     * @param numQis
+     * @return
+     */
     private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis) {
-        // Select data for the given algorithm
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()

@@ -191,7 +191,7 @@ public class BenchmarkDriver {
 
         ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, qiConf, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
-        anonymizer.setMaxTransformations(210000);
+//        anonymizer.setMaxTransformations(210000);
 
         // Benchmark
         BenchmarkSetup.BENCHMARK.addRun(measure.toString(),
