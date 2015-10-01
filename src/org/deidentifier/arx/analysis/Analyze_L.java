@@ -35,6 +35,8 @@ import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
 
 public class Analyze_L {
+	
+    private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString()/*, COLUMNS.ENTROPY.toString()*/};
 
     /**
      * Main
@@ -43,70 +45,82 @@ public class Analyze_L {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateCriteriaSettingsPlots();
+    	generateCriteriaSettingsPlots("analysis_loss_c4_l3_multiPage.pdf", false);
+    	generateCriteriaSettingsPlots("analysis_loss_c4_l3_multiCol.pdf" , true);
     	System.out.println("done.");
     }
     
     /**
      * Generate the plots
+     * @param pdfFileName TODO
+     * @param condensed TODO
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateCriteriaSettingsPlots() throws IOException, ParseException {
+    private static void generateCriteriaSettingsPlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
         
-        CSVFile file = new CSVFile(new File("results/results.csv"));
+        CSVFile file = new CSVFile(new File("results/results.csv"));        
 
-        String col1 = "'red'";
-        String col2 = "'green'";
-        String col3 = "'blue'";
-        String col4 = "'magenta'";
+        String col1, col2, col3, col4;
+        col1 = "'red'";
+        col2 = "'green'";
+        col3 = "'blue'";
+        col4 = "'magenta'";        	
         
-        double yOffset = 0.42;
-        double ySpacing = 0.03;
+        double xOffset  = 0.42;
+        double xSpacing = 0.03;
+        double yOffset  = 0.96;
 
         String gnuPlotFileName = "results/commads.plg";
-        String pdfFileName = "results/analysis_loss_c4_l3_colQiCount.pdf";
+        String pdfFilePath = "results/" + pdfFileName;
         
         
         
         PrintWriter commandWriter = new PrintWriter(gnuPlotFileName, "UTF-8");
         commandWriter.println("set term pdf enhanced font ',5'");
-        commandWriter.println("set output \"" + pdfFileName + "\"");
+        commandWriter.println("set output \"" + pdfFilePath + "\"");
         commandWriter.println("set datafile separator \";\"");
         commandWriter.println("set grid");
-        commandWriter.println("set style line 1 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col1);
-        commandWriter.println("set style line 2 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col2);
-        commandWriter.println("set style line 3 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col3);
-        commandWriter.println("set style line 4 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col4);
-        commandWriter.println("set multiplot title 'Loss / recursive-(c,l)-diversity mit c=4, l=3'");
-        commandWriter.println("set size 0.4,0.4");
-        commandWriter.println("set yrange [0:1]");
+
+    	commandWriter.println("set label '1 QI'  at screen " + (xOffset + (0d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col1);
+    	commandWriter.println("set label '2 QIs' at screen " + (xOffset + (1d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col2);
+    	commandWriter.println("set label '3 QIs' at screen " + (xOffset + (2d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col3);
+    	commandWriter.println("set label '4 QIs' at screen " + (xOffset + (3d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col4);
+    	
+        if (condensed) {        	
+        	commandWriter.println("set multiplot title 'Loss / recursive-(c,l)-diversity mit c=4, l=3'");
+        	commandWriter.println("set size 0.4,0.4");
+        }
         
-        commandWriter.println("set label '1 QI'  at screen " + (yOffset + (0d * ySpacing)) + ", screen 0.95 textcolor rgb " + col1);
-        commandWriter.println("set label '2 QIs' at screen " + (yOffset + (1d * ySpacing)) + ", screen 0.95 textcolor rgb " + col2);
-        commandWriter.println("set label '3 QIs' at screen " + (yOffset + (2d * ySpacing)) + ", screen 0.95 textcolor rgb " + col3);
-        commandWriter.println("set label '4 QIs' at screen " + (yOffset + (3d * ySpacing)) + ", screen 0.95 textcolor rgb " + col4);
+    	commandWriter.println("set style line 1 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col1);
+    	commandWriter.println("set style line 2 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col2);
+    	commandWriter.println("set style line 3 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col3);
+    	commandWriter.println("set style line 4 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col4);
+        
+        commandWriter.println("set yrange [0:1]");
 
 
-        for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-            String suppFactorString = String.valueOf(suppFactor);
-            for (String attrProp : new String[] {COLUMNS.ENTROPY.toString(), COLUMNS.FREQ_DEVI.toString()}) {
-                String measure  = COLUMNS.SOLUTION_RATIO.toString();
-                commandWriter.println();              
-                String originX = suppFactor == 0d ? "0.0" : "0.5";
-                String originY;
-                String xRange;
-                if (COLUMNS.FREQ_DEVI.toString().equals(attrProp)) {
-                    originY = "0.5";
-                    xRange = "[0:0.4]";
-                } else {
-                    originY = "0.0";
-                    xRange = "[0:5.5]";
+        for (String attrProp : attrProps) {
+        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
+        	String suppFactorString = String.valueOf(suppFactor);
+        	String measure  = COLUMNS.SOLUTION_RATIO.toString();
+                commandWriter.println();
+                if (condensed) {
+                	String originX = suppFactor == 0d ? "0.0" : "0.5";
+                	String originY;
+                	String xRange;
+                	if (COLUMNS.FREQ_DEVI.toString().equals(attrProp)) {
+                		originY = "0.5";
+                		xRange = "[0:0.4]";
+                	} else {
+                		originY = "0.0";
+                		xRange = "[0:5.5]";
+                	}
+                	commandWriter.println("set xrange " + xRange);
+                	String origin = originX + "," + originY;
+                    commandWriter.println("set origin " + origin);
                 }
-                commandWriter.println("set xrange " + xRange);
-                String origin = originX + "," + originY;
                 commandWriter.println("set title 'suppression: " + suppFactorString + "'");
-                commandWriter.println("set origin " + origin);
                 commandWriter.println("set xlabel \"" + attrProp + "\"");
                 commandWriter.println("set ylabel \"" + measure + "\"");
                 for (int numQis = 1; numQis <= 4; numQis++) {
@@ -124,7 +138,8 @@ public class Analyze_L {
                 }
             }
         }
-        commandWriter.println("unset multiplot");
+        if (condensed)
+        	commandWriter.println("unset multiplot");
         commandWriter.close();
 
         ProcessBuilder b = new ProcessBuilder();
