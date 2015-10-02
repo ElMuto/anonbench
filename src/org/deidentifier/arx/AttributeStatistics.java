@@ -29,6 +29,7 @@ public class AttributeStatistics {
      * @param mean_arith
      * @param mean_geom
      * @param median
+     * @param entropy
      */
     public AttributeStatistics(Integer numValues,
                                Double frequencyDeviation,

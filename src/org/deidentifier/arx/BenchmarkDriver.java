@@ -317,11 +317,13 @@ public class BenchmarkDriver {
             
             // calculate entropy
             double entropy = 0d;
-            double log2 = Math.log(2d);
+            double ln2 = Math.log(2d);
             for (int i = 0; i < freqs.length; i++) {
-                entropy += freqs[i] * Math.log(freqs[i]) / log2;
+                entropy += freqs[i] * Math.log(freqs[i]) / ln2;
             }
             entropy *= -1d;
+            
+            double normalizedReversedEntropy = 1- ((ln2 / Math.log(freqs.length)) * entropy);
             
             if (
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
@@ -361,16 +363,17 @@ public class BenchmarkDriver {
                 
                 // print
                 if (verbosity >= 2) {
-                    System.out.println("      stand. dev.       = " + standDeviation);
-                    System.out.println("      stand. dev. norm. = " + deviation_norm);
-                    System.out.println("      variance_coeff    = " + variance_coeff);
-                    System.out.println("      quartil coeff.    = " + quartil_coeff);
-                    System.out.println("      skewness          = " + skewness);
-                    System.out.println("      kurtosis          = " + kurtosis);
-                    System.out.println("      arith. mean       = " + mean_arith);
-                    System.out.println("      geom. mean        = " + mean_geom);
-                    System.out.println("      median            = " + median);
-                    System.out.println("      entropy           = " + entropy);
+                    System.out.println("      stand. dev.        = " + standDeviation);
+                    System.out.println("      stand. dev. norm.  = " + deviation_norm);
+                    System.out.println("      variance_coeff     = " + variance_coeff);
+                    System.out.println("      quartil coeff.     = " + quartil_coeff);
+                    System.out.println("      skewness           = " + skewness);
+                    System.out.println("      kurtosis           = " + kurtosis);
+                    System.out.println("      arith. mean        = " + mean_arith);
+                    System.out.println("      geom. mean         = " + mean_geom);
+                    System.out.println("      median             = " + median);
+                    System.out.println("      entropy            = " + entropy);
+                    System.out.println("      normalized entropy = " + normalizedReversedEntropy);
                 }
             } else {
                 
@@ -384,6 +387,7 @@ public class BenchmarkDriver {
                 if (verbosity >= 2) {
                     System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
                     System.out.println("      entropy                       = " + entropy);
+                    System.out.println("      normalized entropy            = " + normalizedReversedEntropy);
                 }
                 if (verbosity >= 3) {
                     System.out.println("      " + Arrays.toString(distinctValues));
@@ -395,7 +399,7 @@ public class BenchmarkDriver {
                                            variance, skewness, kurtosis,
                                            standDeviation, variance_coeff, deviation_norm,
                                            quartil_coeff, mean_arith,
-                                           mean_geom, median, entropy));
+                                           mean_geom, median, normalizedReversedEntropy));
             
             return statsCache.get(statsKey);
         }

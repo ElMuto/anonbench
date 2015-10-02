@@ -405,7 +405,7 @@ public class BenchmarkSetup {
         ENTROPY {
             @Override
             public String toString() {
-                return "Entropy";
+                return "Normalized Reversed Entropy";
             }
         },
         EFD_SCORE {

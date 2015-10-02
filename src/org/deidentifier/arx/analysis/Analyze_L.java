@@ -36,7 +36,7 @@ import de.linearbits.subframe.io.CSVFile;
 
 public class Analyze_L {
 	
-    private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString()/*, COLUMNS.ENTROPY.toString()*/};
+    private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.ENTROPY.toString()};
 
     /**
      * Main
