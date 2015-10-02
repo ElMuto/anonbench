@@ -125,7 +125,7 @@ public class Analyze_L {
                 commandWriter.println("set ylabel \"" + measure + "\"");
                 for (int numQis = 1; numQis <= 4; numQis++) {
                     String lineStyle = "ls " + String.valueOf(numQis);
-                    Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis);
+                    Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, "[lr]");
 
                     String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
                             " measure" + measure + " numQis" + numQis + ".csv";
@@ -171,15 +171,17 @@ public class Analyze_L {
      * @param attrProp
      * @param measure
      * @param numQis
+     * @param criterion TODO
      * @return
      */
-    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis) {
+    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion) {
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
-                                              .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
-                                              .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis))
-                                              .build();
+                           .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(criterion).and()
+                           .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
+                           .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis))
+                           .build();
         } catch (ParseException e) {
             e.printStackTrace();
         }

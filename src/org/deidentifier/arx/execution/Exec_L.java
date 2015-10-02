@@ -55,31 +55,43 @@ public class Exec_L {
         for (BenchmarkMeasure measure : BenchmarkSetup.getMeasures()) {
         	
             // for each suppression factor
-            for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 
-                // For each dataset
-                for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
+        		// For each dataset
+        		for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
-                    // for each sensitive attribute candidate
-                    for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+        			for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
+        				
+        				for (int l = 3; l <= 3 ; l ++) {
+        					
+        					for (double c : new double[] { 4d }) {
 
-                        for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
-                            BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
-                            BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-                            for (int l = 3; l <= 3 ; l ++) {
-                                for (double c : new double[] { 4d }) {
-                                    // Print status info
-                                    System.out.println("Running recursive (cl)-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
-                                    driver.anonymize(measure, suppFactor, dataset, true, null,
-                                                     l, c, null, 
-                                                     null, null, sa,
-                                                     null, qiConf);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        						// for each sensitive attribute candidate
+        						for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+        							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE }, sa);
+        							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+        							// Print status info
+        							System.out.println("Running recursive (cl)-diversity: " + measure.toString() + " / " + String.valueOf(suppFactor) + " / " + dataset.toString() + " / SA = " + sa + " / c = " + c + " / l = " + l);
+        							driver.anonymize(measure, suppFactor, dataset, false, null,
+        									l, c, null, 
+        									null, null, sa,
+        									null, qiConf);
+        						}
+        					}
+    						BenchmarkDataset datasetForK = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY });
+    						BenchmarkDriver driverForK = new BenchmarkDriver(measure, datasetForK);
+
+    						System.out.println("Running l-anonymity: " +
+    								measure.toString() + " / " + String.valueOf(suppFactor) + " / " +
+    								datasetForK.toString() + " / k = l = " + l);
+    						driverForK.anonymize(measure, suppFactor, datasetForK, false, l,
+    								null, null, null,
+    								null, null, null,
+    								null, qiConf);
+        				}
+        			}
+        		}
+        	}
         }
     }
 }
