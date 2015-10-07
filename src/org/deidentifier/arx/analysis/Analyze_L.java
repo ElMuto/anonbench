@@ -89,7 +89,7 @@ public class Analyze_L {
     	
         if (condensed) {        	
         	commandWriter.println("set multiplot title 'Loss / recursive-(c,l)-diversity mit c=4, l=3'");
-        	commandWriter.println("set size 0.4,0.4");
+        	commandWriter.println("set size 0.5,0.5");
         }
         
     	commandWriter.println("set style line 1 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col1);
@@ -114,7 +114,7 @@ public class Analyze_L {
                 		xRange = "[0:0.4]";
                 	} else {
                 		originY = "0.0";
-                		xRange = "[0:5.5]";
+                		xRange = "[0:1]";
                 	}
                 	commandWriter.println("set xrange " + xRange);
                 	String origin = originX + "," + originY;
