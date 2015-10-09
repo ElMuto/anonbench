@@ -26,6 +26,7 @@ import java.util.Arrays;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.QiConfig;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -43,7 +44,8 @@ public class Exec_Multi {
 		private final Integer k;
 		private final Double  c;
 		private final Integer l;
-		private final Double  t;		
+		private final Double  t;
+		private final boolean isSaBased;
 
 		/**
 		 * @param criterion
@@ -52,13 +54,14 @@ public class Exec_Multi {
 		 * @param l
 		 * @param t
 		 */
-		public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t) {
+		public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, boolean isSaBased) {
 			super();
 			this.criterion = criterion;
 			this.k = k;
 			this.c = c;
 			this.l = l;
 			this.t = t;
+			this.isSaBased = isSaBased;
 		}
 
 		public BenchmarkCriterion getCriterion() {
@@ -81,23 +84,31 @@ public class Exec_Multi {
 			return t;
 		}
 		
+		public boolean isSaBased() {
+			return isSaBased;
+		}
+
 		@Override
 		public String toString() {
-			String theString = criterion.toString();
+			String theString;
 			switch (criterion) {
 			case K_ANONYMITY:
-				theString += "_" + k;
+				theString = k + "-anonymity";
 				break;
 			case L_DIVERSITY_DISTINCT:
+				theString = "distinct-" + l + "-diversity";
+				break;
 			case L_DIVERSITY_ENTROPY:
-				theString += "_" + l;
+				theString = "entropy-" + l + "-diversity";
 				break;
 			case L_DIVERSITY_RECURSIVE:
-				theString += ("_" + c + "_" + l);
+				theString = "recursive-(" + c + ", " + l + ")-diversity";
 				break;
 			case T_CLOSENESS_ED:
+				theString = "equal-distance-" + t + "-closeness";
+				break;
 			case T_CLOSENESS_HD:
-				theString += "_" + t;
+				theString = "hierarchical-distance-" + t + "-closeness";
 				break;
 			default:
 				throw new RuntimeException("Invalid criterion");
@@ -119,32 +130,80 @@ public class Exec_Multi {
 		System.out.println("done.");
 	}
 	
-	private static void comparePrivacyModels() {
+	private static void comparePrivacyModels() throws IOException {
 		PrivacyModel[] privacyModels = new PrivacyModel[] {
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 2,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 4,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 6,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 2,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 4,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 6,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.2d),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            3,   null, null, null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            5,   null, null, null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           10,   null, null, null),
-				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           20,   null, null, null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 2,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 4,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 6,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 2,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 4,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 6,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.2d, true),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            3,   null, null, null, false),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            5,   null, null, null, false),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           10,   null, null, null, false),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           20,   null, null, null, false),
 				};
 		
-		for (PrivacyModel model : privacyModels) {
-			System.out.println(model.toString());
+
+		// for each privacy model
+		for (PrivacyModel privacyModel : privacyModels) {
+
+			// For each dataset
+			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
+
+				// for each qi configuration
+				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
+
+					BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
+					if (privacyModel.isSaBased()) {
+
+						// for each sensitive attribute candidate
+						for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+
+							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+
+							// for each suppression factor
+							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+								// Print status info
+								System.out.println("Running " + privacyModel.toString() + " with SA=" + sa + " and SF=" + suppFactor);
+								driver.anonymize(measure, suppFactor, dataset, false,
+										privacyModel.getK(),
+										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+										null, null, sa,
+										null, qiConf);
+							}
+						}
+					} else {
+						
+						BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
+						BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+
+						// for each suppression factor
+						for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+							// Print status info
+							System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
+							driver.anonymize(measure, suppFactor, dataset, false,
+									privacyModel.getK(),
+									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+									null, null, null,
+									null, qiConf);
+
+
+						}
+					}
+				}
+			}
 		}
 	}
 
