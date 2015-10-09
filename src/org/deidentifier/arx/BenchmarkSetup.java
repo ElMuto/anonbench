@@ -167,9 +167,9 @@ public class BenchmarkSetup {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_HD },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_HD },
         };
     }
     
@@ -182,15 +182,15 @@ public class BenchmarkSetup {
         return new BenchmarkCriterion[][] {
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY },
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS},
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS_HD},
             new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS },                                           
+            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_HD },                                           
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE },
             new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS_HD },
             new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS },
+            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS_HD },
         };
     }
     
@@ -441,10 +441,16 @@ public class BenchmarkSetup {
                 return "lr";
             }
         },
-        T_CLOSENESS {
+        T_CLOSENESS_HD {
             @Override
             public String toString() {
-                return "t";
+                return "thd";
+            }
+        },
+        T_CLOSENESS_ED {
+            @Override
+            public String toString() {
+                return "ted";
             }
         },
         D_PRESENCE {

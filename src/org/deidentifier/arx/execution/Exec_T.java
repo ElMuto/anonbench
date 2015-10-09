@@ -64,7 +64,7 @@ public class Exec_T {
                     for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
                         // distinct l-diversity
-                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS };
+                        BenchmarkCriterion[] criteria = new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_HD };
                         BenchmarkDataset dataset = new BenchmarkDataset(datafile, new QiConfig(4), criteria,sa);
                         BenchmarkDriver driver = new BenchmarkDriver(benchmarkMeasure, dataset);
                         double tStart = 0d;

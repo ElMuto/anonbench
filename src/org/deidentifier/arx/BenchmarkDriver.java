@@ -33,6 +33,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
+import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -154,8 +155,11 @@ public class BenchmarkDriver {
             case L_DIVERSITY_RECURSIVE:
                 config.addCriterion(new RecursiveCLDiversity(sa, c, l));
                 break;
-            case T_CLOSENESS:
+            case T_CLOSENESS_HD:
                 config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
+                break;
+            case T_CLOSENESS_ED:
+                config.addCriterion(new EqualDistanceTCloseness(sa, t));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");

@@ -37,6 +37,74 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * @author Fabian Prasser
  */
 public class Exec_Multi {
+	
+	private static class PrivacyModel {
+		private final BenchmarkCriterion criterion;
+		private final Integer k;
+		private final Double  c;
+		private final Integer l;
+		private final Double  t;		
+
+		/**
+		 * @param criterion
+		 * @param k
+		 * @param c
+		 * @param l
+		 * @param t
+		 */
+		public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t) {
+			super();
+			this.criterion = criterion;
+			this.k = k;
+			this.c = c;
+			this.l = l;
+			this.t = t;
+		}
+
+		public BenchmarkCriterion getCriterion() {
+			return criterion;
+		}
+
+		public Integer getK() {
+			return k;
+		}
+
+		public Double getC() {
+			return c;
+		}
+
+		public Integer getL() {
+			return l;
+		}
+
+		public Double getT() {
+			return t;
+		}
+		
+		@Override
+		public String toString() {
+			String theString = criterion.toString();
+			switch (criterion) {
+			case K_ANONYMITY:
+				theString += "_" + k;
+				break;
+			case L_DIVERSITY_DISTINCT:
+			case L_DIVERSITY_ENTROPY:
+				theString += "_" + l;
+				break;
+			case L_DIVERSITY_RECURSIVE:
+				theString += ("_" + c + "_" + l);
+				break;
+			case T_CLOSENESS_ED:
+			case T_CLOSENESS_HD:
+				theString += "_" + t;
+				break;
+			default:
+				throw new RuntimeException("Invalid criterion");
+			}
+			return theString;
+		}
+	}
 
 	/**
 	 * Main entry point
@@ -46,8 +114,38 @@ public class Exec_Multi {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		evaluateCriteriaWithDifferentSuppressionValues();
+//		evaluateCriteriaWithDifferentSuppressionValues();
+		comparePrivacyModels();
 		System.out.println("done.");
+	}
+	
+	private static void comparePrivacyModels() {
+		PrivacyModel[] privacyModels = new PrivacyModel[] {
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 2,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 4,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 6,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 2,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 4,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 6,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.2d),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            3,   null, null, null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            5,   null, null, null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           10,   null, null, null),
+				new Exec_Multi.PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           20,   null, null, null),
+				};
+		
+		for (PrivacyModel model : privacyModels) {
+			System.out.println(model.toString());
+		}
 	}
 
 	private static void evaluateCriteriaWithDifferentSuppressionValues() throws IOException {

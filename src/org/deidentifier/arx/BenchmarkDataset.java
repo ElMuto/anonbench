@@ -327,7 +327,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                         case L_DIVERSITY_DISTINCT:
                         case L_DIVERSITY_ENTROPY:
                         case L_DIVERSITY_RECURSIVE:
-                        case T_CLOSENESS:
+                        case T_CLOSENESS_HD:
                             String sensitive = getSensitiveAttribute();
                             arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
                             break;
