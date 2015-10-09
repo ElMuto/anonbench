@@ -95,7 +95,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             String inFormat =  "%13.2f";
             String outFormat = "%16.2f";
             System.out.println();
-            System.out.println(datafile + " " + Arrays.toString(header));
+            System.out.println(datafile + " " + Arrays.toString(header) + ", SA=" + sensitiveAttribute);
             System.out.println("  AECS: min = " + String.format(inFormat, minAecs) + " / max = " + String.format(outFormat, maxAecs));
             System.out.println("  Disc: min = " + String.format(inFormat, minDisc) + " / max = " + String.format(outFormat, maxDisc));
             System.out.println("  Loss: min = " + String.format(inFormat, minLoss) + " / max = " + String.format(outFormat, maxLoss));
