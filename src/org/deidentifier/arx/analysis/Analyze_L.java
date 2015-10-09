@@ -23,7 +23,10 @@ package org.deidentifier.arx.analysis;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
@@ -45,8 +48,7 @@ public class Analyze_L {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateCriteriaSettingsPlots("analysis_loss_c4_l3_multiPage.pdf", false);
-    	generateCriteriaSettingsPlots("analysis_loss_c4_l3_multiCol.pdf" , true);
+    	generateCriteriaSettingsPlots("analysis_recursive-4_3-diversity.pdf" , true);
     	System.out.println("done.");
     }
     
@@ -61,20 +63,22 @@ public class Analyze_L {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));        
 
-        String col1, col2, col3, col4;
+        String col1, col2, col3, col4, col5;
         col1 = "'red'";
         col2 = "'green'";
         col3 = "'blue'";
-        col4 = "'magenta'";        	
+        col4 = "'magenta'";      
+        col5 = "'black'";        	
         
         double xOffset  = 0.42;
         double xSpacing = 0.03;
         double yOffset  = 0.96;
 
+        Set<File> fileBucket = new HashSet<File>();
+
         String gnuPlotFileName = "results/commads.plg";
-        String pdfFilePath = "results/" + pdfFileName;
         
-        
+        String pdfFilePath = "results/" + pdfFileName; 
         
         PrintWriter commandWriter = new PrintWriter(gnuPlotFileName, "UTF-8");
         commandWriter.println("set term pdf enhanced font ',5'");
@@ -88,7 +92,7 @@ public class Analyze_L {
     	commandWriter.println("set label '4 QIs' at screen " + (xOffset + (3d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col4);
     	
         if (condensed) {        	
-        	commandWriter.println("set multiplot title 'Loss / recursive-(c,l)-diversity mit c=4, l=3'");
+        	commandWriter.println("set multiplot title 'recursive-(4, 3)-diversity'");
         	commandWriter.println("set size 0.5,0.5");
         }
         
@@ -96,6 +100,7 @@ public class Analyze_L {
     	commandWriter.println("set style line 2 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col2);
     	commandWriter.println("set style line 3 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col3);
     	commandWriter.println("set style line 4 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col4);
+    	commandWriter.println("set style line 5 lt 2 lw 1 pt 3 ps 0.05 lc rgb " + col5);
         
         commandWriter.println("set yrange [0:1]");
 
@@ -123,19 +128,30 @@ public class Analyze_L {
                 commandWriter.println("set title 'suppression: " + suppFactorString + "'");
                 commandWriter.println("set xlabel \"" + attrProp + "\"");
                 commandWriter.println("set ylabel \"" + measure + "\"");
+                String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
+                        " measure" + measure + ".csv";
+                PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
+                fileBucket.add(new File(pointsFileName));
                 for (int numQis = 1; numQis <= 4; numQis++) {
                     String lineStyle = "ls " + String.valueOf(numQis);
                     Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, "[lr]");
 
-                    String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
+                    String qiSpecificPointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
                             " measure" + measure + " numQis" + numQis + ".csv";
-                    PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
+                    fileBucket.add(new File(qiSpecificPointsFileName));
+                    PrintWriter qiSpecificPointsWriter = new PrintWriter(qiSpecificPointsFileName, "UTF-8");
                     for (Point2D point : _series.getData()) {
+                        qiSpecificPointsWriter.println(point.x + ";" + point.y);
                         pointsWriter.println(point.x + ";" + point.y);
                     }
-                    pointsWriter.close();
-                    commandWriter.println("plot '" + pointsFileName + "' " + lineStyle + " notitle");
+                    qiSpecificPointsWriter.close();
+                    commandWriter.println("plot '" + qiSpecificPointsFileName + "' " + lineStyle + " notitle");
                 }
+                pointsWriter.close();
+                commandWriter.println("f(x) = m*x + b");
+                commandWriter.println("fit f(x) '" + pointsFileName + "' using 1:2 via m,b");
+                commandWriter.println("plot f(x) title 'Line Fit' ls 5");
+                
             }
         }
         if (condensed)
@@ -144,7 +160,9 @@ public class Analyze_L {
 
         ProcessBuilder b = new ProcessBuilder();
         Process p;
-        if (new File(gnuPlotFileName).exists()) {
+        File gnuPlotFile = new File(gnuPlotFileName);
+        if (gnuPlotFile.exists()) {
+        	fileBucket.add(gnuPlotFile);
             b.command("gnuplot", gnuPlotFileName);
             p = b.start();
             StreamReader output = new StreamReader(p.getInputStream());
@@ -162,6 +180,19 @@ public class Analyze_L {
             }
         } else {
             System.err.println("Files not existent");
+        }
+        try {
+        	for (File fileToBeDeleted : fileBucket) {
+        		if(fileToBeDeleted.delete()){
+        			System.out.println(fileToBeDeleted.getName() + " is deleted!");
+        		}else{
+        			System.out.println("Delete operation is failed.");
+        		}
+        	}
+        }catch(Exception e){
+
+        	e.printStackTrace();
+
         }
     }
     
