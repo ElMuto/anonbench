@@ -270,8 +270,18 @@ public class BenchmarkDriver {
         ARXLattice lattice = result.getLattice();
         for (ARXNode[] level : lattice.getLevels()) {
             for (ARXNode node : level) {
-                if (Anonymity.ANONYMOUS.equals(node.getAnonymity())) {
-                    numSolutions++;
+         
+            	// Make sure that every transformation is classified correctly
+            	if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+            		result.getOutput(node);
+            	}
+            	
+            	if (node.getAnonymity() == Anonymity.ANONYMOUS) {
+            		numSolutions++;
+            		
+            	// Sanity check
+            	} else if (node.getAnonymity() != Anonymity.NOT_ANONYMOUS) {
+	            	throw new RuntimeException("Solution space is still not classified completely");   
                 }
             }
         }

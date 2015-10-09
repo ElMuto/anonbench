@@ -123,8 +123,8 @@ public class Analyze_L {
                 	commandWriter.println("set xrange " + xRange);
                 	String origin = originX + "," + originY;
                     commandWriter.println("set origin " + origin);
-                }
-                commandWriter.println("set title 'suppression: " + suppFactorString + "'");
+                }             
+                commandWriter.println("set title '" + (suppFactorString.equals(String.valueOf(0d)) ? "Generalization only" : "Generalization and suppression") + "'");
                 commandWriter.println("set xlabel \"" + attrProp + "\"");
                 commandWriter.println("set ylabel \"" + measure + "\"");
                 String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
