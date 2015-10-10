@@ -8,7 +8,6 @@ public class PrivacyModel {
 	private final Double  c;
 	private final Integer l;
 	private final Double  t;
-	private final boolean isSaBased;
 
 	/**
 	 * @param criterion
@@ -17,14 +16,13 @@ public class PrivacyModel {
 	 * @param l
 	 * @param t
 	 */
-	public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, boolean isSaBased) {
+	public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t) {
 		super();
 		this.criterion = criterion;
 		this.k = k;
 		this.c = c;
 		this.l = l;
 		this.t = t;
-		this.isSaBased = isSaBased;
 	}
 
 	public BenchmarkCriterion getCriterion() {
@@ -48,7 +46,18 @@ public class PrivacyModel {
 	}
 
 	public boolean isSaBased() {
-		return isSaBased;
+		switch (criterion) {
+		case K_ANONYMITY:
+			return false;
+		case L_DIVERSITY_DISTINCT:
+		case L_DIVERSITY_ENTROPY:
+		case L_DIVERSITY_RECURSIVE:
+		case T_CLOSENESS_ED:
+		case T_CLOSENESS_HD:
+			return true;
+		default:
+			throw new RuntimeException("Invalid criterion");
+		}
 	}
 
 	@Override
