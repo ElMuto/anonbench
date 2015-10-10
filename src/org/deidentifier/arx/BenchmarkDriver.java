@@ -231,8 +231,6 @@ public class BenchmarkDriver {
         	il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
 
-
-        
         // put info-losses into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, il_abs);

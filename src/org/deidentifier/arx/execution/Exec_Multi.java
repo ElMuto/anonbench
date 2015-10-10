@@ -55,7 +55,7 @@ public class Exec_Multi {
 	private static void comparePrivacyModels() throws IOException {
 
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.privacyModels) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {

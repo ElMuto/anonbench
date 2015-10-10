@@ -91,7 +91,7 @@ public class Analyze_IOE {
         commandWriter.println("set label '3 QIs' at screen " + (xOffset + (2d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col3);
         commandWriter.println("set label '4 QIs' at screen " + (xOffset + (3d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col4);
 
-        for (PrivacyModel privacyModel : BenchmarkSetup.privacyModels) {
+        for (PrivacyModel privacyModel : BenchmarkSetup.getSaBasedPrivacyModels()) {
         	System.out.println("Processing " + privacyModel);
         	if (condensed) {        	
         		commandWriter.println("set multiplot title '"+ privacyModel + "'");
@@ -136,7 +136,8 @@ public class Analyze_IOE {
         			fileBucket.add(new File(pointsFileName));
         			for (int numQis = 1; numQis <= 4; numQis++) {
         				String lineStyle = "ls " + String.valueOf(numQis);
-        				Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, privacyModel.getCriterion().toString());
+        				Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, privacyModel.getCriterion().toString(),
+        						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT());
 
         				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
         						"suppr" + suppFactorString + " attrProp" + attrProp +
@@ -211,13 +212,22 @@ public class Analyze_IOE {
      * @param measure
      * @param numQis
      * @param criterion TODO
+     * @param k TODO
+     * @param c TODO
+     * @param l TODO
+     * @param t TODO
      * @return
      */
-    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion) {
+    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion,
+    		Integer k, Double c, Integer l, Double t) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
+                           .field(BenchmarkSetup.COLUMNS.PARAM_K.toString()).equals(k != null ? String.valueOf(k) : "").and()
+                           .field(BenchmarkSetup.COLUMNS.PARAM_C.toString()).equals(c != null ? String.valueOf(c) : "").and()
+                           .field(BenchmarkSetup.COLUMNS.PARAM_L.toString()).equals(l != null ? String.valueOf(l) : "").and()
+                           .field(BenchmarkSetup.COLUMNS.PARAM_T.toString()).equals(t != null ? String.valueOf(t) : "").and()
                            .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
                            .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
                            .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis))
