@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
 
 import de.linearbits.objectselector.Selector;
@@ -36,7 +37,7 @@ import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
 
-public class Analyze_L {
+public class Analyze_IOE {
 	
     private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.ENTROPY.toString()};
 
@@ -47,7 +48,7 @@ public class Analyze_L {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateCriteriaSettingsPlots("analysis_recursive-4_3-diversity.pdf" , true);
+    	generateEasinessInfluencePlots("influenceOnEasinessPlots.pdf" , true);
     	System.out.println("done.");
     }
     
@@ -58,7 +59,7 @@ public class Analyze_L {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateCriteriaSettingsPlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
+    private static void generateEasinessInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));        
 
@@ -85,78 +86,84 @@ public class Analyze_L {
         commandWriter.println("set datafile separator \";\"");
         commandWriter.println("set grid");
 
-    	commandWriter.println("set label '1 QI'  at screen " + (xOffset + (0d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col1);
-    	commandWriter.println("set label '2 QIs' at screen " + (xOffset + (1d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col2);
-    	commandWriter.println("set label '3 QIs' at screen " + (xOffset + (2d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col3);
-    	commandWriter.println("set label '4 QIs' at screen " + (xOffset + (3d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col4);
-    	
-        if (condensed) {        	
-        	commandWriter.println("set multiplot title 'recursive-(4, 3)-diversity'");
-        	commandWriter.println("set size 0.5,0.5");
-        }
-        
-    	commandWriter.println("set style line 1 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col1);
-    	commandWriter.println("set style line 2 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col2);
-    	commandWriter.println("set style line 3 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col3);
-    	commandWriter.println("set style line 4 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col4);
-    	commandWriter.println("set style line 5 lt 2 lw 1 pt 3 ps 0.05 lc rgb " + col5);
-        
-        commandWriter.println("set yrange [0:1]");
+        commandWriter.println("set label '1 QI'  at screen " + (xOffset + (0d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col1);
+        commandWriter.println("set label '2 QIs' at screen " + (xOffset + (1d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col2);
+        commandWriter.println("set label '3 QIs' at screen " + (xOffset + (2d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col3);
+        commandWriter.println("set label '4 QIs' at screen " + (xOffset + (3d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col4);
+
+        for (PrivacyModel privacyModel : BenchmarkSetup.privacyModels) {
+        	System.out.println("Processing " + privacyModel);
+        	if (condensed) {        	
+        		commandWriter.println("set multiplot title '"+ privacyModel + "'");
+        		commandWriter.println("set size 0.5,0.5");
+        	}
+
+        	commandWriter.println("set style line 1 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col1);
+        	commandWriter.println("set style line 2 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col2);
+        	commandWriter.println("set style line 3 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col3);
+        	commandWriter.println("set style line 4 lt 2 lw 2 pt 3 ps 0.05 lc rgb " + col4);
+        	commandWriter.println("set style line 5 lt 2 lw 1 pt 3 ps 0.05 lc rgb " + col5);
+
+        	commandWriter.println("set yrange [0:1]");
 
 
-        for (String attrProp : attrProps) {
-        	for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-        	String suppFactorString = String.valueOf(suppFactor);
-        	String measure  = COLUMNS.SOLUTION_RATIO.toString();
-                commandWriter.println();
-                if (condensed) {
-                	String originX = suppFactor == 0d ? "0.0" : "0.5";
-                	String originY;
-                	String xRange;
-                	if (COLUMNS.FREQ_DEVI.toString().equals(attrProp)) {
-                		originY = "0.5";
-                		xRange = "[0:0.4]";
-                	} else {
-                		originY = "0.0";
-                		xRange = "[0:1]";
-                	}
-                	commandWriter.println("set xrange " + xRange);
-                	String origin = originX + "," + originY;
-                    commandWriter.println("set origin " + origin);
-                }             
-                commandWriter.println("set title '" + (suppFactorString.equals(String.valueOf(0d)) ? "Generalization only" : "Generalization and suppression") + "'");
-                commandWriter.println("set xlabel \"" + attrProp + "\"");
-                commandWriter.println("set ylabel \"" + measure + "\"");
-                String pointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
-                        " measure" + measure + ".csv";
-                PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
-                fileBucket.add(new File(pointsFileName));
-                for (int numQis = 1; numQis <= 4; numQis++) {
-                    String lineStyle = "ls " + String.valueOf(numQis);
-                    Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, "[lr]");
+        	for (String attrProp : attrProps) {
+        		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
+        			String suppFactorString = String.valueOf(suppFactor);
+        			String measure  = COLUMNS.SOLUTION_RATIO.toString();
+        			commandWriter.println();
+        			if (condensed) {
+        				String originX = suppFactor == 0d ? "0.0" : "0.5";
+        				String originY;
+        				String xRange;
+        				if (COLUMNS.FREQ_DEVI.toString().equals(attrProp)) {
+        					originY = "0.5";
+        					xRange = "[0:0.4]";
+        				} else {
+        					originY = "0.0";
+        					xRange = "[0:1]";
+        				}
+        				commandWriter.println("set xrange " + xRange);
+        				String origin = originX + "," + originY;
+        				commandWriter.println("set origin " + origin);
+        			}             
+        			commandWriter.println("set title '" + (suppFactorString.equals(String.valueOf(0d)) ? "Generalization only" : "Generalization and suppression") + "'");
+        			commandWriter.println("set xlabel \"" + attrProp + "\"");
+        			commandWriter.println("set ylabel \"" + measure + "\"");
+        			String pointsFileName = "results/points_" + privacyModel.toString() + "_" +
+        					"suppr" + suppFactorString + " attrProp" + attrProp + ".csv";
+        			PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
+        			fileBucket.add(new File(pointsFileName));
+        			for (int numQis = 1; numQis <= 4; numQis++) {
+        				String lineStyle = "ls " + String.valueOf(numQis);
+        				Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, privacyModel.getCriterion().toString());
 
-                    String qiSpecificPointsFileName = "results/points suppr" + suppFactorString + " attrProp" + attrProp +
-                            " measure" + measure + " numQis" + numQis + ".csv";
-                    fileBucket.add(new File(qiSpecificPointsFileName));
-                    PrintWriter qiSpecificPointsWriter = new PrintWriter(qiSpecificPointsFileName, "UTF-8");
-                    for (Point2D point : _series.getData()) {
-                        qiSpecificPointsWriter.println(point.x + ";" + point.y);
-                        pointsWriter.println(point.x + ";" + point.y);
-                    }
-                    qiSpecificPointsWriter.close();
-                    commandWriter.println("plot '" + qiSpecificPointsFileName + "' " + lineStyle + " notitle");
-                }
+        				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
+        						"suppr" + suppFactorString + " attrProp" + attrProp +
+        						" numQis" + numQis + ".csv";
+        				fileBucket.add(new File(qiSpecificPointsFileName));
+        				PrintWriter qiSpecificPointsWriter = new PrintWriter(qiSpecificPointsFileName, "UTF-8");
+        				for (Point2D point : _series.getData()) {
+        					qiSpecificPointsWriter.println(point.x + ";" + point.y);
+        					pointsWriter.println(point.x + ";" + point.y);
+        				}
+        				qiSpecificPointsWriter.close();
+        				commandWriter.println("plot '" + qiSpecificPointsFileName + "' " + lineStyle + " notitle");
+        			}
                 pointsWriter.close();
                 commandWriter.println("f(x) = m*x + b");
                 commandWriter.println("fit f(x) '" + pointsFileName + "' using 1:2 via m,b");
                 commandWriter.println("plot f(x) title 'Line Fit' ls 5");
-                
-            }
+
+        	}
         }
         if (condensed)
         	commandWriter.println("unset multiplot");
-        commandWriter.close();
+    	}
 
+        commandWriter.close();
+        
+        System.out.println("Executing gnuplot");
         ProcessBuilder b = new ProcessBuilder();
         Process p;
         File gnuPlotFile = new File(gnuPlotFileName);
@@ -180,7 +187,11 @@ public class Analyze_L {
         } else {
             System.err.println("Files not existent");
         }
-        try {
+        deleteFilesFromBucket(fileBucket);
+    }
+
+	private static void deleteFilesFromBucket(Set<File> fileBucket) {
+		try {
         	for (File fileToBeDeleted : fileBucket) {
         		if(fileToBeDeleted.delete()){
         			System.out.println(fileToBeDeleted.getName() + " is deleted!");
@@ -188,12 +199,10 @@ public class Analyze_L {
         			System.out.println("Delete operation is failed.");
         		}
         	}
-        }catch(Exception e){
-
+        } catch (Exception e){
         	e.printStackTrace();
-
         }
-    }
+	}
     
     /** return a a series of points, selected by the parameters supplied
      * @param file
@@ -205,10 +214,11 @@ public class Analyze_L {
      * @return
      */
     private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion) {
+    	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
-                           .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(criterion).and()
+                           .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
                            .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
                            .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis))
                            .build();

@@ -92,6 +92,31 @@ public class BenchmarkSetup {
     public static final double NO_RESULT_FOUND_DOUBLE_VAL=Double.POSITIVE_INFINITY;
     public static final String NO_RESULT_FOUND_STRING_VAL="n.s.f.";
     
+
+	public static final PrivacyModel[] privacyModels = new PrivacyModel[] {
+			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 2,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 4,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 6,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 2,    null, true),
+			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 4,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 6,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null, true),
+			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null, true),
+//			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d, true),
+			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d, true),
+//			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d, true),
+			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.2d, true),
+//			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            3,   null, null, null, false),
+//			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            5,   null, null, null, false),
+//			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           10,   null, null, null, false),
+//			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           20,   null, null, null, false),
+			};
+	
+    
     /**
      * Returns all metrics
      * @return

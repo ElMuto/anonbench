@@ -20,6 +20,10 @@ public class QiConfig {
         return numQis;
     }
 
+    /**
+     * @return an array with the indices of the activated QIs,
+     * <code>null</code> if no specific indices are configured.
+     */
     public int[] getActiveQis() {
         return activeQis;
     }
