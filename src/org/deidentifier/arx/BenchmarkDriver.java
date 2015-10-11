@@ -239,7 +239,7 @@ public class BenchmarkDriver {
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, dataset.getMaxInfoLoss(measure));
         
         // report solution ratio
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SOLUTION_RATIO, calculateSolutionRatio(result));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SOLUTION_RATIO, calculateDifficulty(result));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?
@@ -267,7 +267,7 @@ public class BenchmarkDriver {
         handle.release();
     }
 
-    private double calculateSolutionRatio(ARXResult result) {
+    private double calculateDifficulty(ARXResult result) {
         int numSolutions = 0;
         ARXLattice lattice = result.getLattice();
         for (ARXNode[] level : lattice.getLevels()) {
@@ -288,7 +288,7 @@ public class BenchmarkDriver {
             }
         }
         
-        return ((double) numSolutions) / ((double) lattice.getSize());
+        return 1- (((double) numSolutions) / ((double) lattice.getSize()));
     }
 
 
@@ -335,7 +335,7 @@ public class BenchmarkDriver {
             }
             entropy *= -1d;
             
-            double normalizedReversedEntropy = 1- ((ln2 / Math.log(freqs.length)) * entropy);
+            double normalizedEntropy = (ln2 / Math.log(freqs.length)) * entropy;
             
             if (
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
@@ -385,7 +385,7 @@ public class BenchmarkDriver {
                     System.out.println("      geom. mean         = " + mean_geom);
                     System.out.println("      median             = " + median);
                     System.out.println("      entropy            = " + entropy);
-                    System.out.println("      normalized entropy = " + normalizedReversedEntropy);
+                    System.out.println("      normalized entropy = " + normalizedEntropy);
                 }
             } else {
                 
@@ -399,7 +399,7 @@ public class BenchmarkDriver {
                 if (verbosity >= 2) {
                     System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
                     System.out.println("      entropy                       = " + entropy);
-                    System.out.println("      normalized entropy            = " + normalizedReversedEntropy);
+                    System.out.println("      normalized entropy            = " + normalizedEntropy);
                 }
                 if (verbosity >= 3) {
                     System.out.println("      " + Arrays.toString(distinctValues));
@@ -411,7 +411,7 @@ public class BenchmarkDriver {
                                            variance, skewness, kurtosis,
                                            standDeviation, variance_coeff, deviation_norm,
                                            quartil_coeff, mean_arith,
-                                           mean_geom, median, normalizedReversedEntropy));
+                                           mean_geom, median, normalizedEntropy));
             
             return statsCache.get(statsKey);
         }

@@ -37,9 +37,9 @@ import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
 
-public class Analyze_IOE {
+public class Analyze_IOD {
 	
-    private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.ENTROPY.toString()};
+    private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
 
     /**
      * Main
@@ -48,7 +48,7 @@ public class Analyze_IOE {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateEasinessInfluencePlots("influenceOnEasinessPlots.pdf" , true);
+    	generateDifficultyInfluencePlots("influenceOnDifficultyPlots.pdf" , true);
     	System.out.println("done.");
     }
     
@@ -59,7 +59,7 @@ public class Analyze_IOE {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateEasinessInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
+    private static void generateDifficultyInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));        
 
@@ -110,7 +110,7 @@ public class Analyze_IOE {
         	for (String attrProp : attrProps) {
         		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
         			String suppFactorString = String.valueOf(suppFactor);
-        			String measure  = COLUMNS.SOLUTION_RATIO.toString();
+        			String measure  = COLUMNS.DIFFICULTY.toString();
         			commandWriter.println();
         			if (condensed) {
         				String originX = suppFactor == 0d ? "0.0" : "0.5";

@@ -59,7 +59,7 @@ public class BenchmarkSetup {
     public static final int INFO_LOSS_REL   = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
     public static final int INFO_LOSS_MIN   = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
     public static final int INFO_LOSS_MAX   = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
-    public static final int SOLUTION_RATIO  = BENCHMARK.addMeasure(COLUMNS.SOLUTION_RATIO.toString());
+    public static final int SOLUTION_RATIO  = BENCHMARK.addMeasure(COLUMNS.DIFFICULTY.toString());
     public static final int NUM_VALUES      = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS        = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS        = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -67,7 +67,7 @@ public class BenchmarkSetup {
     public static final int STAND_DEVIATION = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
     public static final int VARIATION_COEFF = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
     public static final int QUARTIL_COEFF   = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
-    public static final int ENTROPY         = BENCHMARK.addMeasure(COLUMNS.ENTROPY.toString());
+    public static final int ENTROPY         = BENCHMARK.addMeasure(COLUMNS.NORM_ENTROPY.toString());
     public static final int EFD_SCORE       = BENCHMARK.addMeasure(COLUMNS.EFD_SCORE.toString());
 
 	static {
@@ -294,10 +294,10 @@ public class BenchmarkSetup {
                 return "Information-loss value from ARX framework";
             }
         },
-        SOLUTION_RATIO {
+        DIFFICULTY {
             @Override
             public String toString() {
-                return "Quotient of found solutions and lattice size";
+                return "Difficulty";
             }
         },
         SUPPRESSION_FACTOR {
@@ -405,7 +405,7 @@ public class BenchmarkSetup {
         FREQ_DEVI {
             @Override
             public String toString() {
-                return "Standard dev of frequs";
+                return "Deviation of frequencies";
             }
         },
         STAND_DEVI {
@@ -438,10 +438,10 @@ public class BenchmarkSetup {
                 return "Quartile coefficient of dispersion";
             }
         },
-        ENTROPY {
+        NORM_ENTROPY {
             @Override
             public String toString() {
-                return "Normalized Reversed Entropy";
+                return "Normalized entropy";
             }
         },
         EFD_SCORE {
