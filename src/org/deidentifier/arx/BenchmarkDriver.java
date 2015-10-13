@@ -240,7 +240,7 @@ public class BenchmarkDriver {
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, dataset.getMaxInfoLoss(measure));
         
         // report solution ratio
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.SOLUTION_RATIO, calculateDifficulty(result));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?

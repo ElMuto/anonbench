@@ -11,6 +11,7 @@ public abstract class GnuPlotter {
     protected static String gnuPlotFileName = "results/commads.plg";
 
 	protected static void executeGnuplot(String gnuPlotFileName) throws IOException {
+		fileBucket.add(new File(gnuPlotFileName));
 		System.out.println("Executing gnuplot");
 	    ProcessBuilder b = new ProcessBuilder();
 	    Process p;
@@ -47,8 +48,5 @@ public abstract class GnuPlotter {
 
 	public GnuPlotter() {
 		super();
-
-	    File gnuPlotFile = new File(gnuPlotFileName);
-		fileBucket.add(gnuPlotFile);
 	}
 }

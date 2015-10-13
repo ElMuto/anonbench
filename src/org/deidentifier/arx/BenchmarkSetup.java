@@ -60,7 +60,7 @@ public class BenchmarkSetup {
     public static final int INFO_LOSS_REL   = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
     public static final int INFO_LOSS_MIN   = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
     public static final int INFO_LOSS_MAX   = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
-    public static final int SOLUTION_RATIO  = BENCHMARK.addMeasure(COLUMNS.DIFFICULTY.toString());
+    public static final int DIFFICULTY      = BENCHMARK.addMeasure(COLUMNS.DIFFICULTY.toString());
     public static final int NUM_VALUES      = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS        = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS        = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
@@ -77,7 +77,7 @@ public class BenchmarkSetup {
         BENCHMARK.addAnalyzer(INFO_LOSS_REL, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_MIN, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_MAX, new ValueBuffer());
-        BENCHMARK.addAnalyzer(SOLUTION_RATIO, new ValueBuffer());
+        BENCHMARK.addAnalyzer(DIFFICULTY, new ValueBuffer());
         BENCHMARK.addAnalyzer(NUM_VALUES, new ValueBuffer());
         BENCHMARK.addAnalyzer(SKEWNESS, new ValueBuffer());
         BENCHMARK.addAnalyzer(KUROTSIS, new ValueBuffer());

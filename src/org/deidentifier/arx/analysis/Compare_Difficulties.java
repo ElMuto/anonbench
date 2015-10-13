@@ -22,23 +22,31 @@ package org.deidentifier.arx.analysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.List;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
-import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
 
 import de.linearbits.objectselector.Selector;
+import de.linearbits.subframe.analyzer.Analyzer;
 import de.linearbits.subframe.graph.Field;
+import de.linearbits.subframe.graph.Labels;
+import de.linearbits.subframe.graph.Plot;
+import de.linearbits.subframe.graph.PlotHistogram;
 import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
+import de.linearbits.subframe.render.GnuPlot;
+import de.linearbits.subframe.render.GnuPlotParams;
+import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 
 public class Compare_Difficulties extends GnuPlotter {
+
+
 	
-    private static String[]  attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
     /**
      * Main
      * @param args
@@ -59,45 +67,67 @@ public class Compare_Difficulties extends GnuPlotter {
      */
     private static void generateDifficultyComparisonPlots(String pdfFileName) throws IOException, ParseException {
 
-    	CSVFile file = new CSVFile(new File("results/results.csv"));        
+    	CSVFile file = new CSVFile(new File("results/results.csv"));
 
-    	String col1, col2, col3, col4, col5;
-    	col1 = "'red'";
-    	col2 = "'green'";
-    	col3 = "'blue'";
-    	col4 = "'magenta'";      
-    	col5 = "'black'";   
-
-    	String pdfFilePath = "results/" + pdfFileName; 
-
-    	PrintWriter commandWriter = new PrintWriter(gnuPlotFileName, "UTF-8");
-    	commandWriter.println("set term pdf enhanced font ',5'");
-    	commandWriter.println("set output \"" + pdfFilePath + "\"");
-    	commandWriter.println("set datafile separator \";\"");
-    	commandWriter.println("set grid");
-
-    	String pointsFileName = "results/points_aggregatesDifficultyComparison.csv";
-    	PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
-    	for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
-    		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-    			Series2D _series = getSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, suppFactor));
-    			for (Point2D point : _series.getData()) {
-    				pointsWriter.println(point.x + ";" + point.y);
+    	for (double sf : BenchmarkSetup.getSuppressionFactors()){
+        	Series2D arithMeanSeries = new Series2D();
+        	Series2D geomMeanSeries = new Series2D();
+        	Series2D stdDevSeries = new Series2D();
+    		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+                // initialize stats package and read values
+                DescriptiveStatistics stats = new DescriptiveStatistics();
+    			Series2D _series = getSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf));
+    			List<Point2D> pointsList = _series.getData();
+    			for (int i = 0; i < pointsList.size(); i++) {
+                    try {
+                        stats.addValue(Double.parseDouble(pointsList.get(i).y));
+                    } catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
     			}
+
+    			String pmString = privacyModel.toString().replaceAll("\\.0", "").replaceAll(" ", "");
+    			
+    			String arithMeanString = String.valueOf(stats.getMean());
+    			String geomMeanString = String.valueOf(stats.getGeometricMean());
+    			String stdDevString = String.valueOf(stats.getStandardDeviation());
+
+    			arithMeanSeries.getData().add(new Point2D(pmString, arithMeanString));
+    			geomMeanSeries.getData().add(new Point2D(pmString, geomMeanString));
+    			stdDevSeries.getData().add(new Point2D(pmString, stdDevString));
     		}
+    		Plot<?> arithMeanPlot = new PlotHistogram("Arithmetic mean SF " + sf, 
+    				new Labels("Privacy Model", "Difficulty"),
+    				arithMeanSeries);
+    		Plot<?> geomMeanPlot = new PlotHistogram("Geometric mean SF " + sf, 
+    				new Labels("Privacy Model", "Difficulty"),
+    				geomMeanSeries);
+    		Plot<?> stdDevPlot = new PlotHistogram("Standard deviation SF " + sf, 
+    				new Labels("Privacy Model", "Difficulty"),
+    				stdDevSeries);
+
+    		//Render the plot
+    		GnuPlotParams params = new GnuPlotParams();
+    		params.rotateXTicks = -90;
+    		params.keypos = KeyPos.TOP_LEFT;
+    		params.size = 1d;
+    		params.minY = 0d;
+    		params.maxY = 1d;
+
+    		GnuPlot.plot(arithMeanPlot, params, "results/" + "Arithmetic mean SF" + sf + " ComparedDifficulties");
+    		GnuPlot.plot(geomMeanPlot,  params, "results/" + "Geometric mean SF" + sf + " ComparedDifficulties");
+    		GnuPlot.plot(stdDevPlot,    params, "results/" + "Standard deviation SF" + sf + " ComparedDifficulties");
     	}
-    	pointsWriter.close();
-
-        executeGnuplot(gnuPlotFileName);
-
-        deleteFilesFromBucket();
-
+    	
+    	// Geclustered nach datensatz
+//    	Series3D series3d = new Series3D();
+//    	series3d.getData().add(new Point3D("dataset", "x", "y"));
+    	//PlotHistogramClustered
     }
 
 	/**
 	 * @param file
 	 * @param privacyModelString
 	 * @return
+	 * 
 	 */
 	private static Series2D getSeries(CSVFile file, String privacyModelString) {
         Selector<String[]> selector = null;
@@ -110,7 +140,9 @@ public class Compare_Difficulties extends GnuPlotter {
         }
 
         // Create series
-        Series2D series = new Series2D(file, selector, new Field("", BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()), new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), "Value"));
+        Series2D series = new Series2D(	file, selector,
+        								new Field("", BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()),
+        								new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), Analyzer.VALUE));
         
 		return series;
 	}
