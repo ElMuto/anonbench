@@ -2,16 +2,8 @@ package org.deidentifier.arx.analysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.deidentifier.arx.BenchmarkSetup;
-
-import de.linearbits.objectselector.Selector;
-import de.linearbits.subframe.graph.Field;
-import de.linearbits.subframe.graph.Series2D;
-import de.linearbits.subframe.io.CSVFile;
 
 public abstract class GnuPlotter {
 

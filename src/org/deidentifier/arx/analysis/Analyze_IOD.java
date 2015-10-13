@@ -74,6 +74,8 @@ public class Analyze_IOD extends GnuPlotter {
         String pdfFilePath = "results/" + pdfFileName; 
         
         PrintWriter commandWriter = new PrintWriter(gnuPlotFileName, "UTF-8");
+        fileBucket.add(new File(gnuPlotFileName));
+        
         commandWriter.println("set term pdf enhanced font ',5'");
         commandWriter.println("set output \"" + pdfFilePath + "\"");
         commandWriter.println("set datafile separator \";\"");
@@ -120,7 +122,7 @@ public class Analyze_IOD extends GnuPlotter {
         				String origin = originX + "," + originY;
         				commandWriter.println("set origin " + origin);
         			}             
-        			commandWriter.println("set title '" + (suppFactorString.equals(String.valueOf(0d)) ? "Generalization only" : "Generalization and suppression") + "'");
+        			commandWriter.println("set title '" + BenchmarkSetup.getSuppressionConfigString(suppFactor) + "'");
         			commandWriter.println("set xlabel \"" + attrProp + "\"");
         			commandWriter.println("set ylabel \"" + measure + "\"");
         			String pointsFileName = "results/points_" + privacyModel.toString() + "_" +

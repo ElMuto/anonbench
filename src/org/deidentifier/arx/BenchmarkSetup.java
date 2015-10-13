@@ -36,6 +36,7 @@ public class BenchmarkSetup {
 
 	/** The benchmark instance - datapoints */
 	public static final Benchmark BENCHMARK    = new Benchmark(new String[] {
+			COLUMNS.PRIVACY_MODEL.toString(),
 			COLUMNS.IL_MEASURE.toString(),
 			COLUMNS.SUPPRESSION_FACTOR.toString(),
 			COLUMNS.DATASET.toString(),
@@ -245,6 +246,10 @@ public class BenchmarkSetup {
         };
     }
     
+    public static String getSuppressionConfigString (double d) {
+    	return d == 0d ? "Generalization only" : "Generalization and suppression";
+    }
+    
     public static enum COLUMNS {
         IL_MEASURE {
             @Override
@@ -256,6 +261,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Dataset";
+            }
+        },
+        PRIVACY_MODEL {
+            @Override
+            public String toString() {
+                return "Privacy Model";
             }
         },
         CRITERIA {

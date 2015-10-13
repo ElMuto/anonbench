@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
@@ -78,14 +79,12 @@ public class Compare_Difficulties extends GnuPlotter {
     	String pointsFileName = "results/points_aggregatesDifficultyComparison.csv";
     	PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
     	for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
-       		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
-    		fileBucket.add(new File(pointsFileName));
-    		Series2D _series = getSeries(file, String.valueOf(suppFactor),
-    				privacyModel.getCriterion().toString(), privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT());
-    		for (Point2D point : _series.getData()) {
-    			pointsWriter.println(point.x + ";" + point.y);
+    		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
+    			Series2D _series = getSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, suppFactor));
+    			for (Point2D point : _series.getData()) {
+    				pointsWriter.println(point.x + ";" + point.y);
+    			}
     		}
-    	}
     	}
     	pointsWriter.close();
 
@@ -95,25 +94,24 @@ public class Compare_Difficulties extends GnuPlotter {
 
     }
 
-	private static Series2D getSeries(CSVFile file, String suppFactor, String criterion, Integer k, Double c, Integer l, Double t) {
-    	String bracketedCriterionString = "[" + criterion + "]";
+	/**
+	 * @param file
+	 * @param privacyModelString
+	 * @return
+	 */
+	private static Series2D getSeries(CSVFile file, String privacyModelString) {
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_K.toString()).equals(k != null ? String.valueOf(k) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_C.toString()).equals(c != null ? String.valueOf(c) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_L.toString()).equals(l != null ? String.valueOf(l) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_T.toString()).equals(t != null ? String.valueOf(t) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
-                           .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
+                           .field(BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()).equals(privacyModelString)
                            .build();
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         // Create series
-//        Series2D series = new Series2D(file, selector, new Field(attrProp, "Value"), new Field(measure, "Value"));
+        Series2D series = new Series2D(file, selector, new Field("", BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()), new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), "Value"));
         
-		return null;
+		return series;
 	}
 }

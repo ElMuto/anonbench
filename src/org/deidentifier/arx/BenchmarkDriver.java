@@ -198,7 +198,8 @@ public class BenchmarkDriver {
 //        anonymizer.setMaxTransformations(210000);
 
         // Benchmark
-        BenchmarkSetup.BENCHMARK.addRun(measure.toString(),
+        BenchmarkSetup.BENCHMARK.addRun(assemblePrivacyModelString(dataset.getCriteria()[0], k, c, l, t, suppFactor),
+        								measure.toString(),
                                         String.valueOf(suppFactor),
                                         dataset.toString(),
                                         Arrays.toString(dataset.getCriteria()),
@@ -267,7 +268,33 @@ public class BenchmarkDriver {
         handle.release();
     }
 
-    private double calculateDifficulty(ARXResult result) {
+    /**
+     * @param pm
+     * @param suppFactor
+     * @return
+     */
+    public static String assemblePrivacyModelString(PrivacyModel pm, double suppFactor) {
+		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor));
+	}
+
+    
+ 
+    /**
+     * @param criterion
+     * @param k
+     * @param c
+     * @param l
+     * @param t
+     * @param suppFactor
+     * @return
+     */
+    private static String assemblePrivacyModelString(BenchmarkCriterion criterion,
+    		Integer k, Double c, Integer l, Double t, 
+    		double suppFactor) {
+		return new PrivacyModel(criterion, k, c, l, t).toString() + " with " + BenchmarkSetup.getSuppressionConfigString(suppFactor);
+	}
+
+	private double calculateDifficulty(ARXResult result) {
         int numSolutions = 0;
         ARXLattice lattice = result.getLattice();
         for (ARXNode[] level : lattice.getLevels()) {
