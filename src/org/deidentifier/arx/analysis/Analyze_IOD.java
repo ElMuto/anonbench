@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
@@ -37,10 +35,9 @@ import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
 
-public class Analyze_IOD {
+public class Analyze_IOD extends GnuPlotter {
 	
-    private static String[] attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
-
+    private static String[]  attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
     /**
      * Main
      * @param args
@@ -48,7 +45,7 @@ public class Analyze_IOD {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateDifficultyInfluencePlots("influenceOnDifficultyPlots.pdf" , true);
+    	generateDifficultyInfluencePlots("Plots_influenceOnDifficulty.pdf" , true);
     	System.out.println("done.");
     }
     
@@ -73,10 +70,6 @@ public class Analyze_IOD {
         double xOffset  = 0.42;
         double xSpacing = 0.03;
         double yOffset  = 0.96;
-
-        Set<File> fileBucket = new HashSet<File>();
-
-        String gnuPlotFileName = "results/commads.plg";
         
         String pdfFilePath = "results/" + pdfFileName; 
         
@@ -161,51 +154,14 @@ public class Analyze_IOD {
         if (condensed)
         	commandWriter.println("unset multiplot");
     	}
-
         commandWriter.close();
         
-        System.out.println("Executing gnuplot");
-        ProcessBuilder b = new ProcessBuilder();
-        Process p;
-        File gnuPlotFile = new File(gnuPlotFileName);
-        if (gnuPlotFile.exists()) {
-        	fileBucket.add(gnuPlotFile);
-            b.command("gnuplot", gnuPlotFileName);
-            p = b.start();
-            StreamReader output = new StreamReader(p.getInputStream());
-            StreamReader error = new StreamReader(p.getErrorStream());
-            new Thread(output).start();
-            new Thread(error).start();
-            try {
-                p.waitFor();
-            } catch (final InterruptedException e) {
-                throw new IOException(e);
-            }
-
-            if (p.exitValue() != 0) {
-                throw new IOException("Error executing gnuplot: " + error.getString() + System.lineSeparator() + output.getString());
-            }
-        } else {
-            System.err.println("Files not existent");
-        }
-        deleteFilesFromBucket(fileBucket);
+        executeGnuplot(gnuPlotFileName);
+        
+        deleteFilesFromBucket();
     }
 
-	private static void deleteFilesFromBucket(Set<File> fileBucket) {
-		try {
-        	for (File fileToBeDeleted : fileBucket) {
-        		if(fileToBeDeleted.delete()){
-        			System.out.println(fileToBeDeleted.getName() + " is deleted!");
-        		}else{
-        			System.out.println("Delete operation is failed.");
-        		}
-        	}
-        } catch (Exception e){
-        	e.printStackTrace();
-        }
-	}
-    
-    /** return a a series of points, selected by the parameters supplied
+	/** return a a series of points, selected by the parameters supplied
      * @param file
      * @param suppFactor
      * @param attrProp
@@ -218,7 +174,7 @@ public class Analyze_IOD {
      * @param t TODO
      * @return
      */
-    private static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion,
+    protected static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion,
     		Integer k, Double c, Integer l, Double t) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
