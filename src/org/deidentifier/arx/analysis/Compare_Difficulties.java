@@ -34,10 +34,10 @@ import de.linearbits.objectselector.Selector;
 import de.linearbits.subframe.analyzer.Analyzer;
 import de.linearbits.subframe.graph.Field;
 import de.linearbits.subframe.graph.Labels;
-import de.linearbits.subframe.graph.Plot;
 import de.linearbits.subframe.graph.PlotHistogram;
 import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
+import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
 import de.linearbits.subframe.render.GnuPlot;
 import de.linearbits.subframe.render.GnuPlotParams;
@@ -70,39 +70,35 @@ public class Compare_Difficulties extends GnuPlotter {
     	CSVFile file = new CSVFile(new File("results/results.csv"));
 
     	for (double sf : BenchmarkSetup.getSuppressionFactors()){
-        	Series2D arithMeanSeries = new Series2D();
-        	Series2D geomMeanSeries = new Series2D();
-        	Series2D stdDevSeries = new Series2D();
+        	Series2D arithMeanSeries2D = new Series2D();
+        	Series2D geomMeanSeries2D = new Series2D();
+        	Series2D stdDevSeries2D = new Series2D();
     		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
-                // initialize stats package and read values
-                DescriptiveStatistics stats = new DescriptiveStatistics();
-    			Series2D _series = getSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf));
-    			List<Point2D> pointsList = _series.getData();
+    			String pmString = privacyModel.toString().replaceAll("\\.0", "").replaceAll(" ", "");
+    			
+    			// get data
+    			Series2D _2Dseries = get2dSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf));
+    			Series3D _3Dseries = get3dSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf));
+    			
+                // initialize stats package
+                DescriptiveStatistics stats2D = new DescriptiveStatistics();
+                DescriptiveStatistics geoMeanStats2D = new DescriptiveStatistics();
+                
+                // read values into stats package
+    			List<Point2D> pointsList = _2Dseries.getData();
     			for (int i = 0; i < pointsList.size(); i++) {
                     try {
-                        stats.addValue(Double.parseDouble(pointsList.get(i).y));
+                        stats2D.addValue(Double.parseDouble(pointsList.get(i).y));
+                        geoMeanStats2D.addValue(Double.parseDouble(pointsList.get(i).y) + 1d);
                     } catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
     			}
 
-    			String pmString = privacyModel.toString().replaceAll("\\.0", "").replaceAll(" ", "");
+    			// add aggregated values into data structure for plotting
     			
-    			String arithMeanString = String.valueOf(stats.getMean());
-    			String geomMeanString = String.valueOf(stats.getGeometricMean());
-    			String stdDevString = String.valueOf(stats.getStandardDeviation());
-
-    			arithMeanSeries.getData().add(new Point2D(pmString, arithMeanString));
-    			geomMeanSeries.getData().add(new Point2D(pmString, geomMeanString));
-    			stdDevSeries.getData().add(new Point2D(pmString, stdDevString));
+    			arithMeanSeries2D.getData().add(new Point2D(pmString, String.valueOf(stats2D.getMean())));
+    			geomMeanSeries2D.getData().add(new Point2D(pmString, String.valueOf(geoMeanStats2D.getGeometricMean() - 1)));
+    			stdDevSeries2D.getData().add(new Point2D(pmString, String.valueOf(stats2D.getStandardDeviation())));
     		}
-    		Plot<?> arithMeanPlot = new PlotHistogram("Arithmetic mean SF " + sf, 
-    				new Labels("Privacy Model", "Difficulty"),
-    				arithMeanSeries);
-    		Plot<?> geomMeanPlot = new PlotHistogram("Geometric mean SF " + sf, 
-    				new Labels("Privacy Model", "Difficulty"),
-    				geomMeanSeries);
-    		Plot<?> stdDevPlot = new PlotHistogram("Standard deviation SF " + sf, 
-    				new Labels("Privacy Model", "Difficulty"),
-    				stdDevSeries);
 
     		//Render the plot
     		GnuPlotParams params = new GnuPlotParams();
@@ -112,9 +108,12 @@ public class Compare_Difficulties extends GnuPlotter {
     		params.minY = 0d;
     		params.maxY = 1d;
 
-    		GnuPlot.plot(arithMeanPlot, params, "results/" + "Arithmetic mean SF" + sf + " ComparedDifficulties");
-    		GnuPlot.plot(geomMeanPlot,  params, "results/" + "Geometric mean SF" + sf + " ComparedDifficulties");
-    		GnuPlot.plot(stdDevPlot,    params, "results/" + "Standard deviation SF" + sf + " ComparedDifficulties");
+    		GnuPlot.plot(new PlotHistogram("Arithmetic mean - SF " + sf, new Labels("Privacy Model", "Difficulty"), arithMeanSeries2D),
+    				params, "results/" + "Plot_Arithmetic_mean_SF" + sf);
+    		GnuPlot.plot(new PlotHistogram("Geometric mean - SF " + sf, new Labels("Privacy Model", "Difficulty"), geomMeanSeries2D), 
+    				params, "results/" + "Plot_Geometric_mean_SF" + sf);
+    		GnuPlot.plot(new PlotHistogram("Standard deviation - SF " + sf, new Labels("Privacy Model", "Difficulty"), stdDevSeries2D),
+    				params, "results/" + "Plot_Standard_deviation_SF" + sf);
     	}
     	
     	// Geclustered nach datensatz
@@ -129,7 +128,7 @@ public class Compare_Difficulties extends GnuPlotter {
 	 * @return
 	 * 
 	 */
-	private static Series2D getSeries(CSVFile file, String privacyModelString) {
+	private static Series2D get2dSeries(CSVFile file, String privacyModelString) {
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
@@ -143,6 +142,31 @@ public class Compare_Difficulties extends GnuPlotter {
         Series2D series = new Series2D(	file, selector,
         								new Field("", BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()),
         								new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), Analyzer.VALUE));
+        
+		return series;
+	}
+
+	/**
+	 * @param file
+	 * @param privacyModelString
+	 * @return
+	 * 
+	 */
+	private static Series3D get3dSeries(CSVFile file, String privacyModelString) {
+        Selector<String[]> selector = null;
+        try {
+            selector = file.getSelectorBuilder()
+                           .field(BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()).equals(privacyModelString)
+                           .build();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // Create series
+        Series3D series = new Series3D(	file, selector,
+        								new Field("", BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()),
+        								new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), Analyzer.VALUE),
+        								new Field(BenchmarkSetup.COLUMNS.DATASET.toString()));
         
 		return series;
 	}
