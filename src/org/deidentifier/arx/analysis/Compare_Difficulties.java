@@ -73,12 +73,40 @@ public class Compare_Difficulties extends GnuPlotter {
         	Series2D arithMeanSeries2D = new Series2D();
         	Series2D geomMeanSeries2D = new Series2D();
         	Series2D stdDevSeries2D = new Series2D();
+			
+        	Series3D arithMeanSeries3D = new Series3D();
+        	Series3D geomMeanSeries3D = new Series3D();
+        	Series3D stdDevSeries3D = new Series3D();
+			
     		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
     			String pmString = privacyModel.toString().replaceAll("\\.0", "").replaceAll(" ", "");
+				
+				for (Dataset ds : getDatasets()) {
+					
+					// get data
+					Series3D _3Dseries = get3dSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf, ds));
+    			
+					// initialize stats package
+					DescriptiveStatistics stats3D = new DescriptiveStatistics();
+					DescriptiveStatistics geoMeanStats3D = new DescriptiveStatistics();
+					
+					// read values into stats package
+					List<Point3D> pointsList3D = _3Dseries.getData();
+					for (int i = 0; i < pointsList3D.size(); i++) {
+						try {
+							stats3D.addValue(Double.parseDouble(pointsList3D.get(i).y));
+							geoMeanStats3D.addValue(Double.parseDouble(pointsList3D.get(i).y) + 1d);
+						} catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
+					}
+
+					// add aggregated values into data structure for plotting					
+					arithMeanSeries3D.getData().add(new Point3D(ds.toString(), pmString, String.valueOf(stats3D.getMean())));
+					geomMeanSeries3D.getData().add(new Point3D(ds.toString(), pmString, String.valueOf(geoMeanStats3D.getGeometricMean() - 1)));
+					stdDevSeries3D.getData().add(new Point3D(ds.toString(), pmString, String.valueOf(stats3D.getStandardDeviation())));
+				}
     			
     			// get data
     			Series2D _2Dseries = get2dSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf));
-    			Series3D _3Dseries = get3dSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf));
     			
                 // initialize stats package
                 DescriptiveStatistics stats2D = new DescriptiveStatistics();
@@ -93,8 +121,7 @@ public class Compare_Difficulties extends GnuPlotter {
                     } catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
     			}
 
-    			// add aggregated values into data structure for plotting
-    			
+    			// add aggregated values into data structure for plotting    			
     			arithMeanSeries2D.getData().add(new Point2D(pmString, String.valueOf(stats2D.getMean())));
     			geomMeanSeries2D.getData().add(new Point2D(pmString, String.valueOf(geoMeanStats2D.getGeometricMean() - 1)));
     			stdDevSeries2D.getData().add(new Point2D(pmString, String.valueOf(stats2D.getStandardDeviation())));
@@ -114,6 +141,13 @@ public class Compare_Difficulties extends GnuPlotter {
     				params, "results/" + "Plot_Geometric_mean_SF" + sf);
     		GnuPlot.plot(new PlotHistogram("Standard deviation - SF " + sf, new Labels("Privacy Model", "Difficulty"), stdDevSeries2D),
     				params, "results/" + "Plot_Standard_deviation_SF" + sf);
+
+    		GnuPlot.plot(new PlotHistogramClustered("Arithmetic mean - SF " + sf, new Labels("Dataset / Privacy Model", "Difficulty"), arithMeanSeries3D),
+    				params, "results/" + "Plot_Clustered_Arithmetic_mean_SF" + sf);
+    		GnuPlot.plot(new PlotHistogramClustered("Geometric mean - SF " + sf, new Labels("Dataset / Privacy Model", "Difficulty"), geomMeanSeries3D), 
+    				params, "results/" + "Plot_Clustered_Geometric_mean_SF" + sf);
+    		GnuPlot.plot(new PlotHistogramClustered("Standard deviation - SF " + sf, new Labels("Dataset / Privacy Model", "Difficulty"), stdDevSeries3D),
+    				params, "results/" + "Plot_Clustered_Standard_deviation_SF" + sf);
     	}
     	
     	// Geclustered nach datensatz
@@ -171,3 +205,7 @@ public class Compare_Difficulties extends GnuPlotter {
 		return series;
 	}
 }
+
+    Status API Training Shop Blog About Pricing 
+
+    © 2015 GitHub, Inc. Terms Privacy Security Contact Help 
