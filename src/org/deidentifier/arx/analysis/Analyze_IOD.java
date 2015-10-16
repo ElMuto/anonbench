@@ -56,7 +56,7 @@ public class Analyze_IOD extends GnuPlotter {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateDifficultyInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
+    static void generateDifficultyInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));        
 

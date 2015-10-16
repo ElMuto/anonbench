@@ -276,7 +276,6 @@ public class BenchmarkDriver {
     public static String assemblePrivacyModelString(PrivacyModel pm, double suppFactor) {
 		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor));
 	}
-
     
  
     /**

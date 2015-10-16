@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
@@ -35,7 +36,9 @@ import de.linearbits.subframe.analyzer.Analyzer;
 import de.linearbits.subframe.graph.Field;
 import de.linearbits.subframe.graph.Labels;
 import de.linearbits.subframe.graph.PlotHistogram;
+import de.linearbits.subframe.graph.PlotHistogramClustered;
 import de.linearbits.subframe.graph.Point2D;
+import de.linearbits.subframe.graph.Point3D;
 import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.graph.Series3D;
 import de.linearbits.subframe.io.CSVFile;
@@ -54,7 +57,7 @@ public class Compare_Difficulties extends GnuPlotter {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateDifficultyComparisonPlots("Plots_difficultyComparison.pdf");
+    	generateDifficultyComparisonPlots();
     	System.out.println("done.");
     }
     
@@ -65,11 +68,12 @@ public class Compare_Difficulties extends GnuPlotter {
      * @throws IOException
      * @throws ParseException
      */
-    private static void generateDifficultyComparisonPlots(String pdfFileName) throws IOException, ParseException {
+    static void generateDifficultyComparisonPlots() throws IOException, ParseException {
 
     	CSVFile file = new CSVFile(new File("results/results.csv"));
 
     	for (double sf : BenchmarkSetup.getSuppressionFactors()){
+    		System.out.println("\nGenerating stats for SF " + sf);
         	Series2D arithMeanSeries2D = new Series2D();
         	Series2D geomMeanSeries2D = new Series2D();
         	Series2D stdDevSeries2D = new Series2D();
@@ -81,28 +85,28 @@ public class Compare_Difficulties extends GnuPlotter {
     		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
     			String pmString = privacyModel.toString().replaceAll("\\.0", "").replaceAll(" ", "");
 				
-				for (Dataset ds : getDatasets()) {
+				for (BenchmarkDatafile df : BenchmarkSetup.getDatafiles()) {
 					
 					// get data
-					Series3D _3Dseries = get3dSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf, ds));
+					Series2D _ClusterSeries = getClusteredSeries(file, BenchmarkDriver.assemblePrivacyModelString(privacyModel, sf), df.toString());
     			
 					// initialize stats package
 					DescriptiveStatistics stats3D = new DescriptiveStatistics();
 					DescriptiveStatistics geoMeanStats3D = new DescriptiveStatistics();
 					
 					// read values into stats package
-					List<Point3D> pointsList3D = _3Dseries.getData();
-					for (int i = 0; i < pointsList3D.size(); i++) {
+					List<Point2D> pointsList4Cluster = _ClusterSeries.getData();
+					for (int i = 0; i < pointsList4Cluster.size(); i++) {
 						try {
-							stats3D.addValue(Double.parseDouble(pointsList3D.get(i).y));
-							geoMeanStats3D.addValue(Double.parseDouble(pointsList3D.get(i).y) + 1d);
+							stats3D.addValue(Double.parseDouble(pointsList4Cluster.get(i).y));
+							geoMeanStats3D.addValue(Double.parseDouble(pointsList4Cluster.get(i).y) + 1d);
 						} catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
 					}
 
 					// add aggregated values into data structure for plotting					
-					arithMeanSeries3D.getData().add(new Point3D(ds.toString(), pmString, String.valueOf(stats3D.getMean())));
-					geomMeanSeries3D.getData().add(new Point3D(ds.toString(), pmString, String.valueOf(geoMeanStats3D.getGeometricMean() - 1)));
-					stdDevSeries3D.getData().add(new Point3D(ds.toString(), pmString, String.valueOf(stats3D.getStandardDeviation())));
+					arithMeanSeries3D.getData().add(new Point3D(pmString, df.toString(), String.valueOf(stats3D.getMean())));
+					geomMeanSeries3D.getData().add(new Point3D (pmString, df.toString(), String.valueOf(geoMeanStats3D.getGeometricMean() - 1)));
+					stdDevSeries3D.getData().add(new Point3D   (pmString, df.toString(), String.valueOf(stats3D.getStandardDeviation())));
 				}
     			
     			// get data
@@ -130,11 +134,14 @@ public class Compare_Difficulties extends GnuPlotter {
     		//Render the plot
     		GnuPlotParams params = new GnuPlotParams();
     		params.rotateXTicks = -90;
-    		params.keypos = KeyPos.TOP_LEFT;
+    		params.keypos = KeyPos.TOP_RIGHT;
     		params.size = 1d;
     		params.minY = 0d;
     		params.maxY = 1d;
+    		params.colorize = true;
+    		params.height = 4.4d;
 
+    		System.out.println("Gnuplotting unclustered plots");
     		GnuPlot.plot(new PlotHistogram("Arithmetic mean - SF " + sf, new Labels("Privacy Model", "Difficulty"), arithMeanSeries2D),
     				params, "results/" + "Plot_Arithmetic_mean_SF" + sf);
     		GnuPlot.plot(new PlotHistogram("Geometric mean - SF " + sf, new Labels("Privacy Model", "Difficulty"), geomMeanSeries2D), 
@@ -142,11 +149,12 @@ public class Compare_Difficulties extends GnuPlotter {
     		GnuPlot.plot(new PlotHistogram("Standard deviation - SF " + sf, new Labels("Privacy Model", "Difficulty"), stdDevSeries2D),
     				params, "results/" + "Plot_Standard_deviation_SF" + sf);
 
-    		GnuPlot.plot(new PlotHistogramClustered("Arithmetic mean - SF " + sf, new Labels("Dataset / Privacy Model", "Difficulty"), arithMeanSeries3D),
+    		System.out.println("Gnuplotting clustered plots");
+    		GnuPlot.plot(new PlotHistogramClustered("Arithmetic mean - SF " + sf, new Labels("Privacy Model", "Difficulty"), arithMeanSeries3D),
     				params, "results/" + "Plot_Clustered_Arithmetic_mean_SF" + sf);
-    		GnuPlot.plot(new PlotHistogramClustered("Geometric mean - SF " + sf, new Labels("Dataset / Privacy Model", "Difficulty"), geomMeanSeries3D), 
+    		GnuPlot.plot(new PlotHistogramClustered("Geometric mean - SF " + sf, new Labels("Privacy Model", "Difficulty"), geomMeanSeries3D), 
     				params, "results/" + "Plot_Clustered_Geometric_mean_SF" + sf);
-    		GnuPlot.plot(new PlotHistogramClustered("Standard deviation - SF " + sf, new Labels("Dataset / Privacy Model", "Difficulty"), stdDevSeries3D),
+    		GnuPlot.plot(new PlotHistogramClustered("Standard deviation - SF " + sf, new Labels("Privacy Model", "Difficulty"), stdDevSeries3D),
     				params, "results/" + "Plot_Clustered_Standard_deviation_SF" + sf);
     	}
     	
@@ -186,26 +194,22 @@ public class Compare_Difficulties extends GnuPlotter {
 	 * @return
 	 * 
 	 */
-	private static Series3D get3dSeries(CSVFile file, String privacyModelString) {
+	private static Series2D getClusteredSeries(CSVFile file, String privacyModelString, String dsString) {
         Selector<String[]> selector = null;
         try {
             selector = file.getSelectorBuilder()
-                           .field(BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()).equals(privacyModelString)
+                    .field(BenchmarkSetup.COLUMNS.DATASET.toString()).equals(dsString).and()
+                    .field(BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()).equals(privacyModelString)
                            .build();
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         // Create series
-        Series3D series = new Series3D(	file, selector,
+        Series2D series = new Series2D(	file, selector,
         								new Field("", BenchmarkSetup.COLUMNS.PRIVACY_MODEL.toString()),
-        								new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), Analyzer.VALUE),
-        								new Field(BenchmarkSetup.COLUMNS.DATASET.toString()));
+        								new Field(BenchmarkSetup.COLUMNS.DIFFICULTY.toString(), Analyzer.VALUE));
         
 		return series;
 	}
 }
-
-    Status API Training Shop Blog About Pricing 
-
-    © 2015 GitHub, Inc. Terms Privacy Security Contact Help 
