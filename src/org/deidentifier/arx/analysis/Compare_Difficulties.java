@@ -104,9 +104,9 @@ public class Compare_Difficulties extends GnuPlotter {
 					}
 
 					// add aggregated values into data structure for plotting					
-					arithMeanSeries3D.getData().add(new Point3D(pmString, df.toString(), String.valueOf(stats3D.getMean())));
-					geomMeanSeries3D.getData().add(new Point3D (pmString, df.toString(), String.valueOf(geoMeanStats3D.getGeometricMean() - 1)));
-					stdDevSeries3D.getData().add(new Point3D   (pmString, df.toString(), String.valueOf(stats3D.getStandardDeviation())));
+					arithMeanSeries3D.getData().add(new Point3D(df.toString(), pmString, String.valueOf(stats3D.getMean())));
+					geomMeanSeries3D.getData().add(new Point3D (df.toString(), pmString, String.valueOf(geoMeanStats3D.getGeometricMean() - 1)));
+					stdDevSeries3D.getData().add(new Point3D   (df.toString(), pmString, String.valueOf(stats3D.getStandardDeviation())));
 				}
     			
     			// get data
