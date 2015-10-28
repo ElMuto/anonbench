@@ -68,19 +68,19 @@ public class PrivacyModel {
 			theString = k + "-anonymity";
 			break;
 		case L_DIVERSITY_DISTINCT:
-			theString = "distinct-" + l + "-diversity";
+			theString = "dist.-" + l + "-diversity";
 			break;
 		case L_DIVERSITY_ENTROPY:
-			theString = "entropy-" + l + "-diversity";
+			theString = "ent.-" + l + "-diversity";
 			break;
 		case L_DIVERSITY_RECURSIVE:
-			theString = "recursive-(" + c + ", " + l + ")-diversity";
+			theString = "rec.-(" + c + ", " + l + ")-diversity";
 			break;
 		case T_CLOSENESS_ED:
-			theString = "equal-distance-" + t + "-closeness";
+			theString = "equ.-dist.-" + t + "-closeness";
 			break;
 		case T_CLOSENESS_HD:
-			theString = "hierarchical-distance-" + t + "-closeness";
+			theString = "hier.-dist.-" + t + "-closeness";
 			break;
 		default:
 			throw new RuntimeException("Invalid criterion");

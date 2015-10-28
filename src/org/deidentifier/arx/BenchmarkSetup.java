@@ -101,19 +101,24 @@ public class BenchmarkSetup {
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 2,    null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 4,    null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 6,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null),
+
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 2,    null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 4,    null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 6,    null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null),
+    			
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null),
+
     			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.2d),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d),
+    			
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d),
+    			
     			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            3,   null, null, null),
     			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            5,   null, null, null),
     			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           10,   null, null, null),
