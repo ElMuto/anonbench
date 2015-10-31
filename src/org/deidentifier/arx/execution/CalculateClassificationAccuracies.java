@@ -1,6 +1,8 @@
 package org.deidentifier.arx.execution;
 
 import weka.core.converters.CSVLoader;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
 
 import java.io.File;
 import java.util.Random;
@@ -12,9 +14,10 @@ import weka.core.Instances;
 public class CalculateClassificationAccuracies {
 
 	public static void main(String[] args) {
-		Instances data = loadData("adult_comma.csv");
 		
-		String[] attributes = new String[] {
+		Instances data = loadData("adult_comma.csv", new String[] { "age", "sex", "race" });
+		
+		String[] workloadAttributes = new String[] {
 				"workclass",
 				"education",
 				"marital-status",
@@ -23,16 +26,17 @@ public class CalculateClassificationAccuracies {
 				"salary-class"
 				};
 		
-		for (String attribute : attributes) {
-			Evaluation eval = getClassificationAccuracyFor(data, attribute);
-
-			System.out.printf("Accuracy for attribute '" + attribute + "': \t%.4f\n", eval.pctCorrect());
+		for (String workloadAttribute : workloadAttributes) {
+			
+			Evaluation eval = getClassificationAccuracyFor(data, workloadAttribute);
+			
+			System.out.printf("Accuracy for attribute '" + workloadAttribute + "': \t%.4f\n", eval.pctCorrect());
 		}
 	}
 
 	private static Evaluation getClassificationAccuracyFor(Instances data, String attribute) {
-		data.setClassIndex(data.attribute(attribute).index());
 		
+		data.setClassIndex(data.attribute(attribute).index());		
 		Evaluation eval = null;
 		try {
 			eval = new Evaluation(data);
@@ -45,17 +49,44 @@ public class CalculateClassificationAccuracies {
 		return eval;
 	}
 
-	private static Instances loadData(String filename) {
+	private static Instances loadData(String filename, String[] filteredAttributes) {
 		Instances data = null;
 		
 		try {
 			CSVLoader loader = new CSVLoader();
 			loader.setSource(new File("data/" + filename));
 			data = loader.getDataSet();
-			return data;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return data;
+		
+		String filterNumbers = null;
+		if (filteredAttributes == null) {
+			return data;
+		} else {
+			filterNumbers = calculateFilteredAttributeNumbers(data, filteredAttributes);
+		}
+
+		Instances filteredData = null;		
+		Remove remove = new Remove(); // new instance of filter
+		try {
+			remove.setOptions(new String[] { "-R", filterNumbers });
+			remove.setInputFormat(data); // inform filter about dataset
+			filteredData = Filter.useFilter(data, remove); // apply filter
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return filteredData;
+	}
+
+	private static String calculateFilteredAttributeNumbers(Instances data, String[] filteredAttributes) {
+		String attNumString = "";
+		for (int i = 0; i < filteredAttributes.length - 1; i++) {
+			attNumString += String.valueOf(data.attribute(filteredAttributes[i]).index() + 1) + ",";
+		}
+		attNumString += String.valueOf(data.attribute(filteredAttributes[filteredAttributes.length - 1]).index() + 1) + ",";
+		
+		return attNumString;
 	}
 }
