@@ -30,6 +30,9 @@
       <filename name="**/jhpl-0.0.1.jar" />
     </or>
   </fileset>
+  <fileset id="local.lib.jars" dir="lib">
+      <filename name="**/weka.jar" />
+  </fileset>
 
 
   <target name="release" depends="jars">
@@ -51,6 +54,7 @@
         <path path="${utility}/bin/" />
         <path path="src/" />
         <fileset refid="lib.jars" />
+        <fileset refid="local.lib.jars" />
       </classpath>
     </javac>
   </target>
@@ -58,6 +62,7 @@
   <target name="buildExternalLibs">
     <jar jarfile="build/extLibs/lib.jar">
       <zipgroupfileset refid="lib.jars" />
+      <zipgroupfileset refid="local.lib.jars" />
     </jar>
   </target>
 
@@ -72,7 +77,7 @@
       <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
       <manifest>
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_Multi" />
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CalculateClassificationAccuracies" />
       </manifest>
     </jar>
     <delete dir="build" failonerror="true" />
