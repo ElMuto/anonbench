@@ -20,24 +20,73 @@ public class CalculateClassificationAccuracies {
 		RandomForest,
 		NaiveBayes
 	}
+	
+	private class Configuration {
+		private final String fileName;
+		private final String workloadAttribute;
+		private final String[] excludedAttributes;
+		
+		Configuration (String fileName, String workloadAttribute, String[] excludedAttributes) {
+			this.fileName = fileName;
+			this.workloadAttribute = workloadAttribute;
+			this.excludedAttributes = excludedAttributes;
+		}
+
+		public String getFileName() {
+			return fileName;
+		}
+
+		public String getWorkloadAttribute() {
+			return workloadAttribute;
+		}
+
+		public String[] getExcludedAttributes() {
+			return excludedAttributes;
+		}
+	}
 
 	public static void main(String[] args) {
 		
-		Instances data = loadData("adult_comma.csv", new String[] { "age", "sex", "race" });
+		String[][] configurations = new String[][] {
+			new String[] { "adult_comma.csv", "workclass"                            },
+			new String[] { "adult_comma.csv", "workclass",      "age", "sex", "race" },
+			new String[] { "adult_comma.csv", "workclass",      "education", "marital-status", "occupation", "native-country", "salary-class" },
+
+			new String[] { "adult_comma.csv", "education",                           },
+			new String[] { "adult_comma.csv", "education",      "age", "sex", "race" },
+			new String[] { "adult_comma.csv", "education",      "workclass", "marital-status", "occupation", "native-country", "salary-class" },
+
+			new String[] { "adult_comma.csv", "marital-status",                      },
+			new String[] { "adult_comma.csv", "marital-status", "age", "sex", "race" },
+			new String[] { "adult_comma.csv", "marital-status", "workclass", "education", "occupation", "native-country", "salary-class" },
+
+			new String[] { "adult_comma.csv", "occupation",                          },
+			new String[] { "adult_comma.csv", "occupation",     "age", "sex", "race" },
+			new String[] { "adult_comma.csv", "occupation",     "workclass", "education", "marital-status", "native-country", "salary-class" },
+
+			new String[] { "adult_comma.csv", "native-country",                      },
+			new String[] { "adult_comma.csv", "native-country", "age", "sex", "race" },
+			new String[] { "adult_comma.csv", "native-country", "workclass", "education", "marital-status", "occupation", "salary-class" },
+
+			new String[] { "adult_comma.csv", "salary-class",                        },
+			new String[] { "adult_comma.csv", "salary-class",   "age", "sex", "race" },
+			new String[] { "adult_comma.csv", "salary-class",   "workclass", "education", "marital-status", "occupation", "native-country" },
+
+		};
 		
-		String[] workloadAttributes = new String[] {
-				"workclass",
-				"education",
-				"marital-status",
-				"occupation",
-				"native-country",
-				"salary-class"
-				};
-		
-		for (String workloadAttribute : workloadAttributes) {
+		for (String[] configuration : configurations) {
 			
-			Evaluation eval = getClassificationAccuracyFor(data, workloadAttribute, Classifier.RandomForest);
+			String fileName = configuration[0];
+			String workloadAttribute = configuration[1];
+			String[] filteredAttributes = new String[configuration.length - 2];
 			
+			for (int i = 2; i < configuration.length; i++) {
+				filteredAttributes[i - 2] = configuration[i];
+			}
+			
+			Instances data = loadData(fileName, filteredAttributes);
+			
+			Evaluation eval = getClassificationAccuracyFor(data, workloadAttribute, Classifier.J48);
 			System.out.printf("Accuracy for attribute '" + workloadAttribute + "': \t%.4f\n", eval.pctCorrect());
 		}
 	}
@@ -89,7 +138,7 @@ public class CalculateClassificationAccuracies {
 		}
 		
 		String filterNumbers = null;
-		if (filteredAttributes == null) {
+		if (filteredAttributes == null || filteredAttributes.length == 0) {
 			return data;
 		} else {
 			filterNumbers = calculateFilteredAttributeNumbers(data, filteredAttributes);
