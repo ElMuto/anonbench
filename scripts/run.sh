@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_CalculateClassificationAccuracies
+java -Xmx5G -jar jars/pc-bench.jar -D_CCA_IHIS_only

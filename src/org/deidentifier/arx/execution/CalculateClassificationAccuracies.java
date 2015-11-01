@@ -89,12 +89,12 @@ public class CalculateClassificationAccuracies {
 		};
 		
 		ClassificationConfig[] ihisConfig = new ClassificationConfig[] {
-				new ClassificationConfig("ihis_comma.csv", "QUARTER", null),
 				new ClassificationConfig("ihis_comma.csv", "REGION", null),
 				new ClassificationConfig("ihis_comma.csv", "MARSTAT", null),
 				new ClassificationConfig("ihis_comma.csv", "SEX", null),
 				new ClassificationConfig("ihis_comma.csv", "RACEA", null),
-				new ClassificationConfig("ihis_comma.csv", "EDUC", null)
+				new ClassificationConfig("ihis_comma.csv", "EDUC", null),
+				new ClassificationConfig("ihis_comma.csv", "QUARTER", null)
 		};
 		
 		ClassificationConfig[] acs13Config = new ClassificationConfig[] {
@@ -113,21 +113,23 @@ public class CalculateClassificationAccuracies {
 		evaluateConfigArray(cupConfig, "results/classificationResultsCup.csv");
 		evaluateConfigArray(atusConfig, "results/classificationResultsAtus.csv");
 		evaluateConfigArray(farsConfig, "results/classificationResultsFars.csv");
-		evaluateConfigArray(ihisConfig, "results/classificationResultsIhis.csv");
 		evaluateConfigArray(acs13Config, "results/classificationResultsAcs13.csv");
+		evaluateConfigArray(ihisConfig, "results/classificationResultsIhis.csv");
 	}
 
-	private static void evaluateConfigArray(ClassificationConfig[] configs, String fileName) {
+	private static void evaluateConfigArray(ClassificationConfig[] configs, String resultFileName) {
+		System.out.println("\nPreparing results for " + resultFileName);
 		double[] results = new double[configs.length];
 		for (int i = 0; i < configs.length; i++) {
-			Instances data = loadData(configs[i].getFileName(), configs[i].getExcludedAttributes());
+			System.out.println("Classifying attribute '" + configs[i].getWorkloadAttribute() + "'");
+			Instances data = loadData(configs[i].getInputFileName(), configs[i].getExcludedAttributes());
 			
 			results[i] = getClassificationAccuracyFor(data, configs[i].getWorkloadAttribute(), Classifier.J48).pctCorrect();
 			
 			System.out.printf("Accuracy for attribute '" + configs[i].getWorkloadAttribute() + "': \t%.4f\n", results[i]);
 		}
 		
-		writeResultsToFile(configs, results, fileName);
+		writeResultsToFile(configs, results, resultFileName);
 	}
 
 	private static void evaluateConfigMatrix(ClassificationConfig[][] adultConfig, String fileName) {
@@ -135,7 +137,7 @@ public class CalculateClassificationAccuracies {
 		for (int i = 0; i < adultConfig.length; i++) {
 			for (int j = 0; j < adultConfig[i].length; j++) {
 
-				Instances data = loadData(adultConfig[i][j].getFileName(), adultConfig[i][j].getExcludedAttributes());
+				Instances data = loadData(adultConfig[i][j].getInputFileName(), adultConfig[i][j].getExcludedAttributes());
 				
 				results[i][j] = getClassificationAccuracyFor(data, adultConfig[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect();
 				

@@ -11,7 +11,7 @@ public class ClassificationConfig {
 		this.excludedAttributes = excludedAttributes;
 	}
 
-	public String getFileName() {
+	public String getInputFileName() {
 		return fileName;
 	}
 
