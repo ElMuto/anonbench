@@ -23,6 +23,12 @@ public class CalculateClassificationAccuracies {
 
 	public static void main(String[] args) {
 
+		getDistinctValues("adult_comma.csv",             null, "results/numDistinctValuesAdult.csv");
+		getDistinctValues("ss13acs_essential_comma.csv", null, "results/numDistinctValuesAcs13.csv");
+		getDistinctValues("atus_comma.csv",              null, "results/numDistinctValuesAtus.csv");
+		getDistinctValues("fars_comma.csv",               "4", "results/numDistinctValuesFars.csv");
+		getDistinctValues("ihis_comma.csv",               "4", "results/numDistinctValuesIhis.csv");
+
 		evaluateConfig(adultBaseline, "results/baselineAdult.csv");
 		evaluateConfig(acs13Baseline, "results/baselineAcs13.csv");
 		evaluateConfig(atusBaseline, "results/baselineAtus.csv");
@@ -47,85 +53,114 @@ public class CalculateClassificationAccuracies {
 		
 	private static ClassificationConfig[][] adultConfigShmatikovCompare = new ClassificationConfig[][] {
 		new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "workclass", null, null, false),
-				new ClassificationConfig("adult_comma.csv", "workclass", new String[] { "age", "sex", "race" }, null, false),
-				new ClassificationConfig("adult_comma.csv", "workclass", new String[] { "age", "sex", "race", "workclass" }, null, true)
+				new ClassificationConfig("adult_comma.csv", "workclass", null, false, null),
+				new ClassificationConfig("adult_comma.csv", "workclass", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("adult_comma.csv", "workclass", new String[] { "age", "sex", "race", "workclass" }, true, null)
 		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "education", null, null, false),
-				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race" }, null, false),
-				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race", "education" }, null, true)
+				new ClassificationConfig("adult_comma.csv", "education", null, false, null),
+				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race", "education" }, true, null)
 		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "marital-status", null, null, false),
-				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race" }, null, false),
-				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race", "marital-status" }, null, true)
+				new ClassificationConfig("adult_comma.csv", "marital-status", null, false, null),
+				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race", "marital-status" }, true, null)
 		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "occupation", null, null, false),
-				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race" }, null, false),
-				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race", "occupation" }, null, true)
+				new ClassificationConfig("adult_comma.csv", "occupation", null, false, null),
+				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race", "occupation" }, true, null)
 		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "native-country", null, null, false),
-				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race" }, null, false),
-				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race", "native-country" }, null, true)
+				new ClassificationConfig("adult_comma.csv", "native-country", null, false, null),
+				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race", "native-country" }, true, null)
 		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "salary-class", null, null, false),
-				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, null, false),
-				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, null, true)
+				new ClassificationConfig("adult_comma.csv", "salary-class", null, false, null),
+				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, true, null)
 		}
 	};
 	
 	private static ClassificationConfig[] adultConfig = new ClassificationConfig[] {
-			new ClassificationConfig("adult_comma.csv", "workclass", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "education", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "marital-status", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "occupation", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "native-country", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "salary-class", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "race", null, null, false),
-			new ClassificationConfig("adult_comma.csv", "sex", null, null, false)};
+			new ClassificationConfig("adult_comma.csv", "workclass", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "education", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "marital-status", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "occupation", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "native-country", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "salary-class", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "race", null, false, null),
+			new ClassificationConfig("adult_comma.csv", "sex", null, false, null)};
 	private static ClassificationConfig[] adultBaseline = convertToBaselineConfig(adultConfig);
 	
 	private static ClassificationConfig[] acs13Config = new ClassificationConfig[] {
-			new ClassificationConfig("ss13acs_essential_comma.csv", "CIT", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "COW", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "SEX", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "FER", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "DOUT", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "DPHY", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "DREM", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "SCHG", null, null, false),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "SCHL", null, null, false)};
+			new ClassificationConfig("ss13acs_essential_comma.csv", "CIT", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "COW", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "SEX", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "FER", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "DOUT", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "DPHY", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "DREM", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "SCHG", null, false, null),
+			new ClassificationConfig("ss13acs_essential_comma.csv", "SCHL", null, false, null)};
 	private static ClassificationConfig[] acs13Baseline = convertToBaselineConfig(acs13Config);
 
 	private static ClassificationConfig[] atusConfig = new ClassificationConfig[] {
-			new ClassificationConfig("atus_comma.csv", "Region", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Age", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Sex", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Race", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Marital status", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Citizenship status", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Birthplace", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Highest level of school completed", null, null, false),
-			new ClassificationConfig("atus_comma.csv", "Labor force status", null, null, false)};
+			new ClassificationConfig("atus_comma.csv", "Region", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Age", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Sex", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Race", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Marital status", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Citizenship status", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Birthplace", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Highest level of school completed", null, false, null),
+			new ClassificationConfig("atus_comma.csv", "Labor force status", null, false, null)};
 	private static ClassificationConfig[] atusBaseline = convertToBaselineConfig(atusConfig);
 
 	private static ClassificationConfig[] farsConfig = new ClassificationConfig[] {
-			new ClassificationConfig("fars_comma.csv", "irace", null, "4", false),
-			new ClassificationConfig("fars_comma.csv", "isex", null, "4", false),
-			new ClassificationConfig("fars_comma.csv", "ihispanic", null, "4", false),
-			new ClassificationConfig("fars_comma.csv", "istatenum", null, "4", false),
-			new ClassificationConfig("fars_comma.csv", "iinjury", null, "4", false),
-			new ClassificationConfig("fars_comma.csv", "ideathmon", null, "4", false),
-			new ClassificationConfig("fars_comma.csv", "ideathday", null, "4", false)};
+			new ClassificationConfig("fars_comma.csv", "irace", null, false, "4"),
+			new ClassificationConfig("fars_comma.csv", "isex", null, false, "4"),
+			new ClassificationConfig("fars_comma.csv", "ihispanic", null, false, "4"),
+			new ClassificationConfig("fars_comma.csv", "istatenum", null, false, "4"),
+			new ClassificationConfig("fars_comma.csv", "iinjury", null, false, "4"),
+			new ClassificationConfig("fars_comma.csv", "ideathmon", null, false, "4"),
+			new ClassificationConfig("fars_comma.csv", "ideathday", null, false, "4")};
 	private static ClassificationConfig[] farsBaseline = convertToBaselineConfig(farsConfig);
 	
 	private static ClassificationConfig[] ihisConfig = new ClassificationConfig[] {
-			new ClassificationConfig("ihis_comma.csv", "REGION", null, null, false),
-			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, null, false),
-			new ClassificationConfig("ihis_comma.csv", "SEX", null, null, false),
-			new ClassificationConfig("ihis_comma.csv", "RACEA", null, null, false),
-			new ClassificationConfig("ihis_comma.csv", "EDUC", null, null, false),
-			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, null, false)};
+			new ClassificationConfig("ihis_comma.csv", "PERNUM", null, false, "4"),
+//			new ClassificationConfig("ihis_comma.csv", "REGION", null, false, "4"),
+//			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, false, "4"),
+//			new ClassificationConfig("ihis_comma.csv", "SEX", null, false, "4"),
+//			new ClassificationConfig("ihis_comma.csv", "RACEA", null, false, "4"),
+//			new ClassificationConfig("ihis_comma.csv", "EDUC", null, false, "4"),
+/*			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, false, "4")*/};
 	private static ClassificationConfig[] ihisBaseline = convertToBaselineConfig(ihisConfig);
+	
+	
+	private static void getDistinctValues(String inputFileName, String nominalAttributes, String resultFileName) {
+
+		System.out.println("\nPreparing results for " + resultFileName);
+		
+
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(resultFileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		out.println("Attribute;NumDistinctValues");
+		
+		Instances data = loadData(new ClassificationConfig(inputFileName, null, null, false, nominalAttributes));
+
+		for (int i = 0; i < data.numAttributes(); i++) {
+
+			if (data.attribute(i).isNominal()) {
+				int numDistinctValues = data.numDistinctValues(i);
+				out.println(data.attribute(i).name() + ": " + numDistinctValues);
+				System.out.println("NumDistinctValues for attribute '" + data.attribute(i).name() + "': \t" + numDistinctValues);
+			}
+		}
+		out.close();
+	}
 
 	private static void evaluateConfig(ClassificationConfig[] configs, String resultFileName) {
 		
@@ -155,7 +190,7 @@ public class CalculateClassificationAccuracies {
 					configArray[i].getInputFileName(),
 					configArray[i].getWorkloadAttribute(),
 					new String[] { configArray[i].getWorkloadAttribute() },
-					configArray[i].getNominalAttributes(), true);
+					true, configArray[i].getNominalAttributes());
 		}
 		return baselineConfig;
 	}

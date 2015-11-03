@@ -7,12 +7,19 @@ public class ClassificationConfig {
 	private final String nominalAttributes;
 	private final boolean invertedSelection;
 	
-	public ClassificationConfig (String fileName, String workloadAttribute, String[] excludedAttributes, String nominalAttributes, boolean invertedSelection) {
+	/**
+	 * @param fileName
+	 * @param workloadAttribute
+	 * @param excludedAttributes
+	 * @param invertSelection
+	 * @param nominalAttributes comma-separated string with attribute indices <B>starting at 1</BR>
+	 */
+	public ClassificationConfig (String fileName, String workloadAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
 		this.fileName = fileName;
 		this.workloadAttribute = workloadAttribute;
 		this.excludedAttributes = excludedAttributes;
 		this.nominalAttributes = nominalAttributes;
-		this.invertedSelection = invertedSelection;
+		this.invertedSelection = invertSelection;
 	}
 
 	public String getInputFileName() {

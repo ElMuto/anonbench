@@ -40,3 +40,11 @@
 /classificationResultsAtus.csv
 /classificationResultsCup.csv
 /classificationResultsFars.csv
+/baselineIhis.csv
+/classificationResultsAcs13.csv
+/classificationResultsAdult.csv
+/numDistinctValuesAcs13.csv
+/numDistinctValuesAdult.csv
+/numDistinctValuesAtus.csv
+/numDistinctValuesFars.csv
+/numDistinctValuesIhis.csv
