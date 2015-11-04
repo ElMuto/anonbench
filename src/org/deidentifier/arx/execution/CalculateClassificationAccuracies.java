@@ -23,11 +23,11 @@ public class CalculateClassificationAccuracies {
 
 	public static void main(String[] args) {
 
-		getDistinctValues("adult_comma.csv",             null, "results/numDistinctValuesAdult.csv");
-		getDistinctValues("ss13acs_essential_comma.csv", null, "results/numDistinctValuesAcs13.csv");
-		getDistinctValues("atus_comma.csv",              null, "results/numDistinctValuesAtus.csv");
-		getDistinctValues("fars_comma.csv",               "4", "results/numDistinctValuesFars.csv");
-		getDistinctValues("ihis_comma.csv",               "4", "results/numDistinctValuesIhis.csv");
+//		getDistinctValues("adult_comma.csv",             null, "results/numDistinctValuesAdult.csv");
+//		getDistinctValues("ss13acs_essential_comma.csv", null, "results/numDistinctValuesAcs13.csv");
+//		getDistinctValues("atus_comma.csv",              null, "results/numDistinctValuesAtus.csv");
+//		getDistinctValues("fars_comma.csv",               "4", "results/numDistinctValuesFars.csv");
+//		getDistinctValues("ihis_comma.csv",               "4", "results/numDistinctValuesIhis.csv");
 
 		evaluateConfig(adultBaseline, "results/baselineAdult.csv");
 		evaluateConfig(acs13Baseline, "results/baselineAcs13.csv");
@@ -183,15 +183,20 @@ public class CalculateClassificationAccuracies {
 
 	private static ClassificationConfig[] convertToBaselineConfig(ClassificationConfig[] configArray) {
 		
-		ClassificationConfig[] baselineConfig = new ClassificationConfig[configArray.length];
+		ClassificationConfig[] baselineConfigArray = new ClassificationConfig[configArray.length];
 		
 		for (int i = 0; i < configArray.length; i++) {
-			baselineConfig[i] = new ClassificationConfig(
-					configArray[i].getInputFileName(),
-					configArray[i].getWorkloadAttribute(),
-					new String[] { configArray[i].getWorkloadAttribute() },
-					true, configArray[i].getNominalAttributes());
+			baselineConfigArray[i] = convertToBaselineConfig(configArray[i]);
 		}
+		return baselineConfigArray;
+	}
+
+	private static ClassificationConfig convertToBaselineConfig(ClassificationConfig classificationConfig) {
+		ClassificationConfig baselineConfig = new ClassificationConfig(
+				classificationConfig.getInputFileName(),
+				classificationConfig.getWorkloadAttribute(),
+				new String[] { classificationConfig.getWorkloadAttribute() },
+				true, classificationConfig.getNominalAttributes());
 		return baselineConfig;
 	}
 
