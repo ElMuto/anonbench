@@ -126,12 +126,12 @@ public class CalculateClassificationAccuracies {
 	
 	private static ClassificationConfig[] ihisConfig = new ClassificationConfig[] {
 			new ClassificationConfig("ihis_comma.csv", "PERNUM", null, false, "4"),
-//			new ClassificationConfig("ihis_comma.csv", "REGION", null, false, "4"),
-//			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, false, "4"),
-//			new ClassificationConfig("ihis_comma.csv", "SEX", null, false, "4"),
-//			new ClassificationConfig("ihis_comma.csv", "RACEA", null, false, "4"),
-//			new ClassificationConfig("ihis_comma.csv", "EDUC", null, false, "4"),
-/*			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, false, "4")*/};
+			new ClassificationConfig("ihis_comma.csv", "REGION", null, false, "4"),
+			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, false, "4"),
+			new ClassificationConfig("ihis_comma.csv", "SEX", null, false, "4"),
+			new ClassificationConfig("ihis_comma.csv", "RACEA", null, false, "4"),
+			new ClassificationConfig("ihis_comma.csv", "EDUC", null, false, "4"),
+			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, false, "4")};
 	private static ClassificationConfig[] ihisBaseline = convertToBaselineConfig(ihisConfig);
 	
 	
