@@ -23,11 +23,11 @@ public class CalculateClassificationAccuracies {
 
 	public static void main(String[] args) {
 
-//		getDistinctValues("adult_comma.csv",             null, "results/numDistinctValuesAdult.csv");
-//		getDistinctValues("ss13acs_essential_comma.csv", null, "results/numDistinctValuesAcs13.csv");
-//		getDistinctValues("atus_comma.csv",              null, "results/numDistinctValuesAtus.csv");
-//		getDistinctValues("fars_comma.csv",               "4", "results/numDistinctValuesFars.csv");
-//		getDistinctValues("ihis_comma.csv",               "4", "results/numDistinctValuesIhis.csv");
+		getDistinctValues("adult_comma.csv",             null, "results/numDistinctValuesAdult.csv");
+		getDistinctValues("ss13acs_essential_comma.csv", null, "results/numDistinctValuesAcs13.csv");
+		getDistinctValues("atus_comma.csv",              null, "results/numDistinctValuesAtus.csv");
+		getDistinctValues("fars_comma.csv",               "4", "results/numDistinctValuesFars.csv");
+		getDistinctValues("ihis_comma.csv",               "1,4", "results/numDistinctValuesIhis.csv");
 
 		evaluateConfig(adultBaseline, "results/baselineAdult.csv");
 		evaluateConfig(acs13Baseline, "results/baselineAcs13.csv");
@@ -125,13 +125,14 @@ public class CalculateClassificationAccuracies {
 	private static ClassificationConfig[] farsBaseline = convertToBaselineConfig(farsConfig);
 	
 	private static ClassificationConfig[] ihisConfig = new ClassificationConfig[] {
-			new ClassificationConfig("ihis_comma.csv", "PERNUM", null, false, "4"),
-			new ClassificationConfig("ihis_comma.csv", "REGION", null, false, "4"),
-			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, false, "4"),
-			new ClassificationConfig("ihis_comma.csv", "SEX", null, false, "4"),
-			new ClassificationConfig("ihis_comma.csv", "RACEA", null, false, "4"),
-			new ClassificationConfig("ihis_comma.csv", "EDUC", null, false, "4"),
-			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, false, "4")};
+			new ClassificationConfig("ihis_comma.csv", "YEAR", null, false, "1,4"),   // year and pernum are ordinal -> mapped to nominal
+			new ClassificationConfig("ihis_comma.csv", "PERNUM", null, false, "1,4"),
+			new ClassificationConfig("ihis_comma.csv", "REGION", null, false, "1,4"),
+			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, false, "1,4"),
+			new ClassificationConfig("ihis_comma.csv", "SEX", null, false, "1,4"),
+			new ClassificationConfig("ihis_comma.csv", "RACEA", null, false, "1,4"),
+			new ClassificationConfig("ihis_comma.csv", "EDUC", null, false, "1,4"),
+			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, false, "1,4")};
 	private static ClassificationConfig[] ihisBaseline = convertToBaselineConfig(ihisConfig);
 	
 	
