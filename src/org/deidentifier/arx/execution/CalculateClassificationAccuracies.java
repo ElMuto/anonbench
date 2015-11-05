@@ -7,7 +7,6 @@ import weka.filters.unsupervised.attribute.Remove;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Random;
 
 import weka.classifiers.Evaluation;
@@ -22,186 +21,65 @@ public class CalculateClassificationAccuracies {
 
 
 	public static void main(String[] args) {
+		evaluateConfig(completeCompare, "results/CompleteComparison.csv", new String[] {
+				"dataset-name",
+				"attribute-name",
+				"PA-max",
+				"PA-min",
+				"PA-IS-only",
+				"PA-QI-only"
+		});
 
-		getDistinctValues("adult_comma.csv",             null, "results/numDistinctValuesAdult.csv");
-		getDistinctValues("ss13acs_essential_comma.csv", null, "results/numDistinctValuesAcs13.csv");
-		getDistinctValues("atus_comma.csv",              null, "results/numDistinctValuesAtus.csv");
-		getDistinctValues("fars_comma.csv",               "4", "results/numDistinctValuesFars.csv");
-		getDistinctValues("ihis_comma.csv",               "1,4", "results/numDistinctValuesIhis.csv");
-
-		evaluateConfig(adultBaseline, "results/baselineAdult.csv");
-		evaluateConfig(acs13Baseline, "results/baselineAcs13.csv");
-		evaluateConfig(atusBaseline, "results/baselineAtus.csv");
-		evaluateConfig(farsBaseline, "results/baselineFars.csv");
-		evaluateConfig(ihisBaseline, "results/baselineIhis.csv");
-				
-		evaluateConfig(adultConfig, "results/classificationResultsAdult.csv");
-		evaluateConfig(acs13Config, "results/classificationResultsAcs13.csv");
-		evaluateConfig(atusConfig, "results/classificationResultsAtus.csv");
-		evaluateConfig(farsConfig, "results/classificationResultsFars.csv");
-		evaluateConfig(ihisConfig, "results/classificationResultsIhis.csv");
-		
-		evaluateConfig(adultConfigShmatikovCompare, "results/ShmatikovComparison.csv");
-		
 	}
-	
+
 	private enum Classifier {
 		J48,
 		RandomForest,
 		NaiveBayes
 	}
-		
-	private static ClassificationConfig[][] adultConfigShmatikovCompare = new ClassificationConfig[][] {
+
+	private static ClassificationConfig[][] completeCompare = new ClassificationConfig[][] {
 		new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "workclass", null, false, null),
-				new ClassificationConfig("adult_comma.csv", "workclass", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("adult_comma.csv", "workclass", new String[] { "age", "sex", "race", "workclass" }, true, null)
-		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "education", null, false, null),
-				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race", "education" }, true, null)
-		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "marital-status", null, false, null),
-				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race", "marital-status" }, true, null)
-		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "occupation", null, false, null),
-				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race", "occupation" }, true, null)
-		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "native-country", null, false, null),
-				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race", "native-country" }, true, null)
-		}, new ClassificationConfig[] {
-				new ClassificationConfig("adult_comma.csv", "salary-class", null, false, null),
-				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, true, null)
-		}
+				new ClassificationConfig("Adult", "adult_comma.csv", "workclass", null, false, null),
+				new ClassificationConfig("Adult", "adult_comma.csv", "workclass", null, false, null).asBaselineConfig(),
+				new ClassificationConfig("Adult", "adult_comma.csv", "workclass", new String[] { "age", "sex", "race" }, false, null),
+				new ClassificationConfig("Adult", "adult_comma.csv", "workclass", new String[] { "age", "sex", "race", "workclass" }, true, null)
+		}//, new ClassificationConfig[] {
+//				new ClassificationConfig("adult_comma.csv", "education", null, false, null),
+//				new ClassificationConfig("adult_comma.csv", "education", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("adult_comma.csv", "education", new String[] { "age", "sex", "race", "education" }, true, null)
+//		}, new ClassificationConfig[] {
+//				new ClassificationConfig("adult_comma.csv", "marital-status", null, false, null),
+//				new ClassificationConfig("adult_comma.csv", "marital-status", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("adult_comma.csv", "marital-status", new String[] { "age", "sex", "race", "marital-status" }, true, null)
+//		}, new ClassificationConfig[] {
+//				new ClassificationConfig("adult_comma.csv", "occupation", null, false, null),
+//				new ClassificationConfig("adult_comma.csv", "occupation", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("adult_comma.csv", "occupation", new String[] { "age", "sex", "race", "occupation" }, true, null)
+//		}, new ClassificationConfig[] {
+//				new ClassificationConfig("adult_comma.csv", "native-country", null, false, null),
+//				new ClassificationConfig("adult_comma.csv", "native-country", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("adult_comma.csv", "native-country", new String[] { "age", "sex", "race", "native-country" }, true, null)
+//		}, new ClassificationConfig[] {
+//				new ClassificationConfig("adult_comma.csv", "salary-class", null, false, null),
+//				new ClassificationConfig("adult_comma.csv", "salary-class", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, true, null)
+//		}
 	};
 	
-	private static ClassificationConfig[] adultConfig = new ClassificationConfig[] {
-			new ClassificationConfig("adult_comma.csv", "workclass", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "education", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "marital-status", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "occupation", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "native-country", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "salary-class", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "race", null, false, null),
-			new ClassificationConfig("adult_comma.csv", "sex", null, false, null)};
-	private static ClassificationConfig[] adultBaseline = convertToBaselineConfig(adultConfig);
-	
-	private static ClassificationConfig[] acs13Config = new ClassificationConfig[] {
-			new ClassificationConfig("ss13acs_essential_comma.csv", "CIT", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "COW", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "SEX", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "FER", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "DOUT", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "DPHY", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "DREM", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "SCHG", null, false, null),
-			new ClassificationConfig("ss13acs_essential_comma.csv", "SCHL", null, false, null)};
-	private static ClassificationConfig[] acs13Baseline = convertToBaselineConfig(acs13Config);
-
-	private static ClassificationConfig[] atusConfig = new ClassificationConfig[] {
-			new ClassificationConfig("atus_comma.csv", "Region", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Age", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Sex", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Race", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Marital status", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Citizenship status", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Birthplace", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Highest level of school completed", null, false, null),
-			new ClassificationConfig("atus_comma.csv", "Labor force status", null, false, null)};
-	private static ClassificationConfig[] atusBaseline = convertToBaselineConfig(atusConfig);
-
-	private static ClassificationConfig[] farsConfig = new ClassificationConfig[] {
-			new ClassificationConfig("fars_comma.csv", "irace", null, false, "4"),
-			new ClassificationConfig("fars_comma.csv", "isex", null, false, "4"),
-			new ClassificationConfig("fars_comma.csv", "ihispanic", null, false, "4"),
-			new ClassificationConfig("fars_comma.csv", "istatenum", null, false, "4"),
-			new ClassificationConfig("fars_comma.csv", "iinjury", null, false, "4"),
-			new ClassificationConfig("fars_comma.csv", "ideathmon", null, false, "4"),
-			new ClassificationConfig("fars_comma.csv", "ideathday", null, false, "4")};
-	private static ClassificationConfig[] farsBaseline = convertToBaselineConfig(farsConfig);
-	
-	private static ClassificationConfig[] ihisConfig = new ClassificationConfig[] {
-			new ClassificationConfig("ihis_comma.csv", "YEAR", null, false, "1,4"),   // year and pernum are ordinal -> mapped to nominal
-			new ClassificationConfig("ihis_comma.csv", "PERNUM", null, false, "1,4"),
-			new ClassificationConfig("ihis_comma.csv", "REGION", null, false, "1,4"),
-			new ClassificationConfig("ihis_comma.csv", "MARSTAT", null, false, "1,4"),
-			new ClassificationConfig("ihis_comma.csv", "SEX", null, false, "1,4"),
-			new ClassificationConfig("ihis_comma.csv", "RACEA", null, false, "1,4"),
-			new ClassificationConfig("ihis_comma.csv", "EDUC", null, false, "1,4"),
-			new ClassificationConfig("ihis_comma.csv", "QUARTER", null, false, "1,4")};
-	private static ClassificationConfig[] ihisBaseline = convertToBaselineConfig(ihisConfig);
-	
-	
-	private static void getDistinctValues(String inputFileName, String nominalAttributes, String resultFileName) {
-
-		System.out.println("\nPreparing results for " + resultFileName);
+	private static int getNumDistinctValues(String datasetName, String inputFileName, String nominalAttributes, String attributeName) {
 		
-
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter(resultFileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		out.println("Attribute;NumDistinctValues");
-		
-		Instances data = loadData(new ClassificationConfig(inputFileName, null, null, false, nominalAttributes));
-
-		for (int i = 0; i < data.numAttributes(); i++) {
-
-			if (data.attribute(i).isNominal()) {
-				int numDistinctValues = data.numDistinctValues(i);
-				out.println(data.attribute(i).name() + ": " + numDistinctValues);
-				System.out.println("NumDistinctValues for attribute '" + data.attribute(i).name() + "': \t" + numDistinctValues);
-			}
-		}
-		out.close();
+		Instances data = loadData(new ClassificationConfig(datasetName, inputFileName, null, null, false, nominalAttributes));
+				
+		return data.numDistinctValues(data.attribute(attributeName));
 	}
 
-	private static void evaluateConfig(ClassificationConfig[] configs, String resultFileName) {
-		
-		System.out.println("\nPreparing results for " + resultFileName);
-		
-		double[] results = new double[configs.length];
-		
-		for (int i = 0; i < configs.length; i++) {
-
-			Instances data = loadData(configs[i]);
-			
-			results[i] = getClassificationAccuracyFor(data, configs[i].getWorkloadAttribute(), Classifier.J48).pctCorrect();
-			
-			System.out.printf("Accuracy for attribute '" + configs[i].getWorkloadAttribute() + "': \t%.2f\n", results[i]);
-			
-		}
-		
-		writeResultsToFile(configs, results, resultFileName);
-	}
-
-	private static ClassificationConfig[] convertToBaselineConfig(ClassificationConfig[] configArray) {
-		
-		ClassificationConfig[] baselineConfigArray = new ClassificationConfig[configArray.length];
-		
-		for (int i = 0; i < configArray.length; i++) {
-			baselineConfigArray[i] = convertToBaselineConfig(configArray[i]);
-		}
-		return baselineConfigArray;
-	}
-
-	private static ClassificationConfig convertToBaselineConfig(ClassificationConfig classificationConfig) {
-		ClassificationConfig baselineConfig = new ClassificationConfig(
-				classificationConfig.getInputFileName(),
-				classificationConfig.getWorkloadAttribute(),
-				new String[] { classificationConfig.getWorkloadAttribute() },
-				true, classificationConfig.getNominalAttributes());
-		return baselineConfig;
-	}
-
-	private static void evaluateConfig(ClassificationConfig[][] configs, String fileName) {
+	private static void evaluateConfig(ClassificationConfig[][] configs, String fileName, String[] header) {
 		
 		double[][] results = new double[configs.length][configs[0].length];
 		
@@ -218,7 +96,7 @@ public class CalculateClassificationAccuracies {
 			}
 		}
 		
-		writeResultsToFile(configs, results, fileName);
+		writeResultsToFile(configs, results, fileName, header);
 		
 	}
 	
@@ -332,41 +210,27 @@ public class CalculateClassificationAccuracies {
 		return attNumArray;
 	}
 	
-	private static void writeResultsToFile(ClassificationConfig[][] configs, double[][] results, String fileName) {
+	private static void writeResultsToFile(ClassificationConfig[][] configs, double[][] results, String fileName, String[] header) {
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter(fileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		out.print("Attribute");
-		for (int j = 0; j < configs[0].length; j++) {
-			out.print(";" + Arrays.toString(configs[0][j].getExcludedAttributes()));
+		out.print(header[0]);
+		for (int j = 1; j < header.length; j++) {
+			out.print(";" + header[j]);
 		}
+		
 		out.print("\n");
 		for (int i = 0; i < configs.length; i ++) {
+			out.print(configs[i][0].getDatasetName() + ";");
 			out.print(configs[i][0].getWorkloadAttribute());
-			for (int j = 0; j < configs[i].length; j++) {
+			for (int j = 0; j < results[i].length; j++) {
 				out.printf(";%.2f", results[i][j]);
 			}
+			out.print(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute()));
 			out.print("\n");
-		}
-		
-		out.close();
-	}
-	
-	private static void writeResultsToFile(ClassificationConfig[] configs, double[] results, String fileName) {
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter(fileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		out.println("Attribute;Accuracy");
-		for (int i = 0; i < configs.length; i ++) {
-			out.printf(configs[i].getWorkloadAttribute() + ";%.2f\n", results[i]);
 		}
 		
 		out.close();

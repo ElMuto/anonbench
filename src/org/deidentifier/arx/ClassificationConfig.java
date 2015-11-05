@@ -1,6 +1,7 @@
 package org.deidentifier.arx;
 
 public class ClassificationConfig {
+	private final String datasetName;
 	private final String fileName;
 	private final String workloadAttribute;
 	private final String[] excludedAttributes;
@@ -14,12 +15,17 @@ public class ClassificationConfig {
 	 * @param invertSelection
 	 * @param nominalAttributes comma-separated string with attribute indices <B>starting at 1</BR>
 	 */
-	public ClassificationConfig (String fileName, String workloadAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
+	public ClassificationConfig (String datasetName, String fileName, String workloadAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
+		this.datasetName = datasetName;
 		this.fileName = fileName;
 		this.workloadAttribute = workloadAttribute;
 		this.excludedAttributes = excludedAttributes;
 		this.nominalAttributes = nominalAttributes;
 		this.invertedSelection = invertSelection;
+	}
+	
+	public String getDatasetName() {
+		return datasetName;
 	}
 
 	public String getInputFileName() {
@@ -40,5 +46,14 @@ public class ClassificationConfig {
 
 	public boolean isInvertedSelection() {
 		return invertedSelection;
+	}
+	
+	public ClassificationConfig asBaselineConfig() {
+		return new ClassificationConfig(
+				getDatasetName(),
+				getInputFileName(),
+				getWorkloadAttribute(),
+				new String[] { getWorkloadAttribute() },
+				true, getNominalAttributes());
 	}
 }
