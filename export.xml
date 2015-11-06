@@ -77,8 +77,8 @@
       <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
       <manifest>
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.CalculateClassificationAccuracies" /-->
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_Multi" />
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CalculateClassificationAccuracies" />
+    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.Exec_Multi" /-->
       </manifest>
     </jar>
     <delete dir="build" failonerror="true" />
