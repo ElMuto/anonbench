@@ -27,6 +27,7 @@ public class CalculateClassificationAccuracies {
 				"Num-distinct-attributes",
 				"PA-max",
 				"PA-min",
+				"PA-gain",
 				"PA-IS-only",
 				"PA-QI-only",
 		});
@@ -43,14 +44,15 @@ public class CalculateClassificationAccuracies {
 	private static String adultBsOccInput         = "adult_comma.csv";
 	private static String[] adultBsOccQis         = new String[] { "age", "sex", "race" };
 	private static String[] adultBsOccClassifiers = new String[] {
-//			"workclass",
-//			"education",
-//			"marital-status",
-//			"occupation",
-//			"native-country",
+			"workclass",
+			"education",
+			"marital-status",
+			"occupation",
+			"native-country",
 			"salary-class",
+			"race",
 			"sex",
-			"race"};
+			};
 	private static String adultBsOccNominalAttrbs  = null;
 	
 	private static ClassificationConfig[][] adult_bs_occ_config_arr = buildAnalysisConfigurations(adultBsOccId, adultBsOccInput, adultBsOccQis, adultBsOccClassifiers, adultBsOccNominalAttrbs);
@@ -127,11 +129,19 @@ public class CalculateClassificationAccuracies {
 			
 			for (int j = 0; j < configs[i].length; j++) {
 
-				Instances data = loadData(configs[i][j]);
-				
-				out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
-				
-				System.out.printf("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "': \t%.4f\n", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
+				if (configs[i][j] != null ) {
+					
+					Instances data = loadData(configs[i][j]);
+
+					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
+
+					System.out.printf("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "': \t%.4f\n", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
+
+				} else {
+					
+					out.print(";");
+					
+				}
 				
 				out.flush();
 			}
@@ -179,7 +189,7 @@ public class CalculateClassificationAccuracies {
 			
 		}
 		
-		return null;
+		return configArray;
 	}
 
 
