@@ -47,59 +47,71 @@ public class CalculateClassificationAccuracies {
 				new ClassificationConfig("Adult", "adult_comma.csv", "workclass", new String[] { "age", "sex", "race", "workclass" }, true, null)
 		}, 
 		new ClassificationConfig[] {
-				new ClassificationConfig("Adult",  "adult_comma.csv", "education", null, false, null),
+				new ClassificationConfig("Adult", "adult_comma.csv", "education", null, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "education", null, false, null).asBaselineConfig(),
 				new ClassificationConfig("Adult", "adult_comma.csv", "education", new String[] { "age", "sex", "race" }, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "education", new String[] { "age", "sex", "race", "education" }, true, null)
-		}, new ClassificationConfig[] {
+		},
+		new ClassificationConfig[] {
 				new ClassificationConfig("Adult", "adult_comma.csv", "marital-status", null, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "marital-status", null, false, null).asBaselineConfig(),
 				new ClassificationConfig("Adult", "adult_comma.csv", "marital-status", new String[] { "age", "sex", "race" }, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "marital-status", new String[] { "age", "sex", "race", "marital-status" }, true, null)
-		}, new ClassificationConfig[] {
+		},
+		new ClassificationConfig[] {
 				new ClassificationConfig("Adult", "adult_comma.csv", "occupation", null, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "occupation", null, false, null).asBaselineConfig(),
 				new ClassificationConfig("Adult", "adult_comma.csv", "occupation", new String[] { "age", "sex", "race" }, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "occupation", new String[] { "age", "sex", "race", "occupation" }, true, null)
-		}, new ClassificationConfig[] {
+		},
+		new ClassificationConfig[] {
 				new ClassificationConfig("Adult", "adult_comma.csv", "native-country", null, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "native-country", null, false, null).asBaselineConfig(),
 				new ClassificationConfig("Adult", "adult_comma.csv", "native-country", new String[] { "age", "sex", "race" }, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "native-country", new String[] { "age", "sex", "race", "native-country" }, true, null)
-		}, new ClassificationConfig[] {
+		},
+		new ClassificationConfig[] {
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", null, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", null, false, null).asBaselineConfig(),
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, true, null)
 		}
 	};
-	
-	private static int getNumDistinctValues(String datasetName, String inputFileName, String nominalAttributes, String attributeName) {
-		
-		Instances data = loadData(new ClassificationConfig(datasetName, inputFileName, null, null, false, nominalAttributes));
-				
-		return data.numDistinctValues(data.attribute(attributeName));
-	}
 
 	private static void evaluateConfig(ClassificationConfig[][] configs, String fileName, String[] header) {
 		
-		double[][] results = new double[configs.length][configs[0].length + 1];
-		
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.print(header[0]);
+		for (int j = 1; j < header.length; j++) {
+			out.print(";" + header[j]);
+		}
+		out.print("\n");
+				
 		for (int i = 0; i < configs.length; i++) {
+			
+			out.print(configs[i][0].getDatasetName() + ";");
+			
+			out.print(configs[i][0].getWorkloadAttribute());
 			
 			for (int j = 0; j < configs[i].length; j++) {
 
 				Instances data = loadData(configs[i][j]);
 				
-				results[i][j] = getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect();
+				out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
 				
-				System.out.printf("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "': \t%.4f\n", results[i][j]);
+				System.out.printf("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "': \t%.4f\n", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
 				
+				out.flush();
 			}
-			results[i][configs[0].length] = Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute()));
+			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute())) + "\n");
 		}
-		
-		writeResultsToFile(configs, results, fileName, header);
+
+		out.close();
 		
 	}
 	
@@ -213,28 +225,10 @@ public class CalculateClassificationAccuracies {
 		return attNumArray;
 	}
 	
-	private static void writeResultsToFile(ClassificationConfig[][] configs, double[][] results, String fileName, String[] header) {
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter(fileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		out.print(header[0]);
-		for (int j = 1; j < header.length; j++) {
-			out.print(";" + header[j]);
-		}
+	private static int getNumDistinctValues(String datasetName, String inputFileName, String nominalAttributes, String attributeName) {
 		
-		out.print("\n");
-		for (int i = 0; i < results.length; i ++) {
-			out.print(configs[i][0].getDatasetName() + ";");
-			out.print(configs[i][0].getWorkloadAttribute());
-			for (int j = 0; j < results[i].length; j++) {
-				out.printf(";%.2f", results[i][j]);
-			}
-			out.print("\n");
-		}
-		
-		out.close();
+		Instances data = loadData(new ClassificationConfig(datasetName, inputFileName, null, null, false, nominalAttributes));
+				
+		return data.numDistinctValues(data.attribute(attributeName));
 	}
 }
