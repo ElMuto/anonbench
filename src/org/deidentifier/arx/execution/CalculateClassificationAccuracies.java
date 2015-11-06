@@ -75,7 +75,25 @@ public class CalculateClassificationAccuracies {
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", null, false, null).asBaselineConfig(),
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, false, null),
 				new ClassificationConfig("Adult", "adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, true, null)
-		}
+		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult", "adult_comma.csv", "age", null, false, null),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "age", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "age", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "age", new String[] { "age", "sex", "race", "occupation" }, true, null)
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult", "adult_comma.csv", "race", null, false, null),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "race", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "race", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "race", new String[] { "age", "sex", "race", "native-country" }, true, null)
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult", "adult_comma.csv", "sex", null, false, null),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "sex", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "sex", new String[] { "age", "sex", "race" }, false, null),
+//				new ClassificationConfig("Adult", "adult_comma.csv", "sex", new String[] { "age", "sex", "race", "salary-class" }, true, null)
+//		}
 	};
 
 	private static void evaluateConfig(ClassificationConfig[][] configs, String fileName, String[] header) {

@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_CCA_IHIS_only
+java -Xmx5G -jar jars/pc-bench.jar -D_CCA_d381ef049f855418af859a690ffb2365954deb59
