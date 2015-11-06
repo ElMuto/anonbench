@@ -56,4 +56,24 @@ public class ClassificationConfig {
 				new String[] { getWorkloadAttribute() },
 				true, getNominalAttributes());
 	}
+	
+	public ClassificationConfig invertQIs() {
+		
+		String[] inversionArray = new String[getExcludedAttributes().length +1];
+		
+		for (int i = 0; i < getExcludedAttributes().length; i++) {
+			
+			inversionArray[i] = getExcludedAttributes()[i];
+			
+		}
+		
+		inversionArray[getExcludedAttributes().length] = getWorkloadAttribute();
+		
+		return new ClassificationConfig(
+				getDatasetName(),
+				getInputFileName(),
+				getWorkloadAttribute(),
+				inversionArray,
+				true, getNominalAttributes());
+	}
 }

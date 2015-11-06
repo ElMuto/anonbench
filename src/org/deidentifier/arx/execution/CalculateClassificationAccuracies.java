@@ -21,14 +21,14 @@ public class CalculateClassificationAccuracies {
 
 
 	public static void main(String[] args) {
-		evaluateConfig(completeCompare, "results/CompleteComparison.csv", new String[] {
+		evaluateConfig(adult_bs_occ_config_arr, "results/CompleteComparison.csv", new String[] {
 				"dataset-name",
 				"attribute-name",
+				"Num-distinct-attributes",
 				"PA-max",
 				"PA-min",
 				"PA-IS-only",
 				"PA-QI-only",
-				"Num-distinct-attributes"
 		});
 
 	}
@@ -39,44 +39,68 @@ public class CalculateClassificationAccuracies {
 		NaiveBayes
 	}
 
-	private static ClassificationConfig[][] completeCompare = new ClassificationConfig[][] {
-		new ClassificationConfig[] {
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "workclass", null, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "workclass", null, false, null).asBaselineConfig(),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "workclass", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "workclass", new String[] { "age", "sex", "race", "workclass" }, true, null)
-		}, 
-		new ClassificationConfig[] {
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "education", null, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "education", null, false, null).asBaselineConfig(),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "education", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "education", new String[] { "age", "sex", "race", "education" }, true, null)
-		},
-		new ClassificationConfig[] {
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "marital-status", null, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "marital-status", null, false, null).asBaselineConfig(),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "marital-status", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "marital-status", new String[] { "age", "sex", "race", "marital-status" }, true, null)
-		},
-		new ClassificationConfig[] {
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "occupation", null, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "occupation", null, false, null).asBaselineConfig(),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "occupation", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "occupation", new String[] { "age", "sex", "race", "occupation" }, true, null)
-		},
-		new ClassificationConfig[] {
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "native-country", null, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "native-country", null, false, null).asBaselineConfig(),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "native-country", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "native-country", new String[] { "age", "sex", "race", "native-country" }, true, null)
-		},
-		new ClassificationConfig[] {
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "salary-class", null, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "salary-class", null, false, null).asBaselineConfig(),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "salary-class", new String[] { "age", "sex", "race" }, false, null),
-				new ClassificationConfig("Adult_BS", "adult_comma.csv", "salary-class", new String[] { "age", "sex", "race", "salary-class" }, true, null)
-		},
-	};
+	private static String adultBsOccId            = "Adult BS Occupation";
+	private static String adultBsOccInput         = "adult_comma.csv";
+	private static String[] adultBsOccQis         = new String[] { "age", "sex", "race" };
+	private static String[] adultBsOccClassifiers = new String[] {
+//			"workclass",
+//			"education",
+//			"marital-status",
+//			"occupation",
+//			"native-country",
+			"salary-class",
+			"sex",
+			"race"};
+	private static String adultBsOccNominalAttrbs  = null;
+	
+	private static ClassificationConfig[][] adult_bs_occ_config_arr = buildAnalysisConfigurations(adultBsOccId, adultBsOccInput, adultBsOccQis, adultBsOccClassifiers, adultBsOccNominalAttrbs);
+
+//	private static ClassificationConfig[][] completeCompare = new ClassificationConfig[][] {
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", adult_bs_occ_qis, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", adult_bs_occ_qis, false, null).invertQIs(),
+//		}, 
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "education", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "education", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "education", adult_bs_occ_qis, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "education", adult_bs_occ_qis, false, null).invertQIs(),
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "marital-status", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "marital-status", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "marital-status", adult_bs_occ_qis, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "marital-status", adult_bs_occ_qis, false, null).invertQIs(),
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "occupation", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "occupation", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "occupation", adult_bs_occ_qis, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "occupation", adult_bs_occ_qis, false, null).invertQIs(),
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "native-country", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "native-country", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "native-country", adult_bs_occ_qis, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "native-country", adult_bs_occ_qis, false, null).invertQIs(),
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "salary-class", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "salary-class", null, false, null).asBaselineConfig(),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "salary-class", adultBsOccQis, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "salary-class", adultBsOccQis, false, null).invertQIs(),
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "sex", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "sex", null, false, null).asBaselineConfig()
+//		},
+//		new ClassificationConfig[] {
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "race", null, false, null),
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "race", null, false, null).asBaselineConfig()
+//		},
+//	};
 
 	private static void evaluateConfig(ClassificationConfig[][] configs, String fileName, String[] header) {
 		
@@ -97,6 +121,9 @@ public class CalculateClassificationAccuracies {
 			out.print(configs[i][0].getDatasetName() + ";");
 			
 			out.print(configs[i][0].getWorkloadAttribute());
+
+			System.out.println("Calculating number of distinct attributes for '" + configs[i][0].getWorkloadAttribute() + "'");
+			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute())));
 			
 			for (int j = 0; j < configs[i].length; j++) {
 
@@ -108,7 +135,9 @@ public class CalculateClassificationAccuracies {
 				
 				out.flush();
 			}
-			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute())) + "\n");
+			
+			out.print("\n");
+			
 		}
 
 		out.close();
@@ -116,6 +145,56 @@ public class CalculateClassificationAccuracies {
 	}
 	
 	
+	private static ClassificationConfig[][] buildAnalysisConfigurations(String id, String inputFileName,
+			String[] qis, String[] classifiers, String nominalAttributes) {
+
+		int numClassifiers = classifiers.length;
+		
+		ClassificationConfig[][] configArray = new ClassificationConfig[numClassifiers][4];
+		
+		for (int i = 0; i < numClassifiers; i++) {
+			
+			configArray[i][0] = new ClassificationConfig(id, inputFileName, classifiers[i], null, false, nominalAttributes);
+//			new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", null, false, null),
+			
+			configArray[i][1] = new ClassificationConfig(id, inputFileName, classifiers[i], null, false, nominalAttributes).asBaselineConfig();
+//			new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", null, false, null).asBaselineConfig(),
+			
+			if (!isClassifierQi(classifiers[i], qis)) {
+				
+				configArray[i][2] = new ClassificationConfig(id, inputFileName, classifiers[i], qis, false, nominalAttributes);
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", adult_bs_occ_qis, false, null),
+				
+				
+				configArray[i][3] = new ClassificationConfig(id, inputFileName, classifiers[i], qis, false, nominalAttributes).invertQIs();
+//				new ClassificationConfig("Adult BS Occupation", "adult_comma.csv", "workclass", adult_bs_occ_qis, false, null).invertQIs(),
+				
+			} else {
+				
+				configArray[i][2] = null;
+				
+				configArray[i][3] = null;
+				
+			}
+			
+		}
+		
+		return null;
+	}
+
+
+	private static boolean isClassifierQi(String classifier, String[] qis) {
+		
+		for (int i = 0; i < qis.length; i++) {
+			
+			if (classifier.equals(qis[i])) return true;
+			
+		}
+		
+		return false;
+	}
+
+
 	/**
 	 * @param classificationConfig TODO
 	 * @return the Weka-dataset containing all but the filtered attributes
