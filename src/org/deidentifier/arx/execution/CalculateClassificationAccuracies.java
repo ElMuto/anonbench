@@ -45,133 +45,117 @@ public class CalculateClassificationAccuracies {
 	
 	private static ClassificationConfig[][][] configCluster = new ClassificationConfig[][][] {
 		
-//		buildAnalysisConfigurations(
-//				"Adult BS Marital",
-//				"adult_comma.csv",
-//				new String[] { "age", "occupation", "education" },
-//				new String[] {
-//						"workclass",
-//						"education",
-//						"marital-status",
-//						"occupation",
-//						"native-country",
-//						"salary-class",
-//						"race",
-//						"sex",
-//						},
-//				null),
-//		
-//		buildAnalysisConfigurations(
-//				"Adult BS Occupation",
-//				"adult_comma.csv",
-//				new String[] { "age", "sex", "race" },
-//				new String[] {
-//						"workclass",
-//						"education",
-//						"marital-status",
-//						"occupation",
-//						"native-country",
-//						"salary-class",
-//						"race",
-//						"sex",
-//						},
-//				null),
-//		
-//		buildAnalysisConfigurations(
-//				"Adult",
-//				"adult_comma.csv",
-//				new String[] { "sex", "age", "race", "marital-status" },
-//				new String[] {
-//						"workclass",
-//						"education",
-//						"marital-status",
-//						"occupation",
-//						"native-country",
-//						"salary-class",
-//						"race",
-//						"sex",
-//						},
-//				null),
-//		
-//		buildAnalysisConfigurations(
-//				"Fars",
-//				"fars_comma.csv",
-//				new String[] { "iage", "irace", "isex", "ihispanic" },
-//				new String[] {
-//						"irace",
-//						"ideathmon",
-//						"ideathday",
-//						"isex",
-//						"ihispanic",
-//						"istatenum",
-//						"iinjury"
-//						},
-//				"4"),
-//		
-//		buildAnalysisConfigurations(
-//				"ACS13",
-//				"ss13acs_essential_comma.csv",
-//				new String[] { "AGEP", "CIT", "COW", "SEX" },
-//				new String[] {
-//						"CIT",
-//						"COW",
-//						"SEX",
-//						"FER",
-//						"DOUT",
-//						"DPHY",
-//						"DREM",
-//						"SCHG",
-//						"SCHL"
-//						},
-//				null),
-//		
-//		buildAnalysisConfigurations(
-//				"Atus",
-//				"atus_comma.csv",
-//				new String[] { "Region", "Age", "Sex", "Race" },
-//				new String[] {
-//						"Region",
-//						"Sex",
-//						"Race",
-//						"Marital status",
-//						"Citizenship status",
-//						"Birthplace",
-//						"Highest level of school completed",
-//						"Labor force status"
-//						},
-//				null),
-//		
-//		buildAnalysisConfigurations(
-//				"Ihis",
-//				"ihis_comma.csv",
-//				new String[] { "REGION", "AGE", "SEX", "RACEA" },
-//				new String[] {
-//						"YEAR",
-//						"QUARTER",
-//						"REGION",
-//						"PERNUM",
-//						"MARSTAT",
-//						"SEX",
-//						"RACEA",
-//						"EDUC"
-//						},
-//				"1,4"),
+		buildAnalysisConfigurations(
+				"Adult BS Marital",
+				"adult_comma.csv",
+				new String[] { "age", "occupation", "education" },
+				new String[] {
+						"workclass",
+						"education",
+						"marital-status",
+						"occupation",
+						"native-country",
+						"salary-class",
+						"race",
+						"sex",
+						},
+				null),
+		
+		buildAnalysisConfigurations(
+				"Adult BS Occupation",
+				"adult_comma.csv",
+				new String[] { "age", "sex", "race" },
+				new String[] {
+						"workclass",
+						"education",
+						"marital-status",
+						"occupation",
+						"native-country",
+						"salary-class",
+						"race",
+						"sex",
+						},
+				null),
+		
+		buildAnalysisConfigurations(
+				"Adult",
+				"adult_comma.csv",
+				new String[] { "sex", "age", "race", "marital-status" },
+				new String[] {
+						"workclass",
+						"education",
+						"marital-status",
+						"occupation",
+						"native-country",
+						"salary-class",
+						"race",
+						"sex",
+						},
+				null),
+		
+		buildAnalysisConfigurations(
+				"Fars",
+				"fars_comma.csv",
+				new String[] { "iage", "irace", "isex", "ihispanic" },
+				new String[] {
+						"irace",
+						"ideathmon",
+						"ideathday",
+						"isex",
+						"ihispanic",
+						"istatenum",
+						"iinjury"
+						},
+				"4"),
+		
+		buildAnalysisConfigurations(
+				"ACS13",
+				"ss13acs_essential_comma.csv",
+				new String[] { "AGEP", "CIT", "COW", "SEX" },
+				new String[] {
+						"CIT",
+						"COW",
+						"SEX",
+						"FER",
+						"DOUT",
+						"DPHY",
+						"DREM",
+						"SCHG",
+						"SCHL"
+						},
+				null),
+		
+		buildAnalysisConfigurations(
+				"Atus",
+				"atus_comma.csv",
+				new String[] { "Region", "Age", "Sex", "Race" },
+				new String[] {
+						"Region",
+						"Sex",
+						"Race",
+						"Marital status",
+						"Citizenship status",
+						"Birthplace",
+						"Highest level of school completed",
+						"Labor force status"
+						},
+				null),
 		
 		buildAnalysisConfigurations(
 				"Ihis",
 				"ihis_comma.csv",
 				new String[] { "REGION", "AGE", "SEX", "RACEA" },
 				new String[] {
-						"EDUC",
-						"RACEA",
-						"SEX",
-						"MARSTAT",
-						"PERNUM",
-						"REGION",
-						"QUARTER",
 						"YEAR",
+						"QUARTER",
+						"REGION",
+						"PERNUM",
+						"MARSTAT",
+						"SEX",
+						"RACEA",
+						"EDUC"
 						},
-				"1,4")
+				"1,4"),
 	};
 
 	private static ClassificationConfig[][] mergeConfigBlocks (ClassificationConfig[][][] configBlockArray) {
