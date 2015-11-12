@@ -22,10 +22,17 @@ import org.deidentifier.arx.ClassificationConfig;
 public class CalculateClassificationAccuracies {
 	
 	private static int NUM_CLASSIFICATION_CONSTELLATIONS = 4;
+	private static Classifier classifier = Classifier.NaiveBayes;
+
+	private enum Classifier {
+		J48,
+		RandomForest,
+		NaiveBayes
+	}
 
 
 	public static void main(String[] args) {
-		evaluateConfig(mergeConfigBlocks(configCluster), "results/CompleteComparison.csv", new String[] {
+		evaluateConfig(mergeConfigBlocks(configCluster), "results/CompleteComparison" + classifier.toString() + ".csv", new String[] {
 				"dataset-name",
 				"attribute-name",
 				"Num-distinct-attributes",
@@ -35,12 +42,6 @@ public class CalculateClassificationAccuracies {
 				"PA-QI-only",
 		});
 
-	}
-
-	private enum Classifier {
-		J48,
-		RandomForest,
-		NaiveBayes
 	}
 	
 	private static ClassificationConfig[][][] configCluster = new ClassificationConfig[][][] {
@@ -200,7 +201,7 @@ public class CalculateClassificationAccuracies {
 			
 			out.print(configs[i][0].getWorkloadAttribute());
 
-			System.out.println("Calculating number of distinct attributes for '" + configs[i][0].getWorkloadAttribute() + "'");
+			System.out.println("Calculating number of distinct attributes for dataset '" + configs[i][0].getDatasetName() + "' / attribute '" + configs[i][0].getWorkloadAttribute() + "'");
 			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute())));
 			
 			for (int j = 0; j < configs[i].length; j++) {
@@ -209,9 +210,9 @@ public class CalculateClassificationAccuracies {
 					
 					Instances data = loadData(configs[i][j]);
 
-					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
+					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), classifier).pctCorrect());
 
-					System.out.printf("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "': \t%.4f\n", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), Classifier.J48).pctCorrect());
+					System.out.println("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "' calculated");
 
 				} else {
 					
