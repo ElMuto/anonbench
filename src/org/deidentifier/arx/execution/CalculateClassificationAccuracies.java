@@ -38,22 +38,22 @@ public class CalculateClassificationAccuracies {
 
 	public static void main(String[] args) {
 		
-//		evaluateConfigs(mergeConfigBlocks(configCluster), "results/CompleteComparison" + Classifier.J48.toString() + ".csv", Classifier.J48, new String[] {
-//				"dataset-name",
-//				"attribute-name",
-//				"Num-distinct-attributes",
-//				"PA-max",
-//				"PA-min",
-//				"PA-IS-only",
-//				"PA-QI-only",
-//		});
-
-		evaluateConfigs(mergeConfigBlocks(baselineCluster), "results/CompleteComparison" + Classifier.Zero_R.toString() + ".csv", Classifier.Zero_R, new String[] {
+		evaluateConfigs(mergeConfigBlocks(configCluster), "results/CompleteComparison" + Classifier.J48.toString() + ".csv", Classifier.J48, new String[] {
 				"dataset-name",
 				"attribute-name",
 				"Num-distinct-attributes",
-				"PA Zero-R",
+				"PA-max",
+				"PA-min",
+				"PA-IS-only",
+				"PA-QI-only",
 		});
+//
+//		evaluateConfigs(mergeConfigBlocks(baselineCluster), "results/CompleteComparison" + Classifier.Zero_R.toString() + ".csv", Classifier.Zero_R, new String[] {
+//				"dataset-name",
+//				"attribute-name",
+//				"Num-distinct-attributes",
+//				"PA Zero-R",
+//		});
 		
 	}
 	
@@ -171,121 +171,6 @@ public class CalculateClassificationAccuracies {
 						},
 				"1,4"),
 	};
-	
-	private static ClassificationConfig[][][] baselineCluster = new ClassificationConfig[][][] {
-		
-		buildBaselineConfigurations(
-				"Adult BS Marital",
-				"adult_comma.csv",
-				new String[] { "age", "occupation", "education" },
-				new String[] {
-						"workclass",
-						"education",
-						"marital-status",
-						"occupation",
-						"native-country",
-						"salary-class",
-						"race",
-						"sex",
-						},
-				null),
-		
-		buildBaselineConfigurations(
-				"Adult BS Occupation",
-				"adult_comma.csv",
-				new String[] { "age", "sex", "race" },
-				new String[] {
-						"workclass",
-						"education",
-						"marital-status",
-						"occupation",
-						"native-country",
-						"salary-class",
-						"race",
-						"sex",
-						},
-				null),
-		
-		buildBaselineConfigurations(
-				"Adult",
-				"adult_comma.csv",
-				new String[] { "sex", "age", "race", "marital-status" },
-				new String[] {
-						"workclass",
-						"education",
-						"marital-status",
-						"occupation",
-						"native-country",
-						"salary-class",
-						"race",
-						"sex",
-						},
-				null),
-		
-		buildBaselineConfigurations(
-				"Fars",
-				"fars_comma.csv",
-				new String[] { "iage", "irace", "isex", "ihispanic" },
-				new String[] {
-						"irace",
-						"ideathmon",
-						"ideathday",
-						"isex",
-						"ihispanic",
-						"istatenum",
-						"iinjury"
-						},
-				"4"),
-		
-		buildBaselineConfigurations(
-				"ACS13",
-				"ss13acs_essential_comma.csv",
-				new String[] { "AGEP", "CIT", "COW", "SEX" },
-				new String[] {
-						"CIT",
-						"COW",
-						"SEX",
-						"FER",
-						"DOUT",
-						"DPHY",
-						"DREM",
-						"SCHG",
-						"SCHL"
-						},
-				null),
-		
-		buildBaselineConfigurations(
-				"Atus",
-				"atus_comma.csv",
-				new String[] { "Region", "Age", "Sex", "Race" },
-				new String[] {
-						"Region",
-						"Sex",
-						"Race",
-						"Marital status",
-						"Citizenship status",
-						"Birthplace",
-						"Highest level of school completed",
-						"Labor force status"
-						},
-				null),
-		
-		buildBaselineConfigurations(
-				"Ihis",
-				"ihis_comma.csv",
-				new String[] { "REGION", "AGE", "SEX", "RACEA" },
-				new String[] {
-						"YEAR",
-						"QUARTER",
-						"REGION",
-						"PERNUM",
-						"MARSTAT",
-						"SEX",
-						"RACEA",
-						"EDUC"
-						},
-				"1,4"),
-	};
 
 	private static ClassificationConfig[][] mergeConfigBlocks (ClassificationConfig[][][] configBlockArray) {
 		
@@ -321,6 +206,7 @@ public class CalculateClassificationAccuracies {
 		for (int j = 1; j < header.length; j++) {
 			out.print(";" + header[j]);
 		}
+		out.print(";" + Classifier.Zero_R.toString());
 		out.print("\n");
 				
 		for (int i = 0; i < configs.length; i++) {
@@ -348,10 +234,12 @@ public class CalculateClassificationAccuracies {
 					
 				}
 				
-				out.flush();
 			}
 			
+			out.printf(";%.2f", getClassificationAccuracyFor(loadData(configs[i][0]), configs[i][0].getClassAttribute(), Classifier.Zero_R).pctCorrect());
+			
 			out.print("\n");
+			out.flush();
 			
 		}
 
@@ -395,31 +283,6 @@ public class CalculateClassificationAccuracies {
 				configArray[i][3] = null;
 				
 			}
-			
-		}
-		
-		return configArray;
-	}
-	
-	
-	/**
-	 * @param id
-	 * @param inputFileName
-	 * @param features
-	 * @param classAttributes
-	 * @param nominalAttributes
-	 * @return
-	 */
-	private static ClassificationConfig[][] buildBaselineConfigurations(String id, String inputFileName,
-			String[] features, String[] classAttributes, String nominalAttributes) {
-
-		int numClassifiers = classAttributes.length;
-		
-		ClassificationConfig[][] configArray = new ClassificationConfig[numClassifiers][1];
-		
-		for (int i = 0; i < numClassifiers; i++) {
-			
-			configArray[i][0] = new ClassificationConfig(id, inputFileName, classAttributes[i], null, false, nominalAttributes);
 			
 		}
 		
