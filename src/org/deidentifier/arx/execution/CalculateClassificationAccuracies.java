@@ -13,35 +13,48 @@ import java.util.Random;
 
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.rules.ZeroR;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 import org.deidentifier.arx.ClassificationConfig;
 
+/**
+ * @author work
+ *
+ */
 public class CalculateClassificationAccuracies {
 	
 	private static int NUM_CLASSIFICATION_CONSTELLATIONS = 4;
-	private static Classifier classifier = Classifier.NaiveBayes;
 
 	private enum Classifier {
 		J48,
 		RandomForest,
-		NaiveBayes
+		NaiveBayes,
+		Zero_R
 	}
 
 
 	public static void main(String[] args) {
-		evaluateConfig(mergeConfigBlocks(configCluster), "results/CompleteComparison" + classifier.toString() + ".csv", new String[] {
+		
+//		evaluateConfigs(mergeConfigBlocks(configCluster), "results/CompleteComparison" + Classifier.J48.toString() + ".csv", Classifier.J48, new String[] {
+//				"dataset-name",
+//				"attribute-name",
+//				"Num-distinct-attributes",
+//				"PA-max",
+//				"PA-min",
+//				"PA-IS-only",
+//				"PA-QI-only",
+//		});
+
+		evaluateConfigs(mergeConfigBlocks(baselineCluster), "results/CompleteComparison" + Classifier.Zero_R.toString() + ".csv", Classifier.Zero_R, new String[] {
 				"dataset-name",
 				"attribute-name",
 				"Num-distinct-attributes",
-				"PA-max",
-				"PA-min",
-				"PA-IS-only",
-				"PA-QI-only",
+				"PA Zero-R",
 		});
-
+		
 	}
 	
 	private static ClassificationConfig[][][] configCluster = new ClassificationConfig[][][] {
@@ -158,6 +171,121 @@ public class CalculateClassificationAccuracies {
 						},
 				"1,4"),
 	};
+	
+	private static ClassificationConfig[][][] baselineCluster = new ClassificationConfig[][][] {
+		
+		buildBaselineConfigurations(
+				"Adult BS Marital",
+				"adult_comma.csv",
+				new String[] { "age", "occupation", "education" },
+				new String[] {
+						"workclass",
+						"education",
+						"marital-status",
+						"occupation",
+						"native-country",
+						"salary-class",
+						"race",
+						"sex",
+						},
+				null),
+		
+		buildBaselineConfigurations(
+				"Adult BS Occupation",
+				"adult_comma.csv",
+				new String[] { "age", "sex", "race" },
+				new String[] {
+						"workclass",
+						"education",
+						"marital-status",
+						"occupation",
+						"native-country",
+						"salary-class",
+						"race",
+						"sex",
+						},
+				null),
+		
+		buildBaselineConfigurations(
+				"Adult",
+				"adult_comma.csv",
+				new String[] { "sex", "age", "race", "marital-status" },
+				new String[] {
+						"workclass",
+						"education",
+						"marital-status",
+						"occupation",
+						"native-country",
+						"salary-class",
+						"race",
+						"sex",
+						},
+				null),
+		
+		buildBaselineConfigurations(
+				"Fars",
+				"fars_comma.csv",
+				new String[] { "iage", "irace", "isex", "ihispanic" },
+				new String[] {
+						"irace",
+						"ideathmon",
+						"ideathday",
+						"isex",
+						"ihispanic",
+						"istatenum",
+						"iinjury"
+						},
+				"4"),
+		
+		buildBaselineConfigurations(
+				"ACS13",
+				"ss13acs_essential_comma.csv",
+				new String[] { "AGEP", "CIT", "COW", "SEX" },
+				new String[] {
+						"CIT",
+						"COW",
+						"SEX",
+						"FER",
+						"DOUT",
+						"DPHY",
+						"DREM",
+						"SCHG",
+						"SCHL"
+						},
+				null),
+		
+		buildBaselineConfigurations(
+				"Atus",
+				"atus_comma.csv",
+				new String[] { "Region", "Age", "Sex", "Race" },
+				new String[] {
+						"Region",
+						"Sex",
+						"Race",
+						"Marital status",
+						"Citizenship status",
+						"Birthplace",
+						"Highest level of school completed",
+						"Labor force status"
+						},
+				null),
+		
+		buildBaselineConfigurations(
+				"Ihis",
+				"ihis_comma.csv",
+				new String[] { "REGION", "AGE", "SEX", "RACEA" },
+				new String[] {
+						"YEAR",
+						"QUARTER",
+						"REGION",
+						"PERNUM",
+						"MARSTAT",
+						"SEX",
+						"RACEA",
+						"EDUC"
+						},
+				"1,4"),
+	};
 
 	private static ClassificationConfig[][] mergeConfigBlocks (ClassificationConfig[][][] configBlockArray) {
 		
@@ -181,7 +309,7 @@ public class CalculateClassificationAccuracies {
 		
 	}
 
-	private static void evaluateConfig(ClassificationConfig[][] configs, String fileName, String[] header) {
+	private static void evaluateConfigs(ClassificationConfig[][] configs, String fileName, Classifier classifier, String[] header) {
 		
 		PrintWriter out = null;
 		try {
@@ -199,10 +327,10 @@ public class CalculateClassificationAccuracies {
 			
 			out.print(configs[i][0].getDatasetName() + ";");
 			
-			out.print(configs[i][0].getWorkloadAttribute());
+			out.print(configs[i][0].getClassAttribute());
 
-			System.out.println("Calculating number of distinct attributes for dataset '" + configs[i][0].getDatasetName() + "' / attribute '" + configs[i][0].getWorkloadAttribute() + "'");
-			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getWorkloadAttribute())));
+			System.out.println("Calculating number of distinct attributes for dataset '" + configs[i][0].getDatasetName() + "' / class attribute '" + configs[i][0].getClassAttribute() + "'");
+			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getClassAttribute())));
 			
 			for (int j = 0; j < configs[i].length; j++) {
 
@@ -210,9 +338,9 @@ public class CalculateClassificationAccuracies {
 					
 					Instances data = loadData(configs[i][j]);
 
-					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getWorkloadAttribute(), classifier).pctCorrect());
+					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getClassAttribute(), classifier).pctCorrect());
 
-					System.out.println("Accuracy for attribute '" + configs[i][j].getWorkloadAttribute() + "' calculated");
+					System.out.println("Accuracy for attribute '" + configs[i][j].getClassAttribute() + "' calculated");
 
 				} else {
 					
@@ -232,33 +360,33 @@ public class CalculateClassificationAccuracies {
 	}
 	
 	
+	
 	/**
 	 * @param id
 	 * @param inputFileName
-	 * @param qis
-	 * @param classifiers
+	 * @param features
+	 * @param classAttributes
 	 * @param nominalAttributes
 	 * @return
 	 */
 	private static ClassificationConfig[][] buildAnalysisConfigurations(String id, String inputFileName,
-			String[] qis, String[] classifiers, String nominalAttributes) {
+			String[] features, String[] classAttributes, String nominalAttributes) {
 
-		int numClassifiers = classifiers.length;
+		int numClassAttributes = classAttributes.length;
 		
-		ClassificationConfig[][] configArray = new ClassificationConfig[numClassifiers][NUM_CLASSIFICATION_CONSTELLATIONS];
+		ClassificationConfig[][] configArray = new ClassificationConfig[numClassAttributes][NUM_CLASSIFICATION_CONSTELLATIONS];
 		
-		for (int i = 0; i < numClassifiers; i++) {
+		for (int i = 0; i < numClassAttributes; i++) {
 			
-			configArray[i][0] = new ClassificationConfig(id, inputFileName, classifiers[i], null, false, nominalAttributes);
+			configArray[i][0] = new ClassificationConfig(id, inputFileName, classAttributes[i], null, false, nominalAttributes);
 			
-			configArray[i][1] = new ClassificationConfig(id, inputFileName, classifiers[i], null, false, nominalAttributes).asBaselineConfig();
+			configArray[i][1] = new ClassificationConfig(id, inputFileName, classAttributes[i], null, false, nominalAttributes).asBaselineConfig();
 			
-			if (!isClassifierQi(classifiers[i], qis)) {
+			if (!isClassAttributeAQi(classAttributes[i], features)) {
 				
-				configArray[i][2] = new ClassificationConfig(id, inputFileName, classifiers[i], qis, false, nominalAttributes);
-				
-				
-				configArray[i][3] = new ClassificationConfig(id, inputFileName, classifiers[i], qis, false, nominalAttributes).invertQIs();
+				configArray[i][2] = new ClassificationConfig(id, inputFileName, classAttributes[i], features, false, nominalAttributes);
+								
+				configArray[i][3] = new ClassificationConfig(id, inputFileName, classAttributes[i], features, false, nominalAttributes).invertFeatureSet();
 				
 			} else {
 				
@@ -272,13 +400,38 @@ public class CalculateClassificationAccuracies {
 		
 		return configArray;
 	}
+	
+	
+	/**
+	 * @param id
+	 * @param inputFileName
+	 * @param features
+	 * @param classAttributes
+	 * @param nominalAttributes
+	 * @return
+	 */
+	private static ClassificationConfig[][] buildBaselineConfigurations(String id, String inputFileName,
+			String[] features, String[] classAttributes, String nominalAttributes) {
+
+		int numClassifiers = classAttributes.length;
+		
+		ClassificationConfig[][] configArray = new ClassificationConfig[numClassifiers][1];
+		
+		for (int i = 0; i < numClassifiers; i++) {
+			
+			configArray[i][0] = new ClassificationConfig(id, inputFileName, classAttributes[i], null, false, nominalAttributes);
+			
+		}
+		
+		return configArray;
+	}
 
 
-	private static boolean isClassifierQi(String classifier, String[] qis) {
+	private static boolean isClassAttributeAQi(String classAttribute, String[] qis) {
 		
 		for (int i = 0; i < qis.length; i++) {
 			
-			if (classifier.equals(qis[i])) return true;
+			if (classAttribute.equals(qis[i])) return true;
 			
 		}
 		
@@ -344,37 +497,44 @@ public class CalculateClassificationAccuracies {
 	 * @return
 	 */
 	private static Evaluation getClassificationAccuracyFor(Instances data, String attribute, Classifier classifier) {
-		
+
 		data.setClassIndex(data.attribute(attribute).index());
 		Evaluation eval = null;
 		try {
 			eval = new Evaluation(data);
-			
-			weka.classifiers.Classifier tree = null;
-			switch (classifier) {
-			case J48:
-				J48 j48Tree = new J48();
-				j48Tree.setConfidenceFactor(0.25f);
-				j48Tree.setMinNumObj(2);
-				tree = j48Tree;
-				break;
-			case NaiveBayes:
-				tree = new NaiveBayes();
-				break;
-			case RandomForest:
-				RandomForest rfTree = new RandomForest();
-				rfTree.setNumTrees(100);
-				rfTree.setNumFeatures(0);
-				rfTree.setSeed(1);
-				tree = rfTree;
-				break;
-			default:
-				break;
-			}
-			
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		weka.classifiers.Classifier tree = null;
+		switch (classifier) {
+		case J48:
+			J48 j48Tree = new J48();
+			j48Tree.setConfidenceFactor(0.25f);
+			j48Tree.setMinNumObj(2);
+			tree = j48Tree;
+			break;
+		case NaiveBayes:
+			tree = new NaiveBayes();
+			break;
+		case RandomForest:
+			RandomForest rfTree = new RandomForest();
+			rfTree.setNumTrees(100);
+			rfTree.setNumFeatures(0);
+			rfTree.setSeed(1);
+			tree = rfTree;
+			break;
+		case Zero_R:
+			tree = new ZeroR();
+			break;
+		default:
+			throw new RuntimeException("Unsupported method: " + classifier.toString());
+		}
+
+		try {
 			// perform the actual classification using a fixed random seed for reproducability
 			eval.crossValidateModel(tree, data, 10, new Random(1)); 
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

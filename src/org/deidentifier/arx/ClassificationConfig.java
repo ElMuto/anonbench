@@ -3,22 +3,23 @@ package org.deidentifier.arx;
 public class ClassificationConfig {
 	private final String datasetName;
 	private final String fileName;
-	private final String workloadAttribute;
+	private final String classAttribute;
 	private final String[] excludedAttributes;
 	private final String nominalAttributes;
 	private final boolean invertedSelection;
 	
 	/**
+	 * @param datasetName
 	 * @param fileName
-	 * @param workloadAttribute
+	 * @param classAttribute
 	 * @param excludedAttributes
 	 * @param invertSelection
-	 * @param nominalAttributes comma-separated string with attribute indices <B>starting at 1</BR>
+	 * @param nominalAttributes
 	 */
-	public ClassificationConfig (String datasetName, String fileName, String workloadAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
+	public ClassificationConfig (String datasetName, String fileName, String classAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
 		this.datasetName = datasetName;
 		this.fileName = fileName;
-		this.workloadAttribute = workloadAttribute;
+		this.classAttribute = classAttribute;
 		this.excludedAttributes = excludedAttributes;
 		this.nominalAttributes = nominalAttributes;
 		this.invertedSelection = invertSelection;
@@ -32,8 +33,8 @@ public class ClassificationConfig {
 		return fileName;
 	}
 
-	public String getWorkloadAttribute() {
-		return workloadAttribute;
+	public String getClassAttribute() {
+		return classAttribute;
 	}
 
 	public String[] getExcludedAttributes() {
@@ -52,12 +53,12 @@ public class ClassificationConfig {
 		return new ClassificationConfig(
 				getDatasetName(),
 				getInputFileName(),
-				getWorkloadAttribute(),
-				new String[] { getWorkloadAttribute() },
+				getClassAttribute(),
+				new String[] { getClassAttribute() },
 				true, getNominalAttributes());
 	}
 	
-	public ClassificationConfig invertQIs() {
+	public ClassificationConfig invertFeatureSet() {
 		
 		String[] inversionArray = new String[getExcludedAttributes().length +1];
 		
@@ -67,12 +68,12 @@ public class ClassificationConfig {
 			
 		}
 		
-		inversionArray[getExcludedAttributes().length] = getWorkloadAttribute();
+		inversionArray[getExcludedAttributes().length] = getClassAttribute();
 		
 		return new ClassificationConfig(
 				getDatasetName(),
 				getInputFileName(),
-				getWorkloadAttribute(),
+				getClassAttribute(),
 				inversionArray,
 				true, getNominalAttributes());
 	}
