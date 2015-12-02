@@ -1,0 +1,26 @@
+dataset-name;attribute-name;Num-distinct-attributes;PA-max;PA-min;PA-IS-only;PA-QI-only;PA-Zero_R
+Adult BS Marital;workclass;7;74.91;73.89;73.89;74.86;73.89
+Adult BS Marital;education;16;41.26;32.62;;;32.62
+Adult BS Marital;marital-status;7;69.24;46.63;58.21;62.57;46.63
+Adult BS Marital;occupation;14;31.78;13.39;;;13.39
+Adult BS Marital;native-country;41;91.61;91.19;91.19;91.61;91.19
+Adult BS Marital;salary-class;2;82.85;75.11;76.62;79.17;75.11
+Adult BS Marital;race;5;88.22;85.98;88.22;85.98;85.98
+Adult BS Marital;sex;2;79.55;67.57;73.99;74.24;67.57
+Adult BS Occupation;workclass;7;74.91;73.89;74.80;73.89;73.89
+Adult BS Occupation;education;16;41.26;32.62;41.02;34.13;32.62
+Adult BS Occupation;marital-status;7;69.24;46.63;58.74;67.51;46.63
+Adult BS Occupation;occupation;14;31.78;13.39;30.47;21.97;13.39
+Adult BS Occupation;native-country;41;91.61;91.19;91.41;91.19;91.19
+Adult BS Occupation;salary-class;2;82.85;75.11;82.28;75.30;75.11
+Adult BS Occupation;race;5;88.22;85.98;;;85.98
+Adult BS Occupation;sex;2;79.55;67.57;;;67.57
+Adult;workclass;7;74.91;73.89;74.57;73.89;73.89
+Adult;education;16;41.26;32.62;40.38;34.60;32.62
+Adult;marital-status;7;69.24;46.63;;;46.63
+Adult;occupation;14;31.78;13.39;28.40;21.81;13.39
+Adult;native-country;41;91.61;91.19;91.19;91.19;91.19
+Adult;salary-class;2;82.85;75.11;78.30;77.38;75.11
+Adult;race;5;88.22;85.98;;;85.98
+Adult;sex;2;79.55;67.57;;;67.57
+Fars;irace;20;93.25;57.22;;;57.22

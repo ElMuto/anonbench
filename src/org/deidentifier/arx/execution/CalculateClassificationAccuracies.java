@@ -45,7 +45,7 @@ public class CalculateClassificationAccuracies {
 				"PA-max",
 				"PA-min",
 				"PA-IS-only",
-				"PA-QI-only",
+				"PA-QI-only"
 		});
 //
 //		evaluateConfigs(mergeConfigBlocks(baselineCluster), "results/CompleteComparison" + Classifier.Zero_R.toString() + ".csv", Classifier.Zero_R, new String[] {
@@ -206,7 +206,7 @@ public class CalculateClassificationAccuracies {
 		for (int j = 1; j < header.length; j++) {
 			out.print(";" + header[j]);
 		}
-		out.print(";" + Classifier.Zero_R.toString());
+		out.print(";PA-" + Classifier.Zero_R.toString());
 		out.print("\n");
 				
 		for (int i = 0; i < configs.length; i++) {
