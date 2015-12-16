@@ -47,14 +47,6 @@ public class CalculateClassificationAccuracies {
 				"PA-IS-only",
 				"PA-QI-only"
 		});
-//
-//		evaluateConfigs(mergeConfigBlocks(baselineCluster), "results/CompleteComparison" + Classifier.Zero_R.toString() + ".csv", Classifier.Zero_R, new String[] {
-//				"dataset-name",
-//				"attribute-name",
-//				"Num-distinct-attributes",
-//				"PA Zero-R",
-//		});
-		
 	}
 	
 	private static ClassificationConfig[][][] configCluster = new ClassificationConfig[][][] {
@@ -124,25 +116,25 @@ public class CalculateClassificationAccuracies {
 		
 		buildAnalysisConfigurations(
 				"ACS13",
-				"ss13acs_essential_comma.csv",
-				new String[] { "AGEP", "CIT", "COW", "SEX" },
+				"ss13acs_comma.csv",
+				new String[] { "Age", "Citizenship", "Married", "Sex" },
 				new String[] {
-						"CIT",
-						"COW",
-						"SEX",
-						"FER",
-						"DOUT",
-						"DPHY",
-						"DREM",
-						"SCHG",
-						"SCHL"
+						"Citizenship",
+						"Married",
+						"Sex",
+						"Childbirth",
+						"Independent living",
+						"Ambulatory",
+						"Cognitive",
+						"Grade level",
+						"Education"
 						},
 				null),
 		
 		buildAnalysisConfigurations(
 				"Atus",
 				"atus_comma.csv",
-				new String[] { "Region", "Age", "Sex", "Race" },
+				new String[] { "Marital status", "Age", "Sex", "Race" },
 				new String[] {
 						"Region",
 						"Sex",
@@ -155,21 +147,21 @@ public class CalculateClassificationAccuracies {
 						},
 				null),
 		
-		buildAnalysisConfigurations(
-				"Ihis",
-				"ihis_comma.csv",
-				new String[] { "REGION", "AGE", "SEX", "RACEA" },
-				new String[] {
-						"YEAR",
-						"QUARTER",
-						"REGION",
-						"PERNUM",
-						"MARSTAT",
-						"SEX",
-						"RACEA",
-						"EDUC"
-						},
-				"1,4"),
+//		buildAnalysisConfigurations(
+//				"Ihis",
+//				"ihis_comma.csv",
+//				new String[] { "REGION", "AGE", "SEX", "RACEA" },
+//				new String[] {
+//						"YEAR",
+//						"QUARTER",
+//						"REGION",
+//						"PERNUM",
+//						"MARSTAT",
+//						"SEX",
+//						"RACEA",
+//						"EDUC"
+//						},
+//				"1,4"),
 	};
 
 	private static ClassificationConfig[][] mergeConfigBlocks (ClassificationConfig[][][] configBlockArray) {

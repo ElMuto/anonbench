@@ -193,11 +193,11 @@ public class BenchmarkSetup {
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
          BenchmarkDatafile.ACS13,
-         BenchmarkDatafile.ADULT,
-//         BenchmarkDatafile.CUP, // hat nur intervallskalierte Attribute
-         BenchmarkDatafile.FARS,
          BenchmarkDatafile.ATUS,
+         BenchmarkDatafile.ADULT,
+         BenchmarkDatafile.FARS,
          BenchmarkDatafile.IHIS,
+//       BenchmarkDatafile.CUP, // hat nur intervallskalierte Attribute
                                         };
     }
 

@@ -7,9 +7,6 @@ import java.util.Set;
 
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
-import org.deidentifier.arx.aggregates.HierarchyBuilder;
-import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased;
-import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
 import org.deidentifier.arx.utility.AggregateFunction;
 import org.deidentifier.arx.utility.DataConverter;
 import org.deidentifier.arx.utility.UtilityMeasureAECS;
@@ -258,14 +255,14 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                       "iinjury" };
             case IHIS:
                 return new String[] { "EDUC",
-                                      "MARSTAT", 
+                                      "REGION", 
                                       "PERNUM", 
                                       "QUARTER" };
             case ACS13:
-                return new String[] { "SCHL",
-//                                      "PWGTP", // interval-scale
-                                      "SCHG",
-//                                      "INTP"   // interval-scale
+                return new String[] { "Education",
+//                                      "Weight", // interval-scale
+                                      "Grade level",
+//                                      "Income"   // interval-scale
                                       };
             default:
                 throw new RuntimeException("Invalid dataset");
@@ -285,17 +282,13 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
          * @throws IOException
          */
         Hierarchy loadHierarchy(String attribute) {
-            if (!datafile.equals(BenchmarkDatafile.ACS13)) {
-            	String path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
-                try {
-					return Hierarchy.create(path, ';');
-				} catch (IOException e) {
-					System.err.println("Unable to load hierarchy from file " + path);
-					return null;
-				}
-            } else {
-                return loadACS13Hierarchy("hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_", attribute);
-            }
+        	String path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
+        	try {
+        		return Hierarchy.create(path, ';');
+        	} catch (IOException e) {
+        		System.err.println("Unable to load hierarchy from file " + path);
+        		return null;
+        	}
         }
         
 
@@ -338,52 +331,6 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             
             return arxData;
         }
-
-        private static Hierarchy loadACS13Hierarchy(String fileBaseName, String attribute) {
-            String filePath = fileBaseName + ACS13_SEMANTIC_QI.valueOf(attribute).fileBaseName();
-            switch (ACS13_SEMANTIC_QI.valueOf(attribute).getType()) {
-            case INTERVAL:
-                filePath += ".ahs";
-                HierarchyBuilder<?> loaded;
-				try {
-					loaded = HierarchyBuilder.create(filePath);
-				} catch (IOException e) {
-					loaded = null;
-					System.err.println("Unable to init hierarchy builder with file " + filePath);
-				}
-                if (loaded.getType() == Type.INTERVAL_BASED) {
-                    HierarchyBuilderIntervalBased<?> builder = (HierarchyBuilderIntervalBased<?>) loaded;
-                    Data data;
-                    String path = "data/" + BenchmarkDatafile.ACS13.getBaseStringForFilename() + ".csv";
-					try {
-						data = Data.create(path, ';');
-					} catch (IOException e) {
-						data = null;
-						System.err.println("Unable to load dataset from file ");
-					}
-                    int index = data
-                                    .getHandle()
-                                    .getColumnIndexOf(attribute);
-                    String[] dataArray = data
-                                             .getHandle()
-                                             .getStatistics()
-                                             .getDistinctValues(index);
-                    builder.prepare(dataArray);
-                    return builder.build();
-                } else {
-                    throw new RuntimeException("Inconsistent hierarchy types. Expected: interval-based, found: " + loaded.getType());
-                }
-            case ORDER:
-                filePath += ".csv";
-                try {
-					return Hierarchy.create(filePath, ';');
-				} catch (IOException e) {
-					System.err.println("Unable to load hierarchy from file " + filePath);
-				}
-            default:
-                throw new RuntimeException("Invalid hierarchy Type");
-            }
-        }
         
         private static String[] customizeQis(String[] allQis, QiConfig qiConf) {
             if (qiConf == null) return allQis;
@@ -418,12 +365,12 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             case ATUS:
                 return customizeQis ((new String[] {   "Age",
                                                        "Race",
-                                                       "Region",
+                                                       "Marital status",
                                                        "Sex",
                                                         "Birthplace",
                                                         "Citizenship status",
                                                         "Labor force status",
-                                                        "Marital status" }),
+                                                        "Region" }),
                                                         qiConf);
             case CUP:
                 return customizeQis ((new String[] {   "AGE",
@@ -446,7 +393,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
             case IHIS:
                 return customizeQis ((new String[] {   "AGE",
                                                        "RACEA",
-                                                       "REGION",
+                                                       "MARSTAT",
                                                        "SEX",
                                                         "MARSTAT",
                                                         "PERNUM",
@@ -454,7 +401,15 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                                                         "YEAR" }),
                                                         qiConf);
             case ACS13:
-                return customizeQis (ACS13_SEMANTIC_QI.getNames(), qiConf);
+                return customizeQis ((new String[] {   "Age",
+								                       "Citizenship",
+								                       "Married",
+								                       "Sex",
+								                       "Citizenship",
+								                       "Childbirth",
+								                       "Independent living",
+								                       "Ambulatory"}),
+								                       qiConf);
             default:
                 throw new RuntimeException("Invalid dataset");
             }
@@ -481,84 +436,6 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
                 return "SCHG";
             default:
                 throw new RuntimeException("Invalid dataset");
-            }
-        }
-
-        private enum ACS13_SEMANTIC_QI {
-            AGEP(HierarchyType.INTERVAL), // height 10
-            CIT(HierarchyType.ORDER), // height 06
-            COW(HierarchyType.ORDER), // height 06
-            SEX(HierarchyType.ORDER), // height 02
-            FER(HierarchyType.ORDER), // height 02
-            DOUT(HierarchyType.ORDER), // height 04
-            DPHY(HierarchyType.ORDER), // height 04
-            DREM(HierarchyType.ORDER), // height 03
-            GCL(HierarchyType.ORDER), // height 02
-            HINS1(HierarchyType.ORDER), // height 02
-            HINS2(HierarchyType.ORDER), // height 02
-            HINS3(HierarchyType.ORDER), // height 02
-            HINS4(HierarchyType.ORDER), // height 02
-            HINS5(HierarchyType.ORDER), // height 02
-            HINS6(HierarchyType.ORDER), // height 02
-            HINS7(HierarchyType.ORDER), // height 02
-            MAR(HierarchyType.ORDER), // height 02
-            MARHD(HierarchyType.ORDER), // height 02
-            MARHM(HierarchyType.ORDER), // height 02
-            MARHW(HierarchyType.ORDER), // height 02
-            MIG(HierarchyType.ORDER), // height 02
-            MIL(HierarchyType.ORDER), // height 02
-            PWGTP(HierarchyType.INTERVAL), // height 03
-            RELP(HierarchyType.ORDER), // height 04
-            SCHL(HierarchyType.ORDER), // height 02
-            INTP(HierarchyType.INTERVAL), // height 02
-            SCHG(HierarchyType.ORDER), // height 02
-            DDRS(HierarchyType.ORDER), // height 05
-            DEAR(HierarchyType.ORDER), // height 05
-            DEYE(HierarchyType.ORDER), // height 05
-            ;
-            
-            private enum HierarchyType {
-                INTERVAL, // interval based
-                ORDER // order based
-            }
-
-            private final HierarchyType ht;
-
-            // constructor
-            ACS13_SEMANTIC_QI(HierarchyType ht) {
-                this.ht = ht;
-            }
-
-            // needed for file name generation
-            public String fileBaseName() {
-                final String        distinctionLetter;
-
-                switch (ht) {
-                case INTERVAL:
-                    distinctionLetter = "i";
-                    break;
-                case ORDER:
-                    distinctionLetter = "o";
-                    break;
-                default:
-                    distinctionLetter = "x";
-                }
-                return (distinctionLetter + "_" + this.name());
-            }
-
-            public HierarchyType getType() {
-                return ht;
-            }
-            
-            public static String[] getNames() {
-                ACS13_SEMANTIC_QI[] qis = values();
-                String[] names = new String[qis.length];
-
-                for (int i = 0; i < qis.length; i++) {
-                    names[i] = qis[i].name();
-                }
-
-                return names;
             }
         }
 
