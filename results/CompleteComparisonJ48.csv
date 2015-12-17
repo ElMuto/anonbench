@@ -1,4 +1,0 @@
-dataset-name;attribute-name;Num-distinct-attributes;PA-max;PA-min;PA-IS-only;PA-QI-only;PA-Zero_R
-ACS13;Cognitive;3;95.59;89.36;95.51;94.12;89.36
-ACS13;Grade level;17;89.73;73.70;88.14;84.75;73.70
-ACS13;Education;26;38.86;17.58;38.21;36.12;17.58

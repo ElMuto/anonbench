@@ -19,6 +19,7 @@ import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 import org.deidentifier.arx.ClassificationConfig;
+import org.deidentifier.arx.ClassificationConfig.Classifier;
 
 /**
  * @author work
@@ -26,24 +27,17 @@ import org.deidentifier.arx.ClassificationConfig;
  */
 public class CalculateClassificationAccuracies {
 	
-	private static int NUM_CLASSIFICATION_CONSTELLATIONS = 4;
-
-	private enum Classifier {
-		J48,
-		RandomForest,
-		NaiveBayes,
-		Zero_R
-	}
-
+	private static final int NUM_CLASSIFICATION_CONSTELLATIONS = 4;
+	private static final Classifier standardClassifier = Classifier.J48;
 
 	public static void main(String[] args) {
 		
-		evaluateConfigs(mergeConfigBlocks(configCluster), "results/CompleteComparison" + Classifier.J48.toString() + ".csv", Classifier.J48, new String[] {
+		evaluateConfigs(mergeConfigBlocks(configCluster), "results/CompleteComparison" + Classifier.J48.toString() + ".csv", new String[] {
 				"dataset-name",
 				"attribute-name",
 				"Num-distinct-attributes",
 				"PA-max",
-				"PA-min",
+				"PA-min (Zero-R)",
 				"PA-IS-only",
 				"PA-QI-only"
 		});
@@ -51,9 +45,8 @@ public class CalculateClassificationAccuracies {
 	
 	private static ClassificationConfig[][][] configCluster = new ClassificationConfig[][][] {
 		
-		buildAnalysisConfigurations(
+		buildClassificationConfigurations(
 				"Adult BS Marital",
-				"adult_comma.csv",
 				new String[] { "age", "occupation", "education" },
 				new String[] {
 						"workclass",
@@ -65,11 +58,11 @@ public class CalculateClassificationAccuracies {
 						"race",
 						"sex",
 						},
-				null),
-		
-		buildAnalysisConfigurations(
-				"Adult BS Occupation",
 				"adult_comma.csv",
+				null, standardClassifier),
+		
+		buildClassificationConfigurations(
+				"Adult BS Occupation",
 				new String[] { "age", "sex", "race" },
 				new String[] {
 						"workclass",
@@ -81,11 +74,11 @@ public class CalculateClassificationAccuracies {
 						"race",
 						"sex",
 						},
-				null),
-		
-		buildAnalysisConfigurations(
-				"Adult",
 				"adult_comma.csv",
+				null, standardClassifier),
+		
+		buildClassificationConfigurations(
+				"Adult",
 				new String[] { "sex", "age", "race", "marital-status" },
 				new String[] {
 						"workclass",
@@ -97,11 +90,11 @@ public class CalculateClassificationAccuracies {
 						"race",
 						"sex",
 						},
-				null),
+				"adult_comma.csv",
+				null, standardClassifier),
 		
-		buildAnalysisConfigurations(
+		buildClassificationConfigurations(
 				"Fars",
-				"fars_comma.csv",
 				new String[] { "iage", "irace", "isex", "ihispanic" },
 				new String[] {
 						"irace",
@@ -112,11 +105,11 @@ public class CalculateClassificationAccuracies {
 						"istatenum",
 						"iinjury"
 						},
-				"4"),
+				"fars_comma.csv",
+				"4", standardClassifier),
 		
-		buildAnalysisConfigurations(
+		buildClassificationConfigurations(
 				"ACS13",
-				"ss13acs_comma.csv",
 				new String[] { "Age", "Citizenship", "Married", "Sex" },
 				new String[] {
 						"Citizenship",
@@ -129,11 +122,11 @@ public class CalculateClassificationAccuracies {
 						"Grade level",
 						"Education"
 						},
-				null),
+				"ss13acs_comma.csv",
+				null, standardClassifier),
 		
-		buildAnalysisConfigurations(
+		buildClassificationConfigurations(
 				"Atus",
-				"atus_comma.csv",
 				new String[] { "Marital status", "Age", "Sex", "Race" },
 				new String[] {
 						"Region",
@@ -145,23 +138,24 @@ public class CalculateClassificationAccuracies {
 						"Highest level of school completed",
 						"Labor force status"
 						},
-				null),
+				"atus_comma.csv",
+				null, standardClassifier),
 		
-//		buildAnalysisConfigurations(
-//				"Ihis",
-//				"ihis_comma.csv",
-//				new String[] { "REGION", "AGE", "SEX", "RACEA" },
-//				new String[] {
-//						"YEAR",
-//						"QUARTER",
-//						"REGION",
-//						"PERNUM",
-//						"MARSTAT",
-//						"SEX",
-//						"RACEA",
-//						"EDUC"
-//						},
-//				"1,4"),
+		buildClassificationConfigurations(
+				"Ihis",
+				new String[] { "REGION", "AGE", "SEX", "RACEA" },
+				new String[] {
+						"YEAR",
+						"QUARTER",
+						"REGION",
+						"PERNUM",
+						"MARSTAT",
+						"SEX",
+						"RACEA",
+						"EDUC"
+						},
+				"ihis_comma.csv",
+				"1,4", standardClassifier),
 	};
 
 	private static ClassificationConfig[][] mergeConfigBlocks (ClassificationConfig[][][] configBlockArray) {
@@ -186,7 +180,7 @@ public class CalculateClassificationAccuracies {
 		
 	}
 
-	private static void evaluateConfigs(ClassificationConfig[][] configs, String fileName, Classifier classifier, String[] header) {
+	private static void evaluateConfigs(ClassificationConfig[][] configs, String fileName, String[] header) {
 		
 		PrintWriter out = null;
 		try {
@@ -198,17 +192,16 @@ public class CalculateClassificationAccuracies {
 		for (int j = 1; j < header.length; j++) {
 			out.print(";" + header[j]);
 		}
-		out.print(";PA-" + Classifier.Zero_R.toString());
 		out.print("\n");
 				
 		for (int i = 0; i < configs.length; i++) {
 			
-			out.print(configs[i][0].getDatasetName() + ";");
+			out.print(configs[i][0].getId() + ";");
 			
 			out.print(configs[i][0].getClassAttribute());
 
-			System.out.println("Calculating number of distinct attributes for dataset '" + configs[i][0].getDatasetName() + "' / class attribute '" + configs[i][0].getClassAttribute() + "'");
-			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getDatasetName(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getClassAttribute())));
+			System.out.println("Calculating number of distinct attributes for dataset '" + configs[i][0].getId() + "' / class attribute '" + configs[i][0].getClassAttribute() + "'");
+			out.print(";" + Integer.valueOf(getNumDistinctValues(configs[i][0].getId(), configs[i][0].getInputFileName(), configs[i][0].getNominalAttributes(), configs[i][0].getClassAttribute())));
 			
 			for (int j = 0; j < configs[i].length; j++) {
 
@@ -216,7 +209,7 @@ public class CalculateClassificationAccuracies {
 					
 					Instances data = loadData(configs[i][j]);
 
-					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getClassAttribute(), classifier).pctCorrect());
+					out.printf(";%.2f", getClassificationAccuracyFor(data, configs[i][j].getClassAttribute(), configs[i][j].getClassifier()).pctCorrect());
 
 					System.out.println("Accuracy for attribute '" + configs[i][j].getClassAttribute() + "' calculated");
 
@@ -228,8 +221,6 @@ public class CalculateClassificationAccuracies {
 				
 			}
 			
-			out.printf(";%.2f", getClassificationAccuracyFor(loadData(configs[i][0]), configs[i][0].getClassAttribute(), Classifier.Zero_R).pctCorrect());
-			
 			out.print("\n");
 			out.flush();
 			
@@ -240,17 +231,24 @@ public class CalculateClassificationAccuracies {
 	}
 	
 	
-	
-	/**
-	 * @param id
-	 * @param inputFileName
-	 * @param features
+	/** Builds a matrix of classification configurations. The rows iterate over the different <code>classAttributes</code>.
+	 * The columns represent 4 different predictor settings for each class attribute based on the supplied list of <code>
+	 * qis</code>:<ol>
+	 * <li>use all available attributes as predictors</li>
+	 * <li>use Zero-R for classification</li>
+	 * <li>use all attributes except the <code>qis</code> as predictors</li>
+	 * <li>use only the <code>qis</code> as predictors</li>
+	 * </ol>
+	 * @param id used for identifying the configuration
+	 * @param qis list of qis that determine the predictor configurations
 	 * @param classAttributes
+	 * @param inputFileName
 	 * @param nominalAttributes
+	 * @param classifier one of the available classification algorithms
 	 * @return
 	 */
-	private static ClassificationConfig[][] buildAnalysisConfigurations(String id, String inputFileName,
-			String[] features, String[] classAttributes, String nominalAttributes) {
+	private static ClassificationConfig[][] buildClassificationConfigurations(String id, String[] qis,
+			String[] classAttributes, String inputFileName, String nominalAttributes, Classifier classifier) {
 
 		int numClassAttributes = classAttributes.length;
 		
@@ -258,15 +256,15 @@ public class CalculateClassificationAccuracies {
 		
 		for (int i = 0; i < numClassAttributes; i++) {
 			
-			configArray[i][0] = new ClassificationConfig(id, inputFileName, classAttributes[i], null, false, nominalAttributes);
+			configArray[i][0] = new ClassificationConfig(id, classifier, inputFileName, classAttributes[i], null, nominalAttributes);
 			
-			configArray[i][1] = new ClassificationConfig(id, inputFileName, classAttributes[i], null, false, nominalAttributes).asBaselineConfig();
+			configArray[i][1] = new ClassificationConfig(id, classifier, inputFileName, classAttributes[i], null, nominalAttributes).asBaselineConfig();
 			
-			if (!isClassAttributeAQi(classAttributes[i], features)) {
+			if (!isQi(classAttributes[i], qis)) {
 				
-				configArray[i][2] = new ClassificationConfig(id, inputFileName, classAttributes[i], features, false, nominalAttributes);
+				configArray[i][2] = new ClassificationConfig(id, classifier, inputFileName, classAttributes[i], qis, nominalAttributes);
 								
-				configArray[i][3] = new ClassificationConfig(id, inputFileName, classAttributes[i], features, false, nominalAttributes).invertFeatureSet();
+				configArray[i][3] = new ClassificationConfig(id, classifier, inputFileName, classAttributes[i], qis, nominalAttributes).invertExclusionSet();
 				
 			} else {
 				
@@ -282,7 +280,7 @@ public class CalculateClassificationAccuracies {
 	}
 
 
-	private static boolean isClassAttributeAQi(String classAttribute, String[] qis) {
+	private static boolean isQi(String classAttribute, String[] qis) {
 		
 		for (int i = 0; i < qis.length; i++) {
 			
@@ -410,9 +408,9 @@ public class CalculateClassificationAccuracies {
 		return attNumArray;
 	}
 	
-	private static int getNumDistinctValues(String datasetName, String inputFileName, String nominalAttributes, String attributeName) {
+	private static int getNumDistinctValues(String id, String inputFileName, String nominalAttributes, String attributeName) {
 		
-		Instances data = loadData(new ClassificationConfig(datasetName, inputFileName, null, null, false, nominalAttributes));
+		Instances data = loadData(new ClassificationConfig(id, Classifier.Zero_R, inputFileName, null, null, nominalAttributes));
 				
 		return data.numDistinctValues(data.attribute(attributeName));
 	}

@@ -1,23 +1,38 @@
 package org.deidentifier.arx;
 
 public class ClassificationConfig {
-	private final String datasetName;
+	
+	public enum Classifier {
+		J48,
+		RandomForest,
+		NaiveBayes,
+		Zero_R
+	}
+	
+	private final Classifier classifier; 
+	private final String id;
 	private final String fileName;
 	private final String classAttribute;
 	private final String[] excludedAttributes;
 	private final String nominalAttributes;
 	private final boolean invertedSelection;
 	
+	public ClassificationConfig (String id, Classifier classifier, String fileName, String classAttribute, String[] excludedAttributes, String nominalAttributes) {
+		this (id, classifier, fileName, classAttribute, excludedAttributes, false, nominalAttributes);
+	}
+	
 	/**
-	 * @param datasetName
+	 * @param id
+	 * @param classifier
 	 * @param fileName
 	 * @param classAttribute
 	 * @param excludedAttributes
 	 * @param invertSelection
 	 * @param nominalAttributes
 	 */
-	public ClassificationConfig (String datasetName, String fileName, String classAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
-		this.datasetName = datasetName;
+	private ClassificationConfig (String id, Classifier classifier, String fileName, String classAttribute, String[] excludedAttributes, boolean invertSelection, String nominalAttributes) {
+		this.id = id;
+		this.classifier = classifier;
 		this.fileName = fileName;
 		this.classAttribute = classAttribute;
 		this.excludedAttributes = excludedAttributes;
@@ -25,8 +40,12 @@ public class ClassificationConfig {
 		this.invertedSelection = invertSelection;
 	}
 	
-	public String getDatasetName() {
-		return datasetName;
+	public Classifier getClassifier() {
+		return classifier;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public String getInputFileName() {
@@ -49,16 +68,25 @@ public class ClassificationConfig {
 		return invertedSelection;
 	}
 	
+	/** Create a Zero-R classification-configuration
+	 * @return
+	 */
 	public ClassificationConfig asBaselineConfig() {
 		return new ClassificationConfig(
-				getDatasetName(),
+				getId(),
+				Classifier.Zero_R,
 				getInputFileName(),
 				getClassAttribute(),
 				new String[] { getClassAttribute() },
 				true, getNominalAttributes());
 	}
 	
-	public ClassificationConfig invertFeatureSet() {
+	/** If we only tell Weka to invert the set of excluded attributes (i.e. the dataset should contain <b>only</b>
+	 * these attributes), the dataset would be missing the class attribute. Therefore, we need to make sure to add
+	 * this attribute to the dataset additionally to the inversion done by the Weka-API
+	 * @return
+	 */
+	public ClassificationConfig invertExclusionSet() {
 		
 		String[] inversionArray = new String[getExcludedAttributes().length +1];
 		
@@ -71,7 +99,8 @@ public class ClassificationConfig {
 		inversionArray[getExcludedAttributes().length] = getClassAttribute();
 		
 		return new ClassificationConfig(
-				getDatasetName(),
+				getId(),
+				getClassifier(),
 				getInputFileName(),
 				getClassAttribute(),
 				inversionArray,

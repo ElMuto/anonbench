@@ -1,6 +1,0 @@
-dataset-name;attribute-name;Num-distinct-attributes;PA-max;PA-min;PA-IS-only;PA-QI-only
-Adult BS Marital;workclass;7;71.77;73.89;73.78;74.13
-Adult BS Marital;education;16;40.40;32.62;;
-Adult BS Marital;marital-status;7;67.00;46.63;58.14;61.57
-Adult BS Marital;occupation;14;32.17;13.39;;
-Adult BS Marital;native-country;41;91.56
