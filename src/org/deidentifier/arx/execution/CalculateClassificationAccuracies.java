@@ -143,7 +143,7 @@ public class CalculateClassificationAccuracies {
 		
 		buildClassificationConfigurations(
 				"Ihis",
-				new String[] { "REGION", "AGE", "SEX", "RACEA" },
+				new String[] { "MARSTAT", "AGE", "SEX", "RACEA" },
 				new String[] {
 						"YEAR",
 						"QUARTER",
