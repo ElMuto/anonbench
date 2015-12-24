@@ -243,7 +243,7 @@ public class CalculateClassificationAccuracies {
 	 * @param qis list of qis that determine the predictor configurations
 	 * @param classAttributes
 	 * @param inputFileName
-	 * @param nominalAttributes
+	 * @param nominalAttributes explicitly treat these attributes as nominal
 	 * @param classifier one of the available classification algorithms
 	 * @return
 	 */
