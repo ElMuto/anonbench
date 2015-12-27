@@ -353,7 +353,6 @@ public class BenchmarkDriver {
             // get the frequencies of attribute instantiations
             double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
             
-            double entropy = calcEntropy(freqs);            
             double normalizedEntropy = calcNormalizedEntropy(freqs);
             
             if (
@@ -403,7 +402,6 @@ public class BenchmarkDriver {
                     System.out.println("      arith. mean        = " + mean_arith);
                     System.out.println("      geom. mean         = " + mean_geom);
                     System.out.println("      median             = " + median);
-                    System.out.println("      entropy            = " + entropy);
                     System.out.println("      normalized entropy = " + normalizedEntropy);
                 }
             } else {
@@ -417,7 +415,6 @@ public class BenchmarkDriver {
                 
                 if (verbosity >= 2) {
                     System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
-                    System.out.println("      entropy                       = " + entropy);
                     System.out.println("      normalized entropy            = " + normalizedEntropy);
                 }
                 if (verbosity >= 3) {
