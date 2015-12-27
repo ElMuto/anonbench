@@ -353,15 +353,8 @@ public class BenchmarkDriver {
             // get the frequencies of attribute instantiations
             double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
             
-            // calculate entropy
-            double entropy = 0d;
-            double ln2 = Math.log(2d);
-            for (int i = 0; i < freqs.length; i++) {
-                entropy += freqs[i] * Math.log(freqs[i]) / ln2;
-            }
-            entropy *= -1d;
-            
-            double normalizedEntropy = (ln2 / Math.log(freqs.length)) * entropy;
+            double entropy = calcEntropy(freqs);            
+            double normalizedEntropy = calcNormalizedEntropy(freqs);
             
             if (
                     BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
@@ -441,5 +434,27 @@ public class BenchmarkDriver {
             
             return statsCache.get(statsKey);
         }
+    }
+
+	public static double calcNormalizedEntropy(double[] freqs) {
+		return calcEntropy(freqs) / log2(freqs.length);
+	}
+
+	public static double calcEntropy(double[] freqs) {
+		// calculate entropy
+		double entropy = 0d;
+		for (int i = 0; i < freqs.length; i++) {
+			if (freqs[i] != 0d) entropy += freqs[i] * log2(freqs[i]);
+		}
+		entropy *= -1d;
+		return entropy;
+	}
+    
+    /** calculate the base-2 logarithm
+     * @param r
+     * @return
+     */
+    private static double log2(double r) {
+    	return Math.log(r) / Math.log(2d);
     }
 }
