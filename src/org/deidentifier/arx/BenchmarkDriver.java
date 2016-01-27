@@ -172,21 +172,19 @@ public class BenchmarkDriver {
 
 
 
-    public void anonymize(
-                                 BenchmarkMeasure measure,
-                                 double suppFactor, BenchmarkDataset dataset,
-                                 boolean subsetBased, Integer k,
-                                 Integer l, Double c, Double t,
-                                 Double dMin, Double dMax, String sa,
-                                 Integer ssNum, QiConfig qiConf
-            ) throws IOException {
-    	anonymize (		measure, suppFactor,  dataset,
-		                subsetBased,  k,
-		                l,  c,  t,
-		                dMin,  dMax,  sa,
-		                ssNum,  qiConf,
-		                new Double[] { null }
-            );
+    public void anonymize(BenchmarkMeasure measure,
+                         double suppFactor, BenchmarkDataset dataset,
+                         boolean subsetBased, Integer k,
+                         Integer l, Double c, Double t,
+                         Double dMin, Double dMax, String sa,
+                         Integer ssNum, QiConfig qiConf) throws IOException
+    {
+    							anonymize (		measure, suppFactor,  dataset,
+					                subsetBased,  k,
+					                l,  c,  t,
+					                dMin,  dMax,  sa,
+					                ssNum,  qiConf,
+					                new Double[] { null });
     }
 
 
@@ -202,6 +200,16 @@ public class BenchmarkDriver {
         ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, qiConf, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 //        anonymizer.setMaxTransformations(210000);
+        
+        String ss_string = "";
+        String qs_string = "";
+        String expType   = "";
+        if (accuracies[0] != null && accuracies[1] != null) {
+        	ss_string = accuracies[0].toString();
+        	qs_string = accuracies[1].toString();
+        	double dependency = (accuracies[1] - accuracies[0]) / accuracies[0];
+        	expType = dependency > 0.05 ? "A" : "B";
+        }
 
         // Benchmark
         BenchmarkSetup.BENCHMARK.addRun(assemblePrivacyModelString(dataset.getCriteria()[0], k, c, l, t, suppFactor),
@@ -215,7 +223,11 @@ public class BenchmarkDriver {
                                         sa != null ? sa.toString() : "",
                                         Arrays.toString(dataset.getQuasiIdentifyingAttributes()),
                                         String.valueOf(dataset.getQuasiIdentifyingAttributes().length),
-                                        ssNum != null ? ssNum.toString() : "");
+                                        ssNum != null ? ssNum.toString() : "",
+                                        ss_string,
+                                        qs_string,
+                                        expType
+                                        );
         
 
         ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);

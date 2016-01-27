@@ -58,12 +58,20 @@ public class PerformDependencyDrivenDifficultyExperiments {
 	}
 	
 	private static void comparePrivacyModels() throws IOException {
+		
+		BenchmarkDatafile[] datafiles = new BenchmarkDatafile[] {
+		         BenchmarkDatafile.ADULT,
+		         BenchmarkDatafile.ACS13,
+		         BenchmarkDatafile.FARS,
+		         BenchmarkDatafile.ATUS,
+		         BenchmarkDatafile.IHIS,
+		};
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : new BenchmarkDatafile[] {BenchmarkDatafile.ADULT}) {
+			for (BenchmarkDatafile datafile : datafiles) {
 
 				// for each qi configuration
 				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
@@ -86,7 +94,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 										privacyModel.getK(),
 										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 										null, null, sa,
-										null, qiConf);
+										null, qiConf, accuracies);
 							}
 						}
 					} else { // !privacyModel.isSaBased()

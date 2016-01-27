@@ -52,6 +52,9 @@ public class BenchmarkSetup {
             COLUMNS.QI_SET.toString(),
             COLUMNS.NUM_QIS.toString(),
 			COLUMNS.SS_NUM.toString(),
+			COLUMNS.PA_SE_SE.toString(),
+			COLUMNS.PA_QI_SE.toString(),
+			COLUMNS.EXP_TYPE.toString(),
 	});
 
 	/* measures */
@@ -192,10 +195,10 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-         BenchmarkDatafile.ACS13,
-         BenchmarkDatafile.ATUS,
          BenchmarkDatafile.ADULT,
+         BenchmarkDatafile.ACS13,
          BenchmarkDatafile.FARS,
+         BenchmarkDatafile.ATUS,
          BenchmarkDatafile.IHIS,
 //       BenchmarkDatafile.CUP, // hat nur intervallskalierte Attribute
                                         };
@@ -386,6 +389,24 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Subset-Nr";
+            }
+        },
+        PA_SE_SE {
+            @Override
+            public String toString() {
+                return "PA(SE->SE)";
+            }
+        },
+        PA_QI_SE {
+            @Override
+            public String toString() {
+                return "PA(QI->SE)";
+            }
+        },
+        EXP_TYPE {
+            @Override
+            public String toString() {
+                return "Experiment-Type";
             }
         },
         LATTICE_SIZE {
