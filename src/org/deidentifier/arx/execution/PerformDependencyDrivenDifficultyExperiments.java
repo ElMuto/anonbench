@@ -66,12 +66,20 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		         BenchmarkDatafile.ATUS,
 		         BenchmarkDatafile.IHIS,
 		};
+		
+		BenchmarkDatafile[] datafiles_reverse = new BenchmarkDatafile[] {
+		         BenchmarkDatafile.IHIS,
+		         BenchmarkDatafile.ATUS,
+		         BenchmarkDatafile.FARS,
+		         BenchmarkDatafile.ACS13,
+		         BenchmarkDatafile.ADULT,
+		};
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : datafiles) {
+			for (BenchmarkDatafile datafile : datafiles_reverse) {
 
 				// for each qi configuration
 				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
