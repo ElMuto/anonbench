@@ -31,7 +31,6 @@ import org.deidentifier.arx.ARXLattice.Anonymity;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.ClassificationConfig.Classifier;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
@@ -39,7 +38,6 @@ import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
-import org.deidentifier.arx.execution.CalculateClassificationAccuracies;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
 import org.deidentifier.arx.utility.DataConverter;
@@ -49,8 +47,6 @@ import org.deidentifier.arx.utility.UtilityMeasureDiscernibility;
 import org.deidentifier.arx.utility.UtilityMeasureLoss;
 import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
 import org.deidentifier.arx.utility.UtilityMeasurePrecision;
-
-import weka.core.Instances;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -172,23 +168,10 @@ public class BenchmarkDriver {
         }
         return config;
     }
+    
 
-    /**
-     * @param measure
-     * @param suppFactor
-     * @param dataset
-     * @param subsetBased
-     * @param k
-     * @param l
-     * @param c
-     * @param t
-     * @param dMin
-     * @param dMax
-     * @param sa
-     * @param ssNum
-     * @param customQiCount TODO
-     * @throws IOException
-     */
+
+
     public void anonymize(
                                  BenchmarkMeasure measure,
                                  double suppFactor, BenchmarkDataset dataset,
@@ -196,6 +179,24 @@ public class BenchmarkDriver {
                                  Integer l, Double c, Double t,
                                  Double dMin, Double dMax, String sa,
                                  Integer ssNum, QiConfig qiConf
+            ) throws IOException {
+    	anonymize (		measure, suppFactor,  dataset,
+		                subsetBased,  k,
+		                l,  c,  t,
+		                dMin,  dMax,  sa,
+		                ssNum,  qiConf,
+		                new Double[] { null }
+            );
+    }
+
+
+    public void anonymize(
+                                 BenchmarkMeasure measure,
+                                 double suppFactor, BenchmarkDataset dataset,
+                                 boolean subsetBased, Integer k,
+                                 Integer l, Double c, Double t,
+                                 Double dMin, Double dMax, String sa,
+                                 Integer ssNum, QiConfig qiConf, Double[] accuracies
             ) throws IOException {
 
         ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, qiConf, dataset.getCriteria());
@@ -216,8 +217,6 @@ public class BenchmarkDriver {
                                         String.valueOf(dataset.getQuasiIdentifyingAttributes().length),
                                         ssNum != null ? ssNum.toString() : "");
         
-        String expType = "";
-        if (sa != null) expType = determineExperimentType(dataset);
 
         ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 
@@ -275,31 +274,6 @@ public class BenchmarkDriver {
         
         handle.release();
     }
-
-    private String determineExperimentType(BenchmarkDataset dataset) {
-		ClassificationConfig conf_se_se = new ClassificationConfig(
-				"",
-				Classifier.J48,
-				"data/" + dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
-				dataset.getSensitiveAttribute(),
-				dataset.getQuasiIdentifyingAttributes(),
-				null).asBaselineConfig();		
-		Instances data_se_se = CalculateClassificationAccuracies.loadData(conf_se_se);
-		double acc_se_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
-		
-		ClassificationConfig conf_qi_se = new ClassificationConfig(
-				"",
-				Classifier.J48,
-				"data/" + dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
-				dataset.getSensitiveAttribute(),
-				dataset.getQuasiIdentifyingAttributes(),
-				null).invertExclusionSet();
-		Instances data_qi_se = CalculateClassificationAccuracies.loadData(conf_qi_se);
-		double acc_qi_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
-		
-		System.out.printf("acc1=%f, acc2=%f, diff=%f\n", acc_se_se, acc_qi_se, acc_qi_se - acc_se_se);
-		return null;
-	}
 
 	/**
      * @param pm

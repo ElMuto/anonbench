@@ -25,10 +25,15 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.ClassificationConfig;
 import org.deidentifier.arx.QiConfig;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.ClassificationConfig.Classifier;
+
+import weka.core.Instances;
+
 import org.deidentifier.arx.PrivacyModel;
 
 
@@ -72,6 +77,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 
+							Double[] accuracies = determineExperimentType(dataset);
 							// for each suppression factor
 							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 								// Print status info
@@ -102,5 +108,32 @@ public class PerformDependencyDrivenDifficultyExperiments {
 				}
 			}
 		}
+	}
+
+
+    private static Double[] determineExperimentType(BenchmarkDataset dataset) {
+    	
+		ClassificationConfig conf_se_se = new ClassificationConfig(
+				"",
+				Classifier.J48,
+				dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
+				dataset.getSensitiveAttribute(),
+				dataset.getQuasiIdentifyingAttributes(),
+				null).asBaselineConfig();		
+		Instances data_se_se = CalculateClassificationAccuracies.loadData(conf_se_se);
+		double acc_se_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
+		
+		ClassificationConfig conf_qi_se = new ClassificationConfig(
+				"",
+				Classifier.J48,
+				dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
+				dataset.getSensitiveAttribute(),
+				dataset.getQuasiIdentifyingAttributes(),
+				null).invertExclusionSet();
+		Instances data_qi_se = CalculateClassificationAccuracies.loadData(conf_qi_se);
+		double acc_qi_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
+		
+		System.out.printf("acc1=%f, acc2=%f, diff=%f percent\n", acc_se_se, acc_qi_se, 100d * (acc_qi_se - acc_se_se) / acc_se_se);
+		return new Double[] { acc_se_se, acc_qi_se };
 	}
 }
