@@ -37,7 +37,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class Exec_Multi {
+public class PerformDifficultyExperiments {
 	
 	/**
 	 * Main entry point
