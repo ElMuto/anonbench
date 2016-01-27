@@ -488,7 +488,7 @@ import org.deidentifier.arx.utility.UtilityMeasurePrecision;
              * @return the string, that will be used for finding and loading the
              * datafile with its hierarchies from the filesystem
              */
-            private String getBaseStringForFilename() {
+            public String getBaseStringForFilename() {
                 return baseStringForFilename;
             }
         }

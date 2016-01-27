@@ -296,7 +296,7 @@ public class CalculateClassificationAccuracies {
 	 * @param classificationConfig TODO
 	 * @return the Weka-dataset containing all but the filtered attributes
 	 */
-	private static Instances loadData(ClassificationConfig classificationConfig) {
+	public static Instances loadData(ClassificationConfig classificationConfig) {
 		Instances data = null;
 		String[] filteredAttributes = classificationConfig.getExcludedAttributes();
 		String nominalAttributes = classificationConfig.getNominalAttributes();
@@ -349,7 +349,7 @@ public class CalculateClassificationAccuracies {
 	 * @param classifier the classifier to be used
 	 * @return
 	 */
-	private static Evaluation getClassificationAccuracyFor(Instances data, String attribute, Classifier classifier) {
+	public static Evaluation getClassificationAccuracyFor(Instances data, String attribute, Classifier classifier) {
 
 		data.setClassIndex(data.attribute(attribute).index());
 		Evaluation eval = null;
