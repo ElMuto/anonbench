@@ -84,7 +84,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : datafiles) {
+			for (BenchmarkDatafile datafile : datafilesReverse) {
 
 				// for each qi configuration
 				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
