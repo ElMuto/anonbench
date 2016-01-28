@@ -30,6 +30,7 @@ import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
 
 import de.linearbits.objectselector.Selector;
+import de.linearbits.objectselector.SelectorBuilder;
 import de.linearbits.subframe.graph.Field;
 import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
@@ -45,18 +46,20 @@ public class Analyze_IOD extends GnuPlotter {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateDifficultyInfluencePlots("Plots_influenceOnDifficulty.pdf" , true);
+    	generateDifficultyInfluencePlots("Plots_influenceOnDifficultyMixed.pdf", null, true);
+    	generateDifficultyInfluencePlots("Plots_influenceOnDifficultyTypeA.pdf", "A", true);
+    	generateDifficultyInfluencePlots("Plots_influenceOnDifficultyTypeB.pdf", "B", true);
     	System.out.println("done.");
     }
     
+ 
     /**
-     * Generate the plots
-     * @param pdfFileName TODO
-     * @param condensed TODO
+     * @param pdfFileName
+     * @param condensed
      * @throws IOException
      * @throws ParseException
      */
-    static void generateDifficultyInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
+    static void generateDifficultyInfluencePlots(String pdfFileName, String expType, boolean condensed) throws IOException, ParseException {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));        
 
@@ -132,7 +135,7 @@ public class Analyze_IOD extends GnuPlotter {
         			for (int numQis = 1; numQis <= 4; numQis++) {
         				String lineStyle = "ls " + String.valueOf(numQis);
         				Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, privacyModel.getCriterion().toString(),
-        						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT());
+        						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType);
 
         				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
         						"suppr" + suppFactorString + " attrProp" + attrProp +
@@ -165,31 +168,41 @@ public class Analyze_IOD extends GnuPlotter {
 
 	/** return a a series of points, selected by the parameters supplied
      * @param file
-     * @param suppFactor
-     * @param attrProp
-     * @param measure
-     * @param numQis
-     * @param criterion TODO
-     * @param k TODO
-     * @param c TODO
-     * @param l TODO
-     * @param t TODO
+	 * @param suppFactor
+	 * @param attrProp
+	 * @param measure
+	 * @param numQis
+	 * @param criterion TODO
+	 * @param k TODO
+	 * @param c TODO
+	 * @param l TODO
+	 * @param t TODO
+	 * @param expType TODO
      * @return
      */
     protected static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion,
-    		Integer k, Double c, Integer l, Double t) {
+    		Integer k, Double c, Integer l, Double t, String expType) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
         try {
-            selector = file.getSelectorBuilder()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_K.toString()).equals(k != null ? String.valueOf(k) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_C.toString()).equals(c != null ? String.valueOf(c) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_L.toString()).equals(l != null ? String.valueOf(l) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.PARAM_T.toString()).equals(t != null ? String.valueOf(t) : "").and()
-                           .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
-                           .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
-                           .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis))
-                           .build();
+        	
+        	SelectorBuilder<String[]> preSelectorBuilder = file.getSelectorBuilder()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_K.toString()).equals(k != null ? String.valueOf(k) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_C.toString()).equals(c != null ? String.valueOf(c) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_L.toString()).equals(l != null ? String.valueOf(l) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_T.toString()).equals(t != null ? String.valueOf(t) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
+                    .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
+                    .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis));
+        	
+        	SelectorBuilder<String[]> selectorBuilder = null;
+        	if (expType != null) {
+        		selectorBuilder = preSelectorBuilder.and().field(BenchmarkSetup.COLUMNS.EXP_TYPE.toString()).equals(expType);
+        	} else {
+        		selectorBuilder = preSelectorBuilder;
+        	}
+        	selector = selectorBuilder.build();
+        	
         } catch (ParseException e) {
             e.printStackTrace();
         }
