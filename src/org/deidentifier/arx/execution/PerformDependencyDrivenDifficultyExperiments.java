@@ -84,7 +84,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
 
 		// For each dataset
-		for (BenchmarkDatafile datafile : datafilesReverse) {
+		for (BenchmarkDatafile datafile : datafiles) {
 
 			// for each qi configuration
 			for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
