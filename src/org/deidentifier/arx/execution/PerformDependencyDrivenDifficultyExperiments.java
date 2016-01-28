@@ -137,6 +137,8 @@ public class PerformDependencyDrivenDifficultyExperiments {
 
 	private static Double[] determineExperimentType(BenchmarkDatafile datafile, QiConfig qiConf, String sa) {
     	
+		System.out.println("Starting classification...");
+		
     	String nominalAttributes = null;
     	
     	String[] qis = BenchmarkDataset.customizeQis(BenchmarkSetup.getAllQis(datafile), qiConf);
