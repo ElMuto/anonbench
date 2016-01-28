@@ -80,11 +80,11 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		         BenchmarkDatafile.IHIS,
 		};
 
-		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+		// For each dataset
+		for (BenchmarkDatafile datafile : datafiles) {
 
-			// For each dataset
-			for (BenchmarkDatafile datafile : datafilesReverse) {
+			// for each privacy model
+			for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
 				// for each qi configuration
 				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
