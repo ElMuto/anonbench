@@ -21,6 +21,7 @@
 package org.deidentifier.arx.execution;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
@@ -80,25 +81,26 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		         BenchmarkDatafile.IHIS,
 		};
 
+		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
+
 		// For each dataset
 		for (BenchmarkDatafile datafile : datafilesReverse) {
 
-			// for each privacy model
-			for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+			// for each qi configuration
+			for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
 
-				// for each qi configuration
-				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
+				// for each sensitive attribute candidate
+				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-					BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
-					if (privacyModel.isSaBased()) {
+					Double[] accuracies = determineExperimentType(datafile, qiConf, sa);
 
-						// for each sensitive attribute candidate
-						for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+					// for each privacy model
+					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+
+						if (privacyModel.isSaBased()) {
 
 							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-
-							Double[] accuracies = determineExperimentType(dataset);
 							// for each suppression factor
 							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 								// Print status info
@@ -109,42 +111,45 @@ public class PerformDependencyDrivenDifficultyExperiments {
 										null, null, sa,
 										null, qiConf, accuracies);
 							}
-						}
-					} else { // !privacyModel.isSaBased()
-						
-						BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
-						BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+						} else { // !privacyModel.isSaBased()
 
-						// for each suppression factor
-						for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-							// Print status info
-							System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
-							driver.anonymize(measure, suppFactor, dataset, false,
-									privacyModel.getK(),
-									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-									null, null, null,
-									null, qiConf);
+							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
+							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+
+							// for each suppression factor
+							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+								// Print status info
+								System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
+								driver.anonymize(measure, suppFactor, dataset, false,
+										privacyModel.getK(),
+										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+										null, null, null,
+										null, qiConf);
+							}
 						}
 					}
+					System.out.println();
 				}
 			}
 		}
 	}
 
 
-    private static Double[] determineExperimentType(BenchmarkDataset dataset) {
+	private static Double[] determineExperimentType(BenchmarkDatafile datafile, QiConfig qiConf, String sa) {
     	
     	String nominalAttributes = null;
+    	
+    	String[] qis = BenchmarkDataset.customizeQis(BenchmarkSetup.getAllQis(datafile), qiConf);
 
-    	if (dataset.getDatafile().equals(BenchmarkDatafile.FARS)) nominalAttributes = "4";
-    	if (dataset.getDatafile().equals(BenchmarkDatafile.IHIS)) nominalAttributes = "1,4";
+    	if (datafile.equals(BenchmarkDatafile.FARS)) nominalAttributes = "4";
+    	if (datafile.equals(BenchmarkDatafile.IHIS)) nominalAttributes = "1,4";
     	
 		ClassificationConfig conf_se_se = new ClassificationConfig(
 				"",
 				Classifier.J48,
-				dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
-				dataset.getSensitiveAttribute(),
-				dataset.getQuasiIdentifyingAttributes(),
+				datafile.getBaseStringForFilename() + "_comma.csv",
+				sa,
+				qis,
 				nominalAttributes).asBaselineConfig();		
 		Instances data_se_se = CalculateClassificationAccuracies.loadData(conf_se_se);
 		double acc_se_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
@@ -152,13 +157,14 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		ClassificationConfig conf_qi_se = new ClassificationConfig(
 				"",
 				Classifier.J48,
-				dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
-				dataset.getSensitiveAttribute(),
-				dataset.getQuasiIdentifyingAttributes(),
+				datafile.getBaseStringForFilename() + "_comma.csv",
+				sa,
+				qis,
 				nominalAttributes).invertExclusionSet();
 		Instances data_qi_se = CalculateClassificationAccuracies.loadData(conf_qi_se);
 		double acc_qi_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
 		
+		System.out.println("QI=" + Arrays.toString(qis) + ", SA=" + sa);
 		System.out.printf("acc1=%f, acc2=%f, diff=%f percent\n", acc_se_se, acc_qi_se, 100d * (acc_qi_se - acc_se_se) / acc_se_se);
 		return new Double[] { acc_se_se, acc_qi_se };
 	}

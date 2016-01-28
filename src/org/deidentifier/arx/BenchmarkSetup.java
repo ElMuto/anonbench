@@ -137,6 +137,14 @@ public class BenchmarkSetup {
     	return _saBasedModelsList.toArray(new PrivacyModel[_saBasedModelsList.size()]);
     }
     
+    public static PrivacyModel[] getNonSaBasedPrivacyModels() {
+    	List<PrivacyModel> _saBasedModelsList = new ArrayList<>();
+    	for (PrivacyModel privacyModel : getPrivacyModels()) {
+    		if (!privacyModel.isSaBased()) _saBasedModelsList.add(privacyModel);
+    	}    	
+    	return _saBasedModelsList.toArray(new PrivacyModel[_saBasedModelsList.size()]);
+    }
+    
     /**
      * Returns all metrics
      * @return
@@ -174,6 +182,73 @@ public class BenchmarkSetup {
         return datasetArr;
     }
     
+    public static String[] getAllQis(BenchmarkDatafile datafile) {
+    	switch (datafile) {
+		case ACS13:
+			return new String[] {
+					"Age",
+                    "Citizenship",
+                    "Married",
+                    "Sex",
+                    "Citizenship",
+                    "Childbirth",
+                    "Independent living",
+                    "Ambulatory"};
+		case ADULT:
+			return new String[] {    
+					"age",
+		            "marital-status",
+		            "race",
+		            "sex",
+		            "education",
+		            "native-country",
+		            "salary-class",
+		            "workclass" };
+		case ATUS:
+			return new String[] {   
+					"Age",
+                    "Race",
+                    "Marital status",
+                    "Sex",
+                    "Birthplace",
+                    "Citizenship status",
+                    "Labor force status",
+                    "Region" };
+		case CUP:
+			return new String[] {  
+					"AGE",
+                    "GENDER",
+                    "STATE",
+                    "ZIP",
+                    "INCOME",
+                    "MINRAMNT",
+                    "NGIFTALL" };
+		case FARS:
+			return new String[] {
+					"iage",
+                    "ihispanic",
+                    "irace",
+                    "isex",
+                    "ideathday",
+                    "ideathmon",
+                    "iinjury" };
+		case IHIS:
+			return new String[] {
+					"AGE",
+                    "RACEA",
+                    "MARSTAT",
+                    "SEX",
+                    "MARSTAT",
+                    "PERNUM",
+                    "QUARTER",
+                    "YEAR" };
+		default:
+			throw new RuntimeException("invalid datafile: " + datafile);
+    	
+    	}
+    }
+    
+      
     public static QiConfig[] getQiConfigPowerSet() {
         int[][] powerSet = { { 1          }, { 2       }, { 3       }, { 4       },
                              { 1, 2       }, { 1, 3    }, { 1, 4    }, { 2, 3    }, { 2, 4 }, { 3, 4 },
