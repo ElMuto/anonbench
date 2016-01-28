@@ -136,12 +136,12 @@ public class PerformDependencyDrivenDifficultyExperiments {
 
 
 	private static Double[] determineExperimentType(BenchmarkDatafile datafile, QiConfig qiConf, String sa) {
-    	
-		System.out.println("Starting classification...");
-		
+    			
     	String nominalAttributes = null;
     	
     	String[] qis = BenchmarkDataset.customizeQis(BenchmarkSetup.getAllQis(datafile), qiConf);
+    	
+		System.out.println("Starting classification for dataset " + datafile + ", QI=" + Arrays.toString(qis) + ", SA=" + sa);
 
     	if (datafile.equals(BenchmarkDatafile.FARS)) nominalAttributes = "4";
     	if (datafile.equals(BenchmarkDatafile.IHIS)) nominalAttributes = "1,4";
@@ -166,7 +166,6 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		Instances data_qi_se = CalculateClassificationAccuracies.loadData(conf_qi_se);
 		double acc_qi_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
 		
-		System.out.println("QI=" + Arrays.toString(qis) + ", SA=" + sa);
 		System.out.printf("acc1=%f, acc2=%f, diff=%f percent\n", acc_se_se, acc_qi_se, 100d * (acc_qi_se - acc_se_se) / acc_se_se);
 		return new Double[] { acc_se_se, acc_qi_se };
 	}
