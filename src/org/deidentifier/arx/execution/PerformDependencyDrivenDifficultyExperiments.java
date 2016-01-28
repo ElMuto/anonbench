@@ -67,19 +67,24 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		         BenchmarkDatafile.IHIS,
 		};
 		
-		BenchmarkDatafile[] datafiles_reverse = new BenchmarkDatafile[] {
+		BenchmarkDatafile[] datafilesReverse = new BenchmarkDatafile[] {
 		         BenchmarkDatafile.IHIS,
 		         BenchmarkDatafile.ATUS,
 		         BenchmarkDatafile.FARS,
 		         BenchmarkDatafile.ACS13,
 		         BenchmarkDatafile.ADULT,
 		};
+		
+		BenchmarkDatafile[] datafilesTestNominal = new BenchmarkDatafile[] {
+		         BenchmarkDatafile.FARS,
+		         BenchmarkDatafile.IHIS,
+		};
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : datafiles_reverse) {
+			for (BenchmarkDatafile datafile : datafiles) {
 
 				// for each qi configuration
 				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
@@ -129,13 +134,18 @@ public class PerformDependencyDrivenDifficultyExperiments {
 
     private static Double[] determineExperimentType(BenchmarkDataset dataset) {
     	
+    	String nominalAttributes = null;
+
+    	if (dataset.getDatafile().equals(BenchmarkDatafile.FARS)) nominalAttributes = "4";
+    	if (dataset.getDatafile().equals(BenchmarkDatafile.IHIS)) nominalAttributes = "1,4";
+    	
 		ClassificationConfig conf_se_se = new ClassificationConfig(
 				"",
 				Classifier.J48,
 				dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
 				dataset.getSensitiveAttribute(),
 				dataset.getQuasiIdentifyingAttributes(),
-				null).asBaselineConfig();		
+				nominalAttributes).asBaselineConfig();		
 		Instances data_se_se = CalculateClassificationAccuracies.loadData(conf_se_se);
 		double acc_se_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
 		
@@ -145,7 +155,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 				dataset.getDatafile().getBaseStringForFilename() + "_comma.csv",
 				dataset.getSensitiveAttribute(),
 				dataset.getQuasiIdentifyingAttributes(),
-				null).invertExclusionSet();
+				nominalAttributes).invertExclusionSet();
 		Instances data_qi_se = CalculateClassificationAccuracies.loadData(conf_qi_se);
 		double acc_qi_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
 		

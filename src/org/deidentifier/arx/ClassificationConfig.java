@@ -17,6 +17,14 @@ public class ClassificationConfig {
 	private final String nominalAttributes;
 	private final boolean invertedSelection;
 	
+	/**
+	 * @param id
+	 * @param classifier
+	 * @param fileName
+	 * @param classAttribute
+	 * @param excludedAttributes
+	 * @param nominalAttributes
+	 */
 	public ClassificationConfig (String id, Classifier classifier, String fileName, String classAttribute, String[] excludedAttributes, String nominalAttributes) {
 		this (id, classifier, fileName, classAttribute, excludedAttributes, false, nominalAttributes);
 	}
