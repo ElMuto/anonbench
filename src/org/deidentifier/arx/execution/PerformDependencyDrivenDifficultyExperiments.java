@@ -81,7 +81,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		};
 
 		// For each dataset
-		for (BenchmarkDatafile datafile : datafiles) {
+		for (BenchmarkDatafile datafile : datafilesReverse) {
 
 			// for each privacy model
 			for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
