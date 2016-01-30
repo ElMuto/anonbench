@@ -207,8 +207,7 @@ public class BenchmarkDriver {
         if (accuracies[0] != null && accuracies[1] != null) {
         	ss_string = accuracies[0].toString();
         	qs_string = accuracies[1].toString();
-        	double dependency = (accuracies[1] - accuracies[0]) / accuracies[0];
-        	expType = dependency > 0.05 ? "A" : "B";
+        	expType = accuracies[1] - accuracies[0] > 5d ? "A" : "B";
         }
 
         // Benchmark

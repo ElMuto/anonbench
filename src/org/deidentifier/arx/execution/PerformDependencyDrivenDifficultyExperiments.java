@@ -84,7 +84,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
 
 		// For each dataset
-		for (BenchmarkDatafile datafile : datafilesReverse) {
+		for (BenchmarkDatafile datafile : datafiles) {
 
 			// for each qi configuration
 			for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
@@ -92,7 +92,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 				// for each sensitive attribute candidate
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
-					Double[] accuracies = determineExperimentType(datafile, qiConf, sa);
+					Double[] accuracies = determineAccuracies(datafile, qiConf, sa);
 
 					// for each privacy model
 					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
@@ -135,7 +135,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 	}
 
 
-	private static Double[] determineExperimentType(BenchmarkDatafile datafile, QiConfig qiConf, String sa) {
+	private static Double[] determineAccuracies(BenchmarkDatafile datafile, QiConfig qiConf, String sa) {
     			
     	String nominalAttributes = null;
     	
