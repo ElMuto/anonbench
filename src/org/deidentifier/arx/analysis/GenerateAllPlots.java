@@ -8,7 +8,7 @@ public class GenerateAllPlots {
     	Analyze_IOD.generateDifficultyInfluencePlots("Plots_influenceOnDifficultyMixed.pdf", null, true);
     	Analyze_IOD.generateDifficultyInfluencePlots("Plots_influenceOnDifficultyTypeA.pdf", "A", true);
     	Analyze_IOD.generateDifficultyInfluencePlots("Plots_influenceOnDifficultyTypeB.pdf", "B", true);
-    	Compare_Difficulties.generateDifficultyComparisonPlots();
+    	Analyze_Compared_Difficulties.generateDifficultyComparisonPlots();
     	System.out.println("done.");
     }
 }

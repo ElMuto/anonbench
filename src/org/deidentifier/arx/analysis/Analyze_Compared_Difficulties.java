@@ -48,7 +48,7 @@ import de.linearbits.subframe.render.GnuPlotParams.KeyPos;
 import de.linearbits.subframe.render.LaTeX;
 import de.linearbits.subframe.render.PlotGroup;
 
-public class Compare_Difficulties extends GnuPlotter {
+public class Analyze_Compared_Difficulties extends GnuPlotter {
 
 
 	
