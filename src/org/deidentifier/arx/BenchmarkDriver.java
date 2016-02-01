@@ -60,10 +60,10 @@ public class BenchmarkDriver {
     
     private final UtilityMeasure<Double> measure;
     private final DataConverter converter;
-//    private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
+    private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
 
     public BenchmarkDriver(BenchmarkSetup.BenchmarkMeasure benchmarkMeasure, BenchmarkDataset dataset) {
-//    	this.benchmarkMeasure = benchmarkMeasure;
+    	this.benchmarkMeasure = benchmarkMeasure;
     	this.converter = new DataConverter();;
         String[][] inputArray = dataset.getInputArray();
 		String[] header = dataset.getQuasiIdentifyingAttributes();
@@ -243,10 +243,9 @@ public class BenchmarkDriver {
             
             il_abs = this.measure.evaluate(outputArray).getUtility();
             il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
-//            il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
-//
-//            if (il_rel > 1d || il_rel < 0d) throw new RuntimeException("Invalid value for il_rel: " + il_rel);
-            il_rel = -1d;
+            il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
+
+            if (il_rel > 1d || il_rel < 0d) throw new RuntimeException("Invalid value for il_rel: " + il_rel);
         } else {
         	il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
@@ -255,8 +254,8 @@ public class BenchmarkDriver {
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, il_abs);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL, il_rel);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN, -1d);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, -1d);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN, dataset.getMinInfoLoss(this.benchmarkMeasure));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, dataset.getMaxInfoLoss(this.benchmarkMeasure));
         
         // report solution ratio
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));

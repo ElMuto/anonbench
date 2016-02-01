@@ -104,7 +104,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 							// for each suppression factor
 							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 								// Print status info
-								System.out.println("Running " + privacyModel.toString() + " with SA=" + sa + " and SF=" + suppFactor);
+								System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
 								driver.anonymize(measure, suppFactor, dataset, false,
 										privacyModel.getK(),
 										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
