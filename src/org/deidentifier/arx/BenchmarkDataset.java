@@ -351,7 +351,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         }
 
         private String[] getQuasiIdentifyingAttributesPrivate(QiConfig qiConf) {
-                return customizeQis (BenchmarkSetup.getAllQis(datafile), qiConf);
+                return customizeQis (BenchmarkSetup.getAllAttributes(datafile), qiConf);
         }
 
         /**

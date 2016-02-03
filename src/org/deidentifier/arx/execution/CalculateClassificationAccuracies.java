@@ -1,4 +1,5 @@
 package org.deidentifier.arx.execution;
+import java.util.Set;
 
 import weka.core.converters.CSVLoader;
 import weka.filters.Filter;
@@ -7,8 +8,7 @@ import weka.filters.unsupervised.attribute.Remove;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
 
 import weka.classifiers.Evaluation;
@@ -27,14 +27,14 @@ import org.deidentifier.arx.ClassificationConfig.Classifier;
  */
 public class CalculateClassificationAccuracies {
 	
-	private static final int NUM_CLASSIFICATION_CONSTELLATIONS = 2;
 	private static final Classifier standardClassifier = Classifier.J48;
 
 	public static void main(String[] args) {
 		
-		evaluateConfigs("results/CompleteComparison" + Classifier.J48.toString() + ".csv", new String[] {
+		evaluateConfigs("results/CompleteComparison" + standardClassifier.toString() + ".csv", new String[] {
 				"dataset-name",
-				"attribute-name",
+				"features",
+				"target",
 				"PA-min (Zero-R)",
 				"PA-max"
 		});
@@ -172,5 +172,22 @@ public class CalculateClassificationAccuracies {
 		}
 		
 		return attNumArray;
+	}
+	
+	public static <T> Set<Set<T>> getLimitedPowerset(Set<T> elements, int maxSubsetCardinality) {
+		Set<Set<T>> powerSet = new HashSet<>();
+		if (elements.size() == 1) {
+			powerSet.add(elements);
+		} else {			
+			for (T element : elements) {
+				Set<T> subElements = new HashSet<>(elements);
+				subElements.remove(element);
+				Set<Set<T>> subPowerSet = getLimitedPowerset(subElements, maxSubsetCardinality);
+				powerSet.addAll(subPowerSet);
+			}
+			if (elements.size() <= maxSubsetCardinality) powerSet.add(elements);
+		}
+		
+		return powerSet;
 	}
 }

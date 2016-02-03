@@ -182,7 +182,7 @@ public class BenchmarkSetup {
         return datasetArr;
     }
     
-    public static String[] getAllQis(BenchmarkDatafile datafile) {
+    public static String[] getAllAttributes(BenchmarkDatafile datafile) {
     	switch (datafile) {
 		case ACS13:
 			return new String[] {

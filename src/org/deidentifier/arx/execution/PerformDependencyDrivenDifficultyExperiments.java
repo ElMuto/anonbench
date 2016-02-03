@@ -67,19 +67,6 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		         BenchmarkDatafile.ATUS,
 		         BenchmarkDatafile.IHIS,
 		};
-		
-		BenchmarkDatafile[] datafilesReverse = new BenchmarkDatafile[] {
-		         BenchmarkDatafile.IHIS,
-		         BenchmarkDatafile.ATUS,
-		         BenchmarkDatafile.FARS,
-		         BenchmarkDatafile.ACS13,
-		         BenchmarkDatafile.ADULT,
-		};
-		
-		BenchmarkDatafile[] datafilesTestNominal = new BenchmarkDatafile[] {
-		         BenchmarkDatafile.FARS,
-		         BenchmarkDatafile.IHIS,
-		};
 
 		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
 
@@ -139,7 +126,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
     			
     	String nominalAttributes = null;
     	
-    	String[] qis = BenchmarkDataset.customizeQis(BenchmarkSetup.getAllQis(datafile), qiConf);
+    	String[] qis = BenchmarkDataset.customizeQis(BenchmarkSetup.getAllAttributes(datafile), qiConf);
     	
 		System.out.println("Starting classification for dataset " + datafile + ", QI=" + Arrays.toString(qis) + ", SA=" + sa);
 
