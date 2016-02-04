@@ -140,8 +140,8 @@ public class PerformDependencyDrivenDifficultyExperiments {
 				sa,
 				qis,
 				nominalAttributes).asBaselineConfig();		
-		Instances data_se_se = CalculateClassificationAccuracies.loadData(conf_se_se);
-		double acc_se_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
+		Instances data_se_se = DetermineDependencies.loadData(conf_se_se);
+		double acc_se_se = DetermineDependencies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
 		
 		ClassificationConfig conf_qi_se = new ClassificationConfig(
 				"",
@@ -150,8 +150,8 @@ public class PerformDependencyDrivenDifficultyExperiments {
 				sa,
 				qis,
 				nominalAttributes).invertExclusionSet();
-		Instances data_qi_se = CalculateClassificationAccuracies.loadData(conf_qi_se);
-		double acc_qi_se = CalculateClassificationAccuracies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
+		Instances data_qi_se = DetermineDependencies.loadData(conf_qi_se);
+		double acc_qi_se = DetermineDependencies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
 		
 		System.out.printf("acc1=%f, acc2=%f, diff=%f percent\n", acc_se_se, acc_qi_se, 100d * (acc_qi_se - acc_se_se) / acc_se_se);
 		return new Double[] { acc_se_se, acc_qi_se };

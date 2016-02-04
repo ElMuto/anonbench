@@ -3,7 +3,7 @@ import java.util.*;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.execution.CalculateClassificationAccuracies;
+import org.deidentifier.arx.execution.DetermineDependencies;
 
 public class TestCombinations {
 	
@@ -12,7 +12,7 @@ public class TestCombinations {
 		String[] testString = new String[] {  };
 		Set<String> testList = new HashSet<>(Arrays.asList(testString));
 		
-		Set<Set<String>> powerSet = CalculateClassificationAccuracies.getLimitedPowerset(testList, 1);
+		Set<Set<String>> powerSet = DetermineDependencies.getLimitedPowerset(testList, 1);
 		
 		Assert.assertEquals(1, powerSet.size());
     }
@@ -22,7 +22,7 @@ public class TestCombinations {
 		String[] testString = new String[] { "A" };
 		Set<String> testList = new HashSet<>(Arrays.asList(testString));
 		
-		Set<Set<String>> powerSet = CalculateClassificationAccuracies.getLimitedPowerset(testList, 1);
+		Set<Set<String>> powerSet = DetermineDependencies.getLimitedPowerset(testList, 1);
 		
 		Assert.assertEquals(powOf2(testString.length) - 1, powerSet.size());
     }
@@ -32,7 +32,7 @@ public class TestCombinations {
 		String[] testString = new String[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" };
 		Set<String> testList = new HashSet<>(Arrays.asList(testString));
 		
-		Set<Set<String>> powerSet = CalculateClassificationAccuracies.getLimitedPowerset(testList, 9);
+		Set<Set<String>> powerSet = DetermineDependencies.getLimitedPowerset(testList, 9);
 		
 		Assert.assertEquals(powOf2(testString.length) - 1, powerSet.size());
     }
@@ -42,7 +42,7 @@ public class TestCombinations {
 		String[] testString = BenchmarkSetup.getAllAttributes(BenchmarkDatafile.ADULT);
 		Set<String> testList = new HashSet<>(Arrays.asList(testString));
 		
-		Set<Set<String>> powerSet = CalculateClassificationAccuracies.getLimitedPowerset(testList, 8);
+		Set<Set<String>> powerSet = DetermineDependencies.getLimitedPowerset(testList, 8);
 		
 //		for (Set<String> subset : powerSet) {
 //			System.out.println(subset);
@@ -56,7 +56,7 @@ public class TestCombinations {
 		String[] testString = BenchmarkSetup.getAllAttributes(BenchmarkDatafile.ADULT);
 		Set<String> testList = new HashSet<>(Arrays.asList(testString));
 		
-		Set<Set<String>> powerSet = CalculateClassificationAccuracies.getLimitedPowerset(testList, 4);
+		Set<Set<String>> powerSet = DetermineDependencies.getLimitedPowerset(testList, 4);
 		
 //		for (Set<String> subset : powerSet) {
 //			System.out.println(subset);
@@ -75,7 +75,7 @@ public class TestCombinations {
 			Set<String> restAttributes = new HashSet<>(testAttributes);
 			restAttributes.remove(classAttribute);
 
-			Set<Set<String>> limitedPowerSet = CalculateClassificationAccuracies.getLimitedPowerset(restAttributes, 4);
+			Set<Set<String>> limitedPowerSet = DetermineDependencies.getLimitedPowerset(restAttributes, 4);
 			for (Set<String> features : limitedPowerSet) {
 				// classify
 

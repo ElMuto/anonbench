@@ -187,13 +187,14 @@ public class BenchmarkSetup {
 		case ACS13:
 			return new String[] {
 					"Age",
-                    "Citizenship",
-                    "Married",
                     "Sex",
+                    "Weight",
+					"Income",
+                    "Marital status",
+                    "Education",
                     "Citizenship",
-                    "Childbirth",
-                    "Independent living",
-                    "Ambulatory"};
+                    "Workclass"
+                    };
 		case ADULT:
 			return new String[] {    
 					"age",

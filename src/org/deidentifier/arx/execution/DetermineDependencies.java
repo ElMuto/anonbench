@@ -8,6 +8,7 @@ import weka.filters.unsupervised.attribute.Remove;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -18,14 +19,16 @@ import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
+import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.ClassificationConfig;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.ClassificationConfig.Classifier;
 
 /**
  * @author work
  *
  */
-public class CalculateClassificationAccuracies {
+public class DetermineDependencies {
 	
 	private static final Classifier standardClassifier = Classifier.J48;
 
@@ -33,10 +36,12 @@ public class CalculateClassificationAccuracies {
 		
 		evaluateConfigs("results/CompleteComparison" + standardClassifier.toString() + ".csv", new String[] {
 				"dataset-name",
+				"numFeatures",
 				"features",
 				"target",
 				"PA-min (Zero-R)",
-				"PA-max"
+				"PA-max",
+				"distance"
 		});
 	}
 
@@ -54,16 +59,58 @@ public class CalculateClassificationAccuracies {
 		}
 		out.print("\n");
 
-		ClassificationConfig classificationConfig = new ClassificationConfig(null, null, null, null, null, null);
+		BenchmarkDatafile[] datafiles = new BenchmarkDatafile[] {
+//				BenchmarkDatafile.ADULT,
+//				BenchmarkDatafile.FARS,
+//				BenchmarkDatafile.ACS13,
+				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.IHIS,
+				};
+		
+		for (BenchmarkDatafile datafile : datafiles) {
 
-		Instances data = loadData(classificationConfig);
+			String[] attributesArray = BenchmarkSetup.getAllAttributes(datafile);
+			Set<String> attributes = new HashSet<>(Arrays.asList(attributesArray));
+			String nominalAttributes = null;
+			if (datafile.equals(BenchmarkDatafile.ADULT)) nominalAttributes = "2";
+			if (datafile.equals(BenchmarkDatafile.CUP))   nominalAttributes = "1,2,4,6,7,8";
+			if (datafile.equals(BenchmarkDatafile.FARS))  nominalAttributes = "1,4";
+			if (datafile.equals(BenchmarkDatafile.ACS13))  nominalAttributes = "1,3,4";
+			if (datafile.equals(BenchmarkDatafile.ATUS)) nominalAttributes =  "2";
+			if (datafile.equals(BenchmarkDatafile.IHIS))  nominalAttributes = "1,4,5";
 
-		out.printf(";%.2f", getClassificationAccuracyFor(data, classificationConfig.getClassAttribute(), classificationConfig.getClassifier()).pctCorrect());
+			for (String classAttribute : attributes) {
 
-		System.out.println("Accuracy for attribute '" + classificationConfig.getClassAttribute() + "' calculated");
+				Set<String> restAttributes = new HashSet<>(attributes);
+				restAttributes.remove(classAttribute);
 
-		out.print("\n");
-		out.flush();
+				Set<Set<String>> limitedPowerSet = DetermineDependencies.getLimitedPowerset(restAttributes, 7);
+				for (Set<String> features : limitedPowerSet) {
+					System.out.printf("datset=%s, class=%s, features=%s\n", datafile.toString(), classAttribute, features.toString());
+					String[] featureArray = features.toArray(new String[features.size()]);
+
+					// classify
+					ClassificationConfig classificationConfig = new ClassificationConfig(
+							"FullAttributeSet", standardClassifier, datafile.getBaseStringForFilename() + "_comma.csv",
+							classAttribute, featureArray, nominalAttributes).invertExclusionSet();
+					ClassificationConfig baselineConfig = classificationConfig.asBaselineConfig();
+
+					double baselineAccuracy       = getClassificationAccuracyFor(loadData(baselineConfig), baselineConfig.getClassAttribute(), baselineConfig.getClassifier()).pctCorrect();
+					double classificationAccuracy = getClassificationAccuracyFor(loadData(classificationConfig), classificationConfig.getClassAttribute(), classificationConfig.getClassifier()).pctCorrect();
+
+				out.printf("%s;%d;%s;%s;%.4f;%.4f;%.4f\n",
+						datafile.toString(),
+						featureArray.length,
+						Arrays.toString(featureArray),
+						classAttribute,
+						baselineAccuracy,
+						classificationAccuracy,
+						classificationAccuracy - baselineAccuracy
+						);
+				out.flush();
+			}
+		}
+		}
 
 		out.close();
 
