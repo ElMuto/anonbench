@@ -61,11 +61,11 @@ public class DetermineDependencies {
 		out.print("\n");
 
 		BenchmarkDatafile[] datafiles = new BenchmarkDatafile[] {
-//				BenchmarkDatafile.ADULT,
-//				BenchmarkDatafile.FARS,
-//				BenchmarkDatafile.ACS13,
-//				BenchmarkDatafile.ATUS,
-//				BenchmarkDatafile.IHIS,
+				BenchmarkDatafile.ADULT,
+				BenchmarkDatafile.FARS,
+				BenchmarkDatafile.ACS13,
+				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.IHIS,
 				BenchmarkDatafile.CUP,
 				};
 		
