@@ -61,11 +61,11 @@ public class DetermineDependencies {
 		out.print("\n");
 
 		BenchmarkDatafile[] datafiles = new BenchmarkDatafile[] {
-				BenchmarkDatafile.ADULT,
-				BenchmarkDatafile.FARS,
-				BenchmarkDatafile.ACS13,
-				BenchmarkDatafile.ATUS,
-				BenchmarkDatafile.IHIS,
+//				BenchmarkDatafile.ADULT,
+//				BenchmarkDatafile.FARS,
+//				BenchmarkDatafile.ACS13,
+//				BenchmarkDatafile.ATUS,
+//				BenchmarkDatafile.IHIS,
 				BenchmarkDatafile.CUP,
 				};
 		
@@ -83,7 +83,7 @@ public class DetermineDependencies {
 
 			for (String classAttribute : attributes) {
 
-				if (BenchmarkDatafile.CUP.equals(datafile) && !"ZIP".equals(classAttribute)) {
+				if (!BenchmarkDatafile.CUP.equals(datafile) || !"ZIP".equals(classAttribute)) {
 
 					Set<String> restAttributes = new HashSet<>(attributes);
 					restAttributes.remove(classAttribute);
