@@ -220,7 +220,7 @@ public class BenchmarkSetup {
 					"AGE",
                     "GENDER",
                     "STATE",
-                    "ZIP",
+//                    "ZIP",
                     "INCOME",
                     "MINRAMNT",
                     "NGIFTALL" };

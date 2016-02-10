@@ -31,10 +31,11 @@ import org.deidentifier.arx.ClassificationConfig.Classifier;
 public class DetermineDependencies {
 	
 	private static final Classifier standardClassifier = Classifier.J48;
+	private static final int MAX_SUBSET_SIZE = 7;
 
 	public static void main(String[] args) {
 		
-		evaluateConfigs("results/CompleteComparison" + standardClassifier.toString() + ".csv", new String[] {
+		evaluateConfigs("results/CompleteComparison" + standardClassifier.toString() + "Cup" + ".csv", new String[] {
 				"dataset-name",
 				"numFeatures",
 				"features",
@@ -63,8 +64,9 @@ public class DetermineDependencies {
 //				BenchmarkDatafile.ADULT,
 //				BenchmarkDatafile.FARS,
 //				BenchmarkDatafile.ACS13,
-				BenchmarkDatafile.ATUS,
-				BenchmarkDatafile.IHIS,
+//				BenchmarkDatafile.ATUS,
+//				BenchmarkDatafile.IHIS,
+				BenchmarkDatafile.CUP,
 				};
 		
 		for (BenchmarkDatafile datafile : datafiles) {
@@ -84,7 +86,7 @@ public class DetermineDependencies {
 				Set<String> restAttributes = new HashSet<>(attributes);
 				restAttributes.remove(classAttribute);
 
-				Set<Set<String>> limitedPowerSet = DetermineDependencies.getLimitedPowerset(restAttributes, 7);
+				Set<Set<String>> limitedPowerSet = DetermineDependencies.getLimitedPowerset(restAttributes, MAX_SUBSET_SIZE);
 				for (Set<String> features : limitedPowerSet) {
 					System.out.printf("datset=%s, class=%s, features=%s\n", datafile.toString(), classAttribute, features.toString());
 					String[] featureArray = features.toArray(new String[features.size()]);
