@@ -31,7 +31,7 @@ import org.deidentifier.arx.ClassificationConfig.Classifier;
 public class DetermineDependencies {
 	
 	private static final Classifier standardClassifier = Classifier.J48;
-	private static final int MAX_SUBSET_SIZE = 7;
+	private static final int MAX_SUBSET_SIZE = 1;
 
 	public static void main(String[] args) {
 		
@@ -83,35 +83,39 @@ public class DetermineDependencies {
 
 			for (String classAttribute : attributes) {
 
-				Set<String> restAttributes = new HashSet<>(attributes);
-				restAttributes.remove(classAttribute);
+				if (BenchmarkDatafile.CUP.equals(datafile) && !"ZIP".equals(classAttribute)) {
 
-				Set<Set<String>> limitedPowerSet = DetermineDependencies.getLimitedPowerset(restAttributes, MAX_SUBSET_SIZE);
-				for (Set<String> features : limitedPowerSet) {
-					System.out.printf("datset=%s, class=%s, features=%s\n", datafile.toString(), classAttribute, features.toString());
-					String[] featureArray = features.toArray(new String[features.size()]);
+					Set<String> restAttributes = new HashSet<>(attributes);
+					restAttributes.remove(classAttribute);
 
-					// classify
-					ClassificationConfig classificationConfig = new ClassificationConfig(
-							"FullAttributeSet", standardClassifier, datafile.getBaseStringForFilename() + "_comma.csv",
-							classAttribute, featureArray, nominalAttributes).invertExclusionSet();
-					ClassificationConfig baselineConfig = classificationConfig.asBaselineConfig();
+					Set<Set<String>> limitedPowerSet = DetermineDependencies.getLimitedPowerset(restAttributes, MAX_SUBSET_SIZE);
+					for (Set<String> features : limitedPowerSet) {
+						System.out.printf("datset=%s, class=%s, features=%s\n", datafile.toString(), classAttribute, features.toString());
+						String[] featureArray = features.toArray(new String[features.size()]);
 
-					double baselineAccuracy       = getClassificationAccuracyFor(loadData(baselineConfig), baselineConfig.getClassAttribute(), baselineConfig.getClassifier()).pctCorrect();
-					double classificationAccuracy = getClassificationAccuracyFor(loadData(classificationConfig), classificationConfig.getClassAttribute(), classificationConfig.getClassifier()).pctCorrect();
+						// classify
+						ClassificationConfig classificationConfig = new ClassificationConfig(
+								"FullAttributeSet", standardClassifier, datafile.getBaseStringForFilename() + "_comma.csv",
+								classAttribute, featureArray, nominalAttributes).invertExclusionSet();
+						ClassificationConfig baselineConfig = classificationConfig.asBaselineConfig();
 
-				out.printf("%s;%d;%s;%s;%.4f;%.4f;%.4f\n",
-						datafile.toString(),
-						featureArray.length,
-						Arrays.toString(featureArray),
-						classAttribute,
-						baselineAccuracy,
-						classificationAccuracy,
-						classificationAccuracy - baselineAccuracy
-						);
-				out.flush();
+						double baselineAccuracy       = getClassificationAccuracyFor(loadData(baselineConfig), baselineConfig.getClassAttribute(), baselineConfig.getClassifier()).pctCorrect();
+						double classificationAccuracy = getClassificationAccuracyFor(loadData(classificationConfig), classificationConfig.getClassAttribute(), classificationConfig.getClassifier()).pctCorrect();
+
+						out.printf("%s;%d;%s;%s;%.4f;%.4f;%.4f\n",
+								datafile.toString(),
+								featureArray.length,
+								Arrays.toString(featureArray),
+								classAttribute,
+								baselineAccuracy,
+								classificationAccuracy,
+								classificationAccuracy - baselineAccuracy
+								);
+						out.flush();
+					}
+
+				}
 			}
-		}
 		}
 
 		out.close();
