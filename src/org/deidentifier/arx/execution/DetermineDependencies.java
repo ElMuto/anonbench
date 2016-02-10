@@ -31,11 +31,11 @@ import org.deidentifier.arx.ClassificationConfig.Classifier;
 public class DetermineDependencies {
 	
 	private static final Classifier standardClassifier = Classifier.J48;
-	private static final int MAX_SUBSET_SIZE = 1;
+	private static final int MAX_SUBSET_SIZE = 7;
 
 	public static void main(String[] args) {
 		
-		evaluateConfigs("results/CompleteComparison" + standardClassifier.toString() + "Cup" + ".csv", new String[] {
+		evaluateConfigs("results/AttributeDependencies" + standardClassifier.toString() + ".csv", new String[] {
 				"dataset-name",
 				"numFeatures",
 				"features",
@@ -61,11 +61,11 @@ public class DetermineDependencies {
 		out.print("\n");
 
 		BenchmarkDatafile[] datafiles = new BenchmarkDatafile[] {
-//				BenchmarkDatafile.ADULT,
-//				BenchmarkDatafile.FARS,
-//				BenchmarkDatafile.ACS13,
-//				BenchmarkDatafile.ATUS,
-//				BenchmarkDatafile.IHIS,
+				BenchmarkDatafile.ADULT,
+				BenchmarkDatafile.FARS,
+				BenchmarkDatafile.ACS13,
+				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.IHIS,
 				BenchmarkDatafile.CUP,
 				};
 		
@@ -119,7 +119,7 @@ public class DetermineDependencies {
 		}
 
 		out.close();
-
+		System.out.println("done.");
 	}
 	
 
