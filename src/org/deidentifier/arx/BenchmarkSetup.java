@@ -204,7 +204,8 @@ public class BenchmarkSetup {
 		            "education",
 		            "native-country",
 		            "salary-class",
-		            "workclass" };
+		            "workclass",
+		            "occupation"};
 		case ATUS:
 			return new String[] {   
 					"Age",
@@ -214,7 +215,8 @@ public class BenchmarkSetup {
                     "Birthplace",
                     "Citizenship status",
                     "Labor force status",
-                    "Region" };
+                    "Region",
+                    "Highest level of school completed"};
 		case CUP:
 			return new String[] {  
 					"AGE",
@@ -223,7 +225,8 @@ public class BenchmarkSetup {
                     "ZIP",
                     "INCOME",
                     "MINRAMNT",
-                    "NGIFTALL" };
+                    "NGIFTALL",
+                    "RAMNTALL" };
 		case FARS:
 			return new String[] {
 					"iage",
@@ -232,17 +235,19 @@ public class BenchmarkSetup {
                     "isex",
                     "ideathday",
                     "ideathmon",
-                    "iinjury" };
+                    "iinjury",
+                    "istatenum"};
 		case IHIS:
 			return new String[] {
 					"AGE",
                     "RACEA",
                     "MARSTAT",
                     "SEX",
-                    "MARSTAT",
                     "PERNUM",
                     "QUARTER",
-                    "YEAR" };
+                    "YEAR",
+                    "EDUC",
+                    "REGION"};
 		default:
 			throw new RuntimeException("invalid datafile: " + datafile);
     	
