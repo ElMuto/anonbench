@@ -31,7 +31,7 @@ import org.deidentifier.arx.ClassificationConfig.Classifier;
 public class DetermineDependencies {
 	
 	private static final Classifier standardClassifier = Classifier.J48;
-	private static final int MAX_SUBSET_SIZE = 7;
+	private static final int MAX_SUBSET_SIZE = 8;
 
 	public static void main(String[] args) {
 		
