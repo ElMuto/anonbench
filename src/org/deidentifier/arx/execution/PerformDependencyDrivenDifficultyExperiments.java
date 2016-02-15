@@ -21,7 +21,11 @@
 package org.deidentifier.arx.execution;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
@@ -69,56 +73,45 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		};
 
 		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
+		List<String> lines = Files.readAllLines(Paths.get("dependency_classes.csv"), StandardCharsets.UTF_8);
 
-		// For each dataset
-		for (BenchmarkDatafile datafile : datafiles) {
+		Double[] accuracies = determineAccuracies(datafile, qiConf, sa);
 
-			// for each qi configuration
-			for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
+		// for each privacy model
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
 
-				// for each sensitive attribute candidate
-				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+			if (privacyModel.isSaBased()) {
 
-					Double[] accuracies = determineAccuracies(datafile, qiConf, sa);
+				BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+				BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+				// for each suppression factor
+				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+					// Print status info
+					System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
+					driver.anonymize(measure, suppFactor, dataset, false,
+							privacyModel.getK(),
+							privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+							null, null, sa,
+							null, qiConf, accuracies);
+				}
+			} else { // !privacyModel.isSaBased()
 
-					// for each privacy model
-					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+				BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
+				BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 
-						if (privacyModel.isSaBased()) {
-
-							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
-							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-							// for each suppression factor
-							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-								// Print status info
-								System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
-								driver.anonymize(measure, suppFactor, dataset, false,
-										privacyModel.getK(),
-										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-										null, null, sa,
-										null, qiConf, accuracies);
-							}
-						} else { // !privacyModel.isSaBased()
-
-							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
-							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-
-							// for each suppression factor
-							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-								// Print status info
-								System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
-								driver.anonymize(measure, suppFactor, dataset, false,
-										privacyModel.getK(),
-										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-										null, null, null,
-										null, qiConf);
-							}
-						}
-					}
-					System.out.println();
+				// for each suppression factor
+				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+					// Print status info
+					System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
+					driver.anonymize(measure, suppFactor, dataset, false,
+							privacyModel.getK(),
+							privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+							null, null, null,
+							null, qiConf);
 				}
 			}
 		}
+					System.out.println();
 	}
 
 
