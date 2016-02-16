@@ -68,6 +68,8 @@ public class PerformDependencyDrivenDifficultyExperiments {
 			BenchmarkDatafile datafile = parseDatafile(lineTokens);
 			QiConfig qiConf            = parseQiConf(lineTokens);
 			String se                  = parseSe(lineTokens);
+			
+			lineTokens = null;
 
 			// for each privacy model
 			for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
@@ -84,7 +86,9 @@ public class PerformDependencyDrivenDifficultyExperiments {
 								null, null, se,
 								null, qiConf, accuracies);
 					}
-					dataset.getArxData().getHandle().release();
+					dataset.cleanUp();
+					dataset = null;
+					driver = null;
 				} else { // !privacyModel.isSaBased()
 					BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
 					BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
@@ -99,7 +103,9 @@ public class PerformDependencyDrivenDifficultyExperiments {
 								null, null, null,
 								null, qiConf);
 					}
-					dataset.getArxData().getHandle().release();
+					dataset.cleanUp();
+					dataset = null;
+					driver = null;
 				}
 			}
 			System.out.println();

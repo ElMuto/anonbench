@@ -45,6 +45,12 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         private final double minLoss; private final double maxLoss;
         private final double minEntr; private final double maxEntr;
         private final double minPrec; private final double maxPrec;
+        
+        public void cleanUp () {
+        	inputHandle.release();
+        	inputArray = null;
+        	outputArray = null;
+        }
 
 
         /**
@@ -99,14 +105,6 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 //            System.out.println("  Entr: min = " + String.format(inFormat, minEntr) + " / max = " + String.format(outFormat, maxEntr));
 //            System.out.println("  Prec: min = " + String.format(inFormat, minPrec) + " / max = " + String.format(outFormat, maxPrec));
             System.out.println();
-            
-            // clean up
-            for (int i = 0; i < inputArray.length; i++) {
-            	for (int j = 0; j < inputArray[0].length; j++) {
-            		inputArray[i][j] = null;
-            		outputArray[i][j] = null;
-            	}
-            }
         }
 
 
