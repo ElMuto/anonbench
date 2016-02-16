@@ -2,7 +2,8 @@ package org.deidentifier.arx;
 
 public class QiConfig {
     private final int numQis;
-    private final int[] activeQis;
+    private int[] activeQis = null;
+    private String[] allQis = null;
     
     public QiConfig(int numQis) {
         super();
@@ -16,6 +17,12 @@ public class QiConfig {
         numQis = activeQis != null ? activeQis.length : 0;
     }
 
+    public QiConfig(String[] qiArray) {
+        super();
+        this.allQis = qiArray;
+        numQis = qiArray != null ? qiArray.length : 0;
+    }
+
     public int getNumQis() {
         return numQis;
     }
@@ -27,4 +34,8 @@ public class QiConfig {
     public int[] getActiveQis() {
         return activeQis;
     }
+
+	public String[] getAllQis() {
+		return allQis;
+	}
 }

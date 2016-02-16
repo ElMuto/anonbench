@@ -24,20 +24,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.ClassificationConfig;
 import org.deidentifier.arx.QiConfig;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.ClassificationConfig.Classifier;
-
-import weka.core.Instances;
 
 import org.deidentifier.arx.PrivacyModel;
 
@@ -56,97 +51,89 @@ public class PerformDependencyDrivenDifficultyExperiments {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-
-//		evaluateCriteriaWithDifferentSuppressionValues();
 		comparePrivacyModels();
 		System.out.println("done.");
 	}
 	
 	private static void comparePrivacyModels() throws IOException {
-		
-		BenchmarkDatafile[] datafiles = new BenchmarkDatafile[] {
-		         BenchmarkDatafile.ADULT,
-		         BenchmarkDatafile.ACS13,
-		         BenchmarkDatafile.FARS,
-		         BenchmarkDatafile.ATUS,
-		         BenchmarkDatafile.IHIS,
-		};
 
 		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
 		List<String> lines = Files.readAllLines(Paths.get("dependency_classes.csv"), StandardCharsets.UTF_8);
+		
+		for (String line : lines) {
 
-		Double[] accuracies = determineAccuracies(datafile, qiConf, sa);
+			String[] lineTokens = line.split(";");
 
-		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+			Double[] accuracies        = parseAccuracies(lineTokens);
+			BenchmarkDatafile datafile = parseDatafile(lineTokens);
+			QiConfig qiConf            = parseQiConf(lineTokens);
+			String se                  = parseSe(lineTokens);
 
-			if (privacyModel.isSaBased()) {
+			// for each privacy model
+			for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+				if (privacyModel.isSaBased()) {
+					BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, se);
+					BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+					// for each suppression factor
+					for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+						// Print status info
+						System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
+						driver.anonymize(measure, suppFactor, dataset, false,
+								privacyModel.getK(),
+								privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+								null, null, se,
+								null, qiConf, accuracies);
+					}
+				} else { // !privacyModel.isSaBased()
 
-				BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
-				BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-				// for each suppression factor
-				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-					// Print status info
-					System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
-					driver.anonymize(measure, suppFactor, dataset, false,
-							privacyModel.getK(),
-							privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-							null, null, sa,
-							null, qiConf, accuracies);
-				}
-			} else { // !privacyModel.isSaBased()
+					BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
+					BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 
-				BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
-				BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-
-				// for each suppression factor
-				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-					// Print status info
-					System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
-					driver.anonymize(measure, suppFactor, dataset, false,
-							privacyModel.getK(),
-							privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-							null, null, null,
-							null, qiConf);
+					// for each suppression factor
+					for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+						// Print status info
+						System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
+						driver.anonymize(measure, suppFactor, dataset, false,
+								privacyModel.getK(),
+								privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+								null, null, null,
+								null, qiConf);
+					}
 				}
 			}
+			System.out.println();
 		}
-					System.out.println();
 	}
 
 
-	private static Double[] determineAccuracies(BenchmarkDatafile datafile, QiConfig qiConf, String sa) {
-    			
-    	String nominalAttributes = null;
-    	
-    	String[] qis = BenchmarkDataset.customizeQis(BenchmarkSetup.getAllAttributes(datafile), qiConf);
-    	
-		System.out.println("Starting classification for dataset " + datafile + ", QI=" + Arrays.toString(qis) + ", SA=" + sa);
+	private static String parseSe(String[] lineTokens) {
+		return lineTokens[3];
+	}
 
-    	if (datafile.equals(BenchmarkDatafile.FARS)) nominalAttributes = "4";
-    	if (datafile.equals(BenchmarkDatafile.IHIS)) nominalAttributes = "1,4";
-    	
-		ClassificationConfig conf_se_se = new ClassificationConfig(
-				"",
-				Classifier.J48,
-				datafile.getBaseStringForFilename() + "_comma.csv",
-				sa,
-				qis,
-				nominalAttributes).asBaselineConfig();		
-		Instances data_se_se = DetermineDependencies.loadData(conf_se_se);
-		double acc_se_se = DetermineDependencies.getClassificationAccuracyFor(data_se_se, conf_se_se.getClassAttribute(), conf_se_se.getClassifier()).pctCorrect();
-		
-		ClassificationConfig conf_qi_se = new ClassificationConfig(
-				"",
-				Classifier.J48,
-				datafile.getBaseStringForFilename() + "_comma.csv",
-				sa,
-				qis,
-				nominalAttributes).invertExclusionSet();
-		Instances data_qi_se = DetermineDependencies.loadData(conf_qi_se);
-		double acc_qi_se = DetermineDependencies.getClassificationAccuracyFor(data_qi_se, conf_qi_se.getClassAttribute(), conf_qi_se.getClassifier()).pctCorrect();
-		
-		System.out.printf("acc1=%f, acc2=%f, diff=%f percent\n", acc_se_se, acc_qi_se, 100d * (acc_qi_se - acc_se_se) / acc_se_se);
-		return new Double[] { acc_se_se, acc_qi_se };
+	private static QiConfig parseQiConf(String[] lineTokens) {
+		return new QiConfig(lineTokens[2].replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(", ", ",").split(","));
+	}
+
+	private static BenchmarkDatafile parseDatafile(String[] lineTokens) {
+		int di = 0;
+		if (lineTokens[di].equals("ACS13")) {
+			return BenchmarkDatafile.ACS13;
+		} else if (lineTokens[di].equals("Adult")) {
+			return BenchmarkDatafile.ADULT;
+		} else if (lineTokens[di].equals("Atus")) {
+			return BenchmarkDatafile.ATUS;
+		} else if (lineTokens[di].equals("Cup")) {
+			return BenchmarkDatafile.CUP;
+		} else if (lineTokens[di].equals("Fars")) {
+			return BenchmarkDatafile.FARS;
+		} else if (lineTokens[di].equals("Ihis")) {
+			return BenchmarkDatafile.IHIS;
+		} else {
+			return null;
+		}
+	}
+
+	private static Double[] parseAccuracies(String[] lineTokens) {
+		return new Double[] { Double.parseDouble(lineTokens[4]), Double.parseDouble(lineTokens[5]) };
 	}
 }
