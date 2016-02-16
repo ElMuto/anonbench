@@ -54,12 +54,12 @@ public class PerformDependencyDrivenDifficultyExperiments {
 		comparePrivacyModels();
 		System.out.println("done.");
 	}
-	
+
 	private static void comparePrivacyModels() throws IOException {
 
 		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
 		List<String> lines = Files.readAllLines(Paths.get("dependency_classes.csv"), StandardCharsets.UTF_8);
-		
+
 		for (String line : lines) {
 
 			String[] lineTokens = line.split(";");
@@ -85,7 +85,6 @@ public class PerformDependencyDrivenDifficultyExperiments {
 								null, qiConf, accuracies);
 					}
 				} else { // !privacyModel.isSaBased()
-
 					BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
 					BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 

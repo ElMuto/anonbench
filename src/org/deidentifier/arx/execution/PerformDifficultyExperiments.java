@@ -82,6 +82,7 @@ public class PerformDifficultyExperiments {
 										null, null, sa,
 										null, qiConf);
 							}
+							dataset.getArxData().getHandle().release();
 						}
 					} else { // !privacyModel.isSaBased()
 						
@@ -98,6 +99,7 @@ public class PerformDifficultyExperiments {
 									null, null, null,
 									null, qiConf);
 						}
+						dataset.getArxData().getHandle().release();
 					}
 				}
 			}
