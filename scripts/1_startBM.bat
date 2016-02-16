@@ -16,6 +16,7 @@ pause
 
 plink -m %_commandfile% PCluster-fed%_cluster_node%
 
+pscp dependency_classes.csv PCluster-fed%_cluster_node%:%_remote_dir%/
 pscp %_benchmark_jar_path% PCluster-fed%_cluster_node%:%_remote_dir%/jars/%_benchmark_jar_name%
 
 pscp %_run_sh_path% PCluster-fed%_cluster_node%:%_remote_dir%/
