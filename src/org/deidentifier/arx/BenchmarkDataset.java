@@ -95,8 +95,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.maxEntr = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(outputArray).getUtility();
             this.maxPrec = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
 
-            String inFormat =  "%13.2f";
-            String outFormat = "%16.2f";
+//            String inFormat =  "%13.2f";
+//            String outFormat = "%16.2f";
 //            System.out.println();
 //            System.out.println(datafile + " " + Arrays.toString(header) + ", SA=" + sensitiveAttribute);
 //            System.out.println("  AECS: min = " + String.format(inFormat, minAecs) + " / max = " + String.format(outFormat, maxAecs));
