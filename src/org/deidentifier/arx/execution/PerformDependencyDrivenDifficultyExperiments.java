@@ -43,7 +43,7 @@ import org.deidentifier.arx.PrivacyModel;
 /**
  * Main benchmark class. Run with java -Xmx4G -XX:+UseConcMarkSweepGC -jar anonbench-0.1.jar
  * 
- * @author Fabian Prasser
+ * @author Helmut Spengler
  */
 public class PerformDependencyDrivenDifficultyExperiments {
 	
@@ -60,7 +60,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
+		BenchmarkMeasure[] measures = new BenchmarkMeasure[] { BenchmarkMeasure.LOSS, BenchmarkMeasure.AECS };
 		List<String> lines = Files.readAllLines(Paths.get("dependency_classes.csv"), StandardCharsets.UTF_8);
 
 		for (String line : lines) {
@@ -80,23 +80,24 @@ public class PerformDependencyDrivenDifficultyExperiments {
 					qiConf.addQi(se);
 				}
 				BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, se);
-				BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+
 				// for each suppression factor
 				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-					// Print status info
-					System.out.println("Running " + privacyModel.toString() + "\twith SF="
-							+ suppFactor + ",\tDataset=" + datafile + ", QIs="
-							+ Arrays.toString(qiConf.getAllQis())
-							+ (privacyModel.isSaBased() ? ", SE=" + se : "" ));
-					driver.anonymize(measure, suppFactor, dataset, false,
-							privacyModel.getK(),
-							privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-							null, null, se,
-							null, qiConf, accuracies);
+					for (BenchmarkMeasure measure : measures) {
+						BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+						// Print status info
+						System.out.println("Running " + privacyModel.toString() + ",\tSF=" + suppFactor
+								+ ", \tmeasure=" + measure + ",\tdataset=" + datafile + ", QIs="
+								+ Arrays.toString(qiConf.getAllQis())
+								+ (privacyModel.isSaBased() ? ", SE=" + se : "" ));
+						driver.anonymize(measure, suppFactor, dataset, false,
+								privacyModel.getK(),
+								privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+								null, null, se,
+								null, qiConf, accuracies);
+					}
 				}
 				dataset.cleanUp();
-				dataset = null;
-				driver = null;
 			}
 		}
 	}
