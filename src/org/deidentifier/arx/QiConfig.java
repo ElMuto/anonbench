@@ -1,9 +1,10 @@
 package org.deidentifier.arx;
 
 public class QiConfig {
-    private final int numQis;
+    private int numQis;
     private int[] activeQis = null;
     private String[] allQis = null;
+    private boolean xTraQi = false;
     
     public QiConfig(int numQis) {
         super();
@@ -37,5 +38,18 @@ public class QiConfig {
 
 	public String[] getAllQis() {
 		return allQis;
+	}
+
+	public void addQi(String se) {
+		if (!xTraQi) {
+			String[] extendedQis = new String[allQis.length + 1];
+			for (int i = 0; i < allQis.length; i++) {
+				extendedQis[i] = allQis[i];
+			}
+			extendedQis[allQis.length] = new String(se);
+			allQis = extendedQis;
+			numQis++;
+			xTraQi = true;
+		}
 	}
 }
