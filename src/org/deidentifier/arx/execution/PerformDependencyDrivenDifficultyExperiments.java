@@ -84,7 +84,7 @@ public class PerformDependencyDrivenDifficultyExperiments {
 				// for each suppression factor
 				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 					// Print status info
-					System.out.println("Running " + privacyModel.toString() + " with SF="
+					System.out.println("Running " + privacyModel.toString() + "\twith SF="
 							+ suppFactor + ",\tDataset=" + datafile + ", QIs="
 							+ Arrays.toString(qiConf.getAllQis())
 							+ (privacyModel.isSaBased() ? ", SE=" + se : "" ));

@@ -161,7 +161,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppressionFactors() {        
-        return new double[] { 0d, 0.05d };
+        return new double[] { /*0d, */0.05d };
     }
 
     /**
