@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_FILE_DRIVEN_993245d
+java -Xmx5G -jar jars/pc-bench.jar -D_DEP_DRIVEN_e44ed0a
