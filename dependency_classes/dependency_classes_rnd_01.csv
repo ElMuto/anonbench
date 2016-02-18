@@ -1,0 +1,180 @@
+ACS13;4;[Citizenship, Education, Workclass, Income];Sex;51.9665;56.131
+Atus;4;[Region, Marital status, Race, Citizenship status];Age;48.1711;48.3658
+Fars;4;[ideathmon, ihispanic, iage, irace];ideathday;57.2159;59.0061
+Adult;4;[marital-status, age, salary-class, education];race;85.979;85.979
+Atus;4;[Age, Region, Labor force status, Sex];Citizenship status;85.0525;85.0525
+Atus;4;[Age, Region, Marital status, Citizenship status];Birthplace;85.0484;91.5509
+Atus;4;[Age, Region, Labor force status, Citizenship status];Birthplace;85.0484;91.5259
+Atus;4;[Marital status, Labor force status, Citizenship status, Sex];Birthplace;85.0484;91.4192
+Atus;4;[Birthplace, Marital status, Labor force status, Citizenship status];Sex;48.1711;57.0098
+Cup;4;[MINRAMNT, STATE, GENDER, INCOME];NGIFTALL;9.7350;17.5770
+ACS13;4;[Education, Marital status, Workclass, Income];Age;1.7737;16.0495
+ACS13;4;[Education, Weight, Marital status, Sex];Income;69.9265;84.291
+Atus;4;[Birthplace, Region, Labor force status, Sex];Citizenship status;85.0525;95.4715
+ACS13;4;[Citizenship, Education, Marital status, Sex];Age;1.7737;15.1066
+Atus;4;[Birthplace, Race, Labor force status, Sex];Citizenship status;85.0525;95.5296
+ACS13;4;[Citizenship, Education, Weight, Income];Marital status;44.6111;62.7006
+ACS13;4;[Citizenship, Education, Weight, Workclass];Marital status;44.6111;62.3645
+ACS13;4;[Citizenship, Education, Weight, Sex];Workclass;40.0276;58.9349
+Adult;4;[age, salary-class, workclass, native-country];marital-status;46.6315;63.1324
+ACS13;4;[Education, Workclass, Income, Sex];Marital status;44.6111;62.98
+Adult;4;[sex, age, salary-class, native-country];marital-status;46.6315;69.1698
+Fars;4;[ideathmon, isex, iage, irace];iinjury;42.7841;64.029
+Atus;4;[Age, Labor force status, Citizenship status, Sex];Marital status;38.4143;58.76
+Adult;4;[sex, age, education, native-country];marital-status;46.6315;67.343
+Fars;4;[ihispanic, isex, iage, irace];iinjury;42.7841;64.029
+ACS13;4;[Citizenship, Age, Income, Sex];Workclass;40.0276;65.6806
+Atus;4;[Age, Region, Labor force status, Citizenship status];Sex;48.1711;75.4726
+Atus;4;[Age, Region, Race, Labor force status];Sex;48.1711;75.5109
+ACS13;4;[Citizenship, Age, Marital status, Income];Workclass;40.0276;65.7344
+ACS13;4;[Education, Age, Weight, Marital status];Workclass;40.0276;65.5671
+ACS13;4;[Age, Weight, Workclass, Income];Marital status;44.6111;74.6555
+ACS13;4;[Education, Age, Workclass, Income];Marital status;44.6111;74.6948
+ACS13;4;[Education, Age, Workclass, Sex];Marital status;44.6111;75.1008
+Fars;4;[ideathday, iinjury, ideathmon, iage];irace;57.2159;88.6276
+ACS13;4;[Education, Age, Income, Sex];Marital status;44.6111;75.0426
+Fars;4;[ideathday, ideathmon, ihispanic, iage];irace;57.2159;92.9402
+Fars;4;[iinjury, isex, iage, irace];ihispanic;57.2159;93.9794
+Ihis;4;[PERNUM, SEX, YEAR, RACEA];MARSTAT;23.6195;59.9269
+Fars;4;[ideathday, ideathmon, iage, irace];ihispanic;57.2159;93.9844
+Fars;4;[ideathday, ideathmon, ihispanic, isex];irace;57.2159;92.9402
+Ihis;4;[PERNUM, AGE, QUARTER, YEAR];MARSTAT;23.6195;76.5557
+Ihis;4;[AGE, SEX, YEAR, RACEA];MARSTAT;23.6195;76.3322
+Ihis;4;[AGE, QUARTER, YEAR, RACEA];MARSTAT;23.6195;75.8137
+Ihis;4;[PERNUM, AGE, YEAR, RACEA];MARSTAT;23.6195;76.8291
+Ihis;4;[AGE, QUARTER, SEX, YEAR];MARSTAT;23.6195;76.0747
+Cup;4;[MINRAMNT, ZIP, GENDER, INCOME];STATE;16.7809;92.4497
+Cup;4;[MINRAMNT, ZIP, AGE, NGIFTALL];STATE;16.7809;92.4497
+Cup;4;[ZIP, AGE, NGIFTALL, INCOME];STATE;16.7809;92.4497
+Cup;4;[ZIP, NGIFTALL, GENDER, INCOME];STATE;16.7809;92.4497
+Cup;4;[MINRAMNT, ZIP, NGIFTALL, INCOME];STATE;16.7809;92.4497
+Adult;3;[sex, marital-status, education];age;2.8181;5.9645
+Adult;3;[sex, marital-status, education];native-country;91.1876;91.2108
+Adult;3;[age, education, workclass];sex;67.5685;67.5685
+Fars;3;[ideathmon, ihispanic, irace];isex;65.5825;65.5825
+Atus;3;[Birthplace, Marital status, Race];Age;48.1711;48.355
+Fars;3;[ideathday, isex, ihispanic];ideathmon;57.2159;62.2517
+Atus;3;[Labor force status, Sex, Citizenship status];Birthplace;85.0484;91.4163
+Adult;3;[marital-status, age, salary-class];sex;67.5685;73.1384
+Cup;3;[MINRAMNT, ZIP, GENDER];NGIFTALL;9.7350;18.0798
+Cup;3;[MINRAMNT, AGE, GENDER];NGIFTALL;9.7350;17.9505
+ACS13;3;[Education, Marital status, Sex];Age;1.7737;15.0455
+Atus;3;[Birthplace, Marital status, Race];Citizenship status;85.0525;95.6369
+Atus;3;[Birthplace, Race, Sex];Citizenship status;85.0525;95.5142
+ACS13;3;[Education, Weight, Income];Age;1.7737;13.0375
+ACS13;3;[Education, Marital status, Sex];Income;69.9265;84.291
+ACS13;3;[Age, Marital status, Sex];Income;69.9265;85.797
+ACS13;3;[Education, Citizenship, Income];Marital status;44.6111;63.0033
+ACS13;3;[Age, Workclass, Sex];Income;69.9265;85.797
+ACS13;3;[Education, Workclass, Sex];Marital status;44.6111;63.0382
+ACS13;3;[Age, Citizenship, Sex];Education;17.5817;35.8094
+Atus;3;[Age, Race, Sex];Marital status;38.4143;59.868
+Adult;3;[sex, age, race];marital-status;46.6315;67.4126
+Fars;3;[ihispanic, iage, irace];iinjury;42.7841;64.029
+ACS13;3;[Education, Citizenship, Marital status];Workclass;40.0276;61.3503
+ACS13;3;[Education, Marital status, Sex];Workclass;40.0276;61.0957
+ACS13;3;[Age, Marital status, Sex];Workclass;40.0276;65.6471
+ACS13;3;[Age, Citizenship, Income];Workclass;40.0276;65.6617
+ACS13;3;[Age, Weight, Marital status];Workclass;40.0276;65.6079
+ACS13;3;[Age, Weight, Income];Workclass;40.0276;65.5671
+Atus;3;[Age, Labor force status, Citizenship status];Sex;48.1711;75.5028
+Fars;3;[ideathmon, isex, iage];irace;57.2159;88.7098
+ACS13;3;[Age, Citizenship, Income];Marital status;44.6111;74.6817
+Fars;3;[ideathday, isex, iage];irace;57.2159;88.7871
+ACS13;3;[Age, Workclass, Sex];Marital status;44.6111;75.1459
+Fars;3;[ideathday, ideathmon, isex];irace;57.2159;88.7098
+Ihis;3;[AGE, QUARTER, SEX];MARSTAT;23.6195;60.3267
+Ihis;3;[PERNUM, AGE, QUARTER];MARSTAT;23.6195;61.0542
+Fars;3;[isex, iage, irace];ihispanic;57.2159;93.9794
+Fars;3;[ideathmon, isex, ihispanic];irace;57.2159;92.9402
+Ihis;3;[PERNUM, AGE, RACEA];MARSTAT;23.6195;61.9918
+Ihis;3;[PERNUM, AGE, YEAR];MARSTAT;23.6195;76.6085
+Ihis;3;[AGE, YEAR, RACEA];MARSTAT;23.6195;75.827
+Ihis;3;[AGE, SEX, YEAR];MARSTAT;23.6195;76.0927
+Ihis;3;[AGE, QUARTER, YEAR];MARSTAT;23.6195;75.6033
+Cup;3;[MINRAMNT, ZIP, AGE];STATE;16.7809;92.4497
+Cup;3;[ZIP, NGIFTALL, INCOME];STATE;16.7809;92.4497
+Cup;3;[ZIP, AGE, INCOME];STATE;16.7809;92.4497
+Cup;3;[ZIP, AGE, NGIFTALL];STATE;16.7809;92.4497
+Cup;3;[ZIP, GENDER, INCOME];STATE;16.7809;92.4497
+Atus;2;[Age, Marital status];Birthplace;85.0484;85.769
+Adult;2;[salary-class, education];native-country;91.1876;91.1876
+Atus;2;[Region, Citizenship status];Age;48.1711;48.3658
+Atus;2;[Birthplace, Citizenship status];Race;77.9747;82.0151
+ACS13;2;[Weight, Income];Education;17.5817;22.0749
+Cup;2;[AGE, NGIFTALL];MINRAMNT;37.0754;42.7027
+Cup;2;[MINRAMNT, AGE];NGIFTALL;9.7350;18.0372
+ACS13;2;[Marital status, Workclass];Education;17.5817;23.2477
+ACS13;2;[Marital status, Workclass];Sex;51.9665;56.9807
+Cup;2;[MINRAMNT, INCOME];NGIFTALL;9.7350;18.0372
+Ihis;2;[AGE, QUARTER];PERNUM;38.6646;50.3205
+Atus;2;[Birthplace, Sex];Citizenship status;85.0525;95.432
+ACS13;2;[Education, Sex];Income;69.9265;82.3645
+ACS13;2;[Education, Weight];Age;1.7737;13.02
+Ihis;2;[AGE, RACEA];PERNUM;38.6646;50.3491
+ACS13;2;[Age, Sex];Education;17.5817;35.8865
+ACS13;2;[Education, Sex];Marital status;44.6111;61.8218
+ACS13;2;[Age, Marital status];Education;17.5817;35.9345
+ACS13;2;[Income, Sex];Workclass;40.0276;56.3376
+ACS13;2;[Age, Income];Education;17.5817;36.096
+Fars;2;[ideathmon, irace];iinjury;42.7841;64.029
+Fars;2;[ihispanic, isex];iinjury;42.7841;64.029
+Fars;2;[isex, irace];iinjury;42.7841;64.029
+Fars;2;[ideathday, ideathmon];iinjury;42.7841;64.029
+Fars;2;[iage, irace];iinjury;42.7841;64.029
+Atus;2;[Age, Labor force status];Sex;48.1711;75.4394
+Atus;2;[Age, Race];Sex;48.1711;75.3229
+ACS13;2;[Age, Income];Workclass;40.0276;65.5642
+ACS13;2;[Age, Weight];Workclass;40.0276;65.5671
+Atus;2;[Birthplace, Age];Sex;48.1711;75.3767
+ACS13;2;[Education, Age];Marital status;44.6111;74.6904
+Fars;2;[ideathday, iage];ihispanic;57.2159;89.2547
+Fars;2;[iinjury, isex];ihispanic;57.2159;89.117
+Fars;2;[ideathday, ideathmon];ihispanic;57.2159;89.2547
+Fars;2;[iinjury, ideathmon];ihispanic;57.2159;89.1923
+Ihis;2;[AGE, SEX];MARSTAT;23.6195;60.3261
+Fars;2;[ideathday, irace];ihispanic;57.2159;93.9854
+Fars;2;[ideathmon, irace];ihispanic;57.2159;93.9963
+Fars;2;[iinjury, ihispanic];irace;57.2159;92.9402
+Ihis;2;[AGE, RACEA];MARSTAT;23.6195;60.6876
+Ihis;2;[AGE, YEAR];MARSTAT;23.6195;75.6194
+Cup;2;[ZIP, NGIFTALL];STATE;16.7809;92.4497
+Cup;2;[ZIP, GENDER];STATE;16.7809;92.4497
+Cup;2;[ZIP, INCOME];STATE;16.7809;92.4497
+Cup;2;[ZIP, AGE];STATE;16.7809;92.4497
+Cup;2;[MINRAMNT, ZIP];STATE;16.7809;92.4497
+Fars;1;[iinjury];isex;65.5825;65.956
+Atus;1;[Race];Citizenship status;85.0525;86.5202
+Atus;1;[Region];Sex;48.1711;48.1711
+Atus;1;[Region];Marital status;38.4143;38.4143
+Adult;1;[education];marital-status;46.6315;47.5565
+Adult;1;[sex];marital-status;46.6315;56.0208
+Adult;1;[salary-class];marital-status;46.6315;51.9031
+Adult;1;[marital-status];sex;67.5685;72.7936
+Atus;1;[Citizenship status];Birthplace;85.0484;91.4163
+Cup;1;[MINRAMNT];NGIFTALL;9.7350;18.1066
+ACS13;1;[Education];Age;1.7737;13.5147
+Ihis;1;[AGE];PERNUM;38.6646;50.3255
+Atus;1;[Birthplace];Citizenship status;85.0525;95.4146
+ACS13;1;[Income];Marital status;44.6111;56.9982
+ACS13;1;[Workclass];Marital status;44.6111;56.3565
+ACS13;1;[Age];Income;69.9265;85.797
+ACS13;1;[Education];Workclass;40.0276;58.868
+Atus;1;[Age];Marital status;38.4143;57.7274
+Ihis;1;[PERNUM];MARSTAT;23.6195;42.6051
+ACS13;1;[Education];Marital status;44.6111;61.8218
+Fars;1;[ideathmon];iinjury;42.7841;64.029
+Fars;1;[ihispanic];iinjury;42.7841;64.029
+Fars;1;[irace];iinjury;42.7841;64.029
+Fars;1;[ideathday];iinjury;42.7841;64.029
+Atus;1;[Age];Sex;48.1711;75.3476
+ACS13;1;[Age];Workclass;40.0276;65.5671
+Fars;1;[ideathday];ihispanic;57.2159;89.2547
+Fars;1;[ideathday];irace;57.2159;88.7871
+Fars;1;[iinjury];irace;57.2159;88.6276
+ACS13;1;[Age];Marital status;44.6111;74.6482
+Fars;1;[iinjury];ihispanic;57.2159;89.117
+Fars;1;[irace];ihispanic;57.2159;93.9854
+Fars;1;[ihispanic];irace;57.2159;92.9402
+Ihis;1;[AGE];MARSTAT;23.6195;59.8545
+Cup;1;[ZIP];STATE;16.7809;92.4497
