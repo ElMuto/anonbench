@@ -34,7 +34,7 @@ FROM (
 		WHEN pa_distance >= 80.0 AND pa_distance < 85.0 THEN '80-85'
 		WHEN pa_distance >= 85.0 AND pa_distance < 90.0 THEN '55-90'
 		WHEN pa_distance >= 90.0 AND pa_distance < 95.0 THEN '90-95'
-		WHEN pa_distance >= 95.0 AND pa_distance <= 100.0 THEN '95-90'
+		WHEN pa_distance >= 95.0 AND pa_distance <= 100.0 THEN '95-100'
 		   ELSE 'Unknown' END) as dependency_class,
 		random() as random
 		FROM attribute_dependencies
