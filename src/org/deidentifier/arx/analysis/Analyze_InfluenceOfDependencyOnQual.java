@@ -38,8 +38,7 @@ import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
 
 public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
-		
-    private static String[]          qualMeasures = new String[] {COLUMNS.DIFFICULTY.toString(), COLUMNS.IL_REL_VALUE.toString()};
+
     private static BenchmarkMeasure[]  ilMeasures = new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.AECS};
     /**
      * Main
@@ -48,9 +47,7 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	for (BenchmarkMeasure ilMeasure : ilMeasures) {
-    		generateDifficultyInfluencePlots("Plots_influenceOfDependencyOnQuality" + ilMeasure.toString() + ".pdf", true, ilMeasure);
-    	}
+    		generateDifficultyInfluencePlots("Plots_influenceOfDependencyOnQuality.pdf", true);
     	System.out.println("done.");
     }
     
@@ -58,11 +55,10 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
     /**
      * @param pdfFileName
      * @param condensed
-     * @param ilMeasure TODO
      * @throws IOException
      * @throws ParseException
      */
-    static void generateDifficultyInfluencePlots(String pdfFileName, boolean condensed, BenchmarkMeasure ilMeasure) throws IOException, ParseException {
+    static void generateDifficultyInfluencePlots(String pdfFileName, boolean condensed) throws IOException, ParseException {
 
     	CSVFile file = new CSVFile(new File("results/results.csv"));        
 
@@ -108,20 +104,18 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
     		commandWriter.println("set yrange [0:1]");
 
 
-    		for (String qualMeasure : qualMeasures) {
+    		for (BenchmarkMeasure ilMeasure : ilMeasures) {
     			for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
     				String suppFactorString = String.valueOf(suppFactor);
     				commandWriter.println();
     				if (condensed) {
     					String originX = suppFactor == 0d ? "0.0" : "0.5";
     					String originY;
-    					String xRange;
-    					if (COLUMNS.DIFFICULTY.toString().equals(qualMeasure)) {
+    					String xRange = "[0:1]";
+    					if (BenchmarkMeasure.AECS.equals(ilMeasure)) {
     						originY = "0.5";
-    						xRange = "[0:1]";
     					} else {
     						originY = "0.0";
-    						xRange = "[0:1]";
     					}
     					commandWriter.println("set xrange " + xRange);
     					String origin = originX + "," + originY;
@@ -129,18 +123,18 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
     				}             
     				commandWriter.println("set title '" + BenchmarkSetup.getSuppressionConfigString(suppFactor) + "'");
     				commandWriter.println("set xlabel \"" + "Degree of Dependency" + "\"");
-    				commandWriter.println("set ylabel \"" + qualMeasure + "\"");
+    				commandWriter.println("set ylabel \"" + ilMeasure + "\"");
     				String pointsFileName = "results/points_" + privacyModel.toString() + "_" +
-    						"suppr" + suppFactorString + "_qMeasure" + qualMeasure + ".csv";
+    						"suppr" + suppFactorString + "_qMeasure" + ilMeasure + ".csv";
     				PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
     				fileBucket.add(new File(pointsFileName));
     				for (int numQis = 1; numQis <= 4; numQis++) {
     					String lineStyle = "ls " + String.valueOf(numQis);
-    					Series2D _series = getSeries(file, suppFactorString, qualMeasure, numQis, privacyModel.getCriterion().toString(),
-    							privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), ilMeasure);
+    					Series2D _series = getSeries(file, suppFactorString, numQis, privacyModel.getCriterion().toString(), privacyModel.getK(),
+    							privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), ilMeasure);
 
     					String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
-    							"suppr" + suppFactorString + "_qMeasure" + qualMeasure +
+    							"suppr" + suppFactorString + "_qMeasure" + ilMeasure +
     							" numQis" + numQis + ".csv";
     					fileBucket.add(new File(qiSpecificPointsFileName));
     					PrintWriter qiSpecificPointsWriter = new PrintWriter(qiSpecificPointsFileName, "UTF-8");
@@ -171,7 +165,6 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
 	/** return a a series of points, selected by the parameters supplied
      * @param file
 	 * @param suppFactor
-	 * @param yAxis
 	 * @param numQis
 	 * @param criterion
 	 * @param k
@@ -179,10 +172,10 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
 	 * @param l
 	 * @param t
 	 * @param ilMeasure TODO
-     * @return
+	 * @return
      */
-    protected static Series2D getSeries(CSVFile file, String suppFactor, String yAxis, int numQis, String criterion,
-    		Integer k, Double c, Integer l, Double t, BenchmarkMeasure ilMeasure) {
+    protected static Series2D getSeries(CSVFile file, String suppFactor, int numQis, String criterion, Integer k,
+    		Double c, Integer l, Double t, BenchmarkMeasure ilMeasure) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
         try {
@@ -204,7 +197,7 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
         }
 
         // Create series
-        Series2D series = new Series2D(file, selector, new Field(COLUMNS.PA_QI_SE.toString()), new Field(COLUMNS.PA_SE_SE.toString()), new Field(yAxis, "Value"));
+        Series2D series = new Series2D(file, selector, new Field(COLUMNS.PA_QI_SE.toString()), new Field(COLUMNS.PA_SE_SE.toString()), new Field(COLUMNS.DIFFICULTY.toString(), "Value"));
         
         return series;
     }
