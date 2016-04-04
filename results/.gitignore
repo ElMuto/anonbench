@@ -56,3 +56,11 @@
 /l-diversity_stats.csv
 /CompleteComparisonJ48Cup.csv
 /AttributeDependenciesJ48.csv
+/Plots_influenceOfSingleAttrOnDifficultyMixed.pdf
+/Plots_influenceOfSingleAttrOnDifficultyTypeA.pdf
+/Plots_influenceOfSingleAttrOnDifficultyTypeB.pdf
+/Plots_influenceOfDependencyOnQuality.pdf
+/Plots_influenceOfSingleAttrOnDifficultyAECS.pdf
+/Plots_influenceOfSingleAttrOnDifficultyLoss.pdf
+/Plots_influenceOfDependencyOnQualityAECS.pdf
+/Plots_influenceOfDependencyOnQualityLoss.pdf

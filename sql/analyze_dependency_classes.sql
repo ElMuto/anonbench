@@ -1,5 +1,5 @@
 ﻿SELECT SETSEED(0);
-SELECT dataset_name, num_features, features, target, pa_min, pa_max--, pa_distance, dependency_class, random, random_rank
+SELECT dataset_name, num_features, features, target, pa_min, pa_max, pa_distance, dependency_class--, random, random_rank
 FROM (
 	SELECT	dataset_name, num_features, features, target, pa_min, pa_max,
 		pa_distance, dependency_class, random,
@@ -41,5 +41,5 @@ FROM (
 		WHERE pa_distance >=0
 	) as base_table
 ) as rank_table
-WHERE random_rank <= 5 AND num_features <= 4
-ORDER BY num_features DESC, dependency_class, random_rank
+WHERE random_rank <= 10 AND num_features <= 4
+ORDER BY num_features DESC, dependency_class, random_rank, dataset_name

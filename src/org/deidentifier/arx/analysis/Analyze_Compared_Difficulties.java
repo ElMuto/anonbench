@@ -178,7 +178,7 @@ public class Analyze_Compared_Difficulties extends GnuPlotter {
     		clusteredPlots.add(new PlotHistogramClustered("Standard deviation - SF " + sf, new Labels("Privacy Model", "Difficulty"), stdDevSeriesClustered));
     		groups.add(new PlotGroup("Clustered plots for SF " + sf, clusteredPlots, clusteredParams, 0.7d));
     		
-    		LaTeX.plot(groups, "results/Plots_compareDifficulties", true);
+    		LaTeX.plot(groups, "results/Plots_compareDifficulties", false);
     	}
     }
 

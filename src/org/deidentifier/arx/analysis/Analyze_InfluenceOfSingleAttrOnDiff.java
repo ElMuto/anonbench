@@ -27,6 +27,7 @@ import java.text.ParseException;
 
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.BenchmarkSetup.COLUMNS;
 
 import de.linearbits.objectselector.Selector;
@@ -36,9 +37,10 @@ import de.linearbits.subframe.graph.Point2D;
 import de.linearbits.subframe.graph.Series2D;
 import de.linearbits.subframe.io.CSVFile;
 
-public class Analyze_IOD extends GnuPlotter {
-	
-    private static String[]  attrProps = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
+public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
+
+    private static String[]  attrProps  = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
+    private static BenchmarkMeasure[]  ilMeasures = new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.AECS};
     /**
      * Main
      * @param args
@@ -46,20 +48,22 @@ public class Analyze_IOD extends GnuPlotter {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
-    	generateDifficultyInfluencePlots("Plots_influenceOnDifficultyMixed.pdf", null, true);
-    	generateDifficultyInfluencePlots("Plots_influenceOnDifficultyTypeA.pdf", "A", true);
-    	generateDifficultyInfluencePlots("Plots_influenceOnDifficultyTypeB.pdf", "B", true);
+    	for (BenchmarkMeasure ilMeasure : ilMeasures) {
+    		generateDifficultyInfluencePlots("Plots_influenceOfSingleAttrOnDifficulty" + ilMeasure.toString() + ".pdf", null, true, ilMeasure);
+    	}
     	System.out.println("done.");
     }
     
  
     /**
      * @param pdfFileName
+     * @param expType "Class A" or "Class B" experiment
      * @param condensed
+     * @param ilMeasure TODO
      * @throws IOException
      * @throws ParseException
      */
-    static void generateDifficultyInfluencePlots(String pdfFileName, String expType, boolean condensed) throws IOException, ParseException {
+    static void generateDifficultyInfluencePlots(String pdfFileName, String expType, boolean condensed, BenchmarkMeasure ilMeasure) throws IOException, ParseException {
         
         CSVFile file = new CSVFile(new File("results/results.csv"));        
 
@@ -135,7 +139,7 @@ public class Analyze_IOD extends GnuPlotter {
         			for (int numQis = 1; numQis <= 4; numQis++) {
         				String lineStyle = "ls " + String.valueOf(numQis);
         				Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, privacyModel.getCriterion().toString(),
-        						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType);
+        						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
 
         				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
         						"suppr" + suppFactorString + " attrProp" + attrProp +
@@ -169,19 +173,20 @@ public class Analyze_IOD extends GnuPlotter {
 	/** return a a series of points, selected by the parameters supplied
      * @param file
 	 * @param suppFactor
-	 * @param attrProp
-	 * @param measure
+	 * @param xAxis
+	 * @param yAxis
 	 * @param numQis
-	 * @param criterion TODO
-	 * @param k TODO
-	 * @param c TODO
-	 * @param l TODO
-	 * @param t TODO
-	 * @param expType TODO
+	 * @param criterion
+	 * @param k
+	 * @param c
+	 * @param l
+	 * @param t
+	 * @param expType "Class A" or "Class B" experiment
+	 * @param ilMeasure TODO
      * @return
      */
-    protected static Series2D getSeries(CSVFile file, String suppFactor, String attrProp, String measure, int numQis, String criterion,
-    		Integer k, Double c, Integer l, Double t, String expType) {
+    protected static Series2D getSeries(CSVFile file, String suppFactor, String xAxis, String yAxis, int numQis, String criterion,
+    		Integer k, Double c, Integer l, Double t, String expType, BenchmarkMeasure ilMeasure) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
         try {
@@ -193,6 +198,7 @@ public class Analyze_IOD extends GnuPlotter {
                     .field(BenchmarkSetup.COLUMNS.PARAM_T.toString()).equals(t != null ? String.valueOf(t) : "").and()
                     .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
                     .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
+                    .field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(ilMeasure.toString()).and()
                     .field(BenchmarkSetup.COLUMNS.NUM_QIS.toString()).equals(String.valueOf(numQis));
         	
         	SelectorBuilder<String[]> selectorBuilder = null;
@@ -208,7 +214,7 @@ public class Analyze_IOD extends GnuPlotter {
         }
 
         // Create series
-        Series2D series = new Series2D(file, selector, new Field(attrProp, "Value"), new Field(measure, "Value"));
+        Series2D series = new Series2D(file, selector, new Field(xAxis, "Value"), new Field(yAxis, "Value"));
         
         return series;
     }
