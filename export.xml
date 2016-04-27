@@ -78,7 +78,8 @@
 
       <manifest>
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.DetermineDependencies" /-->
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.PerformDependencyDrivenDifficultyExperiments" />
+    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.PerformDependencyDrivenDifficultyExperiments" /-->
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.PerformDifficultyExperiments" />
       </manifest>
     </jar>
     <delete dir="build" failonerror="true" />

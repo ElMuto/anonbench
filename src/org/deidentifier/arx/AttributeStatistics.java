@@ -4,6 +4,7 @@ public class AttributeStatistics {
 
     public final Integer numValues;
     public final Double frequencyDeviation;
+    public final Double frequencySpan;
     public final Double variance;
     public final Double skewness;
     public final Double kurtosis;
@@ -19,6 +20,7 @@ public class AttributeStatistics {
     /**
      * @param numValues
      * @param frequencyDeviation
+     * @param frequencySpan TODO
      * @param variance
      * @param skewness
      * @param kurtosis
@@ -33,6 +35,7 @@ public class AttributeStatistics {
      */
     public AttributeStatistics(Integer numValues,
                                Double frequencyDeviation,
+                               Double frequencySpan,
                                Double variance,
                                Double skewness,
                                Double kurtosis,
@@ -42,10 +45,10 @@ public class AttributeStatistics {
                                Double quartil_coeff,
                                Double mean_arith,
                                Double mean_geom,
-                               Double median,
-                               Double entropy) {
+                               Double median, Double entropy) {
         this.numValues = numValues;
         this.frequencyDeviation = frequencyDeviation;
+        this.frequencySpan = frequencyDeviation;
         this.variance = variance;
         this.skewness = skewness;
         this.kurtosis = kurtosis;
@@ -65,6 +68,10 @@ public class AttributeStatistics {
 
     public Double getFrequencyDeviation() {
         return frequencyDeviation;
+    }
+
+    public Double getFrequencySpan() {
+        return frequencySpan;
     }
 
     public Double getVariance() {

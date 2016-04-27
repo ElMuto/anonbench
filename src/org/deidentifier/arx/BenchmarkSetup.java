@@ -67,7 +67,8 @@ public class BenchmarkSetup {
     public static final int NUM_VALUES      = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
     public static final int SKEWNESS        = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
     public static final int KUROTSIS        = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
-    public static final int FREQ_DEVI       = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies of normalized standard deviation
+    public static final int FREQ_DEVI       = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies
+    public static final int FREQ_SPAN       = BENCHMARK.addMeasure(COLUMNS.FREQ_SPAN.toString());  // span of the frequencies
     public static final int STAND_DEVIATION = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
     public static final int VARIATION_COEFF = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
     public static final int QUARTIL_COEFF   = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
@@ -87,6 +88,7 @@ public class BenchmarkSetup {
         BENCHMARK.addAnalyzer(STAND_DEVIATION, new ValueBuffer());
         BENCHMARK.addAnalyzer(VARIATION_COEFF, new ValueBuffer());
         BENCHMARK.addAnalyzer(FREQ_DEVI, new ValueBuffer());
+        BENCHMARK.addAnalyzer(FREQ_SPAN, new ValueBuffer());
         BENCHMARK.addAnalyzer(QUARTIL_COEFF, new ValueBuffer());
         BENCHMARK.addAnalyzer(ENTROPY, new ValueBuffer());
         BENCHMARK.addAnalyzer(EFD_SCORE, new ValueBuffer());
@@ -524,6 +526,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Deviation of frequencies";
+            }
+        },
+        FREQ_SPAN {
+            @Override
+            public String toString() {
+                return "Span of frequencies";
             }
         },
         STAND_DEVI {

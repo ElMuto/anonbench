@@ -279,6 +279,8 @@ public class BenchmarkDriver {
                 attrStats.getEntropy() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.EFD_SCORE, sa != null  && attrStats.getFrequencyDeviation() != null ?
                 attrStats.getEntropy() * attrStats.getFrequencyDeviation() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.FREQ_SPAN, sa != null  && attrStats.getFrequencySpan() != null ?
+                attrStats.getFrequencySpan() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
 
         // Write results incrementally
         BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
@@ -352,6 +354,7 @@ public class BenchmarkDriver {
         } else {
             Integer numValues = null;
             Double  frequencyDeviation = null;
+            Double  frequencySpan = null;
             Double  variance = null;
             Double  skewness = null;
             Double  kurtosis = null;
@@ -430,6 +433,7 @@ public class BenchmarkDriver {
                     stats.addValue(freqs[i]);
                 }
                 frequencyDeviation = stats.getStandardDeviation();
+                frequencySpan = stats.getMax() - stats.getMin();
                 
                 if (verbosity >= 2) {
                     System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
@@ -442,10 +446,10 @@ public class BenchmarkDriver {
             }
             
             statsCache.put(statsKey, new AttributeStatistics(numValues, frequencyDeviation,
-                                           variance, skewness, kurtosis,
-                                           standDeviation, variance_coeff, deviation_norm,
-                                           quartil_coeff, mean_arith,
-                                           mean_geom, median, normalizedEntropy));
+            							   frequencySpan, variance, skewness,
+                                           kurtosis, standDeviation, variance_coeff,
+                                           deviation_norm, quartil_coeff,
+                                           mean_arith, mean_geom, median, normalizedEntropy));
             
             return statsCache.get(statsKey);
         }
