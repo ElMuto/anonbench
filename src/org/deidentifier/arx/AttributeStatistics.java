@@ -48,7 +48,7 @@ public class AttributeStatistics {
                                Double median, Double entropy) {
         this.numValues = numValues;
         this.frequencyDeviation = frequencyDeviation;
-        this.frequencySpan = frequencyDeviation;
+        this.frequencySpan = frequencySpan;
         this.variance = variance;
         this.skewness = skewness;
         this.kurtosis = kurtosis;
