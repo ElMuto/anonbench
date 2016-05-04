@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -39,8 +40,8 @@ import de.linearbits.subframe.io.CSVFile;
 
 public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
 
-    private static String[]  attrProps  = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.NORM_ENTROPY.toString()};
-    private static BenchmarkMeasure[]  ilMeasures = new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.AECS};
+    private static String[]  attrProps  = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.FREQ_SPAN.toString()};
+    private static BenchmarkMeasure[]  ilMeasures = new BenchmarkMeasure[] {BenchmarkMeasure.LOSS/*, BenchmarkMeasure.AECS*/};
     /**
      * Main
      * @param args
@@ -153,13 +154,16 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         				qiSpecificPointsWriter.close();
         				commandWriter.println("plot '" + qiSpecificPointsFileName + "' " + lineStyle + " notitle");
         			}
-                pointsWriter.close();
-                commandWriter.println("f(x) = m*x + b");
-                commandWriter.println("fit f(x) '" + pointsFileName + "' using 1:2 via m,b");
-                commandWriter.println("plot f(x) title 'Line Fit' ls 5");
+       				calcCorrelationCoeff(file, suppFactorString, attrProp, measure, privacyModel.getCriterion().toString(),
+    						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
 
+        			pointsWriter.close();
+        			commandWriter.println("f(x) = m*x + b");
+        			commandWriter.println("fit f(x) '" + pointsFileName + "' using 1:2 via m,b");
+        			commandWriter.println("plot f(x) title 'Line Fit' ls 5");
+
+        		}
         	}
-        }
         if (condensed)
         	commandWriter.println("unset multiplot");
     	}
@@ -170,19 +174,20 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         deleteFilesFromBucket();
     }
 
-	/** return a a series of points, selected by the parameters supplied
+
+    /**
      * @param file
-	 * @param suppFactor
-	 * @param xAxis
-	 * @param yAxis
-	 * @param numQis
-	 * @param criterion
-	 * @param k
-	 * @param c
-	 * @param l
-	 * @param t
-	 * @param expType "Class A" or "Class B" experiment
-	 * @param ilMeasure TODO
+     * @param suppFactor
+     * @param xAxis
+     * @param yAxis
+     * @param numQis
+     * @param criterion
+     * @param k
+     * @param c
+     * @param l
+     * @param t
+     * @param expType
+     * @param ilMeasure
      * @return
      */
     protected static Series2D getSeries(CSVFile file, String suppFactor, String xAxis, String yAxis, int numQis, String criterion,
@@ -217,5 +222,48 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         Series2D series = new Series2D(file, selector, new Field(xAxis, "Value"), new Field(yAxis, "Value"));
         
         return series;
+    }
+    
+    protected static void calcCorrelationCoeff(CSVFile file, String suppFactor, String xAxis, String yAxis, String criterion,
+    		Integer k, Double c, Integer l, Double t, String expType, BenchmarkMeasure ilMeasure) {
+    	String bracketedCriterionString = "[" + criterion + "]";
+        Selector<String[]> selector = null;
+        try {
+        	
+        	SelectorBuilder<String[]> preSelectorBuilder = file.getSelectorBuilder()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_K.toString()).equals(k != null ? String.valueOf(k) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_C.toString()).equals(c != null ? String.valueOf(c) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_L.toString()).equals(l != null ? String.valueOf(l) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.PARAM_T.toString()).equals(t != null ? String.valueOf(t) : "").and()
+                    .field(BenchmarkSetup.COLUMNS.CRITERIA.toString()).equals(bracketedCriterionString).and()
+                    .field(BenchmarkSetup.COLUMNS.SUPPRESSION_FACTOR.toString()).equals(suppFactor).and()
+                    .field(BenchmarkSetup.COLUMNS.IL_MEASURE.toString()).equals(ilMeasure.toString());
+        	
+        	SelectorBuilder<String[]> selectorBuilder = null;
+        	if (expType != null) {
+        		selectorBuilder = preSelectorBuilder.and().field(BenchmarkSetup.COLUMNS.EXP_TYPE.toString()).equals(expType);
+        	} else {
+        		selectorBuilder = preSelectorBuilder;
+        	}
+        	selector = selectorBuilder.build();
+        	
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // Create series
+        Series2D series = new Series2D(file, selector, new Field(xAxis, "Value"), new Field(yAxis, "Value"));
+        
+        int seriesLength = series.getData().size();
+        
+        double []x = new double[seriesLength];
+        double []y = new double[seriesLength];
+        
+        for (int i = 0; i < seriesLength; i++) {
+        	x[i] = Double.parseDouble(series.getData().get(i).x);
+        	y[i] = Double.parseDouble(series.getData().get(i).y);
+        }
+        
+        System.out.println("SF " + suppFactor + ", attrProp " + xAxis + "\t: " + new SpearmansCorrelation().correlation(x, y));
     }
 }
