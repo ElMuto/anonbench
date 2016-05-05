@@ -153,6 +153,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         				String lineStyle = "ls " + String.valueOf(numQis);
         				Series2D _series = getSeriesForSingleQiCount(resultsFile, suppFactorString, attrProp, difficultyMeasure, numQis, privacyModel.getCriterion().toString(),
         						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
+           		        calcSpearman(correlationsWriter, String.valueOf(suppFactor), attrProp, _series, privacyModel.toString(), String.valueOf(numQis), ilMeasure.toString());
 
         				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
         						"suppr" + suppFactorString + " attrProp" + attrProp +
