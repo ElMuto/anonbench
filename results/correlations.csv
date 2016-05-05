@@ -1,0 +1,129 @@
+Criterion;QiNum;ILMeasure;SF;attrProp;SpearmanCC
+dist.-2-diversity;all;Loss;0.0;Deviation of frequencies;0.1834234497411469
+dist.-2-diversity;all;Loss;0.05;Deviation of frequencies;0.2396549762168268
+dist.-2-diversity;all;Loss;0.0;Span of frequencies;0.25273164041033885
+dist.-2-diversity;all;Loss;0.05;Span of frequencies;0.21052519262715066
+dist.-4-diversity;all;Loss;0.0;Deviation of frequencies;0.3564813740200227
+dist.-4-diversity;all;Loss;0.05;Deviation of frequencies;0.44280783807741175
+dist.-4-diversity;all;Loss;0.0;Span of frequencies;0.25198529000229286
+dist.-4-diversity;all;Loss;0.05;Span of frequencies;0.27500027878164246
+dist.-6-diversity;all;Loss;0.0;Deviation of frequencies;0.20322201377730337
+dist.-6-diversity;all;Loss;0.05;Deviation of frequencies;0.2978923930327962
+dist.-6-diversity;all;Loss;0.0;Span of frequencies;-0.014716171977677004
+dist.-6-diversity;all;Loss;0.05;Span of frequencies;0.0350085203159794
+rec.-(4.0, 2)-diversity;all;Loss;0.0;Deviation of frequencies;0.5342494989818325
+rec.-(4.0, 2)-diversity;all;Loss;0.05;Deviation of frequencies;0.6034956789256345
+rec.-(4.0, 2)-diversity;all;Loss;0.0;Span of frequencies;0.7359703544405655
+rec.-(4.0, 2)-diversity;all;Loss;0.05;Span of frequencies;0.7943002386765884
+rec.-(4.0, 4)-diversity;all;Loss;0.0;Deviation of frequencies;0.6725557209910822
+rec.-(4.0, 4)-diversity;all;Loss;0.05;Deviation of frequencies;0.7698659326008074
+rec.-(4.0, 4)-diversity;all;Loss;0.0;Span of frequencies;0.768372083348477
+rec.-(4.0, 4)-diversity;all;Loss;0.05;Span of frequencies;0.8626861781921082
+rec.-(4.0, 6)-diversity;all;Loss;0.0;Deviation of frequencies;0.5058628995916672
+rec.-(4.0, 6)-diversity;all;Loss;0.05;Deviation of frequencies;0.5536427217190583
+rec.-(4.0, 6)-diversity;all;Loss;0.0;Span of frequencies;0.46937216764109874
+rec.-(4.0, 6)-diversity;all;Loss;0.05;Span of frequencies;0.5243018946428861
+rec.-(3.0, 2)-diversity;all;Loss;0.0;Deviation of frequencies;0.618639384330614
+rec.-(3.0, 2)-diversity;all;Loss;0.05;Deviation of frequencies;0.6818446493756025
+rec.-(3.0, 2)-diversity;all;Loss;0.0;Span of frequencies;0.7421818091624492
+rec.-(3.0, 2)-diversity;all;Loss;0.05;Span of frequencies;0.8221928213147841
+rec.-(3.0, 4)-diversity;all;Loss;0.0;Deviation of frequencies;0.6767283437487145
+rec.-(3.0, 4)-diversity;all;Loss;0.05;Deviation of frequencies;0.7752493239475893
+rec.-(3.0, 4)-diversity;all;Loss;0.0;Span of frequencies;0.7711419735143904
+rec.-(3.0, 4)-diversity;all;Loss;0.05;Span of frequencies;0.8672548899278846
+rec.-(3.0, 6)-diversity;all;Loss;0.0;Deviation of frequencies;0.5109190577300169
+rec.-(3.0, 6)-diversity;all;Loss;0.05;Deviation of frequencies;0.5563248171682305
+rec.-(3.0, 6)-diversity;all;Loss;0.0;Span of frequencies;0.47321263134882274
+rec.-(3.0, 6)-diversity;all;Loss;0.05;Span of frequencies;0.5263274549745584
+ent.-2-diversity;all;Loss;0.0;Deviation of frequencies;0.6102453331969973
+ent.-2-diversity;all;Loss;0.05;Deviation of frequencies;0.6595570098773775
+ent.-2-diversity;all;Loss;0.0;Span of frequencies;0.6047362666260857
+ent.-2-diversity;all;Loss;0.05;Span of frequencies;0.6995419681859929
+ent.-4-diversity;all;Loss;0.0;Deviation of frequencies;0.4496069472231549
+ent.-4-diversity;all;Loss;0.05;Deviation of frequencies;0.5168878361869939
+ent.-4-diversity;all;Loss;0.0;Span of frequencies;0.47977521259086875
+ent.-4-diversity;all;Loss;0.05;Span of frequencies;0.5510333099093244
+ent.-6-diversity;all;Loss;0.0;Deviation of frequencies;0.5835415371179071
+ent.-6-diversity;all;Loss;0.05;Deviation of frequencies;0.6099860961066538
+ent.-6-diversity;all;Loss;0.0;Span of frequencies;0.5460518024811039
+ent.-6-diversity;all;Loss;0.05;Span of frequencies;0.5801263076192227
+equ.-dist.-0.2-closeness;all;Loss;0.0;Deviation of frequencies;0.013224700158614738
+equ.-dist.-0.2-closeness;all;Loss;0.05;Deviation of frequencies;0.029638546022789838
+equ.-dist.-0.2-closeness;all;Loss;0.0;Span of frequencies;-0.01764976470318238
+equ.-dist.-0.2-closeness;all;Loss;0.05;Span of frequencies;-0.06847798006141677
+equ.-dist.-0.15-closeness;all;Loss;0.0;Deviation of frequencies;0.08167571303343273
+equ.-dist.-0.15-closeness;all;Loss;0.05;Deviation of frequencies;0.06495095087868347
+equ.-dist.-0.15-closeness;all;Loss;0.0;Span of frequencies;0.016432506817005227
+equ.-dist.-0.15-closeness;all;Loss;0.05;Span of frequencies;-0.018985022979260975
+hier.-dist.-0.2-closeness;all;Loss;0.0;Deviation of frequencies;0.058663798287220924
+hier.-dist.-0.2-closeness;all;Loss;0.05;Deviation of frequencies;0.061604987546408536
+hier.-dist.-0.2-closeness;all;Loss;0.0;Span of frequencies;0.030172052147724983
+hier.-dist.-0.2-closeness;all;Loss;0.05;Span of frequencies;-0.0643241173978444
+hier.-dist.-0.15-closeness;all;Loss;0.0;Deviation of frequencies;0.06261761559099416
+hier.-dist.-0.15-closeness;all;Loss;0.05;Deviation of frequencies;0.055473313542321684
+hier.-dist.-0.15-closeness;all;Loss;0.0;Span of frequencies;-0.003816299124019839
+hier.-dist.-0.15-closeness;all;Loss;0.05;Span of frequencies;-0.0877559276400407
+dist.-2-diversity;all;AECS;0.0;Deviation of frequencies;0.1834234497411469
+dist.-2-diversity;all;AECS;0.05;Deviation of frequencies;0.2396549762168268
+dist.-2-diversity;all;AECS;0.0;Span of frequencies;0.25273164041033885
+dist.-2-diversity;all;AECS;0.05;Span of frequencies;0.21052519262715066
+dist.-4-diversity;all;AECS;0.0;Deviation of frequencies;0.3564813740200227
+dist.-4-diversity;all;AECS;0.05;Deviation of frequencies;0.44280783807741175
+dist.-4-diversity;all;AECS;0.0;Span of frequencies;0.25198529000229286
+dist.-4-diversity;all;AECS;0.05;Span of frequencies;0.27500027878164246
+dist.-6-diversity;all;AECS;0.0;Deviation of frequencies;0.20322201377730337
+dist.-6-diversity;all;AECS;0.05;Deviation of frequencies;0.2978923930327962
+dist.-6-diversity;all;AECS;0.0;Span of frequencies;-0.014716171977677004
+dist.-6-diversity;all;AECS;0.05;Span of frequencies;0.0350085203159794
+rec.-(4.0, 2)-diversity;all;AECS;0.0;Deviation of frequencies;0.5342494989818325
+rec.-(4.0, 2)-diversity;all;AECS;0.05;Deviation of frequencies;0.6034956789256345
+rec.-(4.0, 2)-diversity;all;AECS;0.0;Span of frequencies;0.7359703544405655
+rec.-(4.0, 2)-diversity;all;AECS;0.05;Span of frequencies;0.7943002386765884
+rec.-(4.0, 4)-diversity;all;AECS;0.0;Deviation of frequencies;0.6725557209910822
+rec.-(4.0, 4)-diversity;all;AECS;0.05;Deviation of frequencies;0.7698659326008074
+rec.-(4.0, 4)-diversity;all;AECS;0.0;Span of frequencies;0.768372083348477
+rec.-(4.0, 4)-diversity;all;AECS;0.05;Span of frequencies;0.8626861781921082
+rec.-(4.0, 6)-diversity;all;AECS;0.0;Deviation of frequencies;0.5058628995916672
+rec.-(4.0, 6)-diversity;all;AECS;0.05;Deviation of frequencies;0.5536427217190583
+rec.-(4.0, 6)-diversity;all;AECS;0.0;Span of frequencies;0.46937216764109874
+rec.-(4.0, 6)-diversity;all;AECS;0.05;Span of frequencies;0.5243018946428861
+rec.-(3.0, 2)-diversity;all;AECS;0.0;Deviation of frequencies;0.618639384330614
+rec.-(3.0, 2)-diversity;all;AECS;0.05;Deviation of frequencies;0.6818446493756025
+rec.-(3.0, 2)-diversity;all;AECS;0.0;Span of frequencies;0.7421818091624492
+rec.-(3.0, 2)-diversity;all;AECS;0.05;Span of frequencies;0.8221928213147841
+rec.-(3.0, 4)-diversity;all;AECS;0.0;Deviation of frequencies;0.6767283437487145
+rec.-(3.0, 4)-diversity;all;AECS;0.05;Deviation of frequencies;0.7752493239475893
+rec.-(3.0, 4)-diversity;all;AECS;0.0;Span of frequencies;0.7711419735143904
+rec.-(3.0, 4)-diversity;all;AECS;0.05;Span of frequencies;0.8672548899278846
+rec.-(3.0, 6)-diversity;all;AECS;0.0;Deviation of frequencies;0.5109190577300169
+rec.-(3.0, 6)-diversity;all;AECS;0.05;Deviation of frequencies;0.5563248171682305
+rec.-(3.0, 6)-diversity;all;AECS;0.0;Span of frequencies;0.47321263134882274
+rec.-(3.0, 6)-diversity;all;AECS;0.05;Span of frequencies;0.5263274549745584
+ent.-2-diversity;all;AECS;0.0;Deviation of frequencies;0.6102453331969973
+ent.-2-diversity;all;AECS;0.05;Deviation of frequencies;0.6595570098773775
+ent.-2-diversity;all;AECS;0.0;Span of frequencies;0.6047362666260857
+ent.-2-diversity;all;AECS;0.05;Span of frequencies;0.6995419681859929
+ent.-4-diversity;all;AECS;0.0;Deviation of frequencies;0.4496069472231549
+ent.-4-diversity;all;AECS;0.05;Deviation of frequencies;0.5168878361869939
+ent.-4-diversity;all;AECS;0.0;Span of frequencies;0.47977521259086875
+ent.-4-diversity;all;AECS;0.05;Span of frequencies;0.5510333099093244
+ent.-6-diversity;all;AECS;0.0;Deviation of frequencies;0.5835415371179071
+ent.-6-diversity;all;AECS;0.05;Deviation of frequencies;0.6099860961066538
+ent.-6-diversity;all;AECS;0.0;Span of frequencies;0.5460518024811039
+ent.-6-diversity;all;AECS;0.05;Span of frequencies;0.5801263076192227
+equ.-dist.-0.2-closeness;all;AECS;0.0;Deviation of frequencies;0.013224700158614738
+equ.-dist.-0.2-closeness;all;AECS;0.05;Deviation of frequencies;0.029638546022789838
+equ.-dist.-0.2-closeness;all;AECS;0.0;Span of frequencies;-0.01764976470318238
+equ.-dist.-0.2-closeness;all;AECS;0.05;Span of frequencies;-0.06847798006141677
+equ.-dist.-0.15-closeness;all;AECS;0.0;Deviation of frequencies;0.08167571303343273
+equ.-dist.-0.15-closeness;all;AECS;0.05;Deviation of frequencies;0.06495095087868347
+equ.-dist.-0.15-closeness;all;AECS;0.0;Span of frequencies;0.016432506817005227
+equ.-dist.-0.15-closeness;all;AECS;0.05;Span of frequencies;-0.018985022979260975
+hier.-dist.-0.2-closeness;all;AECS;0.0;Deviation of frequencies;0.058663798287220924
+hier.-dist.-0.2-closeness;all;AECS;0.05;Deviation of frequencies;0.061604987546408536
+hier.-dist.-0.2-closeness;all;AECS;0.0;Span of frequencies;0.030172052147724983
+hier.-dist.-0.2-closeness;all;AECS;0.05;Span of frequencies;-0.0643241173978444
+hier.-dist.-0.15-closeness;all;AECS;0.0;Deviation of frequencies;0.06261761559099416
+hier.-dist.-0.15-closeness;all;AECS;0.05;Deviation of frequencies;0.055473313542321684
+hier.-dist.-0.15-closeness;all;AECS;0.0;Span of frequencies;-0.003816299124019839
+hier.-dist.-0.15-closeness;all;AECS;0.05;Span of frequencies;-0.0877559276400407

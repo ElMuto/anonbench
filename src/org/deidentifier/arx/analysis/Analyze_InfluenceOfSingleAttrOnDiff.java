@@ -41,7 +41,9 @@ import de.linearbits.subframe.io.CSVFile;
 public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
 
     private static String[]  attrProps  = new String[] {COLUMNS.FREQ_DEVI.toString(), COLUMNS.FREQ_SPAN.toString()};
-    private static BenchmarkMeasure[]  ilMeasures = new BenchmarkMeasure[] {BenchmarkMeasure.LOSS/*, BenchmarkMeasure.AECS*/};
+    private static BenchmarkMeasure[]  ilMeasures = new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.AECS};
+    private static final String correlationsFile = "results/correlations.csv"; 
+    
     /**
      * Main
      * @param args
@@ -49,9 +51,17 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
      * @throws ParseException 
      */
     public static void main(String[] args) throws IOException, ParseException {
+
+        
+        PrintWriter correlationsWriter = new PrintWriter (correlationsFile, "UTF-8");
+        correlationsWriter.println("Criterion;QiNum;ILMeasure;SF;attrProp;SpearmanCC");
+        
     	for (BenchmarkMeasure ilMeasure : ilMeasures) {
-    		generateDifficultyInfluencePlots("Plots_influenceOfSingleAttrOnDifficulty" + ilMeasure.toString() + ".pdf", null, true, ilMeasure);
+    		generateDifficultyInfluencePlots("Plots_influenceOfSingleAttrOnDifficulty" + ilMeasure.toString() + ".pdf", null, true, ilMeasure, correlationsWriter);
     	}
+    	
+
+        correlationsWriter.close();
     	System.out.println("done.");
     }
     
@@ -61,12 +71,14 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
      * @param expType "Class A" or "Class B" experiment
      * @param condensed
      * @param ilMeasure TODO
+     * @param correlationsWriter TODO
      * @throws IOException
      * @throws ParseException
      */
-    static void generateDifficultyInfluencePlots(String pdfFileName, String expType, boolean condensed, BenchmarkMeasure ilMeasure) throws IOException, ParseException {
+    static void generateDifficultyInfluencePlots(String pdfFileName, String expType, boolean condensed, BenchmarkMeasure ilMeasure, PrintWriter correlationsWriter) throws IOException, ParseException {
         
-        CSVFile file = new CSVFile(new File("results/results.csv"));        
+        CSVFile resultsFile = new CSVFile(new File("results/results.csv"));
+        
 
         String col1, col2, col3, col4, col5;
         col1 = "'red'";
@@ -113,7 +125,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         	for (String attrProp : attrProps) {
         		for (double suppFactor : BenchmarkSetup.getSuppressionFactors()){
         			String suppFactorString = String.valueOf(suppFactor);
-        			String measure  = COLUMNS.DIFFICULTY.toString();
+        			String difficultyMeasure  = COLUMNS.DIFFICULTY.toString();
         			commandWriter.println();
         			if (condensed) {
         				String originX = suppFactor == 0d ? "0.0" : "0.5";
@@ -132,14 +144,14 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         			}             
         			commandWriter.println("set title '" + BenchmarkSetup.getSuppressionConfigString(suppFactor) + "'");
         			commandWriter.println("set xlabel \"" + attrProp + "\"");
-        			commandWriter.println("set ylabel \"" + measure + "\"");
+        			commandWriter.println("set ylabel \"" + difficultyMeasure + "\"");
         			String pointsFileName = "results/points_" + privacyModel.toString() + "_" +
         					"suppr" + suppFactorString + " attrProp" + attrProp + ".csv";
         			PrintWriter pointsWriter = new PrintWriter(pointsFileName, "UTF-8");
         			fileBucket.add(new File(pointsFileName));
         			for (int numQis = 1; numQis <= 4; numQis++) {
         				String lineStyle = "ls " + String.valueOf(numQis);
-        				Series2D _series = getSeries(file, suppFactorString, attrProp, measure, numQis, privacyModel.getCriterion().toString(),
+        				Series2D _series = getSeriesForSingleQiCount(resultsFile, suppFactorString, attrProp, difficultyMeasure, numQis, privacyModel.getCriterion().toString(),
         						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
 
         				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
@@ -154,8 +166,11 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         				qiSpecificPointsWriter.close();
         				commandWriter.println("plot '" + qiSpecificPointsFileName + "' " + lineStyle + " notitle");
         			}
-       				calcCorrelationCoeff(file, suppFactorString, attrProp, measure, privacyModel.getCriterion().toString(),
-    						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
+       				Series2D _seriesAllQis = getSeriesForAllQiCounts(resultsFile, correlationsWriter, suppFactorString, attrProp, difficultyMeasure,
+    						privacyModel.getCriterion().toString(), privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
+
+       		        
+       		        calcSpearman(correlationsWriter, String.valueOf(suppFactor), attrProp, _seriesAllQis, privacyModel.toString(), "all", ilMeasure.toString());
 
         			pointsWriter.close();
         			commandWriter.println("f(x) = m*x + b");
@@ -190,7 +205,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
      * @param ilMeasure
      * @return
      */
-    protected static Series2D getSeries(CSVFile file, String suppFactor, String xAxis, String yAxis, int numQis, String criterion,
+    protected static Series2D getSeriesForSingleQiCount(CSVFile file, String suppFactor, String xAxis, String yAxis, int numQis, String criterion,
     		Integer k, Double c, Integer l, Double t, String expType, BenchmarkMeasure ilMeasure) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
@@ -224,13 +239,13 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         return series;
     }
     
-    protected static void calcCorrelationCoeff(CSVFile file, String suppFactor, String xAxis, String yAxis, String criterion,
-    		Integer k, Double c, Integer l, Double t, String expType, BenchmarkMeasure ilMeasure) {
+    protected static Series2D getSeriesForAllQiCounts(CSVFile resultsFile, PrintWriter correlationsWriter, String suppFactor, String attrProp, String yAxis,
+    		String criterion, Integer k, Double c, Integer l, Double t, String expType, BenchmarkMeasure ilMeasure) {
     	String bracketedCriterionString = "[" + criterion + "]";
         Selector<String[]> selector = null;
         try {
         	
-        	SelectorBuilder<String[]> preSelectorBuilder = file.getSelectorBuilder()
+        	SelectorBuilder<String[]> preSelectorBuilder = resultsFile.getSelectorBuilder()
                     .field(BenchmarkSetup.COLUMNS.PARAM_K.toString()).equals(k != null ? String.valueOf(k) : "").and()
                     .field(BenchmarkSetup.COLUMNS.PARAM_C.toString()).equals(c != null ? String.valueOf(c) : "").and()
                     .field(BenchmarkSetup.COLUMNS.PARAM_L.toString()).equals(l != null ? String.valueOf(l) : "").and()
@@ -252,9 +267,24 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         }
 
         // Create series
-        Series2D series = new Series2D(file, selector, new Field(xAxis, "Value"), new Field(yAxis, "Value"));
+        Series2D series = new Series2D(resultsFile, selector, new Field(attrProp, "Value"), new Field(yAxis, "Value"));
         
-        int seriesLength = series.getData().size();
+        return series;
+    }
+
+
+	/**
+	 * @param correlationsWriter
+	 * @param suppFactor
+	 * @param attrProp
+	 * @param series
+	 * @param criterion
+	 * @param qiNum
+	 * @param ilMeasure TODO
+	 */
+	private static void calcSpearman(PrintWriter correlationsWriter, String suppFactor, String attrProp,
+			Series2D series, String criterion, String qiNum, String ilMeasure) {
+		int seriesLength = series.getData().size();
         
         double []x = new double[seriesLength];
         double []y = new double[seriesLength];
@@ -264,6 +294,6 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         	y[i] = Double.parseDouble(series.getData().get(i).y);
         }
         
-        System.out.println("SF " + suppFactor + ", attrProp " + xAxis + "\t: " + new SpearmansCorrelation().correlation(x, y));
-    }
+        correlationsWriter.println(criterion + ";" + qiNum + ";" +  ilMeasure + ";" + suppFactor + ";" + attrProp + ";" + new SpearmansCorrelation().correlation(x, y));
+	}
 }
