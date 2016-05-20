@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
@@ -54,7 +55,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
 
         
         PrintWriter correlationsWriter = new PrintWriter (correlationsFile, "UTF-8");
-        correlationsWriter.println("Criterion;QiNum;ILMeasure;SF;attrProp;SpearmanCC");
+        correlationsWriter.println("Criterion;QiNum;ILMeasure;SF;attrProp;SpearmanCC;PearsonCC");
         
     	for (BenchmarkMeasure ilMeasure : ilMeasures) {
     		generateDifficultyInfluencePlots("Plots_influenceOfSingleAttrOnDifficulty" + ilMeasure.toString() + ".pdf", null, true, ilMeasure, correlationsWriter);
@@ -153,7 +154,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         				String lineStyle = "ls " + String.valueOf(numQis);
         				Series2D _series = getSeriesForSingleQiCount(resultsFile, suppFactorString, attrProp, difficultyMeasure, numQis, privacyModel.getCriterion().toString(),
         						privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
-           		        calcSpearman(correlationsWriter, String.valueOf(suppFactor), attrProp, _series, privacyModel.toString(), String.valueOf(numQis), ilMeasure.toString());
+           		        calcCorrelation(correlationsWriter, String.valueOf(suppFactor), attrProp, _series, privacyModel.toString(), String.valueOf(numQis), ilMeasure.toString());
 
         				String qiSpecificPointsFileName = "results/points_" + privacyModel.toString() + "_" +
         						"suppr" + suppFactorString + " attrProp" + attrProp +
@@ -171,7 +172,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
     						privacyModel.getCriterion().toString(), privacyModel.getK(), privacyModel.getC(), privacyModel.getL(), privacyModel.getT(), expType, ilMeasure);
 
        		        
-       		        calcSpearman(correlationsWriter, String.valueOf(suppFactor), attrProp, _seriesAllQis, privacyModel.toString(), "all", ilMeasure.toString());
+       		        calcCorrelation(correlationsWriter, String.valueOf(suppFactor), attrProp, _seriesAllQis, privacyModel.toString(), "all", ilMeasure.toString());
 
         			pointsWriter.close();
         			commandWriter.println("f(x) = m*x + b");
@@ -283,7 +284,7 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
 	 * @param qiNum
 	 * @param ilMeasure TODO
 	 */
-	private static void calcSpearman(PrintWriter correlationsWriter, String suppFactor, String attrProp,
+	private static void calcCorrelation(PrintWriter correlationsWriter, String suppFactor, String attrProp,
 			Series2D series, String criterion, String qiNum, String ilMeasure) {
 		int seriesLength = series.getData().size();
         
@@ -295,6 +296,6 @@ public class Analyze_InfluenceOfSingleAttrOnDiff extends GnuPlotter {
         	y[i] = Double.parseDouble(series.getData().get(i).y);
         }
         
-        correlationsWriter.println(criterion + ";" + qiNum + ";" +  ilMeasure + ";" + suppFactor + ";" + attrProp + ";" + new SpearmansCorrelation().correlation(x, y));
+        correlationsWriter.println(criterion + ";" + qiNum + ";" +  ilMeasure + ";" + suppFactor + ";" + attrProp + ";" + new SpearmansCorrelation().correlation(x, y) + ";" + new PearsonsCorrelation().correlation(x, y));
 	}
 }

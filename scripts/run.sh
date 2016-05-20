@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_DIFFI_8278e8a
+java -Xmx5G -jar jars/pc-bench.jar -D_DetermineDeps_14215e0

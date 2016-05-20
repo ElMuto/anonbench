@@ -37,7 +37,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class PerformDifficultyExperiments {
+public class ComparePrivacyModels {
 	
 	/**
 	 * Main entry point
@@ -63,46 +63,48 @@ public class PerformDifficultyExperiments {
 				// for each qi configuration
 				for (QiConfig qiConf : BenchmarkSetup.getQiConfigPowerSet()) {
 
-					BenchmarkMeasure measure = BenchmarkMeasure.LOSS;
-					if (privacyModel.isSaBased()) {
+					for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.AECS}) {
 
-						// for each sensitive attribute candidate
-						for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+						if (privacyModel.isSaBased()) {
 
-							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+							// for each sensitive attribute candidate
+							for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+
+								BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+								BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
+
+								// for each suppression factor
+								for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
+									// Print status info
+									System.out.println("Running " + privacyModel.toString() + " with SA=" + sa + " and SF=" + suppFactor);
+									driver.anonymize(measure, suppFactor, dataset, false,
+											privacyModel.getK(),
+											privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+											null, null, sa,
+											null, qiConf);
+								}
+								dataset.getArxData().getHandle().release();
+							}
+						} else { // !privacyModel.isSaBased()
+
+							BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
 							BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 
 							// for each suppression factor
 							for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
 								// Print status info
-								System.out.println("Running " + privacyModel.toString() + " with SA=" + sa + " and SF=" + suppFactor);
+								System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
 								driver.anonymize(measure, suppFactor, dataset, false,
 										privacyModel.getK(),
 										privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-										null, null, sa,
+										null, null, null,
 										null, qiConf);
 							}
 							dataset.getArxData().getHandle().release();
 						}
-					} else { // !privacyModel.isSaBased()
-						
-						BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, null);
-						BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
-
-						// for each suppression factor
-						for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
-							// Print status info
-							System.out.println("Running " + privacyModel.toString() + " with SF=" + suppFactor);
-							driver.anonymize(measure, suppFactor, dataset, false,
-									privacyModel.getK(),
-									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-									null, null, null,
-									null, qiConf);
-						}
-						dataset.getArxData().getHandle().release();
-					}
 				}
 			}
+		}
 		}
 	}
 }
