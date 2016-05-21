@@ -1,6 +1,7 @@
 package org.deidentifier.arx;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -217,7 +218,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         	} else {
         		filename = "data/subsets_" + baseName + "/" + baseName + "_subset_" + ssNum + ".csv";       
         	}
-        	return DataSubset.create(this.toArxData(qiConf, null), Data.create(filename, ';'));
+        	return DataSubset.create(this.toArxData(qiConf, null), Data.create(filename, Charset.forName("UTF-8"), ';'));
         }
 
         /**
@@ -290,7 +291,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         Hierarchy loadHierarchy(String attribute) {
         	String path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
         	try {
-        		return Hierarchy.create(path, ';');
+        		return Hierarchy.create(path, Charset.forName("UTF-8"), ';');
         	} catch (IOException e) {
         		System.err.println("Unable to load hierarchy from file " + path);
         		return null;
@@ -311,7 +312,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
             	String path = "data/" + datafile.getBaseStringForFilename() + ".csv";
                 try {
-					arxData = Data.create(path, ';');
+					arxData = Data.create(path, Charset.forName("UTF-8"), ';');
 				} catch (IOException e) {
 					arxData = null;
 					System.err.println("Unable to load dataset from file " + path);
