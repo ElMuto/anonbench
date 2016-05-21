@@ -47,8 +47,8 @@ public class ComparePrivacyModels {
 	 */
 	public static void main(String[] args) throws IOException {
 
-//		evaluateCriteriaWithDifferentSuppressionValues();
 		comparePrivacyModels();
+		
 		System.out.println("done.");
 	}
 	
