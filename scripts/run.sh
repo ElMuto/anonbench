@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_ComparePrivacyModels_14215e0
+java -Xmx5G -jar jars/pc-bench.jar -D_ComparePrivacyModels_d8a27fb
