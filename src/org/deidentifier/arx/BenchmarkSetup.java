@@ -101,39 +101,20 @@ public class BenchmarkSetup {
     public static final double NO_RESULT_FOUND_DOUBLE_VAL=Double.POSITIVE_INFINITY;
     public static final String NO_RESULT_FOUND_STRING_VAL="n.s.f.";
 	
-    public static PrivacyModel[] getPrivacyModels() {
+    public static PrivacyModel[] getNon_K_PrivacyModels() {
     	return new PrivacyModel[] {
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 2,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 4,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  null, null, 6,    null),
-
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 2,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 4,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 4.0d, 6,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 2,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 4,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, null, 3.0d, 6,    null),
-    			
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 2,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 4,    null),
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   null, null, 6,    null),
-
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.2d),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        null, null, null, 0.15d),
-    			
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.2d),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        null, null, null, 0.15d),
-    			
-    			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            3,   null, null, null),
-    			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,            5,   null, null, null),
-    			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           10,   null, null, null),
-    			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           20,   null, null, null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  5, null, 3,    null, null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.2d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        5, null, null, 0.2d, null),
+    			new PrivacyModel(BenchmarkCriterion.D_DISCLOSURE_PRIVACY,  5, null, null, null, 1d),
     	};
     }
     
-    public static PrivacyModel[] getSaBasedPrivacyModels() {
+    public static PrivacyModel[] getDifficultyRelevantPrivacyModels() {
     	List<PrivacyModel> _saBasedModelsList = new ArrayList<>();
-    	for (PrivacyModel privacyModel : getPrivacyModels()) {
+    	for (PrivacyModel privacyModel : getNon_K_PrivacyModels()) {
     		if (privacyModel.isSaBased()) _saBasedModelsList.add(privacyModel);
     	}    	
     	return _saBasedModelsList.toArray(new PrivacyModel[_saBasedModelsList.size()]);
@@ -141,21 +122,10 @@ public class BenchmarkSetup {
     
     public static PrivacyModel[] getNonSaBasedPrivacyModels() {
     	List<PrivacyModel> _saBasedModelsList = new ArrayList<>();
-    	for (PrivacyModel privacyModel : getPrivacyModels()) {
+    	for (PrivacyModel privacyModel : getNon_K_PrivacyModels()) {
     		if (!privacyModel.isSaBased()) _saBasedModelsList.add(privacyModel);
     	}    	
     	return _saBasedModelsList.toArray(new PrivacyModel[_saBasedModelsList.size()]);
-    }
-    
-    /**
-     * Returns all metrics
-     * @return
-     */
-    public static BenchmarkMeasure[] getMeasures() {        
-        return new BenchmarkMeasure[] {
-        		BenchmarkMeasure.LOSS,
-//        		BenchmarkMeasure.AECS,
-        		};
     }
     
     /**
@@ -163,7 +133,7 @@ public class BenchmarkSetup {
      * @return
      */
     public static double[] getSuppressionFactors() {        
-        return new double[] { 0d, 0.05d };
+        return new double[] { 0.05d };
     }
 
     /**
@@ -176,7 +146,6 @@ public class BenchmarkSetup {
         for (int i = 0; i < getDatafiles().length; i++) {
             datasetArr[i] = new BenchmarkDataset(
                                     getDatafiles()[i],
-                                    BenchmarkDatafile.ACS13.equals(getDatafiles()[i]) ? new QiConfig(8) : null,
                                     criteria
                                 );
         }
@@ -255,22 +224,6 @@ public class BenchmarkSetup {
     	
     	}
     }
-    
-      
-    public static QiConfig[] getQiConfigPowerSet() {
-        int[][] powerSet = { { 1          }, { 2       }, { 3       }, { 4       },
-                             { 1, 2       }, { 1, 3    }, { 1, 4    }, { 2, 3    }, { 2, 4 }, { 3, 4 },
-                             { 2, 3, 4    }, { 1, 3, 4 }, { 1, 2, 4 }, { 1, 2, 3 },
-                             { 1, 2, 3, 4 }
-        };
-        
-        QiConfig[] qiConfigPowerSet = new QiConfig[powerSet.length];
-        for (int i = 0; i < powerSet.length; i++) {
-            qiConfigPowerSet[i] = new QiConfig(powerSet[i]);
-        }
-        
-        return qiConfigPowerSet;
-    }
 
     /**
      * Returns all datasets
@@ -278,9 +231,9 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-         BenchmarkDatafile.ADULT,
+//         BenchmarkDatafile.ADULT,
          BenchmarkDatafile.ACS13,
-         BenchmarkDatafile.FARS,
+//         BenchmarkDatafile.FARS,
          BenchmarkDatafile.ATUS,
          BenchmarkDatafile.IHIS,
 //       BenchmarkDatafile.CUP, // hat nur intervallskalierte Attribute
@@ -618,7 +571,7 @@ public class BenchmarkSetup {
         D_PRESENCE {
             @Override
             public String toString() {
-                return "d";
+                return "dpres";
             }
         },
         INCLUSION {
@@ -627,6 +580,12 @@ public class BenchmarkSetup {
                 return "i";
             }
         },
+        D_DISCLOSURE_PRIVACY {
+            @Override
+            public String toString() {
+                return "ddis";
+            }
+        }
     }
     
     public static enum BenchmarkMeasure {

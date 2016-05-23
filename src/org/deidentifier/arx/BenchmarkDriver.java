@@ -31,6 +31,7 @@ import org.deidentifier.arx.ARXLattice.Anonymity;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
@@ -95,19 +96,20 @@ public class BenchmarkDriver {
 	 * @param l
 	 * @param c
 	 * @param t
+	 * @param d TODO
 	 * @param dMin
 	 * @param dMax
 	 * @param sa
-	 * @param customQiCount TODO
 	 * @param criteria
-     * @return
+	 * @param customQiCount TODO
+	 * @return
      * @throws IOException
      */
     private static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
                                                      Integer k, Integer l, Double c,
-                                                     Double t, Double dMin, Double dMax,
-                                                     String sa, Integer ssNum,
-                                                     QiConfig qiConf, BenchmarkCriterion... criteria) throws IOException {
+                                                     Double t, Double d, Double dMin,
+                                                     Double dMax, String sa,
+                                                     Integer ssNum, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
 
@@ -139,10 +141,10 @@ public class BenchmarkDriver {
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(qiConf, ssNum)));
+                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(ssNum)));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset(qiConf, ssNum)));
+                config.addCriterion(new Inclusion(dataset.getResearchSubset(ssNum)));
                 break;
             case K_ANONYMITY:
                 config.addCriterion(new KAnonymity(k));
@@ -162,6 +164,9 @@ public class BenchmarkDriver {
             case T_CLOSENESS_ED:
                 config.addCriterion(new EqualDistanceTCloseness(sa, t));
                 break;
+            case D_DISCLOSURE_PRIVACY:
+                config.addCriterion(new DDisclosurePrivacy(sa, d));
+                break;
             default:
                 throw new RuntimeException("Invalid criterion");
             }
@@ -176,14 +181,14 @@ public class BenchmarkDriver {
                          double suppFactor, BenchmarkDataset dataset,
                          boolean subsetBased, Integer k,
                          Integer l, Double c, Double t,
-                         Double dMin, Double dMax, String sa,
-                         Integer ssNum, QiConfig qiConf) throws IOException
+                         Double d, Double dMin, Double dMax,
+                         String sa, Integer ssNum) throws IOException
     {
     							anonymize (		measure, suppFactor,  dataset,
 					                subsetBased,  k,
 					                l,  c,  t,
-					                dMin,  dMax,  sa,
-					                ssNum,  qiConf,
+					                d,  dMin,  dMax,
+					                sa,  ssNum,
 					                new Double[] { null });
     }
 
@@ -193,11 +198,11 @@ public class BenchmarkDriver {
                                  double suppFactor, BenchmarkDataset dataset,
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
-                                 Double dMin, Double dMax, String sa,
-                                 Integer ssNum, QiConfig qiConf, Double[] accuracies
+                                 Double d, Double dMin, Double dMax,
+                                 String sa, Integer ssNum, Double[] accuracies
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, dMin, dMax, sa, ssNum, qiConf, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 //        anonymizer.setMaxTransformations(210000);
         
@@ -211,7 +216,11 @@ public class BenchmarkDriver {
         }
 
         // Benchmark
-        BenchmarkSetup.BENCHMARK.addRun(assemblePrivacyModelString(dataset.getCriteria()[0], k, c, l, t, suppFactor),
+        
+        BenchmarkCriterion foo = dataset.getCriteria()[1];
+//        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
+        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
+        BenchmarkSetup.BENCHMARK.addRun(bar,
         								measure.toString(),
                                         String.valueOf(suppFactor),
                                         dataset.toString(),
@@ -288,29 +297,18 @@ public class BenchmarkDriver {
         handle.release();
     }
 
+	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
+			Double d) {
+		return new PrivacyModel(criterion, k, c, l, t, d).toString() + " with " + BenchmarkSetup.getSuppressionConfigString(suppFactor);
+	}
+
 	/**
      * @param pm
      * @param suppFactor
      * @return
      */
     public static String assemblePrivacyModelString(PrivacyModel pm, double suppFactor) {
-		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor));
-	}
-    
- 
-    /**
-     * @param criterion
-     * @param k
-     * @param c
-     * @param l
-     * @param t
-     * @param suppFactor
-     * @return
-     */
-    private static String assemblePrivacyModelString(BenchmarkCriterion criterion,
-    		Integer k, Double c, Integer l, Double t, 
-    		double suppFactor) {
-		return new PrivacyModel(criterion, k, c, l, t).toString() + " with " + BenchmarkSetup.getSuppressionConfigString(suppFactor);
+		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor), pm.getD());
 	}
 
 	private double calculateDifficulty(ARXResult result) {

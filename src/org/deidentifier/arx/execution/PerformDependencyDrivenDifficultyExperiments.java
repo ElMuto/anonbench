@@ -29,7 +29,6 @@ import java.util.List;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.QiConfig;
 
 import cern.colt.Arrays;
 
@@ -75,11 +74,11 @@ public class PerformDependencyDrivenDifficultyExperiments {
 			lineTokens = null;
 
 			// for each privacy model
-			for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+			for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
 				if (privacyModel.getCriterion().equals(BenchmarkCriterion.K_ANONYMITY)) {
 					qiConf.addQi(se);
 				}
-				BenchmarkDataset dataset = new BenchmarkDataset(datafile, qiConf, new BenchmarkCriterion[] { privacyModel.getCriterion() }, se);
+				BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, se);
 
 				// for each suppression factor
 				for (double suppFactor : BenchmarkSetup.getSuppressionFactors()) {
@@ -93,8 +92,8 @@ public class PerformDependencyDrivenDifficultyExperiments {
 						driver.anonymize(measure, suppFactor, dataset, false,
 								privacyModel.getK(),
 								privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-								null, null, se,
-								null, qiConf, accuracies);
+								privacyModel.getD(), null, null,
+								se, null);
 					}
 				}
 				dataset.cleanUp();

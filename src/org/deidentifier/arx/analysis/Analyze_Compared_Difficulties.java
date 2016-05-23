@@ -85,7 +85,7 @@ public class Analyze_Compared_Difficulties extends GnuPlotter {
         	Series3D geomMeanSeriesClustered = new Series3D();
         	Series3D stdDevSeriesClustered = new Series3D();
 			
-    		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModels()) {
+    		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
     			String pmString = privacyModel.toString().replaceAll("\\.0", "").replaceAll(" ", "");
 				
 				for (BenchmarkDatafile df : BenchmarkSetup.getDatafiles()) {

@@ -2,7 +2,6 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,16 +55,16 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
         /**
          * @param datafile
-         * @param customQiCount
          * @param criteria
          * @param sensitiveAttribute
+         * @param customQiCount
          */
-        public BenchmarkDataset(BenchmarkDatafile datafile, QiConfig qiConf, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
+        public BenchmarkDataset(BenchmarkDatafile datafile, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
             this.datafile = datafile;
             this.sensitiveAttribute = sensitiveAttribute;
             this.criteria = criteria;
             
-            this.arxData = toArxData(qiConf, criteria);
+            this.arxData = toArxData(criteria);
             this.inputHandle = arxData.getHandle();
             this.inputDataDef = inputHandle.getDefinition();
             
@@ -73,7 +72,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             DataConverter converter = new DataConverter();            
             this.inputArray = converter.toArray(inputHandle, inputDataDef);
             
-            this.outputArray = new String[this.inputArray.length][qiConf != null ? qiConf.getNumQis() : getQuasiIdentifyingAttributes().length];
+            this.outputArray = new String[this.inputArray.length][getQuasiIdentifyingAttributes().length];
             for (int i = 0; i < this.inputArray.length; i++) {
                 for (int j = 0; j < this.inputArray[0].length; j++) {
                 	this.outputArray[i][j] = "*";
@@ -114,8 +113,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
          * @param customQiCount
          * @param criteria
          */
-        public BenchmarkDataset(BenchmarkDatafile datafile, QiConfig qiConf, BenchmarkCriterion[] criteria) {
-        	this(datafile, qiConf, criteria, getDefaultSensitiveAttribute(datafile));
+        public BenchmarkDataset(BenchmarkDatafile datafile, BenchmarkCriterion[] criteria) {
+        	this(datafile, criteria, getDefaultSensitiveAttribute(datafile));
         }
 
         public BenchmarkDatafile getDatafile() {
@@ -205,12 +204,12 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
  
         /** Returns the research subset for the dataset
-         * @param customQiCount
          * @param ssNum
+         * @param customQiCount
          * @return
          * @throws IOException
          */
-        public DataSubset getResearchSubset(QiConfig qiConf, Integer ssNum) throws IOException {
+        public DataSubset getResearchSubset(Integer ssNum) throws IOException {
         	String filename;
         	String baseName = getDatafile().baseStringForFilename;
         	if (ssNum == null) {
@@ -218,7 +217,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         	} else {
         		filename = "data/subsets_" + baseName + "/" + baseName + "_subset_" + ssNum + ".csv";       
         	}
-        	return DataSubset.create(this.toArxData(qiConf, null), Data.create(filename, Charset.forName("UTF-8"), ';'));
+        	return DataSubset.create(this.toArxData(null), Data.create(filename, Charset.forName("UTF-8"), ';'));
         }
 
         /**
@@ -236,41 +235,14 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
          * @return
          */
         public static String[] getSensitiveAttributeCandidates(BenchmarkDatafile datafile) {
+
             switch (datafile) {
-            case ADULT:
-                return new String[] { "occupation",
-                                      "education", 
-                                      "salary-class", 
-                                      "workclass" };
             case ATUS:
-                return new String[] { "Highest level of school completed",
-                                      "Birthplace", 
-                                      "Citizenship status", 
-                                      "Labor force status" 
-                                      };
-            case CUP:
-                return new String[] { 
-//                                      "RAMNTALL", // interval-scale
-//                                      "INCOME",   // interval-scale
-//                                      "MINRAMNT", // interval-scale
-//                                      "NGIFTALL"  // interval-scale
-                                      };
-            case FARS:
-                return new String[] { "istatenum",
-                                      "ideathday",
-                                      "ideathmon", 
-                                      "iinjury" };
+                return new String[] { "Marital status", "Highest level of school completed" };
             case IHIS:
-                return new String[] { "EDUC",
-                                      "REGION", 
-                                      "PERNUM", 
-                                      "QUARTER" };
+                return new String[] { "MARSTAT", "EDUC" };
             case ACS13:
-                return new String[] { "Education",
-//                                      "Weight", // interval-scale
-                                      "Grade level",
-//                                      "Income"   // interval-scale
-                                      };
+                return new String[] { "Marital status", "Grade level" };
             default:
                 throw new RuntimeException("Invalid dataset");
             }
@@ -301,13 +273,13 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
         /**
          * Configures and returns the dataset as <code>org.deidentifier.arx.Data</code>
-         * 
-         * @param customQiCount
          * @param criteria
+         * @param customQiCount
+         * 
          * @return
          */
         @SuppressWarnings("incomplete-switch")
-		private Data toArxData(QiConfig qiConf, BenchmarkCriterion[] criteria) {
+		private Data toArxData(BenchmarkCriterion[] criteria) {
         	Data arxData;
 
             	String path = "data/" + datafile.getBaseStringForFilename() + ".csv";
@@ -317,7 +289,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 					arxData = null;
 					System.err.println("Unable to load dataset from file " + path);
 				}
-                for (String qi : getQuasiIdentifyingAttributesPrivate(qiConf)) {
+                for (String qi : getQuasiIdentifyingAttributesPrivate()) {
                     arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
                     arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
                 }
@@ -338,30 +310,18 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             
             return arxData;
         }
-        
-        public static String[] customizeQis(String[] allQis, QiConfig qiConf) {
-            if (qiConf == null) return allQis;
-            
-            int numQis = qiConf.getNumQis();
-            String[] qiArray = new String[numQis];
-            
-            if (qiConf.getActiveQis() == null) {
-                qiArray = Arrays.copyOf(allQis, numQis);
-            } else {
-                for (int i = 0; i < numQis; i++) {
-                    int qiIndex = qiConf.getActiveQis()[i];
-                    if (qiIndex > allQis.length) throw new RuntimeException("qiIndex (" + qiIndex + ") exceeds number of available QIs (" + allQis.length + ")");
-                    qiArray[i] = allQis[qiIndex-1];
-                }
-            }
-            return qiArray;
-        }
 
-        private String[] getQuasiIdentifyingAttributesPrivate(QiConfig qiConf) {
-        	if (qiConf.getAllQis() == null)
-                return customizeQis (BenchmarkSetup.getAllAttributes(datafile), qiConf);
-        	else
-        		return qiConf.getAllQis();
+        private String[] getQuasiIdentifyingAttributesPrivate() {
+            switch (datafile) {
+            case ATUS:
+                return new String[] { "Age", "Sex", "Race" };
+            case IHIS:
+                return new String[] { "AGE", "SEX", "RACEA" };
+            case ACS13:
+            	return new String[] { "Age", "Sex", "Workclass" };
+            default:
+                throw new RuntimeException("Invalid dataset: " + datafile);
+            }
         }
 
         /**
@@ -387,6 +347,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                 throw new RuntimeException("Invalid dataset");
             }
         }
+
+   
 
 
         public static enum BenchmarkDatafile {
