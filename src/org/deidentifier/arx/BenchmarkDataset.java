@@ -301,6 +301,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                         case L_DIVERSITY_RECURSIVE:
                         case T_CLOSENESS_HD:
                         case T_CLOSENESS_ED:
+                        case D_DISCLOSURE_PRIVACY:
                             String sensitive = getSensitiveAttribute();
                             arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
                             break;
@@ -311,8 +312,14 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             return arxData;
         }
 
-        private String[] getQuasiIdentifyingAttributesPrivate() {
-            switch (datafile) {
+
+        private  String[] getQuasiIdentifyingAttributesPrivate() {
+        	return getQuasiIdentifyingAttributes(datafile);
+        }
+        
+
+        public static String[] getQuasiIdentifyingAttributes(BenchmarkDatafile _datafile) {
+            switch (_datafile) {
             case ATUS:
                 return new String[] { "Age", "Sex", "Race" };
             case IHIS:
@@ -320,7 +327,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             case ACS13:
             	return new String[] { "Age", "Sex", "Workclass" };
             default:
-                throw new RuntimeException("Invalid dataset: " + datafile);
+                throw new RuntimeException("Invalid dataset: " + _datafile);
             }
         }
 

@@ -103,6 +103,7 @@ public class BenchmarkSetup {
 	
     public static PrivacyModel[] getNon_K_PrivacyModels() {
     	return new PrivacyModel[] {
+    			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           5, null, null, null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  5, null, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null),
@@ -231,63 +232,10 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-//         BenchmarkDatafile.ADULT,
          BenchmarkDatafile.ACS13,
-//         BenchmarkDatafile.FARS,
          BenchmarkDatafile.ATUS,
          BenchmarkDatafile.IHIS,
-//       BenchmarkDatafile.CUP, // hat nur intervallskalierte Attribute
                                         };
-    }
-
-    /**
-     * Returns all non-subset-based sets of criteria
-     * @return
-     */
-    public static BenchmarkCriterion[][] getNonSubsetBasedCriteria() {
-        return new BenchmarkCriterion[][] {
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY },
-            new BenchmarkCriterion[] { BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_HD },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_HD },
-        };
-    }
-    
-
-    /**
-     * Returns all sets of subset based criteria
-     * @return
-     */
-    public static BenchmarkCriterion[][] getSubsetBasedCriteria() {
-        return new BenchmarkCriterion[][] {
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.T_CLOSENESS_HD},
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.INCLUSION, BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_HD },                                           
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS_HD },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-            new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_PRESENCE, BenchmarkCriterion.T_CLOSENESS_HD },
-        };
-    }
-    
-    public static double[][] get_d_values() {
-        return new double[][] {
-        		new double[] {0d,   0.05},
-        		new double[] {0d,   0.07},
-        		new double[] {0d,   0.1},
-        		new double[] {0d,   0.2},
-        		new double[] {0d,   0.5},
-        		new double[] {0d,   0.7},
-        		new double[] {0.05, 0.2},
-        		new double[] {0.05, 0.7},
-        		new double[] {0.1,  0.2},
-        		new double[] {0.1,  0.7},
-        };
     }
     
     public static String getSuppressionConfigString (double d) {

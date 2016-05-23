@@ -37,6 +37,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.QiConfig;
 
 
 /**

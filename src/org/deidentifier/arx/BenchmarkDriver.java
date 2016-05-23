@@ -217,7 +217,7 @@ public class BenchmarkDriver {
 
         // Benchmark
         
-        BenchmarkCriterion foo = dataset.getCriteria()[1];
+        BenchmarkCriterion foo = dataset.getCriteria()[dataset.getCriteria().length - 1];
 //        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
         String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
         BenchmarkSetup.BENCHMARK.addRun(bar,
@@ -254,7 +254,7 @@ public class BenchmarkDriver {
             il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
             il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
 
-            if (il_rel > 1d || il_rel < 0d) throw new RuntimeException("Invalid value for il_rel: " + il_rel);
+            if (il_rel > 1d || il_rel < 0d) System.err.println("Negative value for il_rel: " + il_rel);
         } else {
         	il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
