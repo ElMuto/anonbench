@@ -242,7 +242,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             case IHIS:
                 return new String[] { "MARSTAT", "EDUC" };
             case ACS13:
-                return new String[] { "Marital status", "Grade level" };
+                return new String[] { "Marital status", "Education" };
             default:
                 throw new RuntimeException("Invalid dataset");
             }
@@ -325,7 +325,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             case IHIS:
                 return new String[] { "AGE", "SEX", "RACEA" };
             case ACS13:
-            	return new String[] { "Age", "Sex", "Workclass" };
+            	return new String[] { "Age", "Sex", "Race" };
             default:
                 throw new RuntimeException("Invalid dataset: " + _datafile);
             }

@@ -299,7 +299,7 @@ public class BenchmarkDriver {
 
 	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
 			Double d) {
-		return new PrivacyModel(criterion, k, c, l, t, d).toString() + " with " + BenchmarkSetup.getSuppressionConfigString(suppFactor);
+		return new PrivacyModel(criterion, k, c, l, t, d).toString();
 	}
 
 	/**

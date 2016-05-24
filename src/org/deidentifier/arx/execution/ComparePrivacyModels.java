@@ -28,8 +28,6 @@ import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.ClassificationConfig;
-import org.deidentifier.arx.ClassificationConfig.Classifier;
 import org.deidentifier.arx.PrivacyModel;
 
 
@@ -55,7 +53,7 @@ public class ComparePrivacyModels {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.ENTROPY}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.LOSS/*, BenchmarkMeasure.ENTROPY*/}) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
