@@ -233,8 +233,8 @@ public class BenchmarkSetup {
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
          BenchmarkDatafile.ACS13,
-         BenchmarkDatafile.ATUS,
-         BenchmarkDatafile.IHIS,
+//         BenchmarkDatafile.ATUS,
+//         BenchmarkDatafile.IHIS,
                                         };
     }
     

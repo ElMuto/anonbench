@@ -293,6 +293,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                     arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
                     arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
                 }
+                String sensitive = getSensitiveAttribute();
+                arxData.getDefinition().setAttributeType(sensitive, AttributeType.INSENSITIVE_ATTRIBUTE);
                 if (criteria != null) {
                     for (BenchmarkCriterion c : criteria) {
                         switch (c) {
@@ -302,7 +304,6 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                         case T_CLOSENESS_HD:
                         case T_CLOSENESS_ED:
                         case D_DISCLOSURE_PRIVACY:
-                            String sensitive = getSensitiveAttribute();
                             arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
                             break;
                         }

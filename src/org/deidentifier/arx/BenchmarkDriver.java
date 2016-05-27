@@ -22,15 +22,20 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.deidentifier.arx.ARXLattice.ARXNode;
 import org.deidentifier.arx.ARXLattice.Anonymity;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.aggregates.StatisticsClassification;
 import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
@@ -48,8 +53,6 @@ import org.deidentifier.arx.utility.UtilityMeasureDiscernibility;
 import org.deidentifier.arx.utility.UtilityMeasureLoss;
 import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
 import org.deidentifier.arx.utility.UtilityMeasurePrecision;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 
 /**
@@ -268,6 +271,8 @@ public class BenchmarkDriver {
         
         // report solution ratio
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
+//        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.OPT_PA, calculateOptimalClassificationAccuracy(result, dataset.getArxData(), sa));
+        System.out.println("Optimal PA: " + calculateOptimalClassificationAccuracy(result, sa));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?
@@ -333,6 +338,35 @@ public class BenchmarkDriver {
         }
         
         return 1- (((double) numSolutions) / ((double) lattice.getSize()));
+    }
+
+	private double calculateOptimalClassificationAccuracy(ARXResult result, String clazz) {
+		
+		double optimalAccuracy = -Double.MAX_VALUE;
+		
+        ARXLattice lattice = result.getLattice();
+        for (ARXNode[] level : lattice.getLevels()) {
+            for (ARXNode node : level) {
+				try {
+					
+					DataHandle handle = result.getOutput(node);
+					List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+					StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+							qis.toArray(new String[qis.size()]), clazz, ARXLogisticRegressionConfiguration.create()
+									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+					
+					double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+					if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+						optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+					}
+					
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
+            }
+        }
+        
+        return optimalAccuracy;
     }
 
 
