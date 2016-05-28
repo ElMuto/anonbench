@@ -271,8 +271,6 @@ public class BenchmarkDriver {
         
         // report solution ratio
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
-//        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.OPT_PA, calculateOptimalClassificationAccuracy(result, dataset.getArxData(), sa));
-        System.out.println("Optimal PA: " + calculateOptimalClassificationAccuracy(result, sa));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getNumValues() != null ?
@@ -300,6 +298,49 @@ public class BenchmarkDriver {
         BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
         
         handle.release();
+    }
+    
+    public void calculateAndPrintMaximalPredictionAccuracy(
+    		BenchmarkMeasure measure,
+    		double suppFactor, BenchmarkDataset dataset,
+    		boolean subsetBased, Integer k,
+    		Integer l, Double c, Double t,
+    		Double d, Double dMin, Double dMax,
+    		String sa, Integer ssNum, Double[] accuracies
+    		) throws IOException {
+
+    	ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
+    	ARXAnonymizer anonymizer = new ARXAnonymizer();
+
+    	ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
+    	
+		double optimalAccuracy = -Double.MAX_VALUE;
+		
+        ARXLattice lattice = result.getLattice();
+        for (ARXNode[] level : lattice.getLevels()) {
+            for (ARXNode node : level) {
+				try {
+					
+					DataHandle handle = result.getOutput(node);
+					List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+					StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+							qis.toArray(new String[qis.size()]), sa, ARXLogisticRegressionConfiguration.create()
+									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+					
+					double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+					if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+						optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+					}
+					
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
+            }
+        }
+        
+
+    	System.out.println("Optimal PA: " + optimalAccuracy);
+
     }
 
 	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
@@ -338,35 +379,6 @@ public class BenchmarkDriver {
         }
         
         return 1- (((double) numSolutions) / ((double) lattice.getSize()));
-    }
-
-	private double calculateOptimalClassificationAccuracy(ARXResult result, String clazz) {
-		
-		double optimalAccuracy = -Double.MAX_VALUE;
-		
-        ARXLattice lattice = result.getLattice();
-        for (ARXNode[] level : lattice.getLevels()) {
-            for (ARXNode node : level) {
-				try {
-					
-					DataHandle handle = result.getOutput(node);
-					List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-					StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-							qis.toArray(new String[qis.size()]), clazz, ARXLogisticRegressionConfiguration.create()
-									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
-					
-					double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-					if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
-						optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-					}
-					
-				} catch (ParseException e) {
-					throw new RuntimeException(e);
-				}
-            }
-        }
-        
-        return optimalAccuracy;
     }
 
 

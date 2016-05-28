@@ -36,7 +36,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class ComparePrivacyModels_ATUS_MarStat {
+public class ComparePrivacyModels_IHIS_EDUC {
 	
 	/**
 	 * Main entry point
@@ -55,9 +55,9 @@ public class ComparePrivacyModels_ATUS_MarStat {
 
 		BenchmarkMeasure measure = BenchmarkMeasure.ENTROPY;
 
-		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS;
+		BenchmarkDatafile datafile = BenchmarkDatafile.IHIS;
 
-		String sa = "Marital status";
+		String sa = "EDUC";
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {

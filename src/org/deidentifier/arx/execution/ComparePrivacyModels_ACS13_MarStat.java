@@ -36,7 +36,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class ComparePrivacyModels_ATUS_HLOC {
+public class ComparePrivacyModels_ACS13_MarStat {
 	
 	/**
 	 * Main entry point
@@ -55,9 +55,9 @@ public class ComparePrivacyModels_ATUS_HLOC {
 
 		BenchmarkMeasure measure = BenchmarkMeasure.ENTROPY;
 
-		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS;
+		BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
 
-		String sa = "Highest level of school completed";
+		String sa = "Marital status";
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
@@ -76,11 +76,11 @@ public class ComparePrivacyModels_ATUS_HLOC {
 			for (double suppFactor : new double[] { 0.05d }) {
 				// Print status info
 				System.out.println("Running " + privacyModel.toString() + " on " + datafile.toString() + " with SA=" + sa + " and IL-Measure " + measure);
-				driver.anonymize(measure, suppFactor, dataset, false,
+				driver.calculateAndPrintMaximalPredictionAccuracy(measure, suppFactor, dataset, false,
 						privacyModel.getK(),
 						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 						privacyModel.getD(), null, null,
-						sa, null);
+						sa, null, new Double[] { null });
 			}
 			dataset.getArxData().getHandle().release();
 		}

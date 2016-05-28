@@ -36,7 +36,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class ComparePrivacyModels_ATUS_MarStat {
+public class ComparePrivacyModels_ATUS_HLOSC {
 	
 	/**
 	 * Main entry point
@@ -57,7 +57,7 @@ public class ComparePrivacyModels_ATUS_MarStat {
 
 		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS;
 
-		String sa = "Marital status";
+		String sa = "Highest level of school completed";
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {

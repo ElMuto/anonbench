@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_DepDrivenExperiments_e340165
+java -Xmx5G -jar jars/pc-bench.jar -D_MaxPA_ATUS_HLOSC
