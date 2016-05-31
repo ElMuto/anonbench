@@ -86,9 +86,8 @@
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.PerformDependencyDrivenDifficultyExperiments" /-->
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.DetermineDependencies" /-->
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" /-->
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels_ATUS_HLOSC" />
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels_IHIS_MARSTAT" /-->
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels_IHIS_EDUC" /-->
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels_ATUS" />
+    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels_IHIS" /-->
       	
       </manifest>
     </jar>

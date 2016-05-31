@@ -103,7 +103,6 @@ public class BenchmarkSetup {
 	
     public static PrivacyModel[] getNon_K_PrivacyModels() {
     	return new PrivacyModel[] {
-//    			new PrivacyModel(BenchmarkCriterion.K_ANONYMITY,           5, null, null, null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  5, null, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null),
@@ -489,31 +488,31 @@ public class BenchmarkSetup {
         L_DIVERSITY_DISTINCT {
             @Override
             public String toString() {
-                return "ld";
+                return "DL";
             }
         },
         L_DIVERSITY_ENTROPY {
             @Override
             public String toString() {
-                return "le";
+                return "RE";
             }
         },
         L_DIVERSITY_RECURSIVE {
             @Override
             public String toString() {
-                return "lr";
+                return "RL";
             }
         },
         T_CLOSENESS_HD {
             @Override
             public String toString() {
-                return "thd";
+                return "HT";
             }
         },
         T_CLOSENESS_ED {
             @Override
             public String toString() {
-                return "ted";
+                return "ET";
             }
         },
         D_PRESENCE {
@@ -531,7 +530,7 @@ public class BenchmarkSetup {
         D_DISCLOSURE_PRIVACY {
             @Override
             public String toString() {
-                return "ddis";
+                return "DP";
             }
         }
     }

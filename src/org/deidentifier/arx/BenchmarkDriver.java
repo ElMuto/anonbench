@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -300,8 +301,7 @@ public class BenchmarkDriver {
         handle.release();
     }
     
-    public void calculateAndPrintMaximalPredictionAccuracy(
-    		BenchmarkMeasure measure,
+    public double calculateMaximalPredictionAccuracy(
     		double suppFactor, BenchmarkDataset dataset,
     		boolean subsetBased, Integer k,
     		Integer l, Double c, Double t,
@@ -309,19 +309,20 @@ public class BenchmarkDriver {
     		String sa, Integer ssNum, Double[] accuracies
     		) throws IOException {
 
-    	ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
+    	ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
     	ARXAnonymizer anonymizer = new ARXAnonymizer();
 
     	ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
     	
 		double optimalAccuracy = -Double.MAX_VALUE;
-		
+				
 		ARXLattice lattice = result.getLattice();
 		for (ARXNode[] level : lattice.getLevels()) {
 			for (ARXNode node : level) {
 				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
 					try {
 
+//						System.out.println("Processing transformation " + Arrays.toString(node.getTransformation()));
 						DataHandle handle = result.getOutput(node);
 						List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
 						StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
@@ -336,14 +337,11 @@ public class BenchmarkDriver {
 					} catch (ParseException e) {
 						throw new RuntimeException(e);
 					}
-					System.out.print("\n");
 				}
 			}
         }
         
-
-    	System.out.println("Optimal PA: " + optimalAccuracy);
-
+    	return optimalAccuracy;
     } 
     
  
@@ -387,7 +385,24 @@ public class BenchmarkDriver {
 
 
 
-    /**
+    public static void compareMaxPAs(BenchmarkDatafile datafile, String sa) throws IOException {
+		System.out.println("Running " + datafile.toString() + " with SA=" + sa);
+		// for each privacy model
+		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
+			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
+				
+				double maxPA = driver.calculateMaximalPredictionAccuracy(0.05, dataset, false,
+						privacyModel.getK(),
+						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+						privacyModel.getD(), null, null,
+						sa, null, new Double[] { null });
+	
+				System.out.format(new Locale("de", "DE"), "%s;%.4f%n", privacyModel.toString(), maxPA);
+		}
+	}
+
+	/**
      * @param dataset
      * @param handle
      * @param attr
