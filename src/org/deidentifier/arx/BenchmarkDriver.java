@@ -320,7 +320,6 @@ public class BenchmarkDriver {
 		for (ARXNode[] level : lattice.getLevels()) {
 			for (ARXNode node : level) {
 				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-					System.out.print("Anonymous transformation " + Arrays.toString(node.getTransformation())); 
 					try {
 
 						DataHandle handle = result.getOutput(node);
@@ -332,7 +331,6 @@ public class BenchmarkDriver {
 						double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
 						if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
 							optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-							System.out.print(": " + accuracy);
 						}
 
 					} catch (ParseException e) {
@@ -348,55 +346,7 @@ public class BenchmarkDriver {
 
     } 
     
-    public void calculateAndPrintPredictionAccuracyOfOptimumAndBottom(
-    		BenchmarkMeasure measure,
-    		double suppFactor, BenchmarkDataset dataset,
-    		boolean subsetBased, Integer k,
-    		Integer l, Double c, Double t,
-    		Double d, Double dMin, Double dMax,
-    		String sa, Integer ssNum, Double[] accuracies
-    		) throws IOException {
-
-    	ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
-    	ARXAnonymizer anonymizer = new ARXAnonymizer();
-    	
-    	System.out.println("Suppression factor is " + suppFactor);
-
-    	ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
-    	 	
-    	DataHandle outHandleOfOptimum = result.getOutput(result.getGlobalOptimum());
-    	DataHandle outHandleofBottom = result.getOutput(result.getLattice().getBottom());
-		List<String> qis = new ArrayList<String>(outHandleOfOptimum.getDefinition().getQuasiIdentifyingAttributes());
-		StatisticsClassification statsOfOptimum, statsOfBottom;
-		System.out.println();
-		try {
-			System.out.println("Calulating stats for global optimum (" + Arrays.toString(result.getGlobalOptimum().getTransformation()) + ")");
-			statsOfOptimum = outHandleOfOptimum.getStatistics().getClassificationPerformance(
-					qis.toArray(new String[qis.size()]), sa, ARXLogisticRegressionConfiguration.create()
-					.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(Integer.MAX_VALUE));
-
-			System.out.println("Calculating stats for bottom node   (" + Arrays.toString(result.getLattice().getBottom().getTransformation()) + ")");
-			statsOfBottom = outHandleofBottom.getStatistics().getClassificationPerformance(
-					qis.toArray(new String[qis.size()]), sa, ARXLogisticRegressionConfiguration.create()
-					.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(Integer.MAX_VALUE));
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-		double optRelAccuracy = (statsOfOptimum.getAccuracy() - statsOfOptimum.getZeroRAccuracy() ) / (statsOfOptimum.getOriginalAccuracy() - statsOfOptimum.getZeroRAccuracy());
-		double botRelAccuracy = (statsOfBottom.getAccuracy() - statsOfBottom.getZeroRAccuracy() ) / (statsOfBottom.getOriginalAccuracy() - statsOfBottom.getZeroRAccuracy());
-		
-		System.out.println();
-		System.out.println("ZeroRAccuracy of optimum:    " + statsOfOptimum.getZeroRAccuracy());
-		System.out.println("OriginalAccuracy of optimum: " + statsOfOptimum.getOriginalAccuracy());
-		System.out.println("AnonAccuracy of optimum:     " + statsOfOptimum.getAccuracy());
-		System.out.println("RelAccuracy of optimum:      " + optRelAccuracy);
-		System.out.println();
-		System.out.println("ZeroRAccuracy of bottom:     " + statsOfBottom.getZeroRAccuracy());
-		System.out.println("OriginalAccuracy of bottom:  " + statsOfBottom.getOriginalAccuracy());
-		System.out.println("AnonAccuracy of bottom:      " + statsOfBottom.getAccuracy());
-		System.out.println("RelAccuracy of bottom:       " + botRelAccuracy);
-    }
-
+ 
 	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
 			Double d) {
 		return new PrivacyModel(criterion, k, c, l, t, d).toString();
