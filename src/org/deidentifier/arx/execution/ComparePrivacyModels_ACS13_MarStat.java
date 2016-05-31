@@ -73,7 +73,7 @@ public class ComparePrivacyModels_ACS13_MarStat {
 			BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 
 			// for each suppression factor
-			for (double suppFactor : new double[] { 0.05d }) {
+			for (double suppFactor : new double[] { 0.05 }) {
 				// Print status info
 				System.out.println("Running " + privacyModel.toString() + " on " + datafile.toString() + " with SA=" + sa + " and IL-Measure " + measure);
 				driver.calculateAndPrintMaximalPredictionAccuracy(measure, suppFactor, dataset, false,
