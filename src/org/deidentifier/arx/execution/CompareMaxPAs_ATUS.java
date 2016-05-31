@@ -31,7 +31,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
  * 
  * @author Helmut Spengler
  */
-public class ComparePrivacyModels_ATUS {
+public class CompareMaxPAs_ATUS {
 	
 	/**
 	 * Main entry point

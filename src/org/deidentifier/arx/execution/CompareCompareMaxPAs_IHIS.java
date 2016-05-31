@@ -31,7 +31,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
  * 
  * @author Helmut Spengler
  */
-public class ComparePrivacyModels_IHIS {
+public class CompareCompareMaxPAs_IHIS {
 	
 	/**
 	 * Main entry point
