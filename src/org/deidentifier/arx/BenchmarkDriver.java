@@ -301,51 +301,7 @@ public class BenchmarkDriver {
         handle.release();
     }
     
-    public double calculateMaximalPredictionAccuracy(
-    		double suppFactor, BenchmarkDataset dataset,
-    		boolean subsetBased, Integer k,
-    		Integer l, Double c, Double t,
-    		Double d, Double dMin, Double dMax,
-    		String sa, Integer ssNum, Double[] accuracies
-    		) throws IOException {
-
-    	ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
-    	ARXAnonymizer anonymizer = new ARXAnonymizer();
-
-    	ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
-    	
-		double optimalAccuracy = -Double.MAX_VALUE;
-				
-		ARXLattice lattice = result.getLattice();
-		for (ARXNode[] level : lattice.getLevels()) {
-			for (ARXNode node : level) {
-				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-					try {
-
-//						System.out.println("Processing transformation " + Arrays.toString(node.getTransformation()));
-						DataHandle handle = result.getOutput(node);
-						List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-						StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-								qis.toArray(new String[qis.size()]), sa, ARXLogisticRegressionConfiguration.create()
-								.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
-
-						double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-						if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
-							optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-						}
-
-					} catch (ParseException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			}
-        }
-        
-    	return optimalAccuracy;
-    } 
-    
- 
-	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
+    private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
 			Double d) {
 		return new PrivacyModel(criterion, k, c, l, t, d).toString();
 	}
@@ -385,14 +341,62 @@ public class BenchmarkDriver {
 
 
 
-    public static void compareMaxPAs(BenchmarkDatafile datafile, String sa) throws IOException {
+    public double calculateMaximalClassificationAccuracy(
+			double suppFactor, BenchmarkDataset dataset,
+			Integer k,
+			Integer l, Double c, Double t,
+			Double d, Double dMin, Double dMax,
+			String sa, Integer ssNum, Double[] accuracies
+			) throws IOException {
+	
+		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
+		ARXAnonymizer anonymizer = new ARXAnonymizer();
+	
+		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
+		
+		double optimalAccuracy = -Double.MAX_VALUE;
+				
+		ARXLattice lattice = result.getLattice();
+		
+		for (ARXNode[] level : lattice.getLevels()) {
+			for (ARXNode node : level) {
+				
+	        	// Make sure that every transformation is classified correctly
+	        	if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+	        		result.getOutput(node).release();
+	        	}				
+				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+					try {
+	
+						DataHandle handle = result.getOutput(node);
+						List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+						StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+								qis.toArray(new String[qis.size()]), sa, ARXLogisticRegressionConfiguration.create()
+								.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+	
+						double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+						if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+							optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+						}
+	
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+	    }
+	    
+		return optimalAccuracy;
+	}
+
+	public static void compareMaxPAs(BenchmarkDatafile datafile, String sa) throws IOException {
 		System.out.println("Running " + datafile.toString() + " with SA=" + sa);
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 				
-				double maxPA = driver.calculateMaximalPredictionAccuracy(0.05, dataset, false,
+				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 						privacyModel.getK(),
 						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 						privacyModel.getD(), null, null,
