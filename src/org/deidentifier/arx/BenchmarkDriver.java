@@ -22,6 +22,7 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -389,8 +390,10 @@ public class BenchmarkDriver {
 		return optimalAccuracy;
 	}
 
-	public static void compareMaxPAs(BenchmarkDatafile datafile, String sa) throws IOException {
-		System.out.println("Running " + datafile.toString() + " with SA=" + sa);
+	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream) throws IOException {
+		String printString = "Running " + datafile.toString() + " with SA=" + sa;
+		outputStream.println(printString);
+		System.out.println(printString);
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
@@ -402,7 +405,8 @@ public class BenchmarkDriver {
 						privacyModel.getD(), null, null,
 						sa, null, new Double[] { null });
 	
-				System.out.format(new Locale("de", "DE"), "%s;%.4f%n", privacyModel.toString(), maxPA);
+				System.out.  format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
+				outputStream.format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
 		}
 	}
 

@@ -53,7 +53,7 @@ public class ComparePrivacyModels {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {/*BenchmarkMeasure.LOSS, */BenchmarkMeasure.ENTROPY}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.ENTROPY}) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {

@@ -21,6 +21,7 @@
 package org.deidentifier.arx.execution;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
@@ -31,7 +32,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
  * 
  * @author Helmut Spengler
  */
-public class CompareMaxPAs_ATUS {
+public class CompareRelPAs {
 	
 	/**
 	 * Main entry point
@@ -40,10 +41,24 @@ public class CompareMaxPAs_ATUS {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAs.txt");
 
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", System.out);
-		System.out.println();
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", System.out);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream);
+		fileOutputStream.println();
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
+		fileOutputStream.println("\n");
+		
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream);
+		fileOutputStream.println();
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream);
+		fileOutputStream.println("\n");
+
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream);
+		fileOutputStream.println();
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream);
+		
 		System.out.println("done.");
+		
+		fileOutputStream.close();
 	}
 }

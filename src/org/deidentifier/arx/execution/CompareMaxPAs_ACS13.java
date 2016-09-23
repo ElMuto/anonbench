@@ -20,7 +20,9 @@
 
 package org.deidentifier.arx.execution;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
@@ -40,10 +42,15 @@ public class CompareMaxPAs_ACS13 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAs.txt");
 
-		BenchmarkDriver.compareMaxPAs(BenchmarkDatafile.ACS13, "Marital status");
-		System.out.println();
-		BenchmarkDriver.compareMaxPAs(BenchmarkDatafile.ACS13, "Education");
-		System.out.println("done.");
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream);
+		fileOutputStream.println();
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
+		
+		
+		fileOutputStream.println("done.");
+		
+		fileOutputStream.close();
 	}
 }

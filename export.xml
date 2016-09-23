@@ -83,11 +83,8 @@
       <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
       <manifest>
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.PerformDependencyDrivenDifficultyExperiments" /-->
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.DetermineDependencies" /-->
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" /-->
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareMaxPAs_ATUS" />
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareMaxPAs_IHIS" /-->
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAs" />
       	
       </manifest>
     </jar>

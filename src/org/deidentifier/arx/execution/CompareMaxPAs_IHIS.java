@@ -41,9 +41,9 @@ public class CompareMaxPAs_IHIS {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		BenchmarkDriver.compareMaxPAs(BenchmarkDatafile.IHIS, "MARSTAT");
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", System.out);
 		System.out.println();
-		BenchmarkDriver.compareMaxPAs(BenchmarkDatafile.IHIS, "EDUC");
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", System.out);
 		System.out.println("done.");
 	}
 }

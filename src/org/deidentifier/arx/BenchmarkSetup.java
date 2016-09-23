@@ -107,7 +107,7 @@ public class BenchmarkSetup {
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.2d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        5, null, null, 0.2d, null),
+//    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        5, null, null, 0.2d, null),
     			new PrivacyModel(BenchmarkCriterion.D_DISCLOSURE_PRIVACY,  5, null, null, null, 1d),
     	};
     }
@@ -232,8 +232,8 @@ public class BenchmarkSetup {
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
          BenchmarkDatafile.ACS13,
-//         BenchmarkDatafile.ATUS,
-//         BenchmarkDatafile.IHIS,
+         BenchmarkDatafile.ATUS,
+         BenchmarkDatafile.IHIS,
                                         };
     }
     
