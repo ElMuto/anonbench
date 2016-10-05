@@ -3,9 +3,9 @@
 
   <property environment="env"/>
   
-  <property name="arx" value="${env.WORKSPACE_PATH}\arx" />
-  <property name="subframe" value="${env.WORKSPACE_PATH}\subframe-fork" />
-  <property name="utility" value="${env.WORKSPACE_PATH}\utility" />
+  <property name="arx" value="${env.WORKSPACE_PATH}\pcc-compare\arx" />
+  <property name="subframe" value="${env.WORKSPACE_PATH}\pcc-compare\subframe-fork" />
+  <property name="utility" value="${env.WORKSPACE_PATH}\pcc-compare\utility" />
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">

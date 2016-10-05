@@ -1,6 +1,6 @@
 @echo off
 
-Set _path=%WORKSPACE_PATH%\anonbench-fork
+Set _path=%WORKSPACE_PATH%\pcc-compare\anonbench-fork
 
 Set _cluster_node=4
 Set _remote_dir=/home/imse/pc-bench-helmut
@@ -15,6 +15,9 @@ echo This batch file also deletes ALL JAR, CSV, LOG files and run.sh!
 pause
 
 plink -m %_commandfile% PCluster-fed%_cluster_node%
+
+echo Local jar: 	%_benchmark_jar_path%
+echo Local run.sh:	%_run_sh_path%
 
 pscp %_benchmark_jar_path% PCluster-fed%_cluster_node%:%_remote_dir%/jars/%_benchmark_jar_name%
 

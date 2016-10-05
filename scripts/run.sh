@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_MaxPA_ATUS
+java -Xmx5G -jar jars/pc-bench.jar -D_CompareRelPAs
