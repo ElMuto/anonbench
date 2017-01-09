@@ -187,14 +187,14 @@ public class BenchmarkDriver {
                          boolean subsetBased, Integer k,
                          Integer l, Double c, Double t,
                          Double d, Double dMin, Double dMax,
-                         String sa, Integer ssNum) throws IOException
+                         String sa, Integer ssNum, String resultsFileName) throws IOException
     {
     							anonymize (		measure, suppFactor,  dataset,
 					                subsetBased,  k,
 					                l,  c,  t,
 					                d,  dMin,  dMax,
 					                sa,  ssNum,
-					                new Double[] { null });
+					                new Double[] { null }, resultsFileName);
     }
 
 
@@ -204,7 +204,7 @@ public class BenchmarkDriver {
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
                                  Double d, Double dMin, Double dMax,
-                                 String sa, Integer ssNum, Double[] accuracies
+                                 String sa, Integer ssNum, Double[] accuracies, String resultsFileName
             ) throws IOException {
 
         ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
@@ -297,7 +297,7 @@ public class BenchmarkDriver {
                 attrStats.getFrequencySpan() : BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL);
 
         // Write results incrementally
-        BenchmarkSetup.BENCHMARK.getResults().write(new File("results/results.csv"));
+        BenchmarkSetup.BENCHMARK.getResults().write(new File(resultsFileName));
         
         handle.release();
     }
@@ -395,7 +395,7 @@ public class BenchmarkDriver {
 		outputStream.println(printString);
 		System.out.println(printString);
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 				
@@ -407,6 +407,24 @@ public class BenchmarkDriver {
 	
 				System.out.  format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
 				outputStream.format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
+		}
+	}
+
+	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, PrintStream outputStream) throws IOException {
+		//		String printString = "Running " + datafile.toString() + " with SA=" + sa;
+		// for each privacy model
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_TK_Comparison()) {
+			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
+				
+				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+						privacyModel.getK(),
+						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+						privacyModel.getD(), null, null,
+						sa, null, new Double[] { null });
+	
+				System.out.  format(new Locale("en", "US"), "%s;%s;%d;%.2f;%.4f%n", datafile.toString(), sa, privacyModel.getK(), privacyModel.getT(), maxPA);
+				outputStream.format(new Locale("en", "US"), "%s;%s;%d;%.2f;%.4f%n", datafile.toString(), sa, privacyModel.getK(), privacyModel.getT(), maxPA);
 		}
 	}
 

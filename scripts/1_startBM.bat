@@ -1,8 +1,8 @@
 @echo off
 
-Set _path=%WORKSPACE_PATH%\pcc-compare\anonbench-fork
+Set _path=%WORKSPACE_PATH%\promotion\code-attr-disclosure-criteria-comparison
 
-Set _cluster_node=4
+Set _cluster_node=2
 Set _remote_dir=/home/imse/pc-bench-helmut
 
 Set _commandfile=%_path%\scripts\plink-commands.txt
@@ -18,6 +18,7 @@ plink -m %_commandfile% PCluster-fed%_cluster_node%
 
 echo Local jar: 	%_benchmark_jar_path%
 echo Local run.sh:	%_run_sh_path%
+echo pc-bench.jar:  %_benchmark_jar_path%
 
 pscp %_benchmark_jar_path% PCluster-fed%_cluster_node%:%_remote_dir%/jars/%_benchmark_jar_name%
 

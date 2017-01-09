@@ -88,7 +88,7 @@ public class Analyze_InfluenceOfDependencyOnQual extends GnuPlotter {
     	commandWriter.println("set label '3 QIs' at screen " + (xOffset + (2d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col3);
     	commandWriter.println("set label '4 QIs' at screen " + (xOffset + (3d * xSpacing)) + ", screen " + yOffset + " textcolor rgb " + col4);
 
-    	for (PrivacyModel privacyModel : BenchmarkSetup.getNon_K_PrivacyModels()) {
+    	for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
     		System.out.println("Processing " + privacyModel);
     		if (condensed) {        	
     			commandWriter.println("set multiplot title '"+ privacyModel + "'");

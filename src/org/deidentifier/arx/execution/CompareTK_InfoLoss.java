@@ -36,7 +36,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class ComparePrivacyModels {
+public class CompareTK_InfoLoss {
 	
 	/**
 	 * Main entry point
@@ -62,27 +62,22 @@ public class ComparePrivacyModels {
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
 					// for each privacy model
-					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
+					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_TK_Comparison()) {
 
-						BenchmarkCriterion[] criteria = null;
-						if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
-							criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-						} else {
-							criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
-						}
-
+						BenchmarkCriterion[] criteria =  new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
+						
 						BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 						BenchmarkDriver driver = new BenchmarkDriver(measure, dataset);
 
 						// for each suppression factor
 						for (double suppFactor : new double[] { 0.05d }) {
 							// Print status info
-							System.out.println("Running " + privacyModel.toString() + " on " + datafile.toString() + " with SA=" + sa + " and IL-Measure " + measure);
+							System.out.println("Running t=" + privacyModel.getT() + ", k=" + privacyModel.getK() + " on " + datafile.toString() + " with SA=" + sa + " and IL-Measure " + measure);
 							driver.anonymize(measure, suppFactor, dataset, false,
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 									privacyModel.getD(), null, null,
-									sa, null, "results/results.csv");
+									sa, null, "results/resultsTKIL.csv");
 						}
 						dataset.getArxData().getHandle().release();
 					}

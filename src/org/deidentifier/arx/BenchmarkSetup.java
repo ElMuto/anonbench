@@ -101,20 +101,36 @@ public class BenchmarkSetup {
     public static final double NO_RESULT_FOUND_DOUBLE_VAL=Double.POSITIVE_INFINITY;
     public static final String NO_RESULT_FOUND_STRING_VAL="n.s.f.";
 	
-    public static PrivacyModel[] getNon_K_PrivacyModels() {
+    public static PrivacyModel[] getPrivacyModelsCombinedWithK() {
     	return new PrivacyModel[] {
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  5, null, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null),
     			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.2d, null),
-//    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_HD,        5, null, null, 0.2d, null),
     			new PrivacyModel(BenchmarkCriterion.D_DISCLOSURE_PRIVACY,  5, null, null, null, 1d),
+    	};
+    }
+	
+    public static PrivacyModel[] getPrivacyModelsConfigsFor_TK_Comparison() {
+    	return new PrivacyModel[] {
+
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.05d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.17d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.25d, null),
+
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       15, null, null, 0.05d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       15, null, null, 0.17d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       15, null, null, 0.25d, null),
+
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       25, null, null, 0.05d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       25, null, null, 0.17d, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       25, null, null, 0.25d, null),
     	};
     }
     
     public static PrivacyModel[] getDifficultyRelevantPrivacyModels() {
     	List<PrivacyModel> _saBasedModelsList = new ArrayList<>();
-    	for (PrivacyModel privacyModel : getNon_K_PrivacyModels()) {
+    	for (PrivacyModel privacyModel : getPrivacyModelsCombinedWithK()) {
     		if (privacyModel.isSaBased()) _saBasedModelsList.add(privacyModel);
     	}    	
     	return _saBasedModelsList.toArray(new PrivacyModel[_saBasedModelsList.size()]);
@@ -122,7 +138,7 @@ public class BenchmarkSetup {
     
     public static PrivacyModel[] getNonSaBasedPrivacyModels() {
     	List<PrivacyModel> _saBasedModelsList = new ArrayList<>();
-    	for (PrivacyModel privacyModel : getNon_K_PrivacyModels()) {
+    	for (PrivacyModel privacyModel : getPrivacyModelsCombinedWithK()) {
     		if (!privacyModel.isSaBased()) _saBasedModelsList.add(privacyModel);
     	}    	
     	return _saBasedModelsList.toArray(new PrivacyModel[_saBasedModelsList.size()]);
