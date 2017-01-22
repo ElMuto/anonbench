@@ -379,6 +379,8 @@ public class BenchmarkDriver {
 						if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
 							optimalAccuracy = Math.max(accuracy, optimalAccuracy);
 						}
+						System.out.printf("\tstats.getZeroRAccuracy()    = %.2f", stats.getZeroRAccuracy() * 100d);
+						System.out.printf("\tstats.getOriginalAccuracy() = %.2f", stats.getOriginalAccuracy() * 100d);
 	
 					} catch (ParseException e) {
 						throw new RuntimeException(e);
