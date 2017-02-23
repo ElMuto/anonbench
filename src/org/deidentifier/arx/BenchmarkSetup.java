@@ -112,20 +112,19 @@ public class BenchmarkSetup {
     }
 	
     public static PrivacyModel[] getPrivacyModelsConfigsFor_TK_Comparison() {
-    	return new PrivacyModel[] {
+    	
+		Integer[] ks = { 2, 5, 10, 15, 20, 25, 30 };
+		Double[]  ts = { 0.01, 0.05, 0.9, 0.13, 0.17, 0.21, 0.25 };
+		
+		PrivacyModel[] pmArr = new PrivacyModel[ks.length * ts.length];
 
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.05d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.17d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.25d, null),
-
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       15, null, null, 0.05d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       15, null, null, 0.17d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       15, null, null, 0.25d, null),
-
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       25, null, null, 0.05d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       25, null, null, 0.17d, null),
-    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,       25, null, null, 0.25d, null),
-    	};
+		for (int ki = 0; ki < ks.length; ki++) {
+			for (int ti = 0; ti < ts.length; ti++) {
+				pmArr[ki * ts.length + ti] = new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED, ks[ki], null, null, ts[ti], null);
+			}
+		}
+    	
+    	return pmArr;
     }
     
     public static PrivacyModel[] getDifficultyRelevantPrivacyModels() {
