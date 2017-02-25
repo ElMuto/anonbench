@@ -111,16 +111,22 @@ public class BenchmarkSetup {
     	};
     }
 	
-    public static PrivacyModel[] getPrivacyModelsConfigsFor_TK_Comparison() {
+    public static PrivacyModel[] getPrivacyModelsConfigsFor_2D_Comparison(String dim2Qualifier) {
     	
-		Integer[] ks = { 2, 5, 10, 15, 20, 25, 30 };
-		Double[]  ts = { 0.01, 0.05, 0.09, 0.13, 0.17, 0.20, 0.25 };
+		Integer[] dim1Vals = { 2, 5, 10, 15, 20, 25, 30 };
+		Double[]  dim2ValsForT = { 0.01, 0.05, 0.09, 0.13, 0.17, 0.20, 0.25 };
 		
-		PrivacyModel[] pmArr = new PrivacyModel[ks.length * ts.length];
+		Double[] dim2Vals = null;
 
-		for (int ki = 0; ki < ks.length; ki++) {
-			for (int ti = 0; ti < ts.length; ti++) {
-				pmArr[ki * ts.length + ti] = new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED, ks[ki], null, null, ts[ti], null);
+		if ("t".equals(dim2Qualifier)) {
+			dim2Vals = dim2ValsForT;
+		}
+		
+		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
+
+		for (int ki = 0; ki < dim1Vals.length; ki++) {
+			for (int ti = 0; ti < dim2Vals.length; ti++) {
+				pmArr[ki * dim2Vals.length + ti] = new PrivacyModel(dim2Qualifier, dim1Vals[ki], dim2Vals[ti]);
 			}
 		}
     	

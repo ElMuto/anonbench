@@ -415,7 +415,7 @@ public class BenchmarkDriver {
 	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, PrintStream outputStream) throws IOException {
 		//		String printString = "Running " + datafile.toString() + " with SA=" + sa;
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_TK_Comparison()) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison("t")) {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 				

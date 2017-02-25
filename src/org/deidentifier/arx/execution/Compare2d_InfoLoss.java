@@ -36,7 +36,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class CompareTK_InfoLoss {
+public class Compare2d_InfoLoss {
 	
 	/**
 	 * Main entry point
@@ -62,7 +62,7 @@ public class CompareTK_InfoLoss {
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
 					// for each privacy model
-					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_TK_Comparison()) {
+					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison("t")) {
 
 						BenchmarkCriterion[] criteria =  new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
 						

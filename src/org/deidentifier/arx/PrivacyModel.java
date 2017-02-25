@@ -9,6 +9,20 @@ public class PrivacyModel {
 	private final Integer l;
 	private final Double  t;
 	private final Double  d;
+	
+	public PrivacyModel(String dim2Qualifier, Integer dim1Val, Double dim2Val) {
+		super();
+		this.k = dim1Val;
+		if ("t".equals(dim2Qualifier)) {
+			this.criterion = BenchmarkCriterion.T_CLOSENESS_ED;
+			this.c = null;
+			this.l = null;
+			this.t = dim2Val;
+			this.d = null;
+		} else {
+			throw new RuntimeException("invalid parameter for constructor: '" + dim2Qualifier + "'");
+		}
+	}
 
 	/**
 	 * @param criterion

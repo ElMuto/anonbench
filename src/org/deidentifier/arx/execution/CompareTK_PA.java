@@ -55,16 +55,6 @@ public class CompareTK_PA {
 		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream);
 		fileOutputStream.println();
 		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
-		fileOutputStream.println("\n");
-		
-		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream);
-		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream);
-		fileOutputStream.println("\n");
-
-		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream);
-		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream);
 		
 		System.out.println("done.");
 		
