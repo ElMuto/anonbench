@@ -113,13 +113,21 @@ public class BenchmarkSetup {
 	
     public static PrivacyModel[] getPrivacyModelsConfigsFor_2D_Comparison(String dim2Qualifier) {
     	
-		Integer[] dim1Vals = { 2, 5, 10, 15, 20, 25, 30 };
-		Double[]  dim2ValsForT = { 0.01, 0.05, 0.09, 0.13, 0.17, 0.20, 0.25 };
+		Integer[] dim1Vals =     { 2, 5, 10, 15, 20, 25, 30 };
+		Double [] dim2ValsForT = { 0.25, 0.20, 0.17, 0.13, 0.09, 0.05, 0.01 };
+		Double [] dim2ValsForL = { 2d, 3d, 4d, 5d, 6d, 7d, 8d };
+		Double [] dim2ValsForD = { 1.2, 1.1, 1d, 0.9, 0.8 };
 		
 		Double[] dim2Vals = null;
 
 		if ("t".equals(dim2Qualifier)) {
 			dim2Vals = dim2ValsForT;
+		} else if ("ld".equals(dim2Qualifier) || "lr".equals(dim2Qualifier) || "le".equals(dim2Qualifier)) {
+			dim2Vals = dim2ValsForL;
+		} else if ("d".equals(dim2Qualifier)) {
+			dim2Vals = dim2ValsForD;
+		} else {
+			throw new RuntimeException("Invalid dim2Qalifier: '" + dim2Qualifier + "'");
 		}
 		
 		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];

@@ -1,4 +1,4 @@
-@echo off
+	@echo off
 
 Set _path=%WORKSPACE_PATH%\promotion\code-attr-disclosure-criteria-comparison
 
@@ -20,12 +20,12 @@ echo Local jar: 	%_benchmark_jar_path%
 echo Local run.sh:	%_run_sh_path%
 echo pc-bench.jar:  %_benchmark_jar_path%
 
-pscp %_benchmark_jar_path% PCluster-fed%_cluster_node%:%_remote_dir%/jars/%_benchmark_jar_name%
+pscp %_benchmark_jar_path% imse@PCluster-fed%_cluster_node%:%_remote_dir%/jars/%_benchmark_jar_name%
+pscp %_run_sh_path% imse@PCluster-fed%_cluster_node%:%_remote_dir%/
 
-pscp %_run_sh_path% PCluster-fed%_cluster_node%:%_remote_dir%/
-plink PCluster-fed%_cluster_node% chmod a+x %_remote_dir%/run.sh
+plink imse@PCluster-fed%_cluster_node% chmod a+x %_remote_dir%/run.sh
 
-plink PCluster-fed%_cluster_node% screen -dmS "C" bash -c 'cd %_remote_dir%;./run.sh; read'
+plink imse@PCluster-fed%_cluster_node% screen -dmS "C" bash -c 'cd %_remote_dir%;./run.sh; read'
 
 start putty -load PCluster-fed%_cluster_node%
 

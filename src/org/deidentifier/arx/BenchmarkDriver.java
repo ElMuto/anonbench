@@ -347,7 +347,7 @@ public class BenchmarkDriver {
 			Integer k,
 			Integer l, Double c, Double t,
 			Double d, Double dMin, Double dMax,
-			String sa, Integer ssNum, Double[] accuracies
+			String sa, Integer ssNum
 			) throws IOException {
 	
 		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
@@ -378,9 +378,10 @@ public class BenchmarkDriver {
 						double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
 						if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
 							optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+							if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
 						}
-						System.out.printf("\tstats.getZeroRAccuracy()    = %.2f", stats.getZeroRAccuracy() * 100d);
-						System.out.printf("\tstats.getOriginalAccuracy() = %.2f", stats.getOriginalAccuracy() * 100d);
+//						System.out.printf("\tstats.getZeroRAccuracy()    = %.2f", stats.getZeroRAccuracy() * 100d);
+//						System.out.printf("\tstats.getOriginalAccuracy() = %.2f", stats.getOriginalAccuracy() * 100d);
 	
 					} catch (ParseException e) {
 						throw new RuntimeException(e);
@@ -405,28 +406,10 @@ public class BenchmarkDriver {
 						privacyModel.getK(),
 						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 						privacyModel.getD(), null, null,
-						sa, null, new Double[] { null });
+						sa, null);
 	
 				System.out.  format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
 				outputStream.format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
-		}
-	}
-
-	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, PrintStream outputStream) throws IOException {
-		//		String printString = "Running " + datafile.toString() + " with SA=" + sa;
-		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison("t")) {
-			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
-			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
-				
-				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
-						privacyModel.getK(),
-						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-						privacyModel.getD(), null, null,
-						sa, null, new Double[] { null });
-	
-				System.out.  format(new Locale("en", "US"), "%s;%s;%d;%.2f;%.4f%n", datafile.toString(), sa, privacyModel.getK(), privacyModel.getT(), maxPA);
-				outputStream.format(new Locale("en", "US"), "%s;%s;%d;%.2f;%.4f%n", datafile.toString(), sa, privacyModel.getK(), privacyModel.getT(), maxPA);
 		}
 	}
 

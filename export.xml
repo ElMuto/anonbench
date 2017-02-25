@@ -85,7 +85,7 @@
       <manifest>
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" /-->
     	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAs" /-->
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareTK_PA" />
+    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
       </manifest>
     </jar>
     <delete dir="build" failonerror="true" />

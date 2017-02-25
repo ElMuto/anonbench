@@ -78,22 +78,22 @@ public class GenerateGnuplot3dFiles {
 			{"ACS13", "Education", "Loss"},
 			};
 
-		for (String[] pair : pairs) {
-			try (Stream<String> lines = Files.lines(Paths.get(resultsFile))) {
-				List<Coord3d> coordList =
-				lines.
-				skip(2).
-				map(GenerateGnuplot3dFiles::extractData).
-				filter(c -> c.getDataset().equals(pair[0]) && c.getSa().equals(pair[1]) && c.getIlMeasure().equals(pair[2])).
-				filter(c -> c.getX() != null && c.getY() != null).
-				sorted().
-				collect(Collectors.toList());
-
-				System.out.println(printWithEmptyLines(coordList));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
+//		for (String[] pair : pairs) {
+//			try (Stream<String> lines = Files.lines(Paths.get(resultsFile))) {
+//				List<Coord3d> coordList =
+//				lines.
+//				skip(2).
+//				map(GenerateGnuplot3dFiles::extractData).
+//				filter(c -> c.getDataset().equals(pair[0]) && c.getSa().equals(pair[1]) && c.getIlMeasure().equals(pair[2])).
+//				filter(c -> c.getX() != null && c.getY() != null).
+//				sorted().
+//				collect(Collectors.toList());
+//
+//				System.out.println(printWithEmptyLines(coordList));
+//			} catch (Exception ex) {
+//				ex.printStackTrace();
+//			}
+//		}
 	}
 	
 	private static Coord3d extractData(String csvLine) {

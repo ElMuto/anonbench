@@ -9,16 +9,42 @@ public class PrivacyModel {
 	private final Integer l;
 	private final Double  t;
 	private final Double  d;
+	private final Double  dim2Val;
 	
 	public PrivacyModel(String dim2Qualifier, Integer dim1Val, Double dim2Val) {
 		super();
 		this.k = dim1Val;
+		this.dim2Val = dim2Val;
 		if ("t".equals(dim2Qualifier)) {
 			this.criterion = BenchmarkCriterion.T_CLOSENESS_ED;
 			this.c = null;
 			this.l = null;
 			this.t = dim2Val;
 			this.d = null;
+		} else if ("ld".equals(dim2Qualifier)) {
+			this.criterion = BenchmarkCriterion.L_DIVERSITY_DISTINCT;
+			this.c = null;
+			this.l = (int) Math.round(dim2Val);
+			this.t = null;
+			this.d = null;
+		} else if ("lr".equals(dim2Qualifier)) {
+			this.criterion = BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
+			this.c = 4d;
+			this.l = (int) Math.round(dim2Val);
+			this.t = null;
+			this.d = null;
+		} else if ("le".equals(dim2Qualifier)) {
+			this.criterion = BenchmarkCriterion.L_DIVERSITY_DISTINCT;
+			this.c = null;
+			this.l = (int) Math.round(dim2Val);
+			this.t = null;
+			this.d = null;
+		} else if ("d".equals(dim2Qualifier)) {
+			this.criterion = BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
+			this.c = null;
+			this.l = null;
+			this.t = null;
+			this.d = dim2Val;
 		} else {
 			throw new RuntimeException("invalid parameter for constructor: '" + dim2Qualifier + "'");
 		}
@@ -40,6 +66,7 @@ public class PrivacyModel {
 		this.l = l;
 		this.t = t;
 		this.d = d;
+		this.dim2Val = null;
 	}
 
 	public BenchmarkCriterion getCriterion() {
@@ -64,6 +91,10 @@ public class PrivacyModel {
 
 	public Double getD() {
 		return d;
+	}
+
+	public Double getDim2Val() {
+		return dim2Val;
 	}
 
 	public boolean isSaBased() {

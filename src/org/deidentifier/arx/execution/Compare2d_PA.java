@@ -22,14 +22,15 @@ package org.deidentifier.arx.execution;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.PrivacyModel;
 
 
 /**
@@ -46,18 +47,46 @@ public class Compare2d_PA {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAsTK.txt");
-		String header = "Dataset;SA;k;t;relPA";
-		
-		fileOutputStream.println(header);
-		System.out.println(header);
+		BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
 
-		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream);
-		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAsTK(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
-		
+		for (String dim2Qual : new String[] { "ld", "lr", "le", "d"/*, "t" */ }) {
+			for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+				compareRelPAsTK(datafile, sa, dim2Qual);
+			}
+		}
 		System.out.println("done.");
-		
-		fileOutputStream.close();
 	}
+
+	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
+
+		String outFileName = "RelCA2d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".c3d";
+
+		PrintStream fos = new PrintStream("results/" + outFileName);
+		System.out.println("Name of output file is " + outFileName);
+
+		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison(dim2Qual)[0].getK();
+		// for each privacy model
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison(dim2Qual)) {
+			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
+			
+			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+					privacyModel.getK(),
+					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
+					privacyModel.getD(), null, null,
+					sa, null);
+			
+			String fStr = "";
+			if (!privacyModel.getK().equals(lastK)) fStr += "\n";
+			fStr += "%d\t%.5f\t%.5f\n";
+			lastK = privacyModel.getK();
+			
+			if (relPA == -Double.MAX_VALUE) relPA = -1d;
+			
+			System.out.format(new Locale("en", "US"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
+			fos       .format(new Locale("en", "US"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
+		}
+		fos.close();
+	}
+
 }
