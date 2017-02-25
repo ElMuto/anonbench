@@ -114,7 +114,7 @@ public class BenchmarkSetup {
     public static PrivacyModel[] getPrivacyModelsConfigsFor_TK_Comparison() {
     	
 		Integer[] ks = { 2, 5, 10, 15, 20, 25, 30 };
-		Double[]  ts = { 0.01, 0.05, 0.09, 0.13, 0.17, 0.21, 0.25 };
+		Double[]  ts = { 0.01, 0.05, 0.09, 0.13, 0.17, 0.20, 0.25 };
 		
 		PrivacyModel[] pmArr = new PrivacyModel[ks.length * ts.length];
 
