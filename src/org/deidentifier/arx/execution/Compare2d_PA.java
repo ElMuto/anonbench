@@ -37,7 +37,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class CompareTK_PA {
+public class Compare2d_PA {
 	
 	/**
 	 * Main entry point
