@@ -20,7 +20,6 @@
 
 package org.deidentifier.arx.execution;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
