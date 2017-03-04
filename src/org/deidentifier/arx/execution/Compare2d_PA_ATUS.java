@@ -47,7 +47,7 @@ public class Compare2d_PA_ATUS {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
+		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS;
 
 		for (String dim2Qual : new String[] { "ld", "t", "lr"/*, "le", "d"*/ }) {
 			for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
