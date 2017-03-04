@@ -38,7 +38,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * 
  * @author Fabian Prasser
  */
-public class Compare2d_PA {
+public class Compare2d_PA_ATUS {
 	
 	/**
 	 * Main entry point
@@ -49,7 +49,7 @@ public class Compare2d_PA {
 	public static void main(String[] args) throws IOException {
 		BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
 
-		for (String dim2Qual : new String[] { "ld", "lr", "le", "d"/*, "t" */ }) {
+		for (String dim2Qual : new String[] { "ld", "t", "lr"/*, "le", "d"*/ }) {
 			for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 				compareRelPAsTK(datafile, sa, dim2Qual);
 			}
