@@ -8,4 +8,7 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar -D_Compare2d_PA
+java -Xmx5G -jar jars/pc-bench.jar -D_Compare2d_PA_ATUS lr &
+java -Xmx5G -jar jars/pc-bench.jar -D_Compare2d_PA_ATUS le &
+java -Xmx5G -jar jars/pc-bench.jar -D_Compare2d_PA_ATUS t  &
+java -Xmx5G -jar jars/pc-bench.jar -D_Compare2d_PA_ATUS d

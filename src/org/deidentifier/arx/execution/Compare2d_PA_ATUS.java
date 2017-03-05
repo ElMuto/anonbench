@@ -48,11 +48,20 @@ public class Compare2d_PA_ATUS {
 	 */
 	public static void main(String[] args) throws IOException {
 		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS;
-
-		for (String dim2Qual : new String[] { "ld", "t", "lr"/*, "le", "d"*/ }) {
-			for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
-				compareRelPAsTK(datafile, sa, dim2Qual);
+		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d" };
+		
+		String dim2Qual = args[0];		
+		boolean validInput = false;		
+		for (String s : allowedInputStrings) {
+			if (dim2Qual != null && s.equals(dim2Qual)) {
+				validInput = true;
+				break;
 			}
+		}		
+		if (!validInput) throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
+
+		for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+			compareRelPAsTK(datafile, sa, dim2Qual);
 		}
 		System.out.println("done.");
 	}
