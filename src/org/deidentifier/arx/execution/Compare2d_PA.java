@@ -38,19 +38,27 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * 
  * @author Fabian Prasser
  */
-public class Compare2d_PA_ATUS {
+public class Compare2d_PA {
 	
 	/**
 	 * Main entry point
 	 * 
-	 * @param args
+	 * @param args[0]: dataset, args[1]: dim2Qual
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS;
-		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d" };
+		BenchmarkDatafile datafile = null;
+		String dataFileName = args[0];
+		if ("ACS13".equals(dataFileName)) {
+			datafile = BenchmarkDatafile.ACS13;
+		} else if ("ATUS".equals(dataFileName)) {
+			datafile = BenchmarkDatafile.ATUS;
+		} else if ("IHIS".equals(dataFileName)) {
+			datafile = BenchmarkDatafile.IHIS;
+		} else throw new RuntimeException("Unsupported datafile: '" + dataFileName + "'");
 		
-		String dim2Qual = args[0];		
+		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d" };		
+		String dim2Qual = args[1];		
 		boolean validInput = false;		
 		for (String s : allowedInputStrings) {
 			if (dim2Qual != null && s.equals(dim2Qual)) {
