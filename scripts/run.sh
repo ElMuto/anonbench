@@ -8,5 +8,5 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -jar jars/pc-bench.jar ACS13 lr &
-java -Xmx5G -jar jars/pc-bench.jar ACS13 le
+java -Xmx5G -jar jars/pc-bench.jar -DHelmut ACS13 lr &
+java -Xmx5G -jar jars/pc-bench.jar -DHelmut ACS13 le
