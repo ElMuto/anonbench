@@ -34,7 +34,7 @@ public class PrivacyModel {
 			this.t = null;
 			this.d = null;
 		} else if ("le".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.L_DIVERSITY_DISTINCT;
+			this.criterion = BenchmarkCriterion.L_DIVERSITY_ENTROPY;
 			this.c = null;
 			this.l = (int) Math.round(dim2Val);
 			this.t = null;
