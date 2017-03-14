@@ -2,7 +2,7 @@
 
 Set _path=%WORKSPACE_PATH%\promotion\code-attr-disclosure-criteria-comparison
 
-Set _cluster_node=4
+Set _cluster_node=3
 Set _remote_dir=/home/imse/pc-bench-helmut
 
 Set _commandfile=%_path%\scripts\plink-commands.txt
@@ -25,7 +25,7 @@ pscp %_run_sh_path% imse@PCluster-fed%_cluster_node%:%_remote_dir%/
 
 plink imse@PCluster-fed%_cluster_node% chmod a+x %_remote_dir%/run.sh
 
-plink imse@PCluster-fed%_cluster_node% screen -dmS "C" bash -c 'cd %_remote_dir%;./run.sh; read'
+plink imse@PCluster-fed%_cluster_node% screen -dmS "2D-Param-Variation" bash -c 'cd %_remote_dir%;./run.sh; read'
 
 start putty -load PCluster-fed%_cluster_node%
 
