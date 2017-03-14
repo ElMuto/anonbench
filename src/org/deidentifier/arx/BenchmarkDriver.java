@@ -55,6 +55,7 @@ import org.deidentifier.arx.utility.UtilityMeasureDiscernibility;
 import org.deidentifier.arx.utility.UtilityMeasureLoss;
 import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
 import org.deidentifier.arx.utility.UtilityMeasurePrecision;
+import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
 
 
 /**
@@ -254,6 +255,10 @@ public class BenchmarkDriver {
         Double il_rel;
         if (result.getGlobalOptimum() != null) {
             String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
+            
+            Double il_sc_abs = new UtilityMeasureSoriaComas(dataset.getInputArray()).evaluate(outputArray, result.getGlobalOptimum().getTransformation()).getUtility();
+            Double il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));;
+            System.out.println("SC-Val = " + il_sc_rel);
             
             il_abs = this.measure.evaluate(outputArray).getUtility();
             il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());

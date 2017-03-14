@@ -13,6 +13,7 @@ import org.deidentifier.arx.utility.UtilityMeasureAECS;
 import org.deidentifier.arx.utility.UtilityMeasureDiscernibility;
 import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
 import org.deidentifier.arx.utility.UtilityMeasurePrecision;
+import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
 import org.deidentifier.arx.utility.UtilityMeasureLoss;
     
 
@@ -45,6 +46,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         private final double minLoss; private final double maxLoss;
         private final double minEntr; private final double maxEntr;
         private final double minPrec; private final double maxPrec;
+        private final double minSC;   private final double maxSC;
         
         public void cleanUp () {
         	inputHandle.release();
@@ -87,6 +89,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.minLoss = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(inputArray).getUtility();
             this.minEntr = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(inputArray).getUtility();
             this.minPrec = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(inputArray).getUtility();
+            this.minSC =   new UtilityMeasureSoriaComas(inputArray).evaluate(inputArray).getUtility();
 
             // Compute for output
             this.maxAecs = new UtilityMeasureAECS().evaluate(outputArray).getUtility();
@@ -94,6 +97,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.maxLoss = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(outputArray).getUtility();
             this.maxEntr = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(outputArray).getUtility();
             this.maxPrec = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
+            this.maxSC   = new UtilityMeasureSoriaComas(inputArray).evaluate(outputArray).getUtility();
 
 //            String inFormat =  "%13.2f";
 //            String outFormat = "%16.2f";
@@ -172,6 +176,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 				return this.minLoss;
 			case PRECISION:
 				return this.minPrec;
+			case SORIA_COMAS:
+				return this.minSC;
 			default:
 				throw new RuntimeException("Invalid measure");
         	}
@@ -193,6 +199,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 				return this.maxLoss;
 			case PRECISION:
 				return this.maxPrec;
+			case SORIA_COMAS:
+				return this.maxSC;
 			default:
 				throw new RuntimeException("Invalid measure");
         	}
@@ -242,6 +250,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             case IHIS:
                 return new String[] { "MARSTAT", "EDUC" };
             case ACS13:
+            case ACS13_NUM:
                 return new String[] { "Marital status", "Education" };
             default:
                 throw new RuntimeException("Invalid dataset");
@@ -326,6 +335,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             case IHIS:
                 return new String[] { "AGE", "SEX", "RACEA" };
             case ACS13:
+            case ACS13_NUM:
             	return new String[] { "Age", "Sex", "Race" };
             default:
                 throw new RuntimeException("Invalid dataset: " + _datafile);
@@ -394,6 +404,12 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                 @Override
                 public String toString() {
                     return "ACS13";
+                }
+            },
+            ACS13_NUM ("ss13acs_numcoded"){
+                @Override
+                public String toString() {
+                    return "ACS13_NUM";
                 }
             },
             DUMMY ("dummy"){

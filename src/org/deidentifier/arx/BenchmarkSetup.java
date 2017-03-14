@@ -265,6 +265,16 @@ public class BenchmarkSetup {
          BenchmarkDatafile.IHIS,
                                         };
     }
+
+    /**
+     * Returns all datasets
+     * @return
+     */
+    public static BenchmarkDatafile[] getDatafilesSoriaComas() {
+        return new BenchmarkDatafile[] {
+         BenchmarkDatafile.ACS13_NUM,
+                                        };
+    }
     
     public static String getSuppressionConfigString (double d) {
     	return d == 0d ? "Generalization only" : "Generalization and suppression";
@@ -599,6 +609,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "Height";
+            }
+        },
+        SORIA_COMAS {
+            @Override
+            public String toString() {
+                return "Soria-Comas";
             }
         },
     }
