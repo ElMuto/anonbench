@@ -253,12 +253,12 @@ public class BenchmarkDriver {
         Double il_arx;
         Double il_abs;
         Double il_rel;
+        Double il_sc_rel;
         if (result.getGlobalOptimum() != null) {
             String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
             
             Double il_sc_abs = new UtilityMeasureSoriaComas(dataset.getInputArray()).evaluate(outputArray, result.getGlobalOptimum().getTransformation()).getUtility();
-            Double il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));;
-            System.out.println("SC-Val = " + il_sc_rel);
+            il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));;
             
             il_abs = this.measure.evaluate(outputArray).getUtility();
             il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
@@ -266,15 +266,16 @@ public class BenchmarkDriver {
 
             if (il_rel > 1d || il_rel < 0d) System.err.println("Negative value for il_rel: " + il_rel);
         } else {
-        	il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        	il_sc_rel = il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
 
         // put info-losses into results-file
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX, il_arx);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS, il_abs);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL, il_rel);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN, dataset.getMinInfoLoss(this.benchmarkMeasure));
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX, dataset.getMaxInfoLoss(this.benchmarkMeasure));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_SORIA_COMAS, il_sc_rel);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX,         il_arx);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         il_abs);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL,         il_rel);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN,         dataset.getMinInfoLoss(this.benchmarkMeasure));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX,         dataset.getMaxInfoLoss(this.benchmarkMeasure));
         
         // report solution ratio
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
