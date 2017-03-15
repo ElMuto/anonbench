@@ -261,40 +261,57 @@ public class BenchmarkDriver {
         Double il_abs = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_sc_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        
         if (result.getGlobalOptimum() != null) {
-        	String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
-
-        	if (BenchmarkMeasure.SORIA_COMAS.equals(measure)) {
-        		UtilityMeasureSoriaComas umsc = new UtilityMeasureSoriaComas(dataset.getInputArray());
-        		
-        		ARXNode scOptimumNode = null;
-        		Double  scOptimumVal = Double.MAX_VALUE;
-        		ARXNode[][] lattice = result.getLattice().getLevels();
-        		for (int i = 0; i <lattice.length; i++) {
-        			for (int j = 0; j < lattice[i].length; j++) {
-        				ARXNode n = lattice[i][j];
-        				String[][]  scOutputData = this.converter.toArray(result.getOutput(n));        				
-        				Double il = umsc.evaluate(scOutputData, n.getTransformation()).getUtility();
-        				
-        				if (il < scOptimumVal) {
-        					scOptimumNode = n;
-        					scOptimumVal = il;
-        				}
-        			}
-        		}
-        		if (scOptimumNode != null) {
-            		Double il_sc_abs = umsc.evaluate(outputArray, scOptimumNode.getTransformation()).getUtility();
-            		il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));
-         		}
-        	} else {
-
-        		il_abs = this.measure.evaluate(outputArray).getUtility();
-        		il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
-        		il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
-
-        		if (il_rel > 1d || il_rel < 0d) System.err.println("Negative value for il_rel: " + il_rel);
-        	}
+            String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
+            
+            il_abs = this.measure.evaluate(outputArray).getUtility();
+            il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
+            il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
+            
+            Double il_sc_abs = new UtilityMeasureSoriaComas(dataset.getInputArray()).evaluate(outputArray, result.getGlobalOptimum().getTransformation()).getUtility();
+            il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));;
+        } else {
+        	il_sc_rel = il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
+    	if (BenchmarkMeasure.SORIA_COMAS.equals(measure)) {            
+    		ARXNode scOptimumNode = null;
+    		Double  scOptimumVal  = Double.MAX_VALUE;
+    		UtilityMeasureSoriaComas umsc = new UtilityMeasureSoriaComas(dataset.getInputArray());
+    		
+
+            for (ARXNode[] level : result.getLattice().getLevels()) {
+                
+                // For each transformation
+            	for (ARXNode node : level) {
+
+            		// Make sure that every transformation is classified correctly
+            		if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+            			result.getOutput(node).release();
+            		}				
+            		if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+
+            			String[][]  scOutputData = this.converter.toArray(result.getOutput(node));
+            			Double il = umsc.evaluate(scOutputData, node.getTransformation()).getUtility();
+            			
+            			if (il < scOptimumVal) {
+            				scOptimumNode = node;
+            				scOptimumVal = il;
+            			}
+    				
+            		}
+    				
+    			}
+    		}
+    		if (scOptimumNode != null) {
+    			Double scMin = dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS); 
+    			Double scMax = dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS);
+        		il_sc_rel = (scOptimumVal - scMin) / (scMax - scMin);
+				System.out.println("\t" + Arrays.toString(scOptimumNode.getTransformation()) + ": " + scOptimumVal);
+     		}
+    	}
+
+        
 
         NumberFormat formatter = NumberFormat.getInstance(Locale.GERMAN);
         formatter.setMinimumFractionDigits(4);

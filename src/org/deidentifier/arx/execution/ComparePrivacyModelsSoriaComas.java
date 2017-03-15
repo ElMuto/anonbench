@@ -53,7 +53,7 @@ public class ComparePrivacyModelsSoriaComas {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.SORIA_COMAS/*BenchmarkMeasure.LOSS, BenchmarkMeasure.ENTROPY*/}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.SORIA_COMAS}) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafilesSoriaComas()) {
