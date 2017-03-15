@@ -625,5 +625,11 @@ public class BenchmarkSetup {
                 return "Soria-Comas";
             }
         },
+        OPT_WITH_LOSS_MEAS_SORIA_COMAS {
+            @Override
+            public String toString() {
+                return "Optimize with Loss, Measure with Soria-Comas";
+            }
+        },
     }
 }

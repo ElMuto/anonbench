@@ -8,8 +8,8 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-#java -Xmx5G -DHelmut -jar jars/pc-bench.jar ACS13 ld &
-#java -Xmx5G -DHelmut -jar jars/pc-bench.jar ACS13 lr &
-#java -Xmx5G -DHelmut -jar jars/pc-bench.jar ACS13 le 
-java -Xmx5G -DHelmut -jar jars/pc-bench.jar ACS13 t &
-java -Xmx5G -DHelmut -jar jars/pc-bench.jar ACS13 d
+#java -Xmx5G -DHelmut -jar jars/pc-bench.jar ATUS ld &
+#java -Xmx5G -DHelmut -jar jars/pc-bench.jar ATUS lr &
+#java -Xmx5G -DHelmut -jar jars/pc-bench.jar ATUS le 
+java -Xmx5G -DHelmut -jar jars/pc-bench.jar ATUS t &
+java -Xmx5G -DHelmut -jar jars/pc-bench.jar ATUS d
