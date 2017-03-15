@@ -46,7 +46,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         private final double minLoss; private final double maxLoss;
         private final double minEntr; private final double maxEntr;
         private final double minPrec; private final double maxPrec;
-        private final double minSC;   private final double maxSC;
+        private final double minSoriaComas;   private final double maxSoriaComas;
         
         public void cleanUp () {
         	inputHandle.release();
@@ -84,20 +84,20 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             String[] header                     = getQuasiIdentifyingAttributes();
             
             // Compute for input
-            this.minAecs = new UtilityMeasureAECS().evaluate(inputArray).getUtility();
-            this.minDisc = new UtilityMeasureDiscernibility().evaluate(inputArray).getUtility();
-            this.minLoss = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(inputArray).getUtility();
-            this.minEntr = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(inputArray).getUtility();
-            this.minPrec = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(inputArray).getUtility();
-            this.minSC =   new UtilityMeasureSoriaComas(inputArray).evaluate(inputArray).getUtility();
+            this.minAecs       = new UtilityMeasureAECS().evaluate(inputArray).getUtility();
+            this.minDisc       = new UtilityMeasureDiscernibility().evaluate(inputArray).getUtility();
+            this.minLoss       = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(inputArray).getUtility();
+            this.minEntr       = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(inputArray).getUtility();
+            this.minPrec       = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(inputArray).getUtility();
+            this.minSoriaComas = new UtilityMeasureSoriaComas(inputArray).evaluate(inputArray).getUtility();
 
             // Compute for output
-            this.maxAecs = new UtilityMeasureAECS().evaluate(outputArray).getUtility();
-            this.maxDisc = new UtilityMeasureDiscernibility().evaluate(outputArray).getUtility();
-            this.maxLoss = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(outputArray).getUtility();
-            this.maxEntr = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(outputArray).getUtility();
-            this.maxPrec = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
-            this.maxSC   = new UtilityMeasureSoriaComas(inputArray).evaluate(outputArray).getUtility();
+            this.maxAecs         = new UtilityMeasureAECS().evaluate(outputArray).getUtility();
+            this.maxDisc         = new UtilityMeasureDiscernibility().evaluate(outputArray).getUtility();
+            this.maxLoss         = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(outputArray).getUtility();
+            this.maxEntr         = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(outputArray).getUtility();
+            this.maxPrec         = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
+            this.maxSoriaComas   = new UtilityMeasureSoriaComas(inputArray).evaluate(outputArray).getUtility();
 
 //            String inFormat =  "%13.2f";
 //            String outFormat = "%16.2f";
@@ -177,7 +177,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 			case PRECISION:
 				return this.minPrec;
 			case SORIA_COMAS:
-				return this.minSC;
+				return this.minSoriaComas;
 			default:
 				throw new RuntimeException("Invalid measure");
         	}
@@ -200,7 +200,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 			case PRECISION:
 				return this.maxPrec;
 			case SORIA_COMAS:
-				return this.maxSC;
+				return this.maxSoriaComas;
 			default:
 				throw new RuntimeException("Invalid measure");
         	}

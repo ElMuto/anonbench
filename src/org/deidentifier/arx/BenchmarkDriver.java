@@ -23,6 +23,7 @@ package org.deidentifier.arx;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,6 +89,9 @@ public class BenchmarkDriver {
 			break;
 		case PRECISION:			this.measure = 	new UtilityMeasurePrecision<Double>(header, hierarchies);
 			break;
+		case SORIA_COMAS:
+			this.measure = 	new UtilityMeasureSoriaComas(inputArray);
+			break;
 		default:
 			throw new RuntimeException("Invalid measure");
         }
@@ -121,6 +125,7 @@ public class BenchmarkDriver {
 
         switch (metric) {
         case ENTROPY:
+        case SORIA_COMAS:
             config.setMetric(Metric.createEntropyMetric());
             break;
         case LOSS:
@@ -249,28 +254,54 @@ public class BenchmarkDriver {
         AttributeStatistics attrStats = null;
         DataHandle handle = dataset.getHandle();
         if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
+        
 
-        Double il_arx;
-        Double il_abs;
-        Double il_rel;
-        Double il_sc_rel;
+ 
+        Double il_arx = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double il_abs = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double il_sc_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         if (result.getGlobalOptimum() != null) {
-            String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
-            
-            Double il_sc_abs = new UtilityMeasureSoriaComas(dataset.getInputArray()).evaluate(outputArray, result.getGlobalOptimum().getTransformation()).getUtility();
-            il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));;
-            
-            il_abs = this.measure.evaluate(outputArray).getUtility();
-            il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
-            il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
+        	String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
 
-            if (il_rel > 1d || il_rel < 0d) System.err.println("Negative value for il_rel: " + il_rel);
-        } else {
-        	il_sc_rel = il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        	if (BenchmarkMeasure.SORIA_COMAS.equals(measure)) {
+        		UtilityMeasureSoriaComas umsc = new UtilityMeasureSoriaComas(dataset.getInputArray());
+        		
+        		ARXNode scOptimumNode = null;
+        		Double  scOptimumVal = Double.MAX_VALUE;
+        		ARXNode[][] lattice = result.getLattice().getLevels();
+        		for (int i = 0; i <lattice.length; i++) {
+        			for (int j = 0; j < lattice[i].length; j++) {
+        				ARXNode n = lattice[i][j];
+        				String[][]  scOutputData = this.converter.toArray(result.getOutput(n));        				
+        				Double il = umsc.evaluate(scOutputData, n.getTransformation()).getUtility();
+        				
+        				if (il < scOptimumVal) {
+        					scOptimumNode = n;
+        					scOptimumVal = il;
+        				}
+        			}
+        		}
+        		if (scOptimumNode != null) {
+            		Double il_sc_abs = umsc.evaluate(outputArray, scOptimumNode.getTransformation()).getUtility();
+            		il_sc_rel = (il_sc_abs - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS) - dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS));
+         		}
+        	} else {
+
+        		il_abs = this.measure.evaluate(outputArray).getUtility();
+        		il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
+        		il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));;
+
+        		if (il_rel > 1d || il_rel < 0d) System.err.println("Negative value for il_rel: " + il_rel);
+        	}
         }
 
+        NumberFormat formatter = NumberFormat.getInstance(Locale.GERMAN);
+        formatter.setMinimumFractionDigits(4);
+        formatter.setMaximumFractionDigits(4);
+        
         // put info-losses into results-file
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_SORIA_COMAS, il_sc_rel);
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_SORIA_COMAS, formatter.format(il_sc_rel));
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX,         il_arx);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         il_abs);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL,         il_rel);
@@ -385,6 +416,7 @@ public class BenchmarkDriver {
 						if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
 							optimalAccuracy = Math.max(accuracy, optimalAccuracy);
 							if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
+							if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
 						}
 //						System.out.printf("\tstats.getZeroRAccuracy()    = %.2f", stats.getZeroRAccuracy() * 100d);
 //						System.out.printf("\tstats.getOriginalAccuracy() = %.2f", stats.getOriginalAccuracy() * 100d);
