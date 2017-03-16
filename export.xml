@@ -72,8 +72,9 @@
     </jar>
   </target>
 
-	  <target name="Compare2d_PA" depends="compile,buildExternalLibs">
-	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
+
+	  <target name="ComparePrivacyModels" depends="compile,buildExternalLibs">
+	    <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
 	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
@@ -83,7 +84,7 @@
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
 	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" />
 	      </manifest>
 	    </jar>
 	    <delete dir="build" failonerror="true" />
@@ -107,8 +108,8 @@
 	  </target>
 
 
-	  <target name="ComparePrivacyModels" depends="compile,buildExternalLibs">
-	    <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
+	  <target name="CompareRelPAsSoriaComas" depends="compile,buildExternalLibs">
+	    <jar destfile="CompareRelPAsSoriaComas.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
 	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
@@ -118,9 +119,29 @@
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
 	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" />
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAsSoriaComas" />
 	      </manifest>
 	    </jar>
 	    <delete dir="build" failonerror="true" />
 	  </target>
+
+	  <target name="Compare2d_PA" depends="compile,buildExternalLibs">
+	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
+	      <fileset dir="build" defaultexcludes="no" />
+
+	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
+	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
+	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+
+	      <manifest>
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
+	      </manifest>
+	    </jar>
+	    <delete dir="build" failonerror="true" />
+	  </target>
+
+	
+	
 </project>
