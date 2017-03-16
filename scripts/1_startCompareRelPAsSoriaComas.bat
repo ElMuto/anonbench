@@ -29,7 +29,7 @@ pscp %_run_sh_path% imse@PCluster-fed%_cluster_node%:%_remote_dir%/
 
 plink imse@PCluster-fed%_cluster_node% chmod a+x %_remote_dir%/%_run_sh_name%
 
-plink imse@PCluster-fed%_cluster_node% screen -dmS "CompareRelPAsSoriaComa" bash -c 'cd %_remote_dir%;./%_run_sh_name%; read'
+plink imse@PCluster-fed%_cluster_node% screen -dmS "CompareRelPAsSoriaComas" bash -c 'cd %_remote_dir%;./%_run_sh_name%; read'
 
 start putty -load PCluster-fed%_cluster_node%
 

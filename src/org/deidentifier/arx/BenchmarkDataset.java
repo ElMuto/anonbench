@@ -344,8 +344,10 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         public static String[] getQuasiIdentifyingAttributes(BenchmarkDatafile _datafile) {
             switch (_datafile) {
             case ATUS:
+            case ATUS_NUM:
                 return new String[] { "Age", "Sex", "Race" };
             case IHIS:
+            case IHIS_NUM:
                 return new String[] { "AGE", "SEX", "RACEA" };
             case ACS13:
             case ACS13_NUM:
@@ -407,10 +409,22 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                     return "Atus";
                 }
             },
+            ATUS_NUM ("atus_numcoded", true){
+                @Override
+                public String toString() {
+                    return "Atus numcoded";
+                }
+            },
             IHIS ("ihis", false){
                 @Override
                 public String toString() {
                     return "Ihis";
+                }
+            },
+            IHIS_NUM ("ihis_numcoded", true){
+                @Override
+                public String toString() {
+                    return "Ihis numcoded";
                 }
             },
             ACS13 ("ss13acs", false){
@@ -422,7 +436,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             ACS13_NUM ("ss13acs_numcoded", true){
                 @Override
                 public String toString() {
-                    return "ACS13_NUM";
+                    return "ACS13 numcoded";
                 }
             },
             DUMMY ("dummy", false){
