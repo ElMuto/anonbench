@@ -69,13 +69,21 @@ public class BenchmarkDriver {
     private final UtilityMeasure<Double> measure;
     private final DataConverter converter;
     private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
+    private final String[] header;
+    private final Map<String, String[][]> hierarchies;
+    
+
+    private final NumberFormat formatter = NumberFormat.getInstance(Locale.GERMAN);
 
     public BenchmarkDriver(BenchmarkSetup.BenchmarkMeasure benchmarkMeasure, BenchmarkDataset dataset) {
     	this.benchmarkMeasure = benchmarkMeasure;
     	this.converter = new DataConverter();;
         String[][] inputArray = dataset.getInputArray();
-		String[] header = dataset.getQuasiIdentifyingAttributes();
-		Map<String, String[][]> hierarchies =this. converter.toMap(dataset.getInputDataDef());
+		header = dataset.getQuasiIdentifyingAttributes();
+		hierarchies =this.converter.toMap(dataset.getInputDataDef());
+
+	    formatter.setMinimumFractionDigits(4);
+	    formatter.setMaximumFractionDigits(4);
 
         switch (benchmarkMeasure) {
 		case AECS:
@@ -125,10 +133,10 @@ public class BenchmarkDriver {
 
         switch (metric) {
         case ENTROPY:
+        case SORIA_COMAS:
             config.setMetric(Metric.createEntropyMetric());
             break;
         case LOSS:
-        case SORIA_COMAS:
             config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
             break;
         case AECS:
@@ -260,7 +268,6 @@ public class BenchmarkDriver {
         Double il_arx = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_abs = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        Double il_sc_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         
         if (result.getGlobalOptimum() != null) {
             String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
@@ -268,20 +275,17 @@ public class BenchmarkDriver {
             il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
             il_abs = this.measure.evaluate(outputArray).getUtility();
             il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
+            
+            System.out.println("\t" + Arrays.toString(result.getGlobalOptimum().getTransformation()) + ": " + formatter.format(il_arx) + " (ARX)");
+            System.out.println("\t" + Arrays.toString(result.getGlobalOptimum().getTransformation()) + ": " + formatter.format(il_abs) + " (Utility)");
         } else {
-        	il_sc_rel = il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        	il_rel = il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
         
-//    	il_sc_rel = findOptimumByFullTraversal(measure, dataset, result);
 
-        
-
-        NumberFormat formatter = NumberFormat.getInstance(Locale.GERMAN);
-        formatter.setMinimumFractionDigits(4);
-        formatter.setMaximumFractionDigits(4);
+    	il_rel = findOptimumByFullTraversal(measure, dataset, result);
         
         // put info-losses into results-file
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_SORIA_COMAS, formatter.format(il_sc_rel));
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX,         il_arx);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         il_abs);
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL,         il_rel);
@@ -320,47 +324,52 @@ public class BenchmarkDriver {
     }
 
 	private Double findOptimumByFullTraversal(BenchmarkMeasure measure, BenchmarkDataset dataset, ARXResult result) {
-		Double ret = null;
-		if (BenchmarkMeasure.SORIA_COMAS.equals(measure)) {            
-    		ARXNode scOptimumNode = null;
-    		Double  scOptimumVal  = Double.MAX_VALUE;
-    		UtilityMeasureSoriaComas umsc = new UtilityMeasureSoriaComas(dataset.getInputArray());
-    		
+		Double ret 					= null;      
+		ARXNode scOptimumNode		= null;
+		Double  scOptimumVal  		= Double.MAX_VALUE;		
+		UtilityMeasure<Double> um	= null;
+		
+		if (BenchmarkMeasure.SORIA_COMAS.equals(measure)) {      
+			um = new UtilityMeasureSoriaComas(dataset.getInputArray());
+		} else if (BenchmarkMeasure.ENTROPY.equals(measure)) {
+			um = new UtilityMeasureNonUniformEntropy<Double>(header, dataset.getInputArray());
+		}
 
-            for (ARXNode[] level : result.getLattice().getLevels()) {
-                
-                // For each transformation
-            	for (ARXNode node : level) {
 
-            		// Make sure that every transformation is classified correctly
-            		if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-            			result.getOutput(node).release();
-            		}				
-            		if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+		for (ARXNode[] level : result.getLattice().getLevels()) {
 
-            			String[][]  scOutputData = this.converter.toArray(result.getOutput(node));
-            			Double il = umsc.evaluate(scOutputData, node.getTransformation()).getUtility();
-            			
-            			if (il < scOptimumVal) {
-            				scOptimumNode = node;
-            				scOptimumVal = il;
-            			}
-    				
-            		}
-    				
-    			}
-    		}
-    		if (scOptimumNode != null) {
-    			Double scMin = dataset.getMinInfoLoss(BenchmarkMeasure.SORIA_COMAS); 
-    			Double scMax = dataset.getMaxInfoLoss(BenchmarkMeasure.SORIA_COMAS);
-        		ret = (scOptimumVal - scMin) / (scMax - scMin);
-				System.out.println("\t" + Arrays.toString(scOptimumNode.getTransformation()) + ": " + scOptimumVal);
-     		}
-    	}
+			// For each transformation
+			for (ARXNode node : level) {
+
+				// Make sure that every transformation is classified correctly
+				if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+					result.getOutput(node).release();
+				}				
+				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+
+					String[][]  scOutputData = this.converter.toArray(result.getOutput(node));
+					Double il = um.evaluate(scOutputData, node.getTransformation()).getUtility();
+
+					if (il < scOptimumVal) {
+						scOptimumNode = node;
+						scOptimumVal = il;
+					}
+
+				}
+
+			}
+		}
+		if (scOptimumNode != null) {
+			Double scMin = dataset.getMinInfoLoss(measure); 
+			Double scMax = dataset.getMaxInfoLoss(measure);
+//			ret = (scOptimumVal - scMin) / (scMax - scMin);
+			ret = scOptimumVal;
+			System.out.println("\t" + Arrays.toString(scOptimumNode.getTransformation()) + ": " + formatter.format(ret) + " (Utility with full traversal)");
+		}
 		return ret;
 	}
-    
-    private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
+
+	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
 			Double d) {
 		return new PrivacyModel(criterion, k, c, l, t, d).toString();
 	}

@@ -58,7 +58,6 @@ public class BenchmarkSetup {
 	});
 
 	/* measures */
-    public static final int INFO_LOSS_SORIA_COMAS   = BENCHMARK.addMeasure(COLUMNS.IL_SORIA_COMAS.toString());
     public static final int INFO_LOSS_ARX           = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
     public static final int INFO_LOSS_ABS           = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
     public static final int INFO_LOSS_REL           = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
@@ -77,7 +76,6 @@ public class BenchmarkSetup {
     public static final int EFD_SCORE               = BENCHMARK.addMeasure(COLUMNS.EFD_SCORE.toString());
 
 	static {
-        BENCHMARK.addAnalyzer(INFO_LOSS_SORIA_COMAS, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_REL, new ValueBuffer());
