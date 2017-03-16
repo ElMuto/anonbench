@@ -84,6 +84,7 @@ public class BenchmarkDriver {
 
 	    formatter.setMinimumFractionDigits(4);
 	    formatter.setMaximumFractionDigits(4);
+	    formatter.setMaximumIntegerDigits(20);
 
         switch (benchmarkMeasure) {
 		case AECS:
@@ -236,10 +237,10 @@ public class BenchmarkDriver {
 
         // Benchmark
         
-        BenchmarkCriterion foo = dataset.getCriteria()[dataset.getCriteria().length - 1];
+        BenchmarkCriterion bc = dataset.getCriteria()[dataset.getCriteria().length - 1];
 //        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
-        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
-        BenchmarkSetup.BENCHMARK.addRun(bar,
+        String bcName = assemblePrivacyModelString(bc, k, c, l, t, suppFactor, d);
+        BenchmarkSetup.BENCHMARK.addRun(bcName,
         								measure.toString(),
                                         String.valueOf(suppFactor),
                                         dataset.toString(),
@@ -270,9 +271,10 @@ public class BenchmarkDriver {
         Double il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         
         if (result.getGlobalOptimum() != null) {
-            String[][] outputArray =this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
 
-            il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());
+            il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());            
+
+            String[][] outputArray = this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
             il_abs = this.measure.evaluate(outputArray).getUtility();
             il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
             
@@ -283,14 +285,14 @@ public class BenchmarkDriver {
         }
         
 
-    	il_rel = findOptimumByFullTraversal(measure, dataset, result);
+    	findAbsOptimumByFullTraversal(measure, dataset, result);
         
         // put info-losses into results-file
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX,         il_arx);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         il_abs);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL,         il_rel);
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN,         dataset.getMinInfoLoss(this.benchmarkMeasure));
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX,         dataset.getMaxInfoLoss(this.benchmarkMeasure));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX,         formatter.format(il_arx));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         formatter.format(il_abs));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL,         formatter.format(il_rel));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN,         formatter.format(dataset.getMinInfoLoss(this.benchmarkMeasure)));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX,        formatter.format( dataset.getMaxInfoLoss(this.benchmarkMeasure)));
         
         // report solution ratio
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
@@ -323,32 +325,37 @@ public class BenchmarkDriver {
         handle.release();
     }
 
-	private Double findOptimumByFullTraversal(BenchmarkMeasure measure, BenchmarkDataset dataset, ARXResult result) {
+	private Double findAbsOptimumByFullTraversal(BenchmarkMeasure bmMeasure, BenchmarkDataset dataset, ARXResult result) {
 		Double ret 					= null;      
 		ARXNode scOptimumNode		= null;
-		Double  scOptimumVal  		= Double.MAX_VALUE;		
-		UtilityMeasure<Double> um	= null;
-		
-		if (BenchmarkMeasure.SORIA_COMAS.equals(measure)) {      
-			um = new UtilityMeasureSoriaComas(dataset.getInputArray());
-		} else if (BenchmarkMeasure.ENTROPY.equals(measure)) {
-			um = new UtilityMeasureNonUniformEntropy<Double>(header, dataset.getInputArray());
-		}
+		Double  scOptimumVal  		= Double.MAX_VALUE;
+
+		ARXLattice lattice = result.getLattice();
+        int minLevel = 0;
+        int maxLevel = lattice.getTop().getTotalGeneralizationLevel();
+        
+        // Expand nodes such that all anonymous nodes are being materialized
+        for (int level = minLevel; level < maxLevel; level++) {
+            for (ARXNode node : lattice.getLevels()[level]) {
+                node.expand();
+            }
+        }
 
 
-		for (ARXNode[] level : result.getLattice().getLevels()) {
+		for (ARXNode[] level : lattice.getLevels()) {
 
 			// For each transformation
 			for (ARXNode node : level) {
 
-				// Make sure that every transformation is classified correctly
-				if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-					result.getOutput(node).release();
-				}				
+//				// Make sure that every transformation is classified correctly
+//				if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+//					result.getOutput(node).release();
+//				}				
 				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
 
-					String[][]  scOutputData = this.converter.toArray(result.getOutput(node));
-					Double il = um.evaluate(scOutputData, node.getTransformation()).getUtility();
+					String[][]  scOutputData = this.converter.toArray(result.getOutput(node),dataset.getInputDataDef());
+					result.getOutput(node).release();
+					Double il = this.measure.evaluate(scOutputData, node.getTransformation()).getUtility();
 
 					if (il < scOptimumVal) {
 						scOptimumNode = node;
@@ -360,8 +367,8 @@ public class BenchmarkDriver {
 			}
 		}
 		if (scOptimumNode != null) {
-			Double scMin = dataset.getMinInfoLoss(measure); 
-			Double scMax = dataset.getMaxInfoLoss(measure);
+			Double scMin = dataset.getMinInfoLoss(bmMeasure); 
+			Double scMax = dataset.getMaxInfoLoss(bmMeasure);
 //			ret = (scOptimumVal - scMin) / (scMax - scMin);
 			ret = scOptimumVal;
 			System.out.println("\t" + Arrays.toString(scOptimumNode.getTransformation()) + ": " + formatter.format(ret) + " (Utility with full traversal)");
