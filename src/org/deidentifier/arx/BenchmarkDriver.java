@@ -456,7 +456,7 @@ public class BenchmarkDriver {
 		return optimalAccuracy;
 	}
 
-	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream, BenchmarkMeasure bmMeasure) throws IOException {
+	public static void compareRelPAs(BenchmarkDatafile datafile, BenchmarkMeasure bmMeasure, String sa, PrintStream outputStream) throws IOException {
 		String printString = "Running " + datafile.toString() + " with SA=" + sa;
 		outputStream.println(printString);
 		System.out.println(printString);
@@ -478,7 +478,7 @@ public class BenchmarkDriver {
 
 	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream)
 			throws IOException {
-		BenchmarkDriver.compareRelPAs(datafile, sa, outputStream, BenchmarkMeasure.ENTROPY);
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.ENTROPY, sa, outputStream);
 	}
 
 	/**
