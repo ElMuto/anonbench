@@ -41,12 +41,14 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         private String[][] inputArray;
         private String[][] outputArray;
 
-        private final double minAecs; private final double maxAecs;
-        private final double minDisc; private final double maxDisc;
-        private final double minLoss; private final double maxLoss;
-        private final double minEntr; private final double maxEntr;
-        private final double minPrec; private final double maxPrec;
+        private final double minAecs;         private final double maxAecs;
+        private final double minDisc;         private final double maxDisc;
+        private final double minLoss;         private final double maxLoss;
+        private final double minEntr;         private final double maxEntr;
+        private final double minPrec;         private final double maxPrec;
         private final double minSoriaComas;   private final double maxSoriaComas;
+        
+        private final boolean isNumCoded;
         
         public void cleanUp () {
         	inputHandle.release();
@@ -59,6 +61,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
          * @param datafile
          * @param criteria
          * @param sensitiveAttribute
+         * @param isNumCoded TODO
          * @param customQiCount
          */
         public BenchmarkDataset(BenchmarkDatafile datafile, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
@@ -69,6 +72,8 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.arxData = toArxData(criteria);
             this.inputHandle = arxData.getHandle();
             this.inputDataDef = inputHandle.getDefinition();
+            
+            this.isNumCoded = datafile.isNumCoded();
             
 
             DataConverter converter = new DataConverter();            
@@ -89,7 +94,11 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.minLoss       = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(inputArray).getUtility();
             this.minEntr       = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(inputArray).getUtility();
             this.minPrec       = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(inputArray).getUtility();
-            this.minSoriaComas = new UtilityMeasureSoriaComas(inputArray).evaluate(inputArray).getUtility();
+            if (isNumCoded) {
+            	this.minSoriaComas = new UtilityMeasureSoriaComas(inputArray).evaluate(inputArray).getUtility();
+            } else {
+            	this.minSoriaComas = Double.NaN;
+            }
 
             // Compute for output
             this.maxAecs         = new UtilityMeasureAECS().evaluate(outputArray).getUtility();
@@ -97,7 +106,11 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.maxLoss         = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(outputArray).getUtility();
             this.maxEntr         = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(outputArray).getUtility();
             this.maxPrec         = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
-            this.maxSoriaComas   = new UtilityMeasureSoriaComas(inputArray).evaluate(outputArray).getUtility();
+            if (isNumCoded) {
+            	this.maxSoriaComas   = new UtilityMeasureSoriaComas(inputArray).evaluate(outputArray).getUtility();
+            } else {
+            	this.maxSoriaComas = Double.NaN;
+            }
 
 //            String inFormat =  "%13.2f";
 //            String outFormat = "%16.2f";
@@ -370,49 +383,49 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
 
         public static enum BenchmarkDatafile {
-            ADULT ("adult"){
+            ADULT ("adult", false){
                 @Override
                 public String toString() {
                     return "Adult";
                 }
             },
-            CUP ("cup") {
+            CUP ("cup", false) {
                 @Override
                 public String toString() {
                     return "Cup";
                 }
             },
-            FARS ("fars"){
+            FARS ("fars", false){
                 @Override
                 public String toString() {
                     return "Fars";
                 }
             },
-            ATUS ("atus"){
+            ATUS ("atus", false){
                 @Override
                 public String toString() {
                     return "Atus";
                 }
             },
-            IHIS ("ihis"){
+            IHIS ("ihis", false){
                 @Override
                 public String toString() {
                     return "Ihis";
                 }
             },
-            ACS13 ("ss13acs"){
+            ACS13 ("ss13acs", false){
                 @Override
                 public String toString() {
                     return "ACS13";
                 }
             },
-            ACS13_NUM ("ss13acs_numcoded"){
+            ACS13_NUM ("ss13acs_numcoded", true){
                 @Override
                 public String toString() {
                     return "ACS13_NUM";
                 }
             },
-            DUMMY ("dummy"){
+            DUMMY ("dummy", false){
                 @Override
                 public String toString() {
                     return "DUMMY";
@@ -420,12 +433,18 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             };
             
             private String baseStringForFilename = null;
+            private boolean isNumCoded;
             
-            BenchmarkDatafile (String baseStringForFilename) {
+            BenchmarkDatafile (String baseStringForFilename, boolean isNumCoded) {
+            	this.isNumCoded = isNumCoded;
                 this.baseStringForFilename = baseStringForFilename;
             }
             
-            /**
+            public boolean isNumCoded() {
+				return isNumCoded;
+			}
+
+			/**
              * @return the string, that will be used for finding and loading the
              * datafile with its hierarchies from the filesystem
              */

@@ -456,14 +456,14 @@ public class BenchmarkDriver {
 		return optimalAccuracy;
 	}
 
-	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream) throws IOException {
+	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream, BenchmarkMeasure bmMeasure) throws IOException {
 		String printString = "Running " + datafile.toString() + " with SA=" + sa;
 		outputStream.println(printString);
 		System.out.println(printString);
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
-			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
+			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
 				
 				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 						privacyModel.getK(),
@@ -474,6 +474,11 @@ public class BenchmarkDriver {
 				System.out.  format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
 				outputStream.format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
 		}
+	}
+
+	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream)
+			throws IOException {
+		BenchmarkDriver.compareRelPAs(datafile, sa, outputStream, BenchmarkMeasure.ENTROPY);
 	}
 
 	/**
