@@ -41,7 +41,7 @@
   </fileset>
 
 
-  <target name="release" depends="jars">
+  <target name="release" depends="CompareRelPAs">
   </target>
 
   <target name="clean">
@@ -72,22 +72,55 @@
     </jar>
   </target>
 
-  <target name="jars" depends="compile,buildExternalLibs">
-    <jar destfile="pc-bench.jar" duplicate="preserve">
-      <fileset dir="build" defaultexcludes="no" />
+	  <target name="Compare2d_PA" depends="compile,buildExternalLibs">
+	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
+	      <fileset dir="build" defaultexcludes="no" />
 
-      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
+	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
+	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
 
-      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-      <manifest>
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" /-->
-    	<!--attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAs" /-->
-    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
-      </manifest>
-    </jar>
-    <delete dir="build" failonerror="true" />
-  </target>
+	      <manifest>
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
+	      </manifest>
+	    </jar>
+	    <delete dir="build" failonerror="true" />
+	  </target>
+
+	  <target name="CompareRelPAs" depends="compile,buildExternalLibs">
+	    <jar destfile="CompareRelPAs.jar" duplicate="preserve">
+	      <fileset dir="build" defaultexcludes="no" />
+
+	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
+	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
+	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+
+	      <manifest>
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAs" />
+	      </manifest>
+	    </jar>
+	    <delete dir="build" failonerror="true" />
+	  </target>
+
+
+	  <target name="ComparePrivacyModels" depends="compile,buildExternalLibs">
+	    <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
+	      <fileset dir="build" defaultexcludes="no" />
+
+	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
+	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
+	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+
+	      <manifest>
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" />
+	      </manifest>
+	    </jar>
+	    <delete dir="build" failonerror="true" />
+	  </target>
 </project>
