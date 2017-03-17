@@ -42,9 +42,15 @@ public class CompareRelPAsSoriaComas {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAsSoriaComas_IHIS_ACS13.txt");
+		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAsSoriaComas_ATUS_IHIS_ACS13.txt");
 
-		BenchmarkDatafile datafile = BenchmarkDatafile.IHIS_NUM;
+		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS_NUM;
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Marital status", fileOutputStream);
+		fileOutputStream.println();
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Highest level of school completed", fileOutputStream);		
+		fileOutputStream.println("\n");
+
+		datafile = BenchmarkDatafile.IHIS_NUM;
 		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "MARSTAT", fileOutputStream);
 		fileOutputStream.println();
 		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "EDUC", fileOutputStream);		
