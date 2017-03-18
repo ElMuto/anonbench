@@ -118,7 +118,7 @@ public class BenchmarkSetup {
 //		Double [] dim2ValsForL = { /*30d, 20d, 15d, */ 10d, /*8d, 6d, 4d, 3d, 2d */};
 		Double [] dim2ValsForL = { 10d, 12d, 14d, 16d, 20d};
 //		Double [] dim2ValsForD = { 5d, 4d, 3d, 2d, 1.5, 1d, 0.5 };
-		Double [] dim2ValsForD = { 5d, 6d, 7d, 8d, 9d, 10d};
+		Double [] dim2ValsForD = { 4.837114749, 5d, 5.5, 6d };
 		
 		Double[] dim2Vals = null;
 
