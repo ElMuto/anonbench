@@ -100,8 +100,8 @@ public class Compare2d_PA {
 			
 			if (relPA == -Double.MAX_VALUE) relPA = -1d;
 			
-			System.out.format(new Locale("en", "US"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
-			fos       .format(new Locale("en", "US"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
+			System.out.format(new Locale("de", "de"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
+			fos       .format(new Locale("de", "de"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
 		}
 		fos.close();
 	}

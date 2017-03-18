@@ -113,10 +113,12 @@ public class BenchmarkSetup {
 	
     public static PrivacyModel[] getPrivacyModelsConfigsFor_2D_Comparison(String dim2Qualifier) {
     	
-		Integer[] dim1Vals =     { 1, 2, 3, 4, 5 };
+		Integer[] dim1Vals =     { 1, /*2, 3, 4, 5*/ };
 		Double [] dim2ValsForT = { 1d, 0.75, 0.5, 0.25, 0d };
-		Double [] dim2ValsForL = { 2d, 4d, 6d, 8d };
-		Double [] dim2ValsForD = { 0.5d, 1d, 1.5d };
+//		Double [] dim2ValsForL = { /*30d, 20d, 15d, */ 10d, /*8d, 6d, 4d, 3d, 2d */};
+		Double [] dim2ValsForL = { 10d, 12d, 14d, 16d, 20d};
+//		Double [] dim2ValsForD = { 5d, 4d, 3d, 2d, 1.5, 1d, 0.5 };
+		Double [] dim2ValsForD = { 5d, 6d, 7d, 8d, 9d, 10d};
 		
 		Double[] dim2Vals = null;
 

@@ -82,9 +82,8 @@ public class BenchmarkDriver {
 		header = dataset.getQuasiIdentifyingAttributes();
 		hierarchies =this.converter.toMap(dataset.getInputDataDef());
 
-	    formatter.setMinimumFractionDigits(4);
-	    formatter.setMaximumFractionDigits(4);
-	    formatter.setMaximumIntegerDigits(20);
+	    formatter.setMinimumFractionDigits(5);
+	    formatter.setMaximumFractionDigits(5);
 
         switch (benchmarkMeasure) {
 		case AECS:
@@ -618,4 +617,10 @@ public class BenchmarkDriver {
     private static double log2(double r) {
     	return Math.log(r) / Math.log(2d);
     }
+
+	public NumberFormat getFormatter() {
+		return formatter;
+	}
+    
+    
 }
