@@ -259,8 +259,10 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
             switch (datafile) {
             case ATUS:
+            case ATUS_NUM:
                 return new String[] { "Marital status", "Highest level of school completed" };
             case IHIS:
+            case IHIS_NUM:
                 return new String[] { "MARSTAT", "EDUC" };
             case ACS13:
             case ACS13_NUM:

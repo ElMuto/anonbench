@@ -359,7 +359,7 @@ public class BenchmarkDriver {
 		}
 		if (scOptimumNode != null) {
 			ret = scOptimumVal;
-			System.out.println("\t" + Arrays.toString(scOptimumNode.getTransformation()) + ": " + formatter.format(ret) + " (Utility with full traversal)");
+			System.out.println(";" + Arrays.toString(scOptimumNode.getTransformation()) + ";" + formatter.format(ret));
 		}
 		return ret;
 	}
