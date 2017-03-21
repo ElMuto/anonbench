@@ -58,24 +58,27 @@ public class BenchmarkSetup {
 	});
 
 	/* measures */
-    public static final int INFO_LOSS_ARX           = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
-    public static final int INFO_LOSS_ABS           = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
-    public static final int INFO_LOSS_REL           = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
-    public static final int INFO_LOSS_MIN           = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
-    public static final int INFO_LOSS_MAX           = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
-    public static final int DIFFICULTY              = BENCHMARK.addMeasure(COLUMNS.DIFFICULTY.toString());
-    public static final int NUM_VALUES              = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
-    public static final int SKEWNESS                = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
-    public static final int KUROTSIS                = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
-    public static final int FREQ_DEVI               = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies
-    public static final int FREQ_SPAN               = BENCHMARK.addMeasure(COLUMNS.FREQ_SPAN.toString());  // span of the frequencies
-    public static final int STAND_DEVIATION         = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
-    public static final int VARIATION_COEFF         = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
-    public static final int QUARTIL_COEFF           = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
-    public static final int ENTROPY                 = BENCHMARK.addMeasure(COLUMNS.NORM_ENTROPY.toString());
-    public static final int EFD_SCORE               = BENCHMARK.addMeasure(COLUMNS.EFD_SCORE.toString());
+
+    public static final int    INFO_LOSS_SORIA_COMAS    = BENCHMARK.addMeasure(COLUMNS.INFO_LOSS_SORIA_COMAS.toString());
+    public static final int    INFO_LOSS_ARX           = BENCHMARK.addMeasure(COLUMNS.IL_ARX_VALUE.toString());
+    public static final int    INFO_LOSS_ABS           = BENCHMARK.addMeasure(COLUMNS.IL_ABS_VALUE.toString());
+    public static final int    INFO_LOSS_REL           = BENCHMARK.addMeasure(COLUMNS.IL_REL_VALUE.toString());
+    public static final int    INFO_LOSS_MIN           = BENCHMARK.addMeasure(COLUMNS.IL_MIN.toString());
+    public static final int    INFO_LOSS_MAX           = BENCHMARK.addMeasure(COLUMNS.IL_MAX.toString());
+    public static final int    DIFFICULTY              = BENCHMARK.addMeasure(COLUMNS.DIFFICULTY.toString());
+    public static final int    NUM_VALUES              = BENCHMARK.addMeasure(COLUMNS.NUM_VALUES.toString());
+    public static final int    SKEWNESS                = BENCHMARK.addMeasure(COLUMNS.SKEWNESS.toString());
+    public static final int    KUROTSIS                = BENCHMARK.addMeasure(COLUMNS.KUROTSIS.toString());
+    public static final int    FREQ_DEVI               = BENCHMARK.addMeasure(COLUMNS.FREQ_DEVI.toString());  // standard deviation of the frequencies
+    public static final int    FREQ_SPAN               = BENCHMARK.addMeasure(COLUMNS.FREQ_SPAN.toString());  // span of the frequencies
+    public static final int    STAND_DEVIATION         = BENCHMARK.addMeasure(COLUMNS.STAND_DEVI.toString());
+    public static final int    VARIATION_COEFF         = BENCHMARK.addMeasure(COLUMNS.VARI_COEFF.toString());
+    public static final int    QUARTIL_COEFF           = BENCHMARK.addMeasure(COLUMNS.QUARTI_COEFF.toString());
+    public static final int    ENTROPY                 = BENCHMARK.addMeasure(COLUMNS.NORM_ENTROPY.toString());
+    public static final int    EFD_SCORE               = BENCHMARK.addMeasure(COLUMNS.EFD_SCORE.toString());
 
 	static {
+        BENCHMARK.addAnalyzer(INFO_LOSS_SORIA_COMAS, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_ARX, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_ABS, new ValueBuffer());
         BENCHMARK.addAnalyzer(INFO_LOSS_REL, new ValueBuffer());
@@ -272,8 +275,8 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafilesSoriaComas() {
         return new BenchmarkDatafile[] {
-                BenchmarkDatafile.ATUS_NUM,
-                BenchmarkDatafile.IHIS_NUM,
+//                BenchmarkDatafile.ATUS_NUM,
+//                BenchmarkDatafile.IHIS_NUM,
                 BenchmarkDatafile.ACS13_NUM,
                                         };
     }
@@ -283,6 +286,12 @@ public class BenchmarkSetup {
     }
     
     public static enum COLUMNS {
+    	INFO_LOSS_SORIA_COMAS {
+            @Override
+            public String toString() {
+                return "IL-SSE";
+            }
+        },
         IL_MEASURE {
             @Override
             public String toString() {

@@ -65,8 +65,9 @@ import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
  */
 public class BenchmarkDriver {
     private final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
-    
+
     private final UtilityMeasure<Double> measure;
+    private final UtilityMeasure<Double> measureSoriaComas;
     private final DataConverter converter;
     private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
     private final String[] header;
@@ -97,12 +98,11 @@ public class BenchmarkDriver {
 			break;
 		case PRECISION:			this.measure = 	new UtilityMeasurePrecision<Double>(header, hierarchies);
 			break;
-		case SORIA_COMAS:
-			this.measure = 	new UtilityMeasureSoriaComas(inputArray);
-			break;
 		default:
 			throw new RuntimeException("Invalid measure");
         }
+        
+        this.measureSoriaComas = new UtilityMeasureSoriaComas(inputArray);
 	}
 
 	/**
@@ -266,27 +266,42 @@ public class BenchmarkDriver {
 
  
         Double il_arx = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        Double il_abs = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double il_abs_from_utility = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        Double il_sc  = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         
         if (result.getGlobalOptimum() != null) {
 
-            il_arx = Double.valueOf(result.getGlobalOptimum().getMinimumInformationLoss().toString());            
+            ARXNode arxOptimum = result.getGlobalOptimum();
+
+            il_arx = Double.valueOf(arxOptimum.getMinimumInformationLoss().toString());
+
+			String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
+			result.getOutput(arxOptimum).release();
+			il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+	        il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
+			
+			il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+			
             
         } else {
-        	il_rel = il_arx = il_abs = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+        	il_sc = il_rel = il_arx = il_abs_from_utility = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
         
-        il_abs = getOptimumsAbsIlByFullTraversal(measure, dataset, result);
-        il_rel = (il_abs - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
+        
+//        if (BenchmarkMeasure.SORIA_COMAS.equals(this.benchmarkMeasure)) {
+//        	il_abs = getOptimumsAbsIlByFullTraversal(measure, dataset, result);
+//        }
+        
 
         
         // put info-losses into results-file
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_SORIA_COMAS, formatter.format(il_sc));
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ARX,         formatter.format(il_arx));
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         formatter.format(il_abs));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_ABS,         formatter.format(il_abs_from_utility));
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_REL,         formatter.format(il_rel));
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MIN,         formatter.format(dataset.getMinInfoLoss(this.benchmarkMeasure)));
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX,        formatter.format( dataset.getMaxInfoLoss(this.benchmarkMeasure)));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX,         formatter.format( dataset.getMaxInfoLoss(this.benchmarkMeasure)));
         
         // report solution ratio
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
