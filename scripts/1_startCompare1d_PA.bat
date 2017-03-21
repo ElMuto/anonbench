@@ -1,8 +1,8 @@
-	@echo off
+@echo off
 
 Set _path=%WORKSPACE_PATH%\promotion\code-attr-disclosure-criteria-comparison
 
-Set _cluster_node=3
+Set _cluster_node=4
 Set _remote_dir=/home/imse/pc-bench-helmut
 
 Set _commandfile=%_path%\scripts\plink-commands.txt
