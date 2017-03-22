@@ -352,6 +352,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                         case T_CLOSENESS_HD:
                         case T_CLOSENESS_ED:
                         case D_DISCLOSURE_PRIVACY:
+                        case BASIC_BETA_LIKENESS:
                             arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
                             break;
                         }

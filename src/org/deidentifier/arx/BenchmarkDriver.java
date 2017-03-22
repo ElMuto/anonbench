@@ -39,6 +39,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.aggregates.StatisticsClassification;
+import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
@@ -118,6 +119,7 @@ public class BenchmarkDriver {
 	 * @param dMin
 	 * @param dMax
 	 * @param sa
+	 * @param b TODO
 	 * @param criteria
 	 * @param customQiCount TODO
 	 * @return
@@ -127,7 +129,7 @@ public class BenchmarkDriver {
                                                      Integer k, Integer l, Double c,
                                                      Double t, Double d, Double dMin,
                                                      Double dMax, String sa,
-                                                     Integer ssNum, BenchmarkCriterion... criteria) throws IOException {
+                                                     Integer ssNum, Double b, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
 
@@ -186,6 +188,9 @@ public class BenchmarkDriver {
             case D_DISCLOSURE_PRIVACY:
                 config.addCriterion(new DDisclosurePrivacy(sa, d));
                 break;
+            case BASIC_BETA_LIKENESS:
+                config.addPrivacyModel(new BasicBLikeness(sa, b));
+                break;
             default:
                 throw new RuntimeException("Invalid criterion");
             }
@@ -201,14 +206,14 @@ public class BenchmarkDriver {
                          boolean subsetBased, Integer k,
                          Integer l, Double c, Double t,
                          Double d, Double dMin, Double dMax,
-                         String sa, Integer ssNum, String resultsFileName) throws IOException
+                         String sa, Integer ssNum, String resultsFileName, Double b) throws IOException
     {
     							anonymize (		measure, suppFactor,  dataset,
 					                subsetBased,  k,
 					                l,  c,  t,
 					                d,  dMin,  dMax,
 					                sa,  ssNum,
-					                new Double[] { null }, resultsFileName);
+					                new Double[] { null }, resultsFileName, b);
     }
 
 
@@ -218,10 +223,10 @@ public class BenchmarkDriver {
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
                                  Double d, Double dMin, Double dMax,
-                                 String sa, Integer ssNum, Double[] accuracies, String resultsFileName
+                                 String sa, Integer ssNum, Double[] accuracies, String resultsFileName, Double b
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, b, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 //        anonymizer.setMaxTransformations(210000);
         
@@ -238,7 +243,7 @@ public class BenchmarkDriver {
         
         BenchmarkCriterion bc = dataset.getCriteria()[dataset.getCriteria().length - 1];
 //        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
-        String bcName = assemblePrivacyModelString(bc, k, c, l, t, suppFactor, d);
+        String bcName = assemblePrivacyModelString(bc, k, c, l, t, suppFactor, d, b);
         BenchmarkSetup.BENCHMARK.addRun(bcName,
         								measure.toString(),
                                         String.valueOf(suppFactor),
@@ -379,8 +384,8 @@ public class BenchmarkDriver {
 	}
 
 	private static String assemblePrivacyModelString(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, double suppFactor,
-			Double d) {
-		return new PrivacyModel(criterion, k, c, l, t, d).toString();
+			Double d, Double b) {
+		return new PrivacyModel(criterion, k, c, l, t, d, b).toString();
 	}
 
 	/**
@@ -389,7 +394,7 @@ public class BenchmarkDriver {
      * @return
      */
     public static String assemblePrivacyModelString(PrivacyModel pm, double suppFactor) {
-		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor), pm.getD());
+		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor), pm.getD(), pm.getB());
 	}
 
 	private double calculateDifficulty(ARXResult result) {
@@ -429,7 +434,7 @@ public class BenchmarkDriver {
 				5,
 				1, 4d, 1d, 
 				1d, null, null,
-				sa, null, true, includeInsensitiveAttributes);
+				sa, null, true, includeInsensitiveAttributes, 3d);
 	}
 
 	/**
@@ -465,10 +470,10 @@ public class BenchmarkDriver {
 						privacyModel.getK(),
 						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 						privacyModel.getD(), null, null,
-						sa, null, false, includeInsensitiveAttributes);
+						sa, null, false, includeInsensitiveAttributes, privacyModel.getB());
 	
-				System.out.  format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
-				outputStream.format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
+				System.out.  format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
+				outputStream.format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
 		}
 	}
 
@@ -486,6 +491,7 @@ public class BenchmarkDriver {
 	 * @param ssNum
 	 * @param calcBaselineOnly TODO
 	 * @param includeInsensitiveAttribute TODO
+	 * @param b TODO
 	 * @return
 	 * @throws IOException
 	 */
@@ -494,11 +500,11 @@ public class BenchmarkDriver {
 			Integer k,
 			Integer l, Double c, Double t,
 			Double d, Double dMin, Double dMax,
-			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute
+			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b
 			) throws IOException {
 	
 		boolean firstNodeVisited = false;
-		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
+		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, b, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
@@ -540,8 +546,8 @@ public class BenchmarkDriver {
 								}
 							}
 							else {
-								System.out.printf("\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
-								System.out.printf("\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
+								System.out.format(new Locale("de", "DE"), "\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
+								System.out.format(new Locale("de", "DE"), "\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
 										stats.getOriginalAccuracy() * 100d,
 										(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
 							}

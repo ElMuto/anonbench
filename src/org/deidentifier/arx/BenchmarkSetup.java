@@ -106,11 +106,12 @@ public class BenchmarkSetup {
 	
     public static PrivacyModel[] getPrivacyModelsCombinedWithK() {
     	return new PrivacyModel[] {
-    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  5, null, 3,    null, null),
-//    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null),
-//    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null),
-//    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.2d, null),
-//    			new PrivacyModel(BenchmarkCriterion.D_DISCLOSURE_PRIVACY,  5, null, null, null, 1d),
+    			new PrivacyModel(BenchmarkCriterion.BASIC_BETA_LIKENESS,   5, null, null,    null, null, 3d),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_DISTINCT,  5, null, 3,    null, null, null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_RECURSIVE, 5, 4.0d, 3,    null, null, null),
+    			new PrivacyModel(BenchmarkCriterion.L_DIVERSITY_ENTROPY,   5, null, 3,    null, null, null),
+    			new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED,        5, null, null, 0.2d, null, null),
+    			new PrivacyModel(BenchmarkCriterion.D_DISCLOSURE_PRIVACY,  5, null, null, null, 1d, null),
     	};
     }
 	
@@ -118,8 +119,9 @@ public class BenchmarkSetup {
     	
 		Integer[] dim1Vals =     { /*1, 2, 3, 4,*/ 5 };
 		Double [] dim2ValsForL = { 1d, 3d, 6d, 9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
-		Double [] dim2ValsForT = { 1d, 0.75, 0.5, 0.25, 0d };
+		Double [] dim2ValsForT = { 1d, 0.8, 0.6, 0.4, 0.2, 0d };
 		Double [] dim2ValsForD = { 6d, 5d, 4d, 3d, 2d, 1d, 0.001d };
+		Double [] dim2ValsForB = { 5d, 4d, 3d, 2d, 1d };
 		
 		Double[] dim2Vals = null;
 
@@ -129,6 +131,8 @@ public class BenchmarkSetup {
 			dim2Vals = dim2ValsForL;
 		} else if ("d".equals(dim2Qualifier)) {
 			dim2Vals = dim2ValsForD;
+		} else if ("b".equals(dim2Qualifier)) {
+			dim2Vals = dim2ValsForB;
 		} else {
 			throw new RuntimeException("Invalid dim2Qalifier: '" + dim2Qualifier + "'");
 		}
@@ -587,6 +591,12 @@ public class BenchmarkSetup {
             @Override
             public String toString() {
                 return "DP";
+            }
+        },
+        BASIC_BETA_LIKENESS {
+            @Override
+            public String toString() {
+                return "BBL";
             }
         }
     }

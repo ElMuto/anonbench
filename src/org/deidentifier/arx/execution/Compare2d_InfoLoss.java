@@ -77,7 +77,7 @@ public class Compare2d_InfoLoss {
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 									privacyModel.getD(), null, null,
-									sa, null, "results/resultsTKIL.csv");
+									sa, null, "results/resultsTKIL.csv", privacyModel.getB());
 						}
 						dataset.getArxData().getHandle().release();
 					}

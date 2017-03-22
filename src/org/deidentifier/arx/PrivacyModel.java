@@ -9,6 +9,7 @@ public class PrivacyModel {
 	private final Integer l;
 	private final Double  t;
 	private final Double  d;
+	private final Double  b;
 	private final Double  dim2Val;
 	
 	public PrivacyModel(String dim2Qualifier, Integer dim1Val, Double dim2Val) {
@@ -21,30 +22,42 @@ public class PrivacyModel {
 			this.l = null;
 			this.t = dim2Val;
 			this.d = null;
+			this.b = null;
 		} else if ("ld".equals(dim2Qualifier)) {
 			this.criterion = BenchmarkCriterion.L_DIVERSITY_DISTINCT;
 			this.c = null;
 			this.l = (int) Math.round(dim2Val);
 			this.t = null;
 			this.d = null;
+			this.b = null;
 		} else if ("lr".equals(dim2Qualifier)) {
 			this.criterion = BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
 			this.c = 4d;
 			this.l = (int) Math.round(dim2Val);
 			this.t = null;
 			this.d = null;
+			this.b = null;
 		} else if ("le".equals(dim2Qualifier)) {
 			this.criterion = BenchmarkCriterion.L_DIVERSITY_ENTROPY;
 			this.c = null;
 			this.l = (int) Math.round(dim2Val);
 			this.t = null;
 			this.d = null;
+			this.b = null;
 		} else if ("d".equals(dim2Qualifier)) {
 			this.criterion = BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
 			this.c = null;
 			this.l = null;
 			this.t = null;
 			this.d = dim2Val;
+			this.b = null;
+		} else if ("b".equals(dim2Qualifier)) {
+			this.criterion = BenchmarkCriterion.BASIC_BETA_LIKENESS;
+			this.c = null;
+			this.l = null;
+			this.t = null;
+			this.d = null;
+			this.b = dim2Val;
 		} else {
 			throw new RuntimeException("invalid parameter for constructor: '" + dim2Qualifier + "'");
 		}
@@ -57,8 +70,9 @@ public class PrivacyModel {
 	 * @param l
 	 * @param t
 	 * @param d TODO
+	 * @param b TODO
 	 */
-	public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, Double d) {
+	public PrivacyModel(BenchmarkCriterion criterion, Integer k, Double c, Integer l, Double t, Double d, Double b) {
 		super();
 		this.criterion = criterion;
 		this.k = k;
@@ -66,6 +80,7 @@ public class PrivacyModel {
 		this.l = l;
 		this.t = t;
 		this.d = d;
+		this.b = b;
 		this.dim2Val = null;
 	}
 
@@ -93,6 +108,10 @@ public class PrivacyModel {
 		return d;
 	}
 
+	public Double getB() {
+		return b;
+	}
+
 	public Double getDim2Val() {
 		return dim2Val;
 	}
@@ -107,6 +126,7 @@ public class PrivacyModel {
 		case T_CLOSENESS_ED:
 		case T_CLOSENESS_HD:
 		case D_DISCLOSURE_PRIVACY:
+		case BASIC_BETA_LIKENESS:
 			return true;
 		default:
 			throw new RuntimeException("Invalid criterion");
@@ -137,6 +157,9 @@ public class PrivacyModel {
 			break;
 		case D_DISCLOSURE_PRIVACY:
 			theString = d + "-disclosure privacy";
+			break;
+		case BASIC_BETA_LIKENESS:
+			theString = "basic-" + b + "-likeness";
 			break;
 		default:
 			throw new RuntimeException("Invalid criterion");

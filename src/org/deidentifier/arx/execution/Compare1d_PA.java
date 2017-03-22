@@ -57,7 +57,7 @@ public class Compare1d_PA {
 			datafile = BenchmarkDatafile.IHIS;
 		} else throw new RuntimeException("Unsupported datafile: '" + dataFileName + "'");
 		
-		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d" };		
+		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d", "b" };		
 		String dim2Qual = args[1];		
 		boolean validInput = false;		
 		for (String s : allowedInputStrings) {
@@ -93,14 +93,14 @@ public class Compare1d_PA {
 					privacyModel.getK(),
 					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 					privacyModel.getD(), null, null,
-					sa, null, false, false);
+					sa, null, false, false, privacyModel.getB());
 			
 			String fStr = "";
 			if (!privacyModel.getK().equals(lastK)) fStr += "\n";
 			fStr += "%.5f\t%.5f\n";
 			lastK = privacyModel.getK();
 			
-			if (relPA == -Double.MAX_VALUE) relPA = -1d;
+			if (relPA == -Double.MAX_VALUE) relPA = 0d;
 			
 			System.out.format(new Locale("de", "de"), fStr, privacyModel.getDim2Val(), relPA);
 			fos       .format(new Locale("de", "de"), fStr, privacyModel.getDim2Val(), relPA);
