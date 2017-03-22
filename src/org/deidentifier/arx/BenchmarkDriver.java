@@ -539,12 +539,12 @@ public class BenchmarkDriver {
 									if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
 								}
 							}
-//							else {
+							else {
 								System.out.printf("\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
 								System.out.printf("\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
 										stats.getOriginalAccuracy() * 100d,
 										(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
-//							}
+							}
 	
 						} catch (ParseException e) {
 							throw new RuntimeException(e);

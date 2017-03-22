@@ -125,6 +125,23 @@
 	    <delete dir="build" failonerror="true" />
 	  </target>
 
+	  <target name="CompareRelPAsIncludingAllPossiblePredictors" depends="compile,buildExternalLibs">
+	    <jar destfile="CompareRelPAsIncludingAllPossiblePredictors.jar" duplicate="preserve">
+	      <fileset dir="build" defaultexcludes="no" />
+
+	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
+	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
+	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+
+	      <manifest>
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAsIncludingAllPossiblePredictors" />
+	      </manifest>
+	    </jar>
+	    <delete dir="build" failonerror="true" />
+	  </target>
+
 	  <target name="Compare2d_PA" depends="compile,buildExternalLibs">
 	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
@@ -141,6 +158,7 @@
 	    </jar>
 	    <delete dir="build" failonerror="true" />
 	  </target>
+	
 
 	  <target name="Compare1d_PA" depends="compile,buildExternalLibs">
 	    <jar destfile="Compare1d_PA.jar" duplicate="preserve">
