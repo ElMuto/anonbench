@@ -76,7 +76,7 @@ public class Compare1d_PA {
 
 	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
 
-		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".c3d";
+		String outFileName = "SA100_RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".dat";
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
@@ -87,7 +87,7 @@ public class Compare1d_PA {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 			
-			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+			double relPA = driver.calculateMaximalClassificationAccuracy(1d, dataset,
 					privacyModel.getK(),
 					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 					privacyModel.getD(), null, null,

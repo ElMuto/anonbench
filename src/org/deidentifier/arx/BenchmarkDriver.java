@@ -418,6 +418,21 @@ public class BenchmarkDriver {
 
 
 
+    /**
+     * @param suppFactor
+     * @param dataset
+     * @param k
+     * @param l
+     * @param c
+     * @param t
+     * @param d
+     * @param dMin
+     * @param dMax
+     * @param sa
+     * @param ssNum
+     * @return
+     * @throws IOException
+     */
     public double calculateMaximalClassificationAccuracy(
 			double suppFactor, BenchmarkDataset dataset,
 			Integer k,
