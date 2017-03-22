@@ -418,90 +418,7 @@ public class BenchmarkDriver {
 
 
 
-    /**
-     * @param suppFactor
-     * @param dataset
-     * @param k
-     * @param l
-     * @param c
-     * @param t
-     * @param d
-     * @param dMin
-     * @param dMax
-     * @param sa
-     * @param ssNum
-     * @param calcBaselineOnly TODO
-     * @return
-     * @throws IOException
-     */
-    public double calculateMaximalClassificationAccuracy(
-			double suppFactor, BenchmarkDataset dataset,
-			Integer k,
-			Integer l, Double c, Double t,
-			Double d, Double dMin, Double dMax,
-			String sa, Integer ssNum, boolean calcBaselineOnly
-			) throws IOException {
-	
-    	boolean firstNodeVisited = false;
-		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
-		ARXAnonymizer anonymizer = new ARXAnonymizer();
-	
-		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
-		
-		double optimalAccuracy = -Double.MAX_VALUE;
-				
-		ARXLattice lattice = result.getLattice();
-		
-		for (ARXNode[] level : lattice.getLevels()) {
-			for (ARXNode node : level) {
-
-				if (!calcBaselineOnly || !firstNodeVisited) {
-
-					firstNodeVisited = true;
-
-					// Make sure that every transformation is classified correctly
-					if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-						result.getOutput(node).release();
-					}				
-					if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-						try {
-
-
-							DataHandle handle = result.getOutput(node);
-							List<String> qis = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-							StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-									qis.toArray(new String[qis.size()]), sa, ARXLogisticRegressionConfiguration.create()
-									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
-
-							if (!calcBaselineOnly) {
-								double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-								if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
-									optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-									if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
-									if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
-								}
-							}
-							if (calcBaselineOnly) {
-								System.out.printf("\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
-								System.out.printf("\tstats.getOriginalAccuracy() = %.2f\n", stats.getOriginalAccuracy() * 100d);
-							}
-
-						} catch (ParseException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}
-			}
-	    }
-	    
-		if (calcBaselineOnly) {
-			return -1d;
-		} else {
-		return optimalAccuracy;
-		}
-	}
-
-	public static void getBasePAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream)
+    public static void getBasePAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream, boolean includeInsensitiveAttributes)
 			throws IOException {
 		String printString = "Running " + datafile.toString() + " with SA=" + sa;
 		outputStream.println(printString);
@@ -512,15 +429,30 @@ public class BenchmarkDriver {
 				5,
 				1, 4d, 1d, 
 				1d, null, null,
-				sa, null, true);
+				sa, null, true, includeInsensitiveAttributes);
 	}
 
-	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream)
+	/**
+	 * @param datafile
+	 * @param sa
+	 * @param outputStream
+	 * @param includeInsensitiveAttributes
+	 * @throws IOException
+	 */
+	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream, boolean includeInsensitiveAttributes)
 			throws IOException {
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.ENTROPY, sa, outputStream);
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.ENTROPY, sa, outputStream, includeInsensitiveAttributes);
 	}
 
-	public static void compareRelPAs(BenchmarkDatafile datafile, BenchmarkMeasure bmMeasure, String sa, PrintStream outputStream) throws IOException {
+	/**
+	 * @param datafile
+	 * @param bmMeasure
+	 * @param sa
+	 * @param outputStream
+	 * @param includeInsensitiveAttributes
+	 * @throws IOException
+	 */
+	public static void compareRelPAs(BenchmarkDatafile datafile, BenchmarkMeasure bmMeasure, String sa, PrintStream outputStream, boolean includeInsensitiveAttributes) throws IOException {
 		String printString = "Running " + datafile.toString() + " with SA=" + sa;
 		outputStream.println(printString);
 		System.out.println(printString);
@@ -533,10 +465,99 @@ public class BenchmarkDriver {
 						privacyModel.getK(),
 						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 						privacyModel.getD(), null, null,
-						sa, null, false);
+						sa, null, false, includeInsensitiveAttributes);
 	
 				System.out.  format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
 				outputStream.format(new Locale("en", "US"), "%s;%.4f%n", privacyModel.toString(), maxPA);
+		}
+	}
+
+	/**
+	 * @param suppFactor
+	 * @param dataset
+	 * @param k
+	 * @param l
+	 * @param c
+	 * @param t
+	 * @param d
+	 * @param dMin
+	 * @param dMax
+	 * @param sa
+	 * @param ssNum
+	 * @param calcBaselineOnly TODO
+	 * @param includeInsensitiveAttribute TODO
+	 * @return
+	 * @throws IOException
+	 */
+	public double calculateMaximalClassificationAccuracy(
+			double suppFactor, BenchmarkDataset dataset,
+			Integer k,
+			Integer l, Double c, Double t,
+			Double d, Double dMin, Double dMax,
+			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute
+			) throws IOException {
+	
+		boolean firstNodeVisited = false;
+		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, dataset.getCriteria());
+		ARXAnonymizer anonymizer = new ARXAnonymizer();
+	
+		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
+		
+		double optimalAccuracy = -Double.MAX_VALUE;
+				
+		ARXLattice lattice = result.getLattice();
+		
+		for (ARXNode[] level : lattice.getLevels()) {
+			for (ARXNode node : level) {
+	
+				if (!calcBaselineOnly || !firstNodeVisited) {
+	
+					firstNodeVisited = true;
+	
+					// Make sure that every transformation is classified correctly
+					if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+						result.getOutput(node).release();
+					}				
+					if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+						try {
+	
+	
+							DataHandle handle = result.getOutput(node);
+							List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+							if (includeInsensitiveAttribute) {
+								predictingAttrs.add(dataset.getInSensitiveAttribute());
+							}
+							StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+									predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
+									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+	
+							if (!calcBaselineOnly) {
+								double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+								if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+									optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+									if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
+									if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
+								}
+							}
+//							else {
+								System.out.printf("\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
+								System.out.printf("\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
+										stats.getOriginalAccuracy() * 100d,
+										(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
+//							}
+	
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}
+			}
+	    }
+	    
+		if (calcBaselineOnly) {
+			return -1d;
+		} else {
+		return optimalAccuracy;
 		}
 	}
 

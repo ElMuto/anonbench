@@ -32,7 +32,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
  * 
  * @author Helmut Spengler
  */
-public class GetClassificationBaseline {
+public class CompareRelPAsIncludingAllPossiblePredictors {
 	
 	/**
 	 * Main entry point
@@ -41,22 +41,22 @@ public class GetClassificationBaseline {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		PrintStream fileOutputStream = new PrintStream("results/resultsBaselineCAs.txt");
+		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAsIncludingsAllPossiblePredictors.txt");
 
-//		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream);
+//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream, true);
 //		fileOutputStream.println();
-//		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
+//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream, true);
 //		fileOutputStream.println("\n");
 		
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream, true);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream, true);
 		fileOutputStream.println();
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream, true);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream, true);
 		fileOutputStream.println("\n");
 
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream, true);
-		fileOutputStream.println();
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream, true);
-		
+//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream, true);
+//		fileOutputStream.println();
+//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream, true);
+//		
 		System.out.println("done.");
 		
 		fileOutputStream.close();

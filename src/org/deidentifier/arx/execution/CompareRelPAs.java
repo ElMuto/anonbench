@@ -43,19 +43,19 @@ public class CompareRelPAs {
 	public static void main(String[] args) throws IOException {
 		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAs.txt");
 
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream, false);
 		fileOutputStream.println("\n");
 		
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream, false);
 		fileOutputStream.println("\n");
 
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream, false);
 		
 		System.out.println("done.");
 		

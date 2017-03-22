@@ -45,21 +45,21 @@ public class CompareRelPAsSoriaComas {
 		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAsSoriaComas_ATUS_IHIS_ACS13.txt");
 
 		BenchmarkDatafile datafile = BenchmarkDatafile.ATUS_NUM;
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Marital status", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Marital status", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Highest level of school completed", fileOutputStream);		
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Highest level of school completed", fileOutputStream, false);		
 		fileOutputStream.println("\n");
 
 		datafile = BenchmarkDatafile.IHIS_NUM;
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "MARSTAT", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "MARSTAT", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "EDUC", fileOutputStream);		
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "EDUC", fileOutputStream, false);		
 		fileOutputStream.println("\n");
 
 		datafile = BenchmarkDatafile.ACS13_NUM;
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Marital status", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Marital status", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Education", fileOutputStream);
+		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.SORIA_COMAS, "Education", fileOutputStream, false);
 		fileOutputStream.println("\n");
 		
 		System.out.println("done.");

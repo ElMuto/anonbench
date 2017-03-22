@@ -2,6 +2,9 @@ package org.deidentifier.arx;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -241,6 +244,27 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         	return DataSubset.create(this.toArxData(null), Data.create(filename, Charset.forName("UTF-8"), ';'));
         }
 
+        /**
+         * Returns the sensitive attribute for the dataset
+         * @param dataset
+         * @return
+         */
+        public String getInSensitiveAttribute() {
+        	String[] saCandidatesArr = getSensitiveAttributeCandidates(getDatafile());
+        	List<String> saCandidatesList = new ArrayList<>(Arrays.asList(saCandidatesArr));
+        	
+        	for (int i = 0; i < saCandidatesList.size(); i++) {
+        		if (saCandidatesList.get(i).equals(getSensitiveAttribute())){
+        			saCandidatesList.remove(i);
+        		}
+        	}
+        	
+        	if (saCandidatesList.size() != 1) {
+        		throw new RuntimeException("This should not happen");
+        	} else {
+        		return saCandidatesList.get(0);
+        	}
+        }
         /**
          * Returns the sensitive attribute for the dataset
          * @param dataset
