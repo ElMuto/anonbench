@@ -41,24 +41,60 @@ public class CompareRelPAsIncludingAllPossiblePredictors {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		PrintStream fileOutputStream = new PrintStream("results/resultsRelCAsIncludingsAllPossiblePredictors.txt");
-
-//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStream, true);
-//		fileOutputStream.println();
-//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream, true);
-//		fileOutputStream.println("\n");
 		
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream, true);
-		fileOutputStream.println();
-		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream, true);
-		fileOutputStream.println("\n");
+		Boolean MS = null;
+		Boolean ED = null;
+		
+		if (args.length != 1) {
+			throw new RuntimeException("missing SA specification");
+		} else {
+			if (args[0].equals("MS")) {
+					MS = true;
+					ED = false;
+			} else if (args[0].equals("ED")) {
+				ED = true;
+				MS = false;
+			} else if (args[0].equals("both")) {
+				ED = MS = true;
+			} else {
+				throw new RuntimeException("invalid SA specification");
+			}
+		}
 
-//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream, true);
-//		fileOutputStream.println();
-//		BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream, true);
-//		
+		
+		if (MS) {
+			PrintStream fileOutputStreamMS = new PrintStream("results/resultsRelCAsIncludingsAllPossiblePredictor_MS.txt");
+			
+//			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStreamMS, true);
+//			fileOutputStreamMS.println();
+//			
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStreamMS, true);
+			fileOutputStreamMS.println();
+			
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStreamMS, true);
+			fileOutputStreamMS.println();
+			
+
+			fileOutputStreamMS.close();
+		}
+
+		if (ED) {
+			PrintStream fileOutputStreamED = new PrintStream("results/resultsRelCAsIncludingsAllPossiblePredictor_ED.txt");
+			
+//			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStreamED, true);
+//			fileOutputStreamED.println("\n");
+
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStreamED, true);
+			fileOutputStreamED.println("\n");
+
+			fileOutputStreamED.println();
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStreamED, true);
+			
+
+			fileOutputStreamED.close();
+		}
+		
 		System.out.println("done.");
 		
-		fileOutputStream.close();
 	}
 }

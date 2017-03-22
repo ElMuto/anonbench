@@ -8,4 +8,4 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -DHelmut -jar jars/CompareRelPAsIncludingAllPossiblePredictors.jar
+java -Xmx5G -DHelmut -jar jars/CompareRelPAsIncludingAllPossiblePredictors.jar ED
