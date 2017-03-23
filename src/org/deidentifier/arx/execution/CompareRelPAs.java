@@ -65,9 +65,9 @@ public class CompareRelPAs {
 		if (MS) {
 			PrintStream fileOutputStreamMS = new PrintStream("results/resultsRelCAsMS.txt");
 			
-//			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStreamMS, false);
-//			fileOutputStreamMS.println();
-//			
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Marital status", fileOutputStreamMS, false);
+			fileOutputStreamMS.println();
+			
 			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStreamMS, false);
 			fileOutputStreamMS.println();
 			
@@ -81,8 +81,8 @@ public class CompareRelPAs {
 		if (ED) {
 			PrintStream fileOutputStreamED = new PrintStream("results/resultsRelCAsED.txt");
 			
-//			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStreamED, false);
-//			fileOutputStreamED.println("\n");
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStreamED, false);
+			fileOutputStreamED.println("\n");
 
 			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStreamED, false);
 			fileOutputStreamED.println("\n");
