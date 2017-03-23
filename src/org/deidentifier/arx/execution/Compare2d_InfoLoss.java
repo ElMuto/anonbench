@@ -62,7 +62,7 @@ public class Compare2d_InfoLoss {
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
 
 					// for each privacy model
-					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison("t")) {
+					for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison("t")) {
 
 						BenchmarkCriterion[] criteria =  new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
 						

@@ -81,10 +81,18 @@ public class Compare2d_PA {
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
 
-		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison(dim2Qual)[0].getK();
+		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual)[0].getK();
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison(dim2Qual)) {
-			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual)) {
+			
+			BenchmarkCriterion[] criteria = null;
+			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
+				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
+			} else {
+				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
+			}
+			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
+			
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 			
 			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,

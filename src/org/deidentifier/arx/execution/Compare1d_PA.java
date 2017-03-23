@@ -82,9 +82,9 @@ public class Compare1d_PA {
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
 
-		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison(dim2Qual)[0].getK();
+		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual)[0].getK();
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsFor_2D_Comparison(dim2Qual)) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual)) {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
