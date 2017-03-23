@@ -463,7 +463,17 @@ public class BenchmarkDriver {
 		System.out.println(printString);
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
-			BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { privacyModel.getCriterion() }, sa);
+			
+
+
+			BenchmarkCriterion[] criteria = null;
+			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
+				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
+			} else {
+				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
+			}
+			
+			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
 				
 				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
