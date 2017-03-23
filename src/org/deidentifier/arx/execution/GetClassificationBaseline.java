@@ -48,14 +48,14 @@ public class GetClassificationBaseline {
 //		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ACS13, "Education", fileOutputStream);
 //		fileOutputStream.println("\n");
 		
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream, true);
+		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ATUS, "Marital status", fileOutputStream, false);
 		fileOutputStream.println();
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream, true);
+		BenchmarkDriver.getBasePAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStream, false);
 		fileOutputStream.println("\n");
 
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream, true);
-		fileOutputStream.println();
-		BenchmarkDriver.getBasePAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream, true);
+//		BenchmarkDriver.getBasePAs(BenchmarkDatafile.IHIS, "MARSTAT", fileOutputStream, true);
+//		fileOutputStream.println();
+//		BenchmarkDriver.getBasePAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStream, true);
 		
 		System.out.println("done.");
 		
