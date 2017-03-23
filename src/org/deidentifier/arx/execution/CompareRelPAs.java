@@ -81,11 +81,11 @@ public class CompareRelPAs {
 		if (ED) {
 			PrintStream fileOutputStreamED = new PrintStream("results/resultsRelCAsED.txt");
 			
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStreamED, false);
-			fileOutputStreamED.println("\n");
-
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStreamED, false);
-			fileOutputStreamED.println("\n");
+//			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, "Education", fileOutputStreamED, false);
+//			fileOutputStreamED.println("\n");
+//
+//			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, "Highest level of school completed", fileOutputStreamED, false);
+//			fileOutputStreamED.println("\n");
 
 			fileOutputStreamED.println();
 			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, "EDUC", fileOutputStreamED, false);

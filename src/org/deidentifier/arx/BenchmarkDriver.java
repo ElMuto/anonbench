@@ -519,6 +519,8 @@ public class BenchmarkDriver {
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
+		System.out.println("Using following criteria: " + config.getCriteria());
+		
 		double optimalAccuracy = -Double.MAX_VALUE;
 				
 		ARXLattice lattice = result.getLattice();
