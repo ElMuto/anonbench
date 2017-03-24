@@ -76,7 +76,7 @@ public class Compare2d_PA {
 
 	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
 
-		String outFileName = "RelCA2d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".c3d";
+		String outFileName = "RelCA2d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".dat";
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
