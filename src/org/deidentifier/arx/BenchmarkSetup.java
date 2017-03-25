@@ -565,7 +565,7 @@ public class BenchmarkSetup {
         L_DIVERSITY_ENTROPY {
             @Override
             public String toString() {
-                return "RE";
+                return "EL";
             }
         },
         L_DIVERSITY_RECURSIVE {

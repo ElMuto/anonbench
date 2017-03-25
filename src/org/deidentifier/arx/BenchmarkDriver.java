@@ -136,22 +136,22 @@ public class BenchmarkDriver {
         switch (metric) {
         case ENTROPY:
         case SORIA_COMAS:
-            config.setMetric(Metric.createEntropyMetric());
+            config.setQualityModel(Metric.createEntropyMetric());
             break;
         case LOSS:
-            config.setMetric(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
+            config.setQualityModel(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
             break;
         case AECS:
-            config.setMetric(Metric.createAECSMetric());
+            config.setQualityModel(Metric.createAECSMetric());
             break;
         case DISCERNABILITY:
-            config.setMetric(Metric.createDiscernabilityMetric());
+            config.setQualityModel(Metric.createDiscernabilityMetric());
             break;
         case PRECISION:
-            config.setMetric(Metric.createPrecisionMetric());
+            config.setQualityModel(Metric.createPrecisionMetric());
             break;
         case HEIGHT:
-            config.setMetric(Metric.createHeightMetric());
+            config.setQualityModel(Metric.createHeightMetric());
             break;
         default:
             throw new RuntimeException("Invalid benchmark metric");
@@ -162,31 +162,31 @@ public class BenchmarkDriver {
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
             case D_PRESENCE:
-                config.addCriterion(new DPresence(dMin, dMax, dataset.getResearchSubset(ssNum)));
+                config.addPrivacyModel(new DPresence(dMin, dMax, dataset.getResearchSubset(ssNum)));
                 break;
             case INCLUSION:
-                config.addCriterion(new Inclusion(dataset.getResearchSubset(ssNum)));
+                config.addPrivacyModel(new Inclusion(dataset.getResearchSubset(ssNum)));
                 break;
             case K_ANONYMITY:
-                config.addCriterion(new KAnonymity(k));
+            	if (k > 1) config.addPrivacyModel(new KAnonymity(k));
                 break;
             case L_DIVERSITY_DISTINCT:
-                config.addCriterion(new DistinctLDiversity(sa, l));
+                config.addPrivacyModel(new DistinctLDiversity(sa, l));
                 break;
             case L_DIVERSITY_ENTROPY:
-                config.addCriterion(new org.deidentifier.arx.criteria.EntropyLDiversity(sa, l));
+                config.addPrivacyModel(new org.deidentifier.arx.criteria.EntropyLDiversity(sa, l));
                 break;
             case L_DIVERSITY_RECURSIVE:
-                config.addCriterion(new RecursiveCLDiversity(sa, c, l));
+                config.addPrivacyModel(new RecursiveCLDiversity(sa, c, l));
                 break;
             case T_CLOSENESS_HD:
-                config.addCriterion(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
+                config.addPrivacyModel(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
                 break;
             case T_CLOSENESS_ED:
-                config.addCriterion(new EqualDistanceTCloseness(sa, t));
+                config.addPrivacyModel(new EqualDistanceTCloseness(sa, t));
                 break;
             case D_DISCLOSURE_PRIVACY:
-                config.addCriterion(new DDisclosurePrivacy(sa, d));
+                config.addPrivacyModel(new DDisclosurePrivacy(sa, d));
                 break;
             case BASIC_BETA_LIKENESS:
                 config.addPrivacyModel(new BasicBLikeness(sa, b));
@@ -279,7 +279,7 @@ public class BenchmarkDriver {
 
             ARXNode arxOptimum = result.getGlobalOptimum();
 
-            il_arx = Double.valueOf(arxOptimum.getMinimumInformationLoss().toString());
+            il_arx = Double.valueOf(arxOptimum.getLowestScore().toString());
 
 			String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
 			result.getOutput(arxOptimum).release();
@@ -520,7 +520,7 @@ public class BenchmarkDriver {
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
-		System.out.println("Using following criteria: " + config.getCriteria());
+		System.out.println("Using following criteria: " + config.getPrivacyModels());
 		
 		ARXNode optNode = null;
 		double optimalAccuracy = -Double.MAX_VALUE;
@@ -528,75 +528,76 @@ public class BenchmarkDriver {
 		ARXLattice lattice = result.getLattice();
 		
 		for (ARXNode[] level : lattice.getLevels()) {
-			
+
 			for (ARXNode node : level) {
-				
+
 				if (!DEBUG || Arrays.equals((new int[] { 1, 1, 0 }), node.getTransformation())) {
 					System.out.println("DEBUGGING-MODE!!!! Remove transformation filter for normal experiments!!!!");
-					
+
 					if (DEBUG) {
 						String filename = "results/output-k" + k + ".csv";
 						DataHandle outputHandle = result.getOutput();
 						String[][] output = converter.toArray(outputHandle, outputHandle.getDefinition(), outputHandle.getView());
-						
+
 						PrintStream fos = new PrintStream(filename);
-						
+
 						for (String[] line : output) {
-//							System.out.format("%s;%s;%s\n", line[0], line[1], line[2]);
+							//							System.out.format("%s;%s;%s\n", line[0], line[1], line[2]);
 							fos.format("%s;%s;%s\n", line[0], line[1], line[2]);
 						}
-						
+						outputHandle.release();
+
 						fos.close();
 					}
-	
-				// if we only wan to to calculate the baseline, it is
-				// sufficient to just take the first node and exit before
-				// the 2nd iteration
-				if (!calcBaselineOnly || !firstNodeVisited) {	
-					firstNodeVisited = true;
-	
-					// Make sure that every transformation is classified correctly
-					if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-						result.getOutput(node).release();
-					}				
-					if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-						try {
-	
-	
-							DataHandle handle = result.getOutput(node);
-							List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-							if (includeInsensitiveAttribute) {
-								predictingAttrs.add(dataset.getInSensitiveAttribute());
-							}
-							StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-									predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
-									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
-	
-							if (!calcBaselineOnly) {
-								double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-								if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
-									if (accuracy > optimalAccuracy) optNode = node;
-									optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-									if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
-									if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
+
+					// if we only wan to to calculate the baseline, it is
+					// sufficient to just take the first node and exit before
+					// the 2nd iteration
+					if (!calcBaselineOnly || !firstNodeVisited) {	
+						firstNodeVisited = true;
+
+						// Make sure that every transformation is classified correctly
+						if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+							result.getOutput(node).release();
+						}				
+						if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+							try {
+
+
+								DataHandle handle = result.getOutput(node);
+								List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+								if (includeInsensitiveAttribute) {
+									predictingAttrs.add(dataset.getInSensitiveAttribute());
 								}
+								StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+										predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
+										.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+
+								if (!calcBaselineOnly) {
+									double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+									if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+										if (accuracy > optimalAccuracy) optNode = node;
+										optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+										if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
+										if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
+									}
+								}
+								else {
+									System.out.format(new Locale("de", "DE"), "\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
+									System.out.format(new Locale("de", "DE"), "\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
+											stats.getOriginalAccuracy() * 100d,
+											(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
+								}
+
+							} catch (ParseException e) {
+								throw new RuntimeException(e);
 							}
-							else {
-								System.out.format(new Locale("de", "DE"), "\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
-								System.out.format(new Locale("de", "DE"), "\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
-										stats.getOriginalAccuracy() * 100d,
-										(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
-							}
-	
-						} catch (ParseException e) {
-							throw new RuntimeException(e);
 						}
 					}
 				}
 			}
-			}
-	    }
-	    
+		}
+
 		if (calcBaselineOnly) {
 			return -1d;
 		} else {
