@@ -513,6 +513,7 @@ public class BenchmarkDriver {
 			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b
 			) throws IOException {
 	
+		boolean DEBUG = true;
 		boolean firstNodeVisited = false;
 		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, b, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
@@ -521,15 +522,37 @@ public class BenchmarkDriver {
 		
 		System.out.println("Using following criteria: " + config.getCriteria());
 		
+		ARXNode optNode = null;
 		double optimalAccuracy = -Double.MAX_VALUE;
 				
 		ARXLattice lattice = result.getLattice();
 		
 		for (ARXNode[] level : lattice.getLevels()) {
+			
 			for (ARXNode node : level) {
+				
+				if (!DEBUG || Arrays.equals((new int[] { 1, 1, 0 }), node.getTransformation())) {
+					System.out.println("DEBUGGING-MODE!!!! Remove transformation filter for normal experiments!!!!");
+					
+					if (DEBUG) {
+						String filename = "results/output-k" + k + ".csv";
+						DataHandle outputHandle = result.getOutput();
+						String[][] output = converter.toArray(outputHandle, outputHandle.getDefinition(), outputHandle.getView());
+						
+						PrintStream fos = new PrintStream(filename);
+						
+						for (String[] line : output) {
+//							System.out.format("%s;%s;%s\n", line[0], line[1], line[2]);
+							fos.format("%s;%s;%s\n", line[0], line[1], line[2]);
+						}
+						
+						fos.close();
+					}
 	
-				if (!calcBaselineOnly || !firstNodeVisited) {
-	
+				// if we only wan to to calculate the baseline, it is
+				// sufficient to just take the first node and exit before
+				// the 2nd iteration
+				if (!calcBaselineOnly || !firstNodeVisited) {	
 					firstNodeVisited = true;
 	
 					// Make sure that every transformation is classified correctly
@@ -552,6 +575,7 @@ public class BenchmarkDriver {
 							if (!calcBaselineOnly) {
 								double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
 								if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+									if (accuracy > optimalAccuracy) optNode = node;
 									optimalAccuracy = Math.max(accuracy, optimalAccuracy);
 									if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
 									if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
@@ -570,12 +594,14 @@ public class BenchmarkDriver {
 					}
 				}
 			}
+			}
 	    }
 	    
 		if (calcBaselineOnly) {
 			return -1d;
 		} else {
-		return optimalAccuracy;
+			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode.getTransformation()));
+			return optimalAccuracy;
 		}
 	}
 

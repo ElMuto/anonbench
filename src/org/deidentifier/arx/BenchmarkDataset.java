@@ -290,7 +290,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                 return new String[] { "MARSTAT", "EDUC" };
             case ACS13:
             case ACS13_NUM:
-                return new String[] { "Education", "Marital status",  };
+                return new String[] { "Education" /*, "Marital status",  */};
             default:
                 throw new RuntimeException("Invalid dataset");
             }
