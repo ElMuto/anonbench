@@ -290,9 +290,9 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafilesSoriaComas() {
         return new BenchmarkDatafile[] {
+//              BenchmarkDatafile.ACS13_NUM,
 //                BenchmarkDatafile.ATUS_NUM,
-//                BenchmarkDatafile.IHIS_NUM,
-                BenchmarkDatafile.ACS13_NUM,
+                BenchmarkDatafile.IHIS_NUM,
                                         };
     }
     

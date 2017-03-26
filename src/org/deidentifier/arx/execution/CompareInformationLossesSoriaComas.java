@@ -53,8 +53,8 @@ public class CompareInformationLossesSoriaComas {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY}) {
-//		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.SORIA_COMAS}) {
+//		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.SORIA_COMAS}) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafilesSoriaComas()) {
@@ -82,8 +82,8 @@ public class CompareInformationLossesSoriaComas {
 							driver.anonymize(measure, suppFactor, dataset, false,
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-									privacyModel.getD(), null, null,
-									sa, null, "results/results.csv", privacyModel.getB());
+									privacyModel.getD(), privacyModel.getB(), null,
+									null, sa, null, "results/resultsSC.csv");
 						}
 						dataset.getArxData().getHandle().release();
 					}

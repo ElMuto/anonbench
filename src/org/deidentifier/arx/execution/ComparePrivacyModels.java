@@ -81,8 +81,8 @@ public class ComparePrivacyModels {
 							driver.anonymize(measure, suppFactor, dataset, false,
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-									privacyModel.getD(), null, null,
-									sa, null, "results/results.csv", privacyModel.getB());
+									privacyModel.getD(), privacyModel.getB(), null,
+									null, sa, null, "results/results.csv");
 						}
 						dataset.getArxData().getHandle().release();
 					}

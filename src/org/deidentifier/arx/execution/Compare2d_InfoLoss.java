@@ -76,8 +76,8 @@ public class Compare2d_InfoLoss {
 							driver.anonymize(measure, suppFactor, dataset, false,
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-									privacyModel.getD(), null, null,
-									sa, null, "results/resultsTKIL.csv", privacyModel.getB());
+									privacyModel.getD(), privacyModel.getB(), null,
+									null, sa, null, "results/resultsTKIL.csv");
 						}
 						dataset.getArxData().getHandle().release();
 					}

@@ -97,7 +97,11 @@ public class BenchmarkDriver {
 			break;
 		case LOSS:			this.	measure = new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
 			break;
-		case PRECISION:			this.measure = 	new UtilityMeasurePrecision<Double>(header, hierarchies);
+		case PRECISION:
+			this.measure = 	new UtilityMeasurePrecision<Double>(header, hierarchies);
+			break;
+		case SORIA_COMAS:
+			this.measure = 	new UtilityMeasureSoriaComas(inputArray);
 			break;
 		default:
 			throw new RuntimeException("Invalid measure");
@@ -116,10 +120,10 @@ public class BenchmarkDriver {
 	 * @param c
 	 * @param t
 	 * @param d TODO
+	 * @param b TODO
 	 * @param dMin
 	 * @param dMax
 	 * @param sa
-	 * @param b TODO
 	 * @param criteria
 	 * @param customQiCount TODO
 	 * @return
@@ -127,9 +131,9 @@ public class BenchmarkDriver {
      */
     private static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
                                                      Integer k, Integer l, Double c,
-                                                     Double t, Double d, Double dMin,
-                                                     Double dMax, String sa,
-                                                     Integer ssNum, Double b, BenchmarkCriterion... criteria) throws IOException {
+                                                     Double t, Double d, Double b,
+                                                     Double dMin, Double dMax,
+                                                     String sa, Integer ssNum, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
 
@@ -201,32 +205,69 @@ public class BenchmarkDriver {
 
 
 
+    /**
+     * @param measure
+     * @param suppFactor
+     * @param dataset
+     * @param subsetBased
+     * @param k
+     * @param l
+     * @param c
+     * @param t
+     * @param d
+     * @param b
+     * @param dMin
+     * @param dMax
+     * @param sa
+     * @param ssNum
+     * @param resultsFileName
+     * @throws IOException
+     */
     public void anonymize(BenchmarkMeasure measure,
                          double suppFactor, BenchmarkDataset dataset,
                          boolean subsetBased, Integer k,
                          Integer l, Double c, Double t,
-                         Double d, Double dMin, Double dMax,
-                         String sa, Integer ssNum, String resultsFileName, Double b) throws IOException
+                         Double d, Double b, Double dMin,
+                         Double dMax, String sa, Integer ssNum, String resultsFileName) throws IOException
     {
     							anonymize (		measure, suppFactor,  dataset,
 					                subsetBased,  k,
 					                l,  c,  t,
-					                d,  dMin,  dMax,
-					                sa,  ssNum,
-					                new Double[] { null }, resultsFileName, b);
+					                d,  b,  dMin,
+					                dMax,  sa,
+					                ssNum, new Double[] { null }, resultsFileName);
     }
 
 
+    /**
+     * @param measure
+     * @param suppFactor
+     * @param dataset
+     * @param subsetBased
+     * @param k
+     * @param l
+     * @param c
+     * @param t
+     * @param d
+     * @param b
+     * @param dMin
+     * @param dMax
+     * @param sa
+     * @param ssNum
+     * @param accuracies
+     * @param resultsFileName
+     * @throws IOException
+     */
     public void anonymize(
                                  BenchmarkMeasure measure,
                                  double suppFactor, BenchmarkDataset dataset,
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
-                                 Double d, Double dMin, Double dMax,
-                                 String sa, Integer ssNum, Double[] accuracies, String resultsFileName, Double b
+                                 Double d, Double b, Double dMin,
+                                 Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, dMin, dMax, sa, ssNum, b, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 //        anonymizer.setMaxTransformations(210000);
         
@@ -294,9 +335,9 @@ public class BenchmarkDriver {
         }
         
         
-//        if (BenchmarkMeasure.SORIA_COMAS.equals(this.benchmarkMeasure)) {
-//        	il_abs = getOptimumsAbsIlByFullTraversal(measure, dataset, result);
-//        }
+        if (BenchmarkMeasure.SORIA_COMAS.equals(this.benchmarkMeasure)) {
+        	il_sc = getOptimumsAbsIlByFullTraversal(measure, dataset, result);
+        }
         
 
         
@@ -515,7 +556,7 @@ public class BenchmarkDriver {
 	
 		boolean DEBUG = true;
 		boolean firstNodeVisited = false;
-		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, dMin, dMax, sa, ssNum, b, dataset.getCriteria());
+		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
