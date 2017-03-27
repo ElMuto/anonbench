@@ -115,7 +115,7 @@ public class BenchmarkSetup {
     	};
     }
 	
-    public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier) {
+    public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa) {
     	
 //    	// 1d
 //		Integer[] dim1Vals =     { 100, 5 };
@@ -127,10 +127,10 @@ public class BenchmarkSetup {
 
     	// 2d
 //		Integer[] dim1Vals =     { 5, 10, 20, 30 };
-		Integer[] dim1Vals =     { 1, 5 };
+		Integer[] dim1Vals =     { 5 };
 		
-		Double [] dim2ValsForL = { 2d, 4d, 5d };
-//		Double [] dim2ValsForL = { 1d, 3d, 6d, 9d, 12d, 15d, 20d, 30d };
+		Double [] dim2ValsForL_SaMarStat = { /*1d, 2d, 3d, 4d,*/ 5d };
+		Double [] dim2ValsForL_SaEduc    = { /*1d, 3d, 6d, 9d, 12d, 15d, 20d, */30d };
 		
 		Double [] dim2ValsForT = { 1d, 0.8, 0.6, 0.4, 0.2, 0d };
 		Double [] dim2ValsForD = { 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
@@ -141,7 +141,14 @@ public class BenchmarkSetup {
 		if ("t".equals(dim2Qualifier)) {
 			dim2Vals = dim2ValsForT;
 		} else if ("ld".equals(dim2Qualifier) || "lr".equals(dim2Qualifier) || "le".equals(dim2Qualifier)) {
-			dim2Vals = dim2ValsForL;
+			if ("Marital status".equals(sa)) {
+				dim2Vals = dim2ValsForL_SaMarStat;
+			} else if ("Education".equals(sa)) {
+				dim2Vals = dim2ValsForL_SaEduc;
+			} else {
+				throw new RuntimeException("This should not happen");
+			}
+				
 		} else if ("d".equals(dim2Qualifier)) {
 			dim2Vals = dim2ValsForD;
 		} else if ("b".equals(dim2Qualifier)) {

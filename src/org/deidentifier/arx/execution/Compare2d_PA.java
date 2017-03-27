@@ -81,9 +81,9 @@ public class Compare2d_PA {
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
 
-		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual)[0].getK();
+		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)[0].getK();
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual)) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)) {
 			
 			BenchmarkCriterion[] criteria = null;
 			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
@@ -99,7 +99,7 @@ public class Compare2d_PA {
 					privacyModel.getK(),
 					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 					privacyModel.getD(), null, null,
-					sa, null, false, false, privacyModel.getB());
+					sa, null, false, false, privacyModel.getB(), privacyModel);
 			
 			String fStr = "";
 			if (!privacyModel.getK().equals(lastK)) fStr += "\n";

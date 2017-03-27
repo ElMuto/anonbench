@@ -271,7 +271,10 @@ public class EntropyLDiversity extends LDiversity {
                 final int frequency = buckets[i + 1];
                 sum1 += frequency * estimator.psi(frequency);
                 // If the sum grows over C, we can abort the loop earlier.
-                if (C < sum1) { anonymous = false; }
+                if (C < sum1) { 
+                	anonymous = false; 
+                	break;
+                }
             }
         }
         
