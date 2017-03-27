@@ -337,50 +337,51 @@ public class BenchmarkDriver {
         		il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
         	} else {
         		DataHandle arxOutput = null;
+        		Locale loc = new Locale ("DE", "de");
         		switch(privacyModel.getCriterion()) {
 				case L_DIVERSITY_DISTINCT:
 	                DistinctLDiversity.prepareBeta();
 	                arxOutput = result.getOutput(false);
 	                DistinctLDiversity.doneBeta();
-	                System.out.println("Min-beta: " + DistinctLDiversity.minBeta);
-	                System.out.println("Max-beta: " + DistinctLDiversity.maxBeta);
-	                System.out.println("Avg-beta: " + DistinctLDiversity.avgBeta);
+	                System.out.format(loc, "Min-beta:  %.5f\n", DistinctLDiversity.minBeta);
+	                System.out.format(loc, "Max-beta:  %.5f\n", DistinctLDiversity.maxBeta);
+	                System.out.format(loc, "Avg-beta:  %.5f\n", DistinctLDiversity.avgBeta);
 	                result.releaseBuffer((DataHandleOutput) arxOutput);
 					break;
 				case L_DIVERSITY_RECURSIVE:
 	                RecursiveCLDiversity.prepareBeta();
 	                arxOutput = result.getOutput(false);
 	                RecursiveCLDiversity.doneBeta();
-	                System.out.println("Min-beta: " + RecursiveCLDiversity.minBeta);
-	                System.out.println("Max-beta: " + RecursiveCLDiversity.maxBeta);
-	                System.out.println("Avg-beta: " + RecursiveCLDiversity.avgBeta);
+	                System.out.format(loc, "Min-beta:  %.5f\n", RecursiveCLDiversity.minBeta);
+	                System.out.format(loc, "Max-beta:  %.5f\n", RecursiveCLDiversity.maxBeta);
+	                System.out.format(loc, "Avg-beta:  %.5f\n", RecursiveCLDiversity.avgBeta);
 	                result.releaseBuffer((DataHandleOutput) arxOutput);
 					break;
 				case L_DIVERSITY_ENTROPY:
 	                EntropyLDiversity.prepareBeta();
 	                arxOutput = result.getOutput(false);
 	                EntropyLDiversity.doneBeta();
-	                System.out.println("Min-beta: " + EntropyLDiversity.minBeta);
-	                System.out.println("Max-beta: " + EntropyLDiversity.maxBeta);
-	                System.out.println("Avg-beta: " + EntropyLDiversity.avgBeta);
+	                System.out.format(loc, "Min-beta:  %.5f\n", EntropyLDiversity.minBeta);
+	                System.out.format(loc, "Max-beta:  %.5f\n", EntropyLDiversity.maxBeta);
+	                System.out.format(loc, "Avg-beta:  %.5f\n", EntropyLDiversity.avgBeta);
 	                result.releaseBuffer((DataHandleOutput) arxOutput);
 					break;
 				case T_CLOSENESS_ED:
 					EqualDistanceTCloseness.prepareBeta();
 	                arxOutput = result.getOutput(false);
 	                EqualDistanceTCloseness.doneBeta();
-	                System.out.println("Min-beta: " + EqualDistanceTCloseness.minBeta);
-	                System.out.println("Max-beta: " + EqualDistanceTCloseness.maxBeta);
-	                System.out.println("Avg-beta: " + EqualDistanceTCloseness.avgBeta);
+	                System.out.format(loc, "Min-beta:  %.5f\n", EqualDistanceTCloseness.minBeta);
+	                System.out.format(loc, "Max-beta:  %.5f\n", EqualDistanceTCloseness.maxBeta);
+	                System.out.format(loc, "Avg-beta:  %.5f\n", EqualDistanceTCloseness.avgBeta);
 	                result.releaseBuffer((DataHandleOutput) arxOutput);
 					break;
 				case D_DISCLOSURE_PRIVACY:
 					DDisclosurePrivacy.prepareBeta();
 	                arxOutput = result.getOutput(false);
 	                DDisclosurePrivacy.doneBeta();
-	                System.out.println("Min-beta: " + DDisclosurePrivacy.minBeta);
-	                System.out.println("Max-beta: " + DDisclosurePrivacy.maxBeta);
-	                System.out.println("Avg-beta: " + DDisclosurePrivacy.avgBeta);
+	                System.out.format(loc, "Min-beta: %.5f\n", DDisclosurePrivacy.minBeta);
+	                System.out.format(loc, "Max-beta: %.5f\n", DDisclosurePrivacy.maxBeta);
+	                System.out.format(loc, "Avg-beta: %.5f\n", DDisclosurePrivacy.avgBeta);
 	                result.releaseBuffer((DataHandleOutput) arxOutput);
 					break;
 				default:
