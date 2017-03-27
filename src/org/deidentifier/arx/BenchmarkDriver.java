@@ -498,7 +498,7 @@ public class BenchmarkDriver {
 				5,
 				1, 4d, 1d, 
 				1d, null, null,
-				sa, null, true, includeInsensitiveAttributes, 3d, null);
+				sa, null, true, includeInsensitiveAttributes, 3d, null, null);
 	}
 
 	/**
@@ -544,7 +544,7 @@ public class BenchmarkDriver {
 						privacyModel.getK(),
 						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 						privacyModel.getD(), null, null,
-						sa, null, false, includeInsensitiveAttributes, privacyModel.getB(), privacyModel);
+						sa, null, false, includeInsensitiveAttributes, privacyModel.getB(), privacyModel, null);
 	
 				System.out.  format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
 				outputStream.format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
@@ -567,6 +567,7 @@ public class BenchmarkDriver {
 	 * @param includeInsensitiveAttribute TODO
 	 * @param b TODO
 	 * @param privacyModel TODO
+	 * @param _fos TODO
 	 * @return
 	 * @throws IOException
 	 */
@@ -575,7 +576,7 @@ public class BenchmarkDriver {
 			Integer k,
 			Integer l, Double c, Double t,
 			Double d, Double dMin, Double dMax,
-			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b, PrivacyModel privacyModel
+			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b, PrivacyModel privacyModel, PrintStream _fos
 			) throws IOException {
 	
 		boolean DEBUG = false;
@@ -690,6 +691,9 @@ public class BenchmarkDriver {
     			out.release();
     		}
     		String sep = ";";
+    		if (_fos != null) {
+    			_fos.format("%s", DisclosureRiskCalculator.toCsv(sep));
+    		}
     		System.out.format("%s", DisclosureRiskCalculator.toCsv(sep));
 			return optimalAccuracy;
 		}

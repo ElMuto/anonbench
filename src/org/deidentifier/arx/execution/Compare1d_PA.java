@@ -100,7 +100,7 @@ public class Compare1d_PA {
 					privacyModel.getK(),
 					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 					privacyModel.getD(), null, null,
-					sa, null, false, false, privacyModel.getB(), privacyModel);
+					sa, null, false, false, privacyModel.getB(), privacyModel, fos);
 			
 			String fStr = "";
 			String sep = ";";

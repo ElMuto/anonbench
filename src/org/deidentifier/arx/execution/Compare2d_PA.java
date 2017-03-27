@@ -99,7 +99,7 @@ public class Compare2d_PA {
 					privacyModel.getK(),
 					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 					privacyModel.getD(), null, null,
-					sa, null, false, false, privacyModel.getB(), privacyModel);
+					sa, null, false, false, privacyModel.getB(), privacyModel, null);
 			
 			String fStr = "";
 			if (!privacyModel.getK().equals(lastK)) fStr += "\n";
