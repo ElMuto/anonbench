@@ -43,7 +43,9 @@ import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
+import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
+import org.deidentifier.arx.criteria.ExplicitPrivacyCriterion;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -204,7 +206,6 @@ public class BenchmarkDriver {
     
 
 
-
     /**
      * @param measure
      * @param suppFactor
@@ -221,6 +222,8 @@ public class BenchmarkDriver {
      * @param sa
      * @param ssNum
      * @param resultsFileName
+     * @param calcBeta TODO
+     * @param privacyModel TODO
      * @throws IOException
      */
     public void anonymize(BenchmarkMeasure measure,
@@ -228,14 +231,14 @@ public class BenchmarkDriver {
                          boolean subsetBased, Integer k,
                          Integer l, Double c, Double t,
                          Double d, Double b, Double dMin,
-                         Double dMax, String sa, Integer ssNum, String resultsFileName) throws IOException
+                         Double dMax, String sa, Integer ssNum, String resultsFileName, boolean calcBeta, PrivacyModel privacyModel) throws IOException
     {
     							anonymize (		measure, suppFactor,  dataset,
 					                subsetBased,  k,
 					                l,  c,  t,
 					                d,  b,  dMin,
 					                dMax,  sa,
-					                ssNum, new Double[] { null }, resultsFileName);
+					                ssNum, new Double[] { null }, resultsFileName, calcBeta, privacyModel);
     }
 
 
@@ -256,6 +259,8 @@ public class BenchmarkDriver {
      * @param ssNum
      * @param accuracies
      * @param resultsFileName
+     * @param calcBeta TODO
+     * @param privacyModel TODO
      * @throws IOException
      */
     public void anonymize(
@@ -264,7 +269,7 @@ public class BenchmarkDriver {
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
                                  Double d, Double b, Double dMin,
-                                 Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName
+                                 Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName, boolean calcBeta, PrivacyModel privacyModel
             ) throws IOException {
 
         ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
@@ -318,16 +323,70 @@ public class BenchmarkDriver {
         
         if (result.getGlobalOptimum() != null) {
 
-            ARXNode arxOptimum = result.getGlobalOptimum();
+        	if (!calcBeta) {
 
-            il_arx = Double.valueOf(arxOptimum.getLowestScore().toString());
+        		ARXNode arxOptimum = result.getGlobalOptimum();
 
-			String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
-			result.getOutput(arxOptimum).release();
-			il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
-	        il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
-			
-			il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+        		il_arx = Double.valueOf(arxOptimum.getLowestScore().toString());
+
+        		String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
+        		result.getOutput(arxOptimum).release();
+        		il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+        		il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
+
+        		il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+        	} else {
+        		DataHandle arxOutput = null;
+        		switch(privacyModel.getCriterion()) {
+				case L_DIVERSITY_DISTINCT:
+	                DistinctLDiversity.prepareBeta();
+	                arxOutput = result.getOutput(false);
+	                DistinctLDiversity.doneBeta();
+	                System.out.println("Min-beta: " + DistinctLDiversity.minBeta);
+	                System.out.println("Max-beta: " + DistinctLDiversity.maxBeta);
+	                System.out.println("Avg-beta: " + DistinctLDiversity.avgBeta);
+	                result.releaseBuffer((DataHandleOutput) arxOutput);
+					break;
+				case L_DIVERSITY_RECURSIVE:
+	                RecursiveCLDiversity.prepareBeta();
+	                arxOutput = result.getOutput(false);
+	                RecursiveCLDiversity.doneBeta();
+	                System.out.println("Min-beta: " + RecursiveCLDiversity.minBeta);
+	                System.out.println("Max-beta: " + RecursiveCLDiversity.maxBeta);
+	                System.out.println("Avg-beta: " + RecursiveCLDiversity.avgBeta);
+	                result.releaseBuffer((DataHandleOutput) arxOutput);
+					break;
+				case L_DIVERSITY_ENTROPY:
+	                EntropyLDiversity.prepareBeta();
+	                arxOutput = result.getOutput(false);
+	                EntropyLDiversity.doneBeta();
+	                System.out.println("Min-beta: " + EntropyLDiversity.minBeta);
+	                System.out.println("Max-beta: " + EntropyLDiversity.maxBeta);
+	                System.out.println("Avg-beta: " + EntropyLDiversity.avgBeta);
+	                result.releaseBuffer((DataHandleOutput) arxOutput);
+					break;
+				case T_CLOSENESS_ED:
+					EqualDistanceTCloseness.prepareBeta();
+	                arxOutput = result.getOutput(false);
+	                EqualDistanceTCloseness.doneBeta();
+	                System.out.println("Min-beta: " + EqualDistanceTCloseness.minBeta);
+	                System.out.println("Max-beta: " + EqualDistanceTCloseness.maxBeta);
+	                System.out.println("Avg-beta: " + EqualDistanceTCloseness.avgBeta);
+	                result.releaseBuffer((DataHandleOutput) arxOutput);
+					break;
+				case D_DISCLOSURE_PRIVACY:
+					DDisclosurePrivacy.prepareBeta();
+	                arxOutput = result.getOutput(false);
+	                DDisclosurePrivacy.doneBeta();
+	                System.out.println("Min-beta: " + DDisclosurePrivacy.minBeta);
+	                System.out.println("Max-beta: " + DDisclosurePrivacy.maxBeta);
+	                System.out.println("Avg-beta: " + DDisclosurePrivacy.avgBeta);
+	                result.releaseBuffer((DataHandleOutput) arxOutput);
+					break;
+				default:
+					break;
+        		}
+        	}
 			
             
         } else {

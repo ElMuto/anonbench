@@ -83,7 +83,7 @@ public class CompareInformationLossesSoriaComas {
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 									privacyModel.getD(), privacyModel.getB(), null,
-									null, sa, null, "results/resultsSC.csv");
+									null, sa, null, "results/resultsSC.csv", false, privacyModel);
 						}
 						dataset.getArxData().getHandle().release();
 					}

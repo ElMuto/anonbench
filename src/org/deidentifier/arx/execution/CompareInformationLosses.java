@@ -36,7 +36,7 @@ import org.deidentifier.arx.PrivacyModel;
  * 
  * @author Fabian Prasser
  */
-public class ComparePrivacyModels {
+public class CompareInformationLosses {
 	
 	/**
 	 * Main entry point
@@ -53,10 +53,10 @@ public class ComparePrivacyModels {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.LOSS, BenchmarkMeasure.ENTROPY}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY, BenchmarkMeasure.LOSS}) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
+			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafilesSoriaComas()) {
 
 				// for each sensitive attribute candidate
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
@@ -82,11 +82,12 @@ public class ComparePrivacyModels {
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 									privacyModel.getD(), privacyModel.getB(), null,
-									null, sa, null, "results/results.csv");
+									null, sa, null, "results/resultsBetaLikeness.csv", false, privacyModel);
 						}
 						dataset.getArxData().getHandle().release();
 					}
 				}
+				System.out.println();
 			}
 		}
 	}
