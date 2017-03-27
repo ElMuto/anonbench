@@ -73,22 +73,6 @@ public class DDisclosurePrivacy extends ExplicitPrivacyCriterion {
         return new DDisclosurePrivacy(this.getAttribute(), this.getD());
     }
 
-    public static void prepareBeta() {
-        numBeta = 0;
-        avgBeta = 0;
-        minBeta = Double.MAX_VALUE;
-        maxBeta = -Double.MAX_VALUE;
-    }
-
-    public static double numBeta = 0;
-    public static double avgBeta = 0;
-    public static double minBeta = Double.MAX_VALUE;
-    public static double maxBeta = -Double.MAX_VALUE;
-
-    public static void doneBeta() {
-        avgBeta /= numBeta;
-    }
-
     /**
      * Returns the parameter delta.
      *
@@ -122,6 +106,7 @@ public class DDisclosurePrivacy extends ExplicitPrivacyCriterion {
         int[] buckets = entry.distributions[index].getBuckets();
         double count = entry.count;
         
+        boolean anonymous = true;
         // For each value in c
         for (int i = 0; i < buckets.length; i += 2) {
             if (buckets[i] != -1) { // bucket not empty
@@ -129,33 +114,14 @@ public class DDisclosurePrivacy extends ExplicitPrivacyCriterion {
                 double frequencyInC = (double) buckets[i + 1] / count;
                 double value = Math.abs(log2(frequencyInC / frequencyInT));
                 if (value >= d) {
-                    return false;
+                    anonymous = false;
+                    break;
                 }
             }
         }
-        
-        // For each value in c
-        double beta = 0d;
-        double numBetas = 0d;
-        for (int i = 0; i < buckets.length; i += 2) {
-            if (buckets[i] != -1) { // bucket not empty
-                double frequencyInT = distribution[buckets[i]];
-                double frequencyInC = (double) buckets[i + 1] / count;
-                double value = (frequencyInC - frequencyInT) / frequencyInT;
-                beta += value;
-                numBetas++;
-            }
-        }
 
-        // Average beta for this class
-        beta /= numBetas;
-        avgBeta += beta;
-        numBeta ++;
-        minBeta = Math.min(minBeta,  beta);
-        maxBeta = Math.max(maxBeta,  beta);
-
-        // check
-        return true;
+        BETA.process(distribution, entry, index, !anonymous);
+        return anonymous;
     }
     
     @Override

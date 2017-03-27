@@ -54,22 +54,6 @@ public class EqualDistanceTCloseness extends TCloseness {
     public EqualDistanceTCloseness clone() {
         return new EqualDistanceTCloseness(this.getAttribute(), this.getT());
     }
-
-    public static void prepareBeta() {
-        numBeta = 0;
-        avgBeta = 0;
-        minBeta = Double.MAX_VALUE;
-        maxBeta = -Double.MAX_VALUE;
-    }
-
-    public static double numBeta = 0;
-    public static double avgBeta = 0;
-    public static double minBeta = Double.MAX_VALUE;
-    public static double maxBeta = -Double.MAX_VALUE;
-
-    public static void doneBeta() {
-        avgBeta /= numBeta;
-    }
     
     @Override
     public void initialize(DataManager manager, ARXConfiguration config) {
@@ -110,31 +94,12 @@ public class EqualDistanceTCloseness extends TCloseness {
             }
         }
         val /= 2;
-        
-
-
-        // For each value in c
-        double beta = 0d;
-        double numBetas = 0d;
-        for (int i = 0; i < buckets.length; i += 2) {
-            if (buckets[i] != -1) { // bucket not empty
-                double frequencyInT = distribution[buckets[i]];
-                double frequencyInC = (double) buckets[i + 1] / count;
-                double value = (frequencyInC - frequencyInT) / frequencyInT;
-                beta += value;
-                numBetas++;
-            }
-        }
-
-        // Average beta for this class
-        beta /= numBetas;
-        avgBeta += beta;
-        numBeta ++;
-        minBeta = Math.min(minBeta,  beta);
-        maxBeta = Math.max(maxBeta,  beta);
 
         // check
-        return val <= t;
+        boolean anonymous = val <= t;
+        
+        BETA.process(distribution, entry, index, !anonymous);
+        return anonymous;
     }
 
 	@Override

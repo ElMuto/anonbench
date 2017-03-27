@@ -39,6 +39,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.aggregates.StatisticsClassification;
+import org.deidentifier.arx.criteria.BETA;
 import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DPresence;
@@ -315,12 +316,12 @@ public class BenchmarkDriver {
         if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
         
 
- 
+
         Double il_arx = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_abs_from_utility = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         Double il_sc  = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
-        
+
         if (result.getGlobalOptimum() != null) {
 
         	if (!calcBeta) {
@@ -336,65 +337,20 @@ public class BenchmarkDriver {
 
         		il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
         	} else {
-        		DataHandle arxOutput = null;
         		Locale loc = new Locale ("DE", "de");
-        		switch(privacyModel.getCriterion()) {
-				case L_DIVERSITY_DISTINCT:
-	                DistinctLDiversity.prepareBeta();
-	                arxOutput = result.getOutput(false);
-	                DistinctLDiversity.doneBeta();
-	                System.out.format(loc, "Min-beta:  %.5f\n", DistinctLDiversity.minBeta);
-	                System.out.format(loc, "Max-beta:  %.5f\n", DistinctLDiversity.maxBeta);
-	                System.out.format(loc, "Avg-beta:  %.5f\n", DistinctLDiversity.avgBeta);
-	                result.releaseBuffer((DataHandleOutput) arxOutput);
-					break;
-				case L_DIVERSITY_RECURSIVE:
-	                RecursiveCLDiversity.prepareBeta();
-	                arxOutput = result.getOutput(false);
-	                RecursiveCLDiversity.doneBeta();
-	                System.out.format(loc, "Min-beta:  %.5f\n", RecursiveCLDiversity.minBeta);
-	                System.out.format(loc, "Max-beta:  %.5f\n", RecursiveCLDiversity.maxBeta);
-	                System.out.format(loc, "Avg-beta:  %.5f\n", RecursiveCLDiversity.avgBeta);
-	                result.releaseBuffer((DataHandleOutput) arxOutput);
-					break;
-				case L_DIVERSITY_ENTROPY:
-	                EntropyLDiversity.prepareBeta();
-	                arxOutput = result.getOutput(false);
-	                EntropyLDiversity.doneBeta();
-	                System.out.format(loc, "Min-beta:  %.5f\n", EntropyLDiversity.minBeta);
-	                System.out.format(loc, "Max-beta:  %.5f\n", EntropyLDiversity.maxBeta);
-	                System.out.format(loc, "Avg-beta:  %.5f\n", EntropyLDiversity.avgBeta);
-	                result.releaseBuffer((DataHandleOutput) arxOutput);
-					break;
-				case T_CLOSENESS_ED:
-					EqualDistanceTCloseness.prepareBeta();
-	                arxOutput = result.getOutput(false);
-	                EqualDistanceTCloseness.doneBeta();
-	                System.out.format(loc, "Min-beta:  %.5f\n", EqualDistanceTCloseness.minBeta);
-	                System.out.format(loc, "Max-beta:  %.5f\n", EqualDistanceTCloseness.maxBeta);
-	                System.out.format(loc, "Avg-beta:  %.5f\n", EqualDistanceTCloseness.avgBeta);
-	                result.releaseBuffer((DataHandleOutput) arxOutput);
-					break;
-				case D_DISCLOSURE_PRIVACY:
-					DDisclosurePrivacy.prepareBeta();
-	                arxOutput = result.getOutput(false);
-	                DDisclosurePrivacy.doneBeta();
-	                System.out.format(loc, "Min-beta: %.5f\n", DDisclosurePrivacy.minBeta);
-	                System.out.format(loc, "Max-beta: %.5f\n", DDisclosurePrivacy.maxBeta);
-	                System.out.format(loc, "Avg-beta: %.5f\n", DDisclosurePrivacy.avgBeta);
-	                result.releaseBuffer((DataHandleOutput) arxOutput);
-					break;
-				default:
-					break;
-        		}
-        	}
-			
-            
+        		BETA.prepareBeta();
+        		result.getOutput(false);
+        		BETA.doneBeta();
+        		System.out.format(loc, "Min-beta:  %.8f\n", BETA.minBeta);
+        		System.out.format(loc, "Max-beta:  %.8f\n", BETA.maxBeta);
+        		System.out.format(loc, "Avg-beta:  %.8f\n", BETA.avgBeta);
+        		handle.release();
+        	}            
         } else {
         	il_sc = il_rel = il_arx = il_abs_from_utility = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
-        
-        
+
+
         if (BenchmarkMeasure.SORIA_COMAS.equals(this.benchmarkMeasure)) {
         	il_sc = getOptimumsAbsIlByFullTraversal(measure, dataset, result);
         }
