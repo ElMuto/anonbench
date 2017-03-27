@@ -58,7 +58,7 @@ public class DistinctLDiversity extends LDiversity{
 	    // Distinct l-diversity
         boolean anonymous = entry.distributions[index].size() >= minSize; // minSize=(int)l;
         
-        BETA.process(distribution, entry, index, !anonymous);
+        DisclosureRiskCalculator.calculateDisclosureRisk(distribution, entry, index, !anonymous);
         
         return anonymous;
     }

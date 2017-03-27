@@ -128,8 +128,10 @@ public class BenchmarkSetup {
     	// 2d
 //		Integer[] dim1Vals =     { 5, 10, 20, 30 };
 		Integer[] dim1Vals =     { 1, 5 };
-		Double [] dim2ValsForL = { 3d };
+		
+		Double [] dim2ValsForL = { 2d, 4d, 5d };
 //		Double [] dim2ValsForL = { 1d, 3d, 6d, 9d, 12d, 15d, 20d, 30d };
+		
 		Double [] dim2ValsForT = { 1d, 0.8, 0.6, 0.4, 0.2, 0d };
 		Double [] dim2ValsForD = { 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
 		Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };

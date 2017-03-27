@@ -102,7 +102,7 @@ public class RecursiveCLDiversity extends LDiversity{
         // Check
         boolean anonymous = frequencyCopy[frequencyCopy.length - 1] < threshold;
         
-        BETA.process(distribution, entry, index, !anonymous);
+        DisclosureRiskCalculator.calculateDisclosureRisk(distribution, entry, index, !anonymous);
         
         return anonymous;
     }

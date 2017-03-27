@@ -98,7 +98,7 @@ public class EqualDistanceTCloseness extends TCloseness {
         // check
         boolean anonymous = val <= t;
         
-        BETA.process(distribution, entry, index, !anonymous);
+        DisclosureRiskCalculator.calculateDisclosureRisk(distribution, entry, index, !anonymous);
         return anonymous;
     }
 

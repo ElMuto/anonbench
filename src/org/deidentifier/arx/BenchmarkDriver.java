@@ -39,14 +39,12 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.aggregates.StatisticsClassification;
-import org.deidentifier.arx.criteria.BETA;
+import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
-import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
-import org.deidentifier.arx.criteria.ExplicitPrivacyCriterion;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -338,12 +336,22 @@ public class BenchmarkDriver {
         		il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
         	} else {
         		Locale loc = new Locale ("DE", "de");
-        		BETA.prepareBeta();
-        		result.getOutput(false);
-        		BETA.doneBeta();
-        		System.out.format(loc, "Min-beta:  %.8f\n", BETA.minBeta);
-        		System.out.format(loc, "Max-beta:  %.8f\n", BETA.maxBeta);
-        		System.out.format(loc, "Avg-beta:  %.8f\n", BETA.avgBeta);
+        		DisclosureRiskCalculator.prepare();
+        		result.getOutput(false);        		
+        		System.out.format(loc, "\tMin-beta:  %.8f\n",   DisclosureRiskCalculator.getBeta().getMin());
+        		System.out.format(loc, "\tMax-beta:  %.8f\n",   DisclosureRiskCalculator.getBeta().getMax());
+        		System.out.format(loc, "\tAvg-beta:  %.8f\n\n", DisclosureRiskCalculator.getBeta().getAvg());
+        		
+        		switch (privacyModel.getCriterion()) {
+				case L_DIVERSITY_DISTINCT:
+	        		System.out.format(loc, "\tMin-ld:    %.8f\n",   DisclosureRiskCalculator.getLd().getMin());
+	        		System.out.format(loc, "\tMax-ld:    %.8f\n",   DisclosureRiskCalculator.getLd().getMax());
+	        		System.out.format(loc, "\tAvg-ld:    %.8f\n\n", DisclosureRiskCalculator.getLd().getAvg());
+					break;
+				default:
+					break;
+        		
+        		}
         		handle.release();
         	}            
         } else {
@@ -487,7 +495,7 @@ public class BenchmarkDriver {
 		System.out.println(printString);
 		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
-		double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+		driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 				5,
 				1, 4d, 1d, 
 				1d, null, null,
@@ -570,7 +578,7 @@ public class BenchmarkDriver {
 			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b
 			) throws IOException {
 	
-		boolean DEBUG = true;
+		boolean DEBUG = false;
 		boolean firstNodeVisited = false;
 		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
@@ -588,67 +596,64 @@ public class BenchmarkDriver {
 
 			for (ARXNode node : level) {
 
-				if (!DEBUG || Arrays.equals((new int[] { 1, 1, 0 }), node.getTransformation())) {
-					System.out.println("DEBUGGING-MODE!!!! Remove transformation filter for normal experiments!!!!");
 
-					if (DEBUG) {
-						String filename = "results/output-k" + k + ".csv";
-						DataHandle outputHandle = result.getOutput();
-						String[][] output = converter.toArray(outputHandle, outputHandle.getDefinition(), outputHandle.getView());
+				if (DEBUG) {
+					String filename = "results/output-k" + k + ".csv";
+					DataHandle outputHandle = result.getOutput();
+					String[][] output = converter.toArray(outputHandle, outputHandle.getDefinition(), outputHandle.getView());
 
-						PrintStream fos = new PrintStream(filename);
+					PrintStream fos = new PrintStream(filename);
 
-						for (String[] line : output) {
-							//							System.out.format("%s;%s;%s\n", line[0], line[1], line[2]);
-							fos.format("%s;%s;%s\n", line[0], line[1], line[2]);
-						}
-						outputHandle.release();
-
-						fos.close();
+					for (String[] line : output) {
+						//							System.out.format("%s;%s;%s\n", line[0], line[1], line[2]);
+						fos.format("%s;%s;%s\n", line[0], line[1], line[2]);
 					}
+					outputHandle.release();
 
-					// if we only wan to to calculate the baseline, it is
-					// sufficient to just take the first node and exit before
-					// the 2nd iteration
-					if (!calcBaselineOnly || !firstNodeVisited) {	
-						firstNodeVisited = true;
+					fos.close();
+				}
 
-						// Make sure that every transformation is classified correctly
-						if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-							result.getOutput(node).release();
-						}				
-						if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-							try {
+				// if we only wan to to calculate the baseline, it is
+				// sufficient to just take the first node and exit before
+				// the 2nd iteration
+				if (!calcBaselineOnly || !firstNodeVisited) {	
+					firstNodeVisited = true;
+
+					// Make sure that every transformation is classified correctly
+					if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+						result.getOutput(node).release();
+					}				
+					if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+						try {
 
 
-								DataHandle handle = result.getOutput(node);
-								List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-								if (includeInsensitiveAttribute) {
-									predictingAttrs.add(dataset.getInSensitiveAttribute());
-								}
-								StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-										predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
-										.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
-
-								if (!calcBaselineOnly) {
-									double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-									if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
-										if (accuracy > optimalAccuracy) optNode = node;
-										optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-										if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
-										if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
-									}
-								}
-								else {
-									System.out.format(new Locale("de", "DE"), "\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
-									System.out.format(new Locale("de", "DE"), "\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
-											stats.getOriginalAccuracy() * 100d,
-											(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
-								}
-
-							} catch (ParseException e) {
-								throw new RuntimeException(e);
+							DataHandle handle = result.getOutput(node);
+							List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+							if (includeInsensitiveAttribute) {
+								predictingAttrs.add(dataset.getInSensitiveAttribute());
 							}
+							StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+									predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
+									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+
+							if (!calcBaselineOnly) {
+								double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+								if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
+									if (accuracy > optimalAccuracy) optNode = node;
+									optimalAccuracy = Math.max(accuracy, optimalAccuracy);
+									if (optimalAccuracy < 0d && optimalAccuracy > -0.05d) optimalAccuracy = 0d;
+									if (optimalAccuracy > 1d && optimalAccuracy <= 1.05) optimalAccuracy = 1d;
+								}
+							}
+							else {
+								System.out.format(new Locale("de", "DE"), "\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
+								System.out.format(new Locale("de", "DE"), "\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
+										stats.getOriginalAccuracy() * 100d,
+										(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
+							}
+
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
 						}
 					}
 				}
@@ -658,13 +663,13 @@ public class BenchmarkDriver {
 		if (calcBaselineOnly) {
 			return -1d;
 		} else {
-			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode.getTransformation()));
+			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode != null ? optNode.getTransformation() : new int[] {}));
 			return optimalAccuracy;
 		}
 	}
 
 	/**
-     * @param dataset
+	 * @param dataset
      * @param handle
      * @param attr
      * @param verbosity

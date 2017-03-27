@@ -275,7 +275,7 @@ public class EntropyLDiversity extends LDiversity {
             }
         }
         
-        BETA.process(distribution, entry, index, !anonymous);
+        DisclosureRiskCalculator.calculateDisclosureRisk(distribution, entry, index, !anonymous);
         return anonymous;
     }
     private double[] distribution;
