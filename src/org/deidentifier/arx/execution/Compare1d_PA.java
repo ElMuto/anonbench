@@ -103,14 +103,15 @@ public class Compare1d_PA {
 					sa, null, false, false, privacyModel.getB(), privacyModel);
 			
 			String fStr = "";
+			String sep = ";";
 			if (!privacyModel.getK().equals(lastK)) fStr += "\n";
-			fStr += "%.5f\t%.5f\n";
+			fStr += "%s%.5f%s%.5f\n";
 			lastK = privacyModel.getK();
 			
 			if (relPA == -Double.MAX_VALUE) relPA = 0d;
 			
-			System.out.format(new Locale("de", "de"), fStr, privacyModel.getDim2Val(), relPA);
-			fos       .format(new Locale("de", "de"), fStr, privacyModel.getDim2Val(), relPA);
+			System.out.format(new Locale("de", "de"), fStr, sep, privacyModel.getDim2Val(), sep, relPA);
+			fos       .format(new Locale("de", "de"), fStr, sep, privacyModel.getDim2Val(), sep, relPA);
 		}
 		fos.close();
 	}

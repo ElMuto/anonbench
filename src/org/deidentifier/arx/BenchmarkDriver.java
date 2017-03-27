@@ -690,8 +690,7 @@ public class BenchmarkDriver {
     			out.release();
     		}
     		String sep = ";";
-    		System.out.format("%s", DisclosureRiskCalculator.toCsv(";"));
-//    		DisclosureRiskCalculator.println();
+    		System.out.format("%s", DisclosureRiskCalculator.toCsv(sep));
 			return optimalAccuracy;
 		}
 	}
