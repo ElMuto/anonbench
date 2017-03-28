@@ -64,6 +64,14 @@ import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
  * This class implements the main benchmark driver
  * @author Fabian Prasser
  */
+/**
+ * @author spengler
+ *
+ */
+/**
+ * @author spengler
+ *
+ */
 public class BenchmarkDriver {
     private final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
 
@@ -478,8 +486,7 @@ public class BenchmarkDriver {
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 		driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 				sa,
-				true, includeInsensitiveAttributes, 3d, 
-				null);
+				true, includeInsensitiveAttributes, null);
 	}
 
 	/**
@@ -523,30 +530,28 @@ public class BenchmarkDriver {
 
 			String maxPAStr[] = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 					sa,
-					false, includeInsensitiveAttributes, privacyModel.getB(), 
-					privacyModel);
+					false, includeInsensitiveAttributes, privacyModel);
 
 			System.out.  format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
 			outputStream.format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
 		}
 	}
-
+	
+	
 	/**
 	 * @param suppFactor
 	 * @param dataset
 	 * @param sa
-	 * @param calcBaselineOnly TODO
-	 * @param includeInsensitiveAttribute TODO
-	 * @param b TODO
-	 * @param privacyModel TODO
+	 * @param calcBaselineOnly
+	 * @param includeInsensitiveAttribute
+	 * @param privacyModel
 	 * @return
 	 * @throws IOException
 	 */
 	public String[] calculateMaximalClassificationAccuracy(
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
-			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b,
-			PrivacyModel privacyModel
+			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, PrivacyModel privacyModel
 			) throws IOException {
 	
 		boolean firstNodeVisited = false;
@@ -647,6 +652,7 @@ public class BenchmarkDriver {
     		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
     		String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
     		
+    		String[] ilMeasureValues = new String[] { };
 			return BenchmarkDriver.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.toArray());
 		}
 	}

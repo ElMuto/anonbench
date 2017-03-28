@@ -98,8 +98,7 @@ public class Compare1d_PA {
 
 			String[] relPAStr = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 					sa,
-					false, false, privacyModel.getB(), 
-					privacyModel);
+					false, false, privacyModel);
 			
 			String[] finalResultArray = BenchmarkDriver.concat(
 					new String[] {
