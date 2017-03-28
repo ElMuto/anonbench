@@ -1,7 +1,11 @@
 package org.deidentifier.arx.criteria;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
+import org.bouncycastle.util.Arrays;
 import org.deidentifier.arx.framework.check.groupify.HashGroupifyEntry;
 
 public class DisclosureRiskCalculator {
@@ -64,6 +68,17 @@ public class DisclosureRiskCalculator {
 			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
 			String formattedMax = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", max));
 			return String.format(new Locale ("DE", "de"), "%s%s%.3f%s%s", formattedMin, sep, avg, sep, formattedMax);
+		}
+
+		public String[] toArray() {
+			String NO_VALUE_FOUND_STRING = "NaN";
+			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
+			String formattedMax = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", max));
+			return new String[] { formattedMin, String.format(new Locale ("DE", "de"), "%.3f", avg), formattedMax };
+		}
+
+		public String[] getHeader() {
+			return new String[] { name + "-" + min, name + "-" + avg, name + "-" + max };
 		}
 
 	}
@@ -200,11 +215,26 @@ public class DisclosureRiskCalculator {
 	public static String toCsv(String sep) {
 		return String.format("%s%s%s%s%s%s%s", l.toCsv(sep), sep, t.toCsv(sep), sep, delta.toCsv(sep), sep, beta.toCsv(sep));
 	}
+	
+	public static String[] toArray() {
+		return concat(concat(concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
+	}
+	
+	public static String[] getHeader() {
+		return concat(concat(concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
+	}
 
 	public static void println() {
 		l.println();
 		t.println();
 		delta.println();
 		beta.println();
+	}
+	
+	public static String[] concat(String[] first, String[] second) {
+	    List<String> both = new ArrayList<String>(first.length + second.length);
+	    Collections.addAll(both, first);
+	    Collections.addAll(both, second);
+	    return both.toArray(new String[both.size()]);
 	}
 }
