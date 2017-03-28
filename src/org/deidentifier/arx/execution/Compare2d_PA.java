@@ -81,7 +81,6 @@ public class Compare2d_PA {
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
 
-		Integer lastK = BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)[0].getK();
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)) {
 			
@@ -95,20 +94,13 @@ public class Compare2d_PA {
 			
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 			
-			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+			String[] relPAStr = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 					sa,
 					false, false, privacyModel.getB(), 
 					privacyModel, null);
-			
-			String fStr = "";
-			if (!privacyModel.getK().equals(lastK)) fStr += "\n";
-			fStr += "%d\t%.5f\t%.5f\n";
-			lastK = privacyModel.getK();
-			
-			if (relPA == -Double.MAX_VALUE) relPA = -1d;
-			
-			System.out.format(new Locale("de", "de"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
-			fos       .format(new Locale("de", "de"), fStr, privacyModel.getK(), privacyModel.getDim2Val(), relPA);
+						
+			System.out.format(new Locale("de", "de"), "%d\t%.5f\t%s\n", privacyModel.getK(), privacyModel.getDim2Val(), relPAStr[0]);
+			fos       .format(new Locale("de", "de"), "%d\t%.5f\t%s\n", privacyModel.getK(), privacyModel.getDim2Val(), relPAStr[0]);
 		}
 		fos.close();
 	}

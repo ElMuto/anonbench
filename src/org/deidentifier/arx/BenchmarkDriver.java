@@ -510,7 +510,7 @@ public class BenchmarkDriver {
 		System.out.println(printString);
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
-			
+
 
 
 			BenchmarkCriterion[] criteria = null;
@@ -519,17 +519,17 @@ public class BenchmarkDriver {
 			} else {
 				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
 			}
-			
+
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
-				
-				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
-						sa,
-						false, includeInsensitiveAttributes, privacyModel.getB(), 
-						privacyModel, null);
-	
-				System.out.  format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
-				outputStream.format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
+
+			String maxPAStr[] = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+					sa,
+					false, includeInsensitiveAttributes, privacyModel.getB(), 
+					privacyModel, null);
+
+			System.out.  format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
+			outputStream.format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
 		}
 	}
 
@@ -545,7 +545,7 @@ public class BenchmarkDriver {
 	 * @return
 	 * @throws IOException
 	 */
-	public double calculateMaximalClassificationAccuracy(
+	public String[] calculateMaximalClassificationAccuracy(
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
 			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b,
@@ -631,7 +631,7 @@ public class BenchmarkDriver {
 		}
 
 		if (calcBaselineOnly) {
-			return -1d;
+			return null;
 		} else {
 //			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode != null ? optNode.getTransformation() : new int[] {}));
 
@@ -653,7 +653,12 @@ public class BenchmarkDriver {
     			fos.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, sep, numOfsuppressedRecords);
     		}
     		System.out.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, sep, numOfsuppressedRecords);
-			return optimalAccuracy;
+    		
+
+    		if (optimalAccuracy == -Double.MAX_VALUE) optimalAccuracy = 0d;
+    		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
+    		
+			return new String[] { optimalAccuracyStr };
 		}
 	}
 

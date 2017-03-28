@@ -93,17 +93,15 @@ public class Compare1d_PA {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
-			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+			String[] relPAStr = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 					sa,
 					false, false, privacyModel.getB(), 
 					privacyModel, fos);
 			
 			String sep = ";";
 			
-			if (relPA == -Double.MAX_VALUE) relPA = 0d;
-			
-			System.out.format(new Locale("de", "de"), "%s%.5f%s%.5f\n", sep, privacyModel.getDim2Val(), sep, relPA);
-			fos       .format(new Locale("de", "de"), "%s%.5f%s%.5f\n", sep, privacyModel.getDim2Val(), sep, relPA);
+			System.out.format(new Locale("de", "de"), "%s%.5f%s%s\n", sep, privacyModel.getDim2Val(), sep, relPAStr[0]);
+			fos       .format(new Locale("de", "de"), "%s%.5f%s%s\n", sep, privacyModel.getDim2Val(), sep, relPAStr[0]);
 		}
 		fos.close();
 	}

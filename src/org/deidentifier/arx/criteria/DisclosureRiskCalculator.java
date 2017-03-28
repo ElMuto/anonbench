@@ -74,11 +74,12 @@ public class DisclosureRiskCalculator {
 			String NO_VALUE_FOUND_STRING = "NaN";
 			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
 			String formattedMax = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", max));
-			return new String[] { formattedMin, String.format(new Locale ("DE", "de"), "%.3f", avg), formattedMax };
+			String formattedAvg= (min == Double.MAX_VALUE && max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", avg));
+			return new String[] { formattedMin, formattedAvg, formattedMax };
 		}
 
 		public String[] getHeader() {
-			return new String[] { name + "-" + min, name + "-" + avg, name + "-" + max };
+			return new String[] { name + "-min", name + "-avg", name + "-max" };
 		}
 
 	}
