@@ -131,9 +131,9 @@ public class BenchmarkSetup {
 		if ("t".equals(dim2Qualifier)) {
 			dim2Vals = dim2ValsForT;
 		} else if ("ld".equals(dim2Qualifier) || "lr".equals(dim2Qualifier) || "le".equals(dim2Qualifier)) {
-			if ("Marital status".equals(sa)) {
+			if ("Marital status".equals(sa) || "MARSTAT".equals(sa)) {
 				dim2Vals = dim2ValsForL_SaMarStat;
-			} else if ("Education".equals(sa)) {
+			} else if ("Education".equals(sa) || "EDUC".equals(sa) || "Highest level of school completed".equals(sa)) {
 				dim2Vals = dim2ValsForL_SaEduc;
 			} else {
 				throw new RuntimeException("This should not happen");
