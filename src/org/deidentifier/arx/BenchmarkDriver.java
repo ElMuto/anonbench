@@ -77,6 +77,7 @@ public class BenchmarkDriver {
 
     private final UtilityMeasure<Double> measure;
     private final UtilityMeasure<Double> measureSoriaComas;
+    private final UtilityMeasure<Double> measureNue;
     private final DataConverter converter;
     private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
     private final String[] header;
@@ -114,8 +115,9 @@ public class BenchmarkDriver {
 		default:
 			throw new RuntimeException("Invalid measure");
         }
-        
-        this.measureSoriaComas = new UtilityMeasureSoriaComas(inputArray);
+
+        this.measureSoriaComas	= new UtilityMeasureSoriaComas(inputArray);
+        this.measureNue 		= new UtilityMeasureNonUniformEntropy<Double>(header, inputArray);
 	}
 
 	/**
@@ -636,29 +638,42 @@ public class BenchmarkDriver {
 
 			String trafoStr = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
 			
+			String[][] outputArray = null;
+			String ilNueStr = "NaN";
+			String ilScStr  = "NaN";
     		DisclosureRiskCalculator.prepare();
-    		DataHandle out = null;
+    		DataHandle outHandle = null;
     		int numOfsuppressedRecords = -1;
     		if (optNode != null) {
-    			out = result.getOutput(optNode, false);
-        		numOfsuppressedRecords = out.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
+    			outHandle = result.getOutput(optNode, false);
+    			outputArray = this.converter.toArray(outHandle, dataset.getInputDataDef());
+        		numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
+        		Locale deLoc = new Locale ("DE", "de");
+        		ilNueStr = String.format(deLoc, "%.3f", this.measureNue       .evaluate(outputArray, optNode.getTransformation()).getUtility());
+        		ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(outputArray, optNode.getTransformation()).getUtility());
     		}
 			DisclosureRiskCalculator.done();
     		if (optNode != null) {
-    			out.release();
+    			outHandle.release();
     		}    		
 
     		if (optimalAccuracy == -Double.MAX_VALUE) optimalAccuracy = 0d;
     		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
+    		String[] ilMeasureValues = new String[] { ilNueStr, ilScStr };
+
+    		
     		String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
     		
-    		String[] ilMeasureValues = new String[] { };
-			return BenchmarkDriver.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.toArray());
+			return BenchmarkDriver.concat(
+					BenchmarkDriver.concat(
+							new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr },
+							ilMeasureValues),
+					DisclosureRiskCalculator.toArray());
 		}
 	}
 	
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return BenchmarkDriver.concat(new String[] { "RelPA", "trafo", "numSuppRecs" }, DisclosureRiskCalculator.getHeader());
+		return BenchmarkDriver.concat(new String[] { "RelPA", "trafo", "numSuppRecs", "IL-NUE", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
 	}
 
 	/**

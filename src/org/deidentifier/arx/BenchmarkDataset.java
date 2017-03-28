@@ -114,17 +114,6 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             } else {
             	this.maxSoriaComas = Double.NaN;
             }
-
-//            String inFormat =  "%13.2f";
-//            String outFormat = "%16.2f";
-//            System.out.println();
-//            System.out.println(datafile + " " + Arrays.toString(header) + ", SA=" + sensitiveAttribute);
-//            System.out.println("  AECS: min = " + String.format(inFormat, minAecs) + " / max = " + String.format(outFormat, maxAecs));
-//            System.out.println("  Disc: min = " + String.format(inFormat, minDisc) + " / max = " + String.format(outFormat, maxDisc));
-//            System.out.println("  Loss: min = " + String.format(inFormat, minLoss) + " / max = " + String.format(outFormat, maxLoss));
-//            System.out.println("  Entr: min = " + String.format(inFormat, minEntr) + " / max = " + String.format(outFormat, maxEntr));
-//            System.out.println("  Prec: min = " + String.format(inFormat, minPrec) + " / max = " + String.format(outFormat, maxPrec));
-//            System.out.println();
         }
 
 

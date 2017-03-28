@@ -130,10 +130,10 @@ public class BenchmarkSetup {
 
 //		Double [] dim2ValsForL_SaMarStat = { 1d, 2d, 3d, 4d, 5d };
 //		Double [] dim2ValsForL_SaEduc    = { 1d, 3d, 6d, 9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
-//		Double [] dim2ValsForL_SaMarStat = { 4d };
-//		Double [] dim2ValsForL_SaEduc    = { 20d };
-		Double [] dim2ValsForL_SaMarStat = { 5d };
-		Double [] dim2ValsForL_SaEduc    = { 30d };
+		Double [] dim2ValsForL_SaMarStat = { 4d };
+		Double [] dim2ValsForL_SaEduc    = { 20d };
+//		Double [] dim2ValsForL_SaMarStat = { 5d };
+//		Double [] dim2ValsForL_SaEduc    = { 30d };
 		
 		Double [] dim2ValsForT = { 1d, 0.8, 0.6, 0.4, 0.2, 0d };
 		Double [] dim2ValsForD = { 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
