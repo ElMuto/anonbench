@@ -635,7 +635,7 @@ public class BenchmarkDriver {
 		} else {
 //			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode != null ? optNode.getTransformation() : new int[] {}));
 
-			String trafoString = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
+			String trafoStr = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
 			
     		DisclosureRiskCalculator.prepare();
     		DataHandle out = null;
@@ -650,16 +650,21 @@ public class BenchmarkDriver {
     		}
     		String sep = ";";
     		if (fos != null) {
-    			fos.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, sep, numOfsuppressedRecords);
+    			fos.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoStr, sep, numOfsuppressedRecords);
     		}
-    		System.out.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, sep, numOfsuppressedRecords);
+    		System.out.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoStr, sep, numOfsuppressedRecords);
     		
 
     		if (optimalAccuracy == -Double.MAX_VALUE) optimalAccuracy = 0d;
     		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
+    		String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
     		
-			return new String[] { optimalAccuracyStr };
+			return DisclosureRiskCalculator.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.getHeader());
 		}
+	}
+	
+	public static String[] getDisclosureRiskHeader() {
+		return DisclosureRiskCalculator.concat(new String[] { "RelPA", "trafo", "numSuppRecs" }, DisclosureRiskCalculator.getHeader());
 	}
 
 	/**
