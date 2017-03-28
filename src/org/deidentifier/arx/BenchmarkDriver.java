@@ -529,12 +529,14 @@ public class BenchmarkDriver {
 	
 		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
+		
+		System.out.println(config.getPrivacyModels());
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
 		ARXNode optNode = null;
 		double relPA = -Double.MAX_VALUE;
-		double absPA = -Double.NaN;
+		double absPA = -Double.MAX_VALUE;
 
 		ARXLattice lattice = result.getLattice();
 		
@@ -550,56 +552,61 @@ public class BenchmarkDriver {
         String maxPAStr = "NaN";
         String gainStr = "NaN";
         
-		boolean aNodeHasBeenVisited = false;
+		boolean baselineValuesCaptured = false;
+		
+		int[] exampleTrafo = new int[] { 1, 1, 0 };
+		boolean onlyVisitExampleTrafo = false;
 		
         for (ARXNode[] level : lattice.getLevels()) {
 
         	for (ARXNode node : level) {
 
-        		// Make sure that every transformation is classified correctly
-        		if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-        			result.getOutput(node).release();
-        		}				
-        		if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-        			try {
+        		if (!onlyVisitExampleTrafo || Arrays.equals(exampleTrafo, node.getTransformation())) {
 
-        				handle = result.getOutput(node);
-        				List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-        				if (includeInsensitiveAttribute) {
-        					predictingAttrs.add(dataset.getInSensitiveAttribute());
+        			// Make sure that every transformation is classified correctly
+        			if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+        				result.getOutput(node).release();
+        			}				
+        			if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+        				try {
+
+        					handle = result.getOutput(node);
+        					List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+        					if (includeInsensitiveAttribute) {
+        						predictingAttrs.add(dataset.getInSensitiveAttribute());
+        					}
+        					StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+        							predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
+        							.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+
+        					if (!baselineValuesCaptured) {
+        						minPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getZeroRAccuracy());
+        						maxPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy());
+        						gainStr  = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+        					}        				
+        					baselineValuesCaptured = true;
+
+        					double epsilon = 0.05;
+        					double absAccuracy = stats.getAccuracy();
+        					double relAccuracy = (absAccuracy - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+        					if (!Double.isNaN(relAccuracy) && !Double.isInfinite(relAccuracy)) {
+        						if (relAccuracy > relPA) {
+        							optNode = node;
+        						}
+        						absPA = Math.max(absAccuracy, absPA);
+        						relPA = Math.max(relAccuracy, relPA);
+        						if (relPA < 0d && relPA > 0d - epsilon) relPA = 0d;
+        						if (relPA > 1d && relPA <= 1d + epsilon) relPA = 1d;
+        					}
+
+
+        					handle.release();
+
+        				} catch (ParseException e) {
+        					throw new RuntimeException(e);
         				}
-        				StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-        						predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
-        						.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
-
-        				if (!aNodeHasBeenVisited) {
-            				minPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getZeroRAccuracy());
-            				maxPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy());
-            				gainStr  = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-        				}
-        				    					
-    					double epsilon = 0.05;
-    					double absAccuracy = stats.getAccuracy();
-    					double relAccuracy = (absAccuracy - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-    					if (!Double.isNaN(relAccuracy) && !Double.isInfinite(relAccuracy)) {
-    						if (relAccuracy > relPA) {
-    							optNode = node;
-    						}
-    						absPA = Math.max(absAccuracy, absPA);
-    						relPA = Math.max(relAccuracy, relPA);
-    						if (relPA < 0d && relPA > 0d - epsilon) relPA = 0d;
-    						if (relPA > 1d && relPA <= 1d + epsilon) relPA = 1d;
-    					}
-
-
-        				handle.release();
-
-        			} catch (ParseException e) {
-        				throw new RuntimeException(e);
         			}
         		}
-        		
-        		aNodeHasBeenVisited = true;
         	}
         }
 
@@ -622,8 +629,8 @@ public class BenchmarkDriver {
         	Locale deLoc = new Locale ("DE", "de");
 
         	double ilNueAbs = measureNue.evaluate(outputArray, optNode.getTransformation()).getUtility();
-        	double ilNueRel =                                       (ilNueAbs - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY) /
-        			(dataset.getMaxInfoLoss(BenchmarkMeasure.ENTROPY) - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY)));
+        	double ilNueRel =                                       (ilNueAbs - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY)) /
+        			(dataset.getMaxInfoLoss(BenchmarkMeasure.ENTROPY) - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY));
 
         	ilNueStr = String.format(deLoc, "%.3f", ilNueRel);
 
@@ -639,6 +646,7 @@ public class BenchmarkDriver {
         }    		
 
         if (relPA == -Double.MAX_VALUE) relPA = Double.NaN;
+        if (absPA == -Double.MAX_VALUE) absPA = Double.NaN;
         String absPAStr = String.format(new Locale("DE", "de"), "%.3f", absPA);
         String relPAStr = String.format(new Locale("DE", "de"), "%.3f", relPA);
         String[] ilMeasureValues = new String[] { ilNueStr, ilScStr };
@@ -654,7 +662,7 @@ public class BenchmarkDriver {
 	}
 
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "trafo", "numSuppRecs", "IL-NUE", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
+		return BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
 	}
 
 	/**

@@ -49,7 +49,8 @@ public class Compare1d_PA {
 		BenchmarkDatafile datafile = null;
 		String dataFileName = args[0];
 		if ("ACS13".equals(dataFileName)) {
-			datafile = BenchmarkDatafile.ACS13_NUM;
+			datafile = BenchmarkDatafile.ACS13;
+//			datafile = BenchmarkDatafile.ACS13_NUM;
 		} else if ("ATUS".equals(dataFileName)) {
 			datafile = BenchmarkDatafile.ATUS_NUM;
 		} else if ("IHIS".equals(dataFileName)) {
@@ -81,8 +82,7 @@ public class Compare1d_PA {
 		System.out.println("Name of output file is " + outFileName);
 		
 
-		System.out.println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
-		fos       .println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
+		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)) {
@@ -111,8 +111,7 @@ public class Compare1d_PA {
 					
 			
 			
-			fos.       println(BenchmarkDriver.toCsvString(finalResultArray, ";"));
-			System.out.println(BenchmarkDriver.toCsvString(finalResultArray, ";"));
+			fos.println(BenchmarkDriver.toCsvString(finalResultArray, ";"));
 		}
 		fos.close();
 	}
