@@ -481,7 +481,7 @@ public class BenchmarkDriver {
 		driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 				sa,
 				true, includeInsensitiveAttributes, 3d, 
-				null, null);
+				null);
 	}
 
 	/**
@@ -526,7 +526,7 @@ public class BenchmarkDriver {
 			String maxPAStr[] = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 					sa,
 					false, includeInsensitiveAttributes, privacyModel.getB(), 
-					privacyModel, null);
+					privacyModel);
 
 			System.out.  format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
 			outputStream.format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
@@ -541,7 +541,6 @@ public class BenchmarkDriver {
 	 * @param includeInsensitiveAttribute TODO
 	 * @param b TODO
 	 * @param privacyModel TODO
-	 * @param fos TODO
 	 * @return
 	 * @throws IOException
 	 */
@@ -549,7 +548,7 @@ public class BenchmarkDriver {
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
 			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b,
-			PrivacyModel privacyModel, PrintStream fos
+			PrivacyModel privacyModel
 			) throws IOException {
 	
 		boolean firstNodeVisited = false;

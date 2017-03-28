@@ -97,7 +97,7 @@ public class Compare2d_PA {
 			String[] relPAStr = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
 					sa,
 					false, false, privacyModel.getB(), 
-					privacyModel, null);
+					privacyModel);
 						
 			System.out.format(new Locale("de", "de"), "%d\t%.5f\t%s\n", privacyModel.getK(), privacyModel.getDim2Val(), relPAStr[0]);
 			fos       .format(new Locale("de", "de"), "%d\t%.5f\t%s\n", privacyModel.getK(), privacyModel.getDim2Val(), relPAStr[0]);
