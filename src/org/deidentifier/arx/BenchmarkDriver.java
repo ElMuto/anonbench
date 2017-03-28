@@ -27,6 +27,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -42,11 +43,9 @@ import org.deidentifier.arx.aggregates.StatisticsClassification;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.criteria.DDisclosurePrivacy;
-import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
-import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
@@ -271,7 +270,6 @@ public class BenchmarkDriver {
         // Benchmark
         
         BenchmarkCriterion bc = dataset.getCriteria()[dataset.getCriteria().length - 1];
-//        String bar = assemblePrivacyModelString(foo, k, c, l, t, suppFactor, d);
         String bcName = assemblePrivacyModelString(bc, k, c, l, t, suppFactor, d, b);
         BenchmarkSetup.BENCHMARK.addRun(bcName,
         								measure.toString(),
@@ -324,7 +322,7 @@ public class BenchmarkDriver {
         		//System.out.println(result.getConfiguration().getMaxOutliers());
         		//System.out.println(Arrays.toString(result.getGlobalOptimum().getTransformation()));
         		DisclosureRiskCalculator.prepare();
-        		DataHandle _out = result.getOutput(false);     
+        		result.getOutput(false);     
         		//System.out.println(_out.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples());
         		DisclosureRiskCalculator.done();
         		DisclosureRiskCalculator.println();
@@ -649,12 +647,12 @@ public class BenchmarkDriver {
     		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
     		String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
     		
-			return DisclosureRiskCalculator.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.toArray());
+			return BenchmarkDriver.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.toArray());
 		}
 	}
 	
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return DisclosureRiskCalculator.concat(new String[] { "RelPA", "trafo", "numSuppRecs" }, DisclosureRiskCalculator.getHeader());
+		return BenchmarkDriver.concat(new String[] { "RelPA", "trafo", "numSuppRecs" }, DisclosureRiskCalculator.getHeader());
 	}
 
 	/**
@@ -799,7 +797,14 @@ public class BenchmarkDriver {
 		return formatter;
 	}
     
-    public static String toCsvString(String[] stringArr, String sep) {
+    public static String[] concat(String[] first, String[] second) {
+	    List<String> both = new ArrayList<String>(first.length + second.length);
+	    Collections.addAll(both, first);
+	    Collections.addAll(both, second);
+	    return both.toArray(new String[both.size()]);
+	}
+
+	public static String toCsvString(String[] stringArr, String sep) {
     	
     	String ret = "";
     	

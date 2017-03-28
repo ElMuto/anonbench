@@ -22,13 +22,11 @@ package org.deidentifier.arx.execution;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -103,7 +101,7 @@ public class Compare1d_PA {
 					false, false, privacyModel.getB(), 
 					privacyModel);
 			
-			String[] finalResultArray = DisclosureRiskCalculator.concat(
+			String[] finalResultArray = BenchmarkDriver.concat(
 					new String[] {
 							datafile.name(),
 							sa,
@@ -121,6 +119,6 @@ public class Compare1d_PA {
 	}
 
 	public static String[] getCsvHeader() {
-		return DisclosureRiskCalculator.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
+		return BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
 	}
 }

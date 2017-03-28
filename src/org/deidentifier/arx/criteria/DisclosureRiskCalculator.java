@@ -1,11 +1,8 @@
 package org.deidentifier.arx.criteria;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
-import org.bouncycastle.util.Arrays;
+import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.framework.check.groupify.HashGroupifyEntry;
 
 public class DisclosureRiskCalculator {
@@ -218,12 +215,12 @@ public class DisclosureRiskCalculator {
 	}
 	
 	public static String[] toArray() {
-		return concat(concat(concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
+		return BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
 	}
 	
 	public static String[] getHeader() {
 		DisclosureRiskCalculator.prepare();
-		return concat(concat(concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
+		return BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
 	}
 
 	public static void println() {
@@ -231,12 +228,5 @@ public class DisclosureRiskCalculator {
 		t.println();
 		delta.println();
 		beta.println();
-	}
-	
-	public static String[] concat(String[] first, String[] second) {
-	    List<String> both = new ArrayList<String>(first.length + second.length);
-	    Collections.addAll(both, first);
-	    Collections.addAll(both, second);
-	    return both.toArray(new String[both.size()]);
 	}
 }
