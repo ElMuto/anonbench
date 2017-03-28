@@ -117,26 +117,13 @@ public class BenchmarkSetup {
 	
     public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa) {
     	
-//    	// 1d
-//		Integer[] dim1Vals =     { 100, 5 };
-//		Double [] dim2ValsForL = { 1d, 3d, 6d, 9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
-//		Double [] dim2ValsForT = { 1d, 0.8, 0.6, 0.4, 0.2, 0d };
-//		Double [] dim2ValsForD = { 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
-//		Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
-		
+    	Integer[] dim1Vals =     { 5 };
 
-    	// 2d
-		Integer[] dim1Vals =     { 5 };
-
-//		Double [] dim2ValsForL_SaMarStat = { 1d, 2d, 3d, 4d, 5d };
-//		Double [] dim2ValsForL_SaEduc    = { 1d, 3d, 6d, 9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
-		Double [] dim2ValsForL_SaMarStat = { 4d };
-		Double [] dim2ValsForL_SaEduc    = { 20d };
-//		Double [] dim2ValsForL_SaMarStat = { 5d };
-//		Double [] dim2ValsForL_SaEduc    = { 30d };
+		Double [] dim2ValsForL_SaMarStat = { 3d, 1d, 2d, 4d, 5d };
+		Double [] dim2ValsForL_SaEduc    = { 3d, 1d, 6d, 9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
 		
-		Double [] dim2ValsForT = { 1d, 0.8, 0.6, 0.4, 0.2, 0d };
-		Double [] dim2ValsForD = { 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
+		Double [] dim2ValsForT = { 0.2, 1d, 0.8, 0.6, 0.4, 0d };
+		Double [] dim2ValsForD = { 1d, 6d, 5d, 4d, 3d, 2d, 0.001 };
 		Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
 		
 		Double[] dim2Vals = null;

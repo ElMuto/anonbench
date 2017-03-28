@@ -230,7 +230,7 @@ public class BenchmarkDriver {
 					                l,  c,  t,
 					                d,  b,  dMin,
 					                dMax,  sa,
-					                ssNum, new Double[] { null }, resultsFileName, calcBeta, privacyModel);
+					                ssNum, new Double[] { null }, resultsFileName, privacyModel);
     }
 
 
@@ -251,7 +251,6 @@ public class BenchmarkDriver {
      * @param ssNum
      * @param accuracies
      * @param resultsFileName
-     * @param calcBeta TODO
      * @param privacyModel TODO
      * @throws IOException
      */
@@ -261,7 +260,7 @@ public class BenchmarkDriver {
                                  boolean subsetBased, Integer k,
                                  Integer l, Double c, Double t,
                                  Double d, Double b, Double dMin,
-                                 Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName, boolean calcBeta, PrivacyModel privacyModel
+                                 Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName, PrivacyModel privacyModel
             ) throws IOException {
 
         ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, sa, privacyModel, dataset.getCriteria());
@@ -304,7 +303,7 @@ public class BenchmarkDriver {
         AttributeStatistics attrStats = null;
         DataHandle handle = dataset.getHandle();
         if (sa != null) attrStats = analyzeAttribute(dataset, handle, sa, 0);
-        
+
 
 
         Double il_arx = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
@@ -314,31 +313,16 @@ public class BenchmarkDriver {
 
         if (result.getGlobalOptimum() != null) {
 
-        	if (!calcBeta) {
+        	ARXNode arxOptimum = result.getGlobalOptimum();
 
-        		ARXNode arxOptimum = result.getGlobalOptimum();
+        	il_arx = Double.valueOf(arxOptimum.getLowestScore().toString());
 
-        		il_arx = Double.valueOf(arxOptimum.getLowestScore().toString());
+        	String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
+        	result.getOutput(arxOptimum).release();
+        	il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+        	il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
 
-        		String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
-        		result.getOutput(arxOptimum).release();
-        		il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
-        		il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
-
-        		il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
-        	} else {
-        		
-        		//System.out.println(result.getConfiguration().getPrivacyModels());
-        		//System.out.println(result.getConfiguration().getMaxOutliers());
-        		//System.out.println(Arrays.toString(result.getGlobalOptimum().getTransformation()));
-        		DisclosureRiskCalculator.prepare();
-        		result.getOutput(false);     
-        		//System.out.println(_out.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples());
-        		DisclosureRiskCalculator.done();
-        		DisclosureRiskCalculator.println();
-        		handle.release();
-        		
-        	}            
+        	il_sc = this.measureSoriaComas.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
         } else {
         	il_sc = il_rel = il_arx = il_abs_from_utility = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
