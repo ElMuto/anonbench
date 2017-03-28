@@ -484,7 +484,7 @@ public class BenchmarkDriver {
 		System.out.println(printString);
 		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
-		driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+		driver.calculateRelPA(0.05, dataset,
 				sa,
 				true, includeInsensitiveAttributes, null);
 	}
@@ -528,7 +528,7 @@ public class BenchmarkDriver {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
 
-			String maxPAStr[] = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+			String maxPAStr[] = driver.calculateRelPA(0.05, dataset,
 					sa,
 					false, includeInsensitiveAttributes, privacyModel);
 
@@ -548,7 +548,7 @@ public class BenchmarkDriver {
 	 * @return
 	 * @throws IOException
 	 */
-	public String[] calculateMaximalClassificationAccuracy(
+	public String[] calculateRelPA(
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
 			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, PrivacyModel privacyModel

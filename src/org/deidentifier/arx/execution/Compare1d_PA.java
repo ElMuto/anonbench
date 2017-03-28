@@ -96,7 +96,7 @@ public class Compare1d_PA {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
-			String[] relPAStr = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
+			String[] relPAStr = driver.calculateRelPA(0.05, dataset,
 					sa,
 					false, false, privacyModel);
 			
