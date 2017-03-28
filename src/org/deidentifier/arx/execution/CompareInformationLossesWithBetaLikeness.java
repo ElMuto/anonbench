@@ -56,7 +56,7 @@ public class CompareInformationLossesWithBetaLikeness {
 		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY}) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafilesSoriaComas()) {
+			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
 				// for each sensitive attribute candidate
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {

@@ -493,18 +493,6 @@ public class BenchmarkDriver {
 
 	/**
 	 * @param datafile
-	 * @param sa
-	 * @param outputStream
-	 * @param includeInsensitiveAttributes
-	 * @throws IOException
-	 */
-	public static void compareRelPAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream, boolean includeInsensitiveAttributes)
-			throws IOException {
-		BenchmarkDriver.compareRelPAs(datafile, BenchmarkMeasure.ENTROPY, sa, outputStream, includeInsensitiveAttributes);
-	}
-
-	/**
-	 * @param datafile
 	 * @param bmMeasure
 	 * @param sa
 	 * @param outputStream

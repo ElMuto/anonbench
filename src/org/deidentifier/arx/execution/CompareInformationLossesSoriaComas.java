@@ -57,7 +57,7 @@ public class CompareInformationLossesSoriaComas {
 		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.SORIA_COMAS}) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafilesSoriaComas()) {
+			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
 				// for each sensitive attribute candidate
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {

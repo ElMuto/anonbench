@@ -290,21 +290,9 @@ public class BenchmarkSetup {
      */
     public static BenchmarkDatafile[] getDatafiles() {
         return new BenchmarkDatafile[] {
-         BenchmarkDatafile.ACS13,
-         BenchmarkDatafile.ATUS,
-         BenchmarkDatafile.IHIS,
-                                        };
-    }
-
-    /**
-     * Returns all datasets
-     * @return
-     */
-    public static BenchmarkDatafile[] getDatafilesSoriaComas() {
-        return new BenchmarkDatafile[] {
-//              BenchmarkDatafile.ACS13_NUM,
-//                BenchmarkDatafile.ATUS_NUM,
-                BenchmarkDatafile.IHIS_NUM,
+              BenchmarkDatafile.ACS13_NUM,
+              BenchmarkDatafile.ATUS_NUM,
+              BenchmarkDatafile.IHIS_NUM,
                                         };
     }
     

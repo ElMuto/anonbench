@@ -56,7 +56,7 @@ public class CompareInformationLosses {
 		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY, BenchmarkMeasure.LOSS}) {
 
 			// For each dataset
-			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafilesSoriaComas()) {
+			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
 
 				// for each sensitive attribute candidate
 				for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
