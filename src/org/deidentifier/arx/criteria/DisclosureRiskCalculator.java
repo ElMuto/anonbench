@@ -222,6 +222,7 @@ public class DisclosureRiskCalculator {
 	}
 	
 	public static String[] getHeader() {
+		DisclosureRiskCalculator.prepare();
 		return concat(concat(concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
 	}
 

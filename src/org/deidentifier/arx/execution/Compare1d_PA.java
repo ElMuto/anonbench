@@ -28,6 +28,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -80,6 +81,10 @@ public class Compare1d_PA {
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
+		
+
+		System.out.println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
+		fos       .println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)) {
@@ -98,12 +103,24 @@ public class Compare1d_PA {
 					false, false, privacyModel.getB(), 
 					privacyModel, fos);
 			
-			String sep = ";";
+			String[] finalResultArray = DisclosureRiskCalculator.concat(
+					new String[] {
+							datafile.name(),
+							sa,
+							privacyModel.getCriterion().toString(),
+							String.valueOf(privacyModel.getDim2Val())
+					},
+					relPAStr);
+					
 			
-			System.out.format(new Locale("de", "de"), "%s%.5f%s%s\n", sep, privacyModel.getDim2Val(), sep, relPAStr[0]);
-			fos       .format(new Locale("de", "de"), "%s%.5f%s%s\n", sep, privacyModel.getDim2Val(), sep, relPAStr[0]);
+			
+			fos.       println(BenchmarkDriver.toCsvString(finalResultArray, ";"));
+			System.out.println(BenchmarkDriver.toCsvString(finalResultArray, ";"));
 		}
 		fos.close();
 	}
 
+	public static String[] getCsvHeader() {
+		return DisclosureRiskCalculator.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
+	}
 }

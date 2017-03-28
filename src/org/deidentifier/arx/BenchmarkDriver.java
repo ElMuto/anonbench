@@ -558,8 +558,6 @@ public class BenchmarkDriver {
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
-		System.out.println("Using following criteria: " + config.getPrivacyModels());
-		
 		ARXNode optNode = null;
 		double optimalAccuracy = -Double.MAX_VALUE;
 
@@ -633,7 +631,6 @@ public class BenchmarkDriver {
 		if (calcBaselineOnly) {
 			return null;
 		} else {
-//			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode != null ? optNode.getTransformation() : new int[] {}));
 
 			String trafoStr = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
 			
@@ -647,23 +644,17 @@ public class BenchmarkDriver {
 			DisclosureRiskCalculator.done();
     		if (optNode != null) {
     			out.release();
-    		}
-    		String sep = ";";
-    		if (fos != null) {
-    			fos.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoStr, sep, numOfsuppressedRecords);
-    		}
-    		System.out.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoStr, sep, numOfsuppressedRecords);
-    		
+    		}    		
 
     		if (optimalAccuracy == -Double.MAX_VALUE) optimalAccuracy = 0d;
     		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
     		String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
     		
-			return DisclosureRiskCalculator.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.getHeader());
+			return DisclosureRiskCalculator.concat(new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr }, DisclosureRiskCalculator.toArray());
 		}
 	}
 	
-	public static String[] getDisclosureRiskHeader() {
+	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
 		return DisclosureRiskCalculator.concat(new String[] { "RelPA", "trafo", "numSuppRecs" }, DisclosureRiskCalculator.getHeader());
 	}
 
@@ -809,5 +800,16 @@ public class BenchmarkDriver {
 		return formatter;
 	}
     
-    
+    public static String toCsvString(String[] stringArr, String sep) {
+    	
+    	String ret = "";
+    	
+    	for (int i = 0; i < stringArr.length - 1; i++) {
+    		ret += stringArr[i] + sep;
+    	}
+    	
+    	ret += stringArr[stringArr.length - 1];
+    	
+    	return ret;
+    }
 }
