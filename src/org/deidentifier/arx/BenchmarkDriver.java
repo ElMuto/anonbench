@@ -116,25 +116,15 @@ public class BenchmarkDriver {
      * @param dataset
 	 * @param suppFactor
 	 * @param metric
-	 * @param k
-	 * @param l
-	 * @param c
-	 * @param t
-	 * @param d TODO
-	 * @param b TODO
-	 * @param dMin
-	 * @param dMax
 	 * @param sa
+	 * @param privacyModel TODO
 	 * @param criteria
 	 * @param customQiCount TODO
 	 * @return
      * @throws IOException
      */
     private static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
-                                                     Integer k, Integer l, Double c,
-                                                     Double t, Double d, Double b,
-                                                     Double dMin, Double dMax,
-                                                     String sa, Integer ssNum, BenchmarkCriterion... criteria) throws IOException {
+                                                     String sa, PrivacyModel privacyModel, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
 
@@ -166,35 +156,29 @@ public class BenchmarkDriver {
 
         for (BenchmarkCriterion crit : criteria) {
             switch (crit) {
-            case D_PRESENCE:
-                config.addPrivacyModel(new DPresence(dMin, dMax, dataset.getResearchSubset(ssNum)));
-                break;
-            case INCLUSION:
-                config.addPrivacyModel(new Inclusion(dataset.getResearchSubset(ssNum)));
-                break;
             case K_ANONYMITY:
-            	if (k > 1) config.addPrivacyModel(new KAnonymity(k));
+            	if (privacyModel.getK() > 1) config.addPrivacyModel(new KAnonymity(privacyModel.getK()));
                 break;
             case L_DIVERSITY_DISTINCT:
-                config.addPrivacyModel(new DistinctLDiversity(sa, l));
+                config.addPrivacyModel(new DistinctLDiversity(sa, privacyModel.getL()));
                 break;
             case L_DIVERSITY_ENTROPY:
-                config.addPrivacyModel(new org.deidentifier.arx.criteria.EntropyLDiversity(sa, l));
+                config.addPrivacyModel(new org.deidentifier.arx.criteria.EntropyLDiversity(sa, privacyModel.getL()));
                 break;
             case L_DIVERSITY_RECURSIVE:
-                config.addPrivacyModel(new RecursiveCLDiversity(sa, c, l));
+                config.addPrivacyModel(new RecursiveCLDiversity(sa, privacyModel.getC(), privacyModel.getL()));
                 break;
             case T_CLOSENESS_HD:
-                config.addPrivacyModel(new HierarchicalDistanceTCloseness(sa, t, dataset.loadHierarchy(sa)));
+                config.addPrivacyModel(new HierarchicalDistanceTCloseness(sa, privacyModel.getT(), dataset.loadHierarchy(sa)));
                 break;
             case T_CLOSENESS_ED:
-                config.addPrivacyModel(new EqualDistanceTCloseness(sa, t));
+                config.addPrivacyModel(new EqualDistanceTCloseness(sa, privacyModel.getT()));
                 break;
             case D_DISCLOSURE_PRIVACY:
-                config.addPrivacyModel(new DDisclosurePrivacy(sa, d));
+                config.addPrivacyModel(new DDisclosurePrivacy(sa, privacyModel.getD()));
                 break;
             case BASIC_BETA_LIKENESS:
-                config.addPrivacyModel(new BasicBLikeness(sa, b));
+                config.addPrivacyModel(new BasicBLikeness(sa, privacyModel.getB()));
                 break;
             default:
                 throw new RuntimeException("Invalid criterion");
@@ -271,7 +255,7 @@ public class BenchmarkDriver {
                                  Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName, boolean calcBeta, PrivacyModel privacyModel
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
+        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, sa, privacyModel, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 //        anonymizer.setMaxTransformations(210000);
         
@@ -495,10 +479,9 @@ public class BenchmarkDriver {
 		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 		driver.calculateMaximalClassificationAccuracy(0.05, dataset,
-				5,
-				1, 4d, 1d, 
-				1d, null, null,
-				sa, null, true, includeInsensitiveAttributes, 3d, null, null);
+				sa,
+				true, includeInsensitiveAttributes, 3d, 
+				null, null);
 	}
 
 	/**
@@ -541,10 +524,9 @@ public class BenchmarkDriver {
 			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
 				
 				double maxPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
-						privacyModel.getK(),
-						privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-						privacyModel.getD(), null, null,
-						sa, null, false, includeInsensitiveAttributes, privacyModel.getB(), privacyModel, null);
+						sa,
+						false, includeInsensitiveAttributes, privacyModel.getB(), 
+						privacyModel, null);
 	
 				System.out.  format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
 				outputStream.format(new Locale("de", "DE"), "%s;%.5f%n", privacyModel.toString(), maxPA);
@@ -554,15 +536,7 @@ public class BenchmarkDriver {
 	/**
 	 * @param suppFactor
 	 * @param dataset
-	 * @param k
-	 * @param l
-	 * @param c
-	 * @param t
-	 * @param d
-	 * @param dMin
-	 * @param dMax
 	 * @param sa
-	 * @param ssNum
 	 * @param calcBaselineOnly TODO
 	 * @param includeInsensitiveAttribute TODO
 	 * @param b TODO
@@ -573,14 +547,13 @@ public class BenchmarkDriver {
 	 */
 	public double calculateMaximalClassificationAccuracy(
 			double suppFactor, BenchmarkDataset dataset,
-			Integer k,
-			Integer l, Double c, Double t,
-			Double d, Double dMin, Double dMax,
-			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b, PrivacyModel privacyModel, PrintStream fos
+			String sa,
+			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b,
+			PrivacyModel privacyModel, PrintStream fos
 			) throws IOException {
 	
 		boolean firstNodeVisited = false;
-		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
+		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);

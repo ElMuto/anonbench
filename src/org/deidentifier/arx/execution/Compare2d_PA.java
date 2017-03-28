@@ -96,10 +96,9 @@ public class Compare2d_PA {
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 			
 			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
-					privacyModel.getK(),
-					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-					privacyModel.getD(), null, null,
-					sa, null, false, false, privacyModel.getB(), privacyModel, null);
+					sa,
+					false, false, privacyModel.getB(), 
+					privacyModel, null);
 			
 			String fStr = "";
 			if (!privacyModel.getK().equals(lastK)) fStr += "\n";

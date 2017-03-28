@@ -94,10 +94,9 @@ public class Compare1d_PA {
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
 			double relPA = driver.calculateMaximalClassificationAccuracy(0.05, dataset,
-					privacyModel.getK(),
-					privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
-					privacyModel.getD(), null, null,
-					sa, null, false, false, privacyModel.getB(), privacyModel, fos);
+					sa,
+					false, false, privacyModel.getB(), 
+					privacyModel, fos);
 			
 			String sep = ";";
 			
