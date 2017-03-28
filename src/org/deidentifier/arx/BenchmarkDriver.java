@@ -677,9 +677,9 @@ public class BenchmarkDriver {
     		}
     		String sep = ";";
     		if (fos != null) {
-    			fos.format("%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, numOfsuppressedRecords);
+    			fos.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, sep, numOfsuppressedRecords);
     		}
-    		System.out.format("%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, numOfsuppressedRecords);
+    		System.out.format("%s%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, sep, numOfsuppressedRecords);
 			return optimalAccuracy;
 		}
 	}
