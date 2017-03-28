@@ -567,7 +567,7 @@ public class BenchmarkDriver {
 	 * @param includeInsensitiveAttribute TODO
 	 * @param b TODO
 	 * @param privacyModel TODO
-	 * @param _fos TODO
+	 * @param fos TODO
 	 * @return
 	 * @throws IOException
 	 */
@@ -576,10 +576,9 @@ public class BenchmarkDriver {
 			Integer k,
 			Integer l, Double c, Double t,
 			Double d, Double dMin, Double dMax,
-			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b, PrivacyModel privacyModel, PrintStream _fos
+			String sa, Integer ssNum, boolean calcBaselineOnly, boolean includeInsensitiveAttribute, Double b, PrivacyModel privacyModel, PrintStream fos
 			) throws IOException {
 	
-		boolean DEBUG = false;
 		boolean firstNodeVisited = false;
 		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, k, l, c, t, d, b, dMin, dMax, sa, ssNum, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
@@ -604,24 +603,6 @@ public class BenchmarkDriver {
 		for (ARXNode[] level : lattice.getLevels()) {
 
 			for (ARXNode node : level) {
-
-
-				if (DEBUG) {
-					String filename = "results/output-k" + k + ".csv";
-					// Materialize
-					DataHandle outputHandle = result.getOutput();
-					String[][] output = converter.toArray(outputHandle, outputHandle.getDefinition(), outputHandle.getView());
-
-					PrintStream fos = new PrintStream(filename);
-
-					for (String[] line : output) {
-						//							System.out.format("%s;%s;%s\n", line[0], line[1], line[2]);
-						fos.format("%s;%s;%s\n", line[0], line[1], line[2]);
-					}
-					outputHandle.release();
-
-					fos.close();
-				}
 
 				// if we only want to to calculate the baseline, it is
 				// sufficient to just take the first node and exit before
@@ -681,20 +662,24 @@ public class BenchmarkDriver {
 		} else {
 //			System.out.println("Transformation with best RelCA is " + Arrays.toString(optNode != null ? optNode.getTransformation() : new int[] {}));
 
+			String trafoString = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
+			
     		DisclosureRiskCalculator.prepare();
     		DataHandle out = null;
+    		int numOfsuppressedRecords = -1;
     		if (optNode != null) {
     			out = result.getOutput(optNode, false);
+        		numOfsuppressedRecords = out.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
     		}
 			DisclosureRiskCalculator.done();
     		if (optNode != null) {
     			out.release();
     		}
     		String sep = ";";
-    		if (_fos != null) {
-    			_fos.format("%s", DisclosureRiskCalculator.toCsv(sep));
+    		if (fos != null) {
+    			fos.format("%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, numOfsuppressedRecords);
     		}
-    		System.out.format("%s", DisclosureRiskCalculator.toCsv(sep));
+    		System.out.format("%s%s%s%s", DisclosureRiskCalculator.toCsv(sep), sep, trafoString, numOfsuppressedRecords);
 			return optimalAccuracy;
 		}
 	}
