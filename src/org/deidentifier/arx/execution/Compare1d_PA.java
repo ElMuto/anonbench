@@ -69,12 +69,12 @@ public class Compare1d_PA {
 		if (!validInput) throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
 
 		for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
-			compareRelPAsTK(datafile, sa, dim2Qual);
+			compareParameterValues(datafile, sa, dim2Qual);
 		}
 		System.out.println("done.");
 	}
 
-	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
+	public static void compareParameterValues(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
 
 		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".csv";
 
