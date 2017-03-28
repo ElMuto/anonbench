@@ -472,7 +472,7 @@ public class BenchmarkDriver {
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 		driver.calculateRelPA(0.05, dataset,
 				sa,
-				true, includeInsensitiveAttributes, null);
+				includeInsensitiveAttributes, null);
 	}
 
 	/**
@@ -504,7 +504,7 @@ public class BenchmarkDriver {
 
 			String maxPAStr[] = driver.calculateRelPA(0.05, dataset,
 					sa,
-					false, includeInsensitiveAttributes, privacyModel);
+					includeInsensitiveAttributes, privacyModel);
 
 			System.out.  format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
 			outputStream.format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
@@ -516,7 +516,6 @@ public class BenchmarkDriver {
 	 * @param suppFactor
 	 * @param dataset
 	 * @param sa
-	 * @param calcBaselineOnly
 	 * @param includeInsensitiveAttribute
 	 * @param privacyModel
 	 * @return
@@ -525,17 +524,17 @@ public class BenchmarkDriver {
 	public String[] calculateRelPA(
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
-			boolean calcBaselineOnly, boolean includeInsensitiveAttribute, PrivacyModel privacyModel
+			boolean includeInsensitiveAttribute, PrivacyModel privacyModel
 			) throws IOException {
 	
-		boolean firstNodeVisited = false;
 		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel, dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
 		ARXNode optNode = null;
-		double optimalAccuracy = -Double.MAX_VALUE;
+		double relPA = -Double.MAX_VALUE;
+		double absPA = -Double.NaN;
 
 		ARXLattice lattice = result.getLattice();
 		
@@ -547,105 +546,115 @@ public class BenchmarkDriver {
         }
 
         DataHandle handle = null;
-		for (ARXNode[] level : lattice.getLevels()) {
+        String minPAStr = "NaN";
+        String maxPAStr = "NaN";
+        String gainStr = "NaN";
+        
+		boolean aNodeHasBeenVisited = false;
+		
+        for (ARXNode[] level : lattice.getLevels()) {
 
-			for (ARXNode node : level) {
+        	for (ARXNode node : level) {
 
-				// if we only want to to calculate the baseline, it is
-				// sufficient to just take the first node and exit before
-				// the 2nd iteration
-				if (!calcBaselineOnly || !firstNodeVisited) {
-					firstNodeVisited = true;
-					
+        		// Make sure that every transformation is classified correctly
+        		if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+        			result.getOutput(node).release();
+        		}				
+        		if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+        			try {
+
+        				handle = result.getOutput(node);
+        				List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
+        				if (includeInsensitiveAttribute) {
+        					predictingAttrs.add(dataset.getInSensitiveAttribute());
+        				}
+        				StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
+        						predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
+        						.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+
+        				if (!aNodeHasBeenVisited) {
+            				minPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getZeroRAccuracy());
+            				maxPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy());
+            				gainStr  = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+        				}
+        				    					
+    					double epsilon = 0.05;
+    					double absAccuracy = stats.getAccuracy();
+    					double relAccuracy = (absAccuracy - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+    					if (!Double.isNaN(relAccuracy) && !Double.isInfinite(relAccuracy)) {
+    						if (relAccuracy > relPA) {
+    							optNode = node;
+    						}
+    						absPA = Math.max(absAccuracy, absPA);
+    						relPA = Math.max(relAccuracy, relPA);
+    						if (relPA < 0d && relPA > 0d - epsilon) relPA = 0d;
+    						if (relPA > 1d && relPA <= 1d + epsilon) relPA = 1d;
+    					}
 
 
-					// Make sure that every transformation is classified correctly
-					if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-						result.getOutput(node).release();
-					}				
-					if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-						try {
+        				handle.release();
 
+        			} catch (ParseException e) {
+        				throw new RuntimeException(e);
+        			}
+        		}
+        		
+        		aNodeHasBeenVisited = true;
+        	}
+        }
 
-							handle = result.getOutput(node);
-							List<String> predictingAttrs = new ArrayList<String>(handle.getDefinition().getQuasiIdentifyingAttributes());
-							if (includeInsensitiveAttribute) {
-								predictingAttrs.add(dataset.getInSensitiveAttribute());
-							}
-							StatisticsClassification stats = handle.getStatistics().getClassificationPerformance(
-									predictingAttrs.toArray(new String[predictingAttrs.size()]), sa, ARXLogisticRegressionConfiguration.create()
-									.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
+        String trafoStr = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
 
-							if (!calcBaselineOnly) {
-								double epsilon = 0.05;
-								double accuracy = (stats.getAccuracy() - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-								if (!Double.isNaN(accuracy) && !Double.isInfinite(accuracy)) {
-									if (accuracy > optimalAccuracy) optNode = node;
-									optimalAccuracy = Math.max(accuracy, optimalAccuracy);
-									if (optimalAccuracy < 0d && optimalAccuracy > 0d - epsilon) optimalAccuracy = 0d;
-									if (optimalAccuracy > 1d && optimalAccuracy <= 1d + epsilon) optimalAccuracy = 1d;
-								}
-							}
-							else {
-								System.out.format(new Locale("de", "DE"), "\tstats.getZeroRAccuracy()    = %.2f\t", stats.getZeroRAccuracy() * 100d);
-								System.out.format(new Locale("de", "DE"), "\tstats.getOriginalAccuracy() = %.2f\tGain = %.2f\n",
-										stats.getOriginalAccuracy() * 100d,
-										(stats.getOriginalAccuracy() - stats.getZeroRAccuracy()) * 100d);
-							}
-							
+        boolean isNumericDatafile =	BenchmarkDatafile.ACS13_NUM.equals(dataset.getDatafile()) ||
+        		BenchmarkDatafile.ATUS_NUM.equals(dataset.getDatafile()) ||
+        		BenchmarkDatafile.IHIS_NUM.equals(dataset.getDatafile());
 
-				    		handle.release();
+        String[][] outputArray = null;
+        String ilNueStr = "NaN";
+        String ilScStr  = "NaN";
+        DisclosureRiskCalculator.prepare();
+        DataHandle outHandle = null;
+        int numOfsuppressedRecords = -1;
+        if (optNode != null) {
+        	outHandle = result.getOutput(optNode, false);
+        	outputArray = this.converter.toArray(outHandle, dataset.getInputDataDef());
+        	numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
+        	Locale deLoc = new Locale ("DE", "de");
 
-						} catch (ParseException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}
-			}
-		}
+        	double ilNueAbs = measureNue.evaluate(outputArray, optNode.getTransformation()).getUtility();
+        	double ilNueRel =                                       (ilNueAbs - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY) /
+        			(dataset.getMaxInfoLoss(BenchmarkMeasure.ENTROPY) - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY)));
 
-		if (calcBaselineOnly) {
-			return null;
-		} else {
+        	ilNueStr = String.format(deLoc, "%.3f", ilNueRel);
 
-			String trafoStr = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
-			
-			String[][] outputArray = null;
-			String ilNueStr = "NaN";
-			String ilScStr  = "NaN";
-    		DisclosureRiskCalculator.prepare();
-    		DataHandle outHandle = null;
-    		int numOfsuppressedRecords = -1;
-    		if (optNode != null) {
-    			outHandle = result.getOutput(optNode, false);
-    			outputArray = this.converter.toArray(outHandle, dataset.getInputDataDef());
-        		numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
-        		Locale deLoc = new Locale ("DE", "de");
-        		ilNueStr = String.format(deLoc, "%.3f", this.measureNue       .evaluate(outputArray, optNode.getTransformation()).getUtility());
+        	if (isNumericDatafile) {
         		ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(outputArray, optNode.getTransformation()).getUtility());
-    		}
-			DisclosureRiskCalculator.done();
-    		if (optNode != null) {
-    			outHandle.release();
-    		}    		
+        	} else {
+        		ilScStr = "";
+        	}
+        }
+        DisclosureRiskCalculator.done();
+        if (optNode != null) {
+        	outHandle.release();
+        }    		
 
-    		if (optimalAccuracy == -Double.MAX_VALUE) optimalAccuracy = 0d;
-    		String optimalAccuracyStr = String.format(new Locale("DE", "de"), "%.3f", optimalAccuracy);
-    		String[] ilMeasureValues = new String[] { ilNueStr, ilScStr };
+        if (relPA == -Double.MAX_VALUE) relPA = Double.NaN;
+        String absPAStr = String.format(new Locale("DE", "de"), "%.3f", absPA);
+        String relPAStr = String.format(new Locale("DE", "de"), "%.3f", relPA);
+        String[] ilMeasureValues = new String[] { ilNueStr, ilScStr };
 
-    		
-    		String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
-    		
-			return BenchmarkDriver.concat(
-					BenchmarkDriver.concat(
-							new String[] { optimalAccuracyStr, trafoStr,  numSupRecsStr },
-							ilMeasureValues),
-					DisclosureRiskCalculator.toArray());
-		}
+
+        String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
+
+        return BenchmarkDriver.concat(
+        		BenchmarkDriver.concat(
+        				new String[] { relPAStr, absPAStr, minPAStr, maxPAStr, gainStr, trafoStr,  numSupRecsStr },
+        				ilMeasureValues),
+        		DisclosureRiskCalculator.toArray());
 	}
-	
+
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return BenchmarkDriver.concat(new String[] { "RelPA", "trafo", "numSuppRecs", "IL-NUE", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
+		return BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "trafo", "numSuppRecs", "IL-NUE", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
 	}
 
 	/**

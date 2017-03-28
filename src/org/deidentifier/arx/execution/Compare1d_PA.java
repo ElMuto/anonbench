@@ -98,7 +98,7 @@ public class Compare1d_PA {
 
 			String[] relPAStr = driver.calculateRelPA(0.05, dataset,
 					sa,
-					false, false, privacyModel);
+					false, privacyModel);
 			
 			String[] finalResultArray = BenchmarkDriver.concat(
 					new String[] {
