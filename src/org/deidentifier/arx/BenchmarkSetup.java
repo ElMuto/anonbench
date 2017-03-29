@@ -120,10 +120,19 @@ public class BenchmarkSetup {
     	Integer[] dim1Vals =     { 5 };
 
 		Double [] dim2ValsForL_SaMarStat = { 3d, 1d, 2d, 4d, 5d };
-		Double [] dim2ValsForL_SaEduc    = { 3d, 1d, 6d, 9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
+//		Double [] dim2ValsForL_SaMarStat = { 5d, 4d, 2d, 1d, 3d };
 		
-		Double [] dim2ValsForT = { 0.2, 1d, 0.8, 0.6, 0.4, 0d };
-		Double [] dim2ValsForD = { 1d, 6d, 5d, 4d, 3d, 2d, 0.001 };
+		Double [] dim2ValsForL_SaEduc    = {  3d,  1d,  6d,  9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
+//		Double [] dim2ValsForL_SaEduc    = { 30d, 27d, 24d, 21d, 18d, 15d, 12d,  9d,  6d,  1d,  3d };
+
+		Double [] dim2ValsForT = { 0.2,  1d,  0.8, 0.6, 0.4, 0d  };
+//		Double [] dim2ValsForT = { 0d,   0.4, 0.6, 0.8, 1d,  0.2 };
+
+		Double [] dim2ValsForD = { 1d,    6d, 5d, 4d, 3d, 2d, 0.001 };
+//		Double [] dim2ValsForD = { 0.001, 2d, 3d, 4d, 5d, 6d, 1d    };
+		
+		
+		
 		Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
 		
 		Double[] dim2Vals = null;
@@ -546,19 +555,19 @@ public class BenchmarkSetup {
         L_DIVERSITY_DISTINCT {
             @Override
             public String toString() {
-                return "DL";
+                return "1_DL";
             }
         },
         L_DIVERSITY_ENTROPY {
             @Override
             public String toString() {
-                return "EL";
+                return "3_EL";
             }
         },
         L_DIVERSITY_RECURSIVE {
             @Override
             public String toString() {
-                return "RL";
+                return "2_RL";
             }
         },
         T_CLOSENESS_HD {
@@ -570,7 +579,7 @@ public class BenchmarkSetup {
         T_CLOSENESS_ED {
             @Override
             public String toString() {
-                return "ET";
+                return "4_ET";
             }
         },
         D_PRESENCE {
@@ -588,7 +597,7 @@ public class BenchmarkSetup {
         D_DISCLOSURE_PRIVACY {
             @Override
             public String toString() {
-                return "DP";
+                return "5_DP";
             }
         },
         BASIC_BETA_LIKENESS {

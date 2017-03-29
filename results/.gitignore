@@ -164,3 +164,8 @@
 /RelCA1d-ATUS_NUM-t-Marital status.csv
 /RelCA1d-IHIS_NUM-t-EDUC.csv
 /RelCA1d-IHIS_NUM-t-MARSTAT.csv
+/RelCA1d-ATUS_NUM-ld-Highest level of school completed.csv
+/RelCA1d-ATUS_NUM-ld-Marital status.csv
+/RelCA1d-ATUS_NUM-lr-Marital status.csv
+/RelCA1d-REVERSEATUS_NUM-ld-Highest level of school completed.csv
+/RelCA1d-REVERSE-ATUS_NUM-ld-Marital status.csv
