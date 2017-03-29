@@ -8,5 +8,28 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar IHIS ld &
-java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar IHIS lr
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar IHIS ld &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar IHIS lr
+
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS ld &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS lr
+
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS le &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS t  &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS d
+
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ACS13 lr &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ACS13 le &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ACS13 t
+
+#fed2
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ACS13 ld &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ACS13 d
+
+#fed2
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS le &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS t  &
+#java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS d
+
+#fed3
+java -Xmx5G -DHelmut -jar jars/Compare1d_PA.jar ATUS ld

@@ -276,7 +276,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                 return new String[] { "Highest level of school completed", "Marital status",  };
             case IHIS:
             case IHIS_NUM:
-                return new String[] { "MARSTAT", "EDUC" };
+                return new String[] { "EDUC", "MARSTAT",  };
             case ACS13:
             case ACS13_NUM:
                 return new String[] { "Education" , "Marital status",  };

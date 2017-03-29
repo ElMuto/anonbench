@@ -56,10 +56,10 @@ public class Compare1d_PA {
 			datafile = BenchmarkDatafile.IHIS_NUM;
 		} else throw new RuntimeException("Unsupported datafile: '" + dataFileName + "'");
 		
-		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d", "b" };		
+		String[] allowedPrivacyMeasures = new String[] { "ld", "lr", "le", "t", "d", "b" };		
 		String dim2Qual = args[1];		
 		boolean validInput = false;		
-		for (String s : allowedInputStrings) {
+		for (String s : allowedPrivacyMeasures) {
 			if (dim2Qual != null && s.equals(dim2Qual)) {
 				validInput = true;
 				break;
@@ -67,7 +67,27 @@ public class Compare1d_PA {
 		}		
 		if (!validInput) throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
 
-		for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
+		int candidateIndex = 0;
+		String[] saList = new String[] { };
+		if (args.length >= 3) {
+			String[] allowedSAs = new String[] { "ED", "MS"  };		
+			String saFromCommandLine = args[2];		
+			validInput = false;		
+			for (String s : allowedSAs) {
+				if (dim2Qual != null && s.equals(saFromCommandLine)) {
+					validInput = true;
+					break;
+				}
+				candidateIndex++;
+			}		
+			if (!validInput) throw new RuntimeException("Unsupported sensitive attribute: '" + saFromCommandLine + "'");
+			saList = new String[] { BenchmarkDataset.getSensitiveAttributeCandidates(datafile) [candidateIndex] };
+			
+		} else {
+			saList = BenchmarkDataset.getSensitiveAttributeCandidates(datafile);
+		}
+
+		for (String sa : saList) {
 			compareParameterValues(datafile, sa, dim2Qual);
 		}
 		System.out.println("done.");
