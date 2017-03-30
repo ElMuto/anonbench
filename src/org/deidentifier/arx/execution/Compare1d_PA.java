@@ -73,7 +73,7 @@ public class Compare1d_PA {
 		int candidateIndex = 0;
 		String[] saList = new String[] { };
 		if (args.length >= 3) {
-			String[] allowedSAs = new String[] { "ED", "MS"  };		
+			String[] allowedSAs = new String[] { "ED", "MS", "both" };		
 			String saFromCommandLine = args[2];		
 			validInput = false;		
 			for (String s : allowedSAs) {
@@ -84,7 +84,12 @@ public class Compare1d_PA {
 				candidateIndex++;
 			}		
 			if (!validInput) throw new RuntimeException("Unsupported sensitive attribute: '" + saFromCommandLine + "'");
-			saList = new String[] { BenchmarkDataset.getSensitiveAttributeCandidates(datafile) [candidateIndex] };
+			
+			if (candidateIndex == allowedSAs.length -1) {
+				saList = BenchmarkDataset.getSensitiveAttributeCandidates(datafile);
+			} else {
+				saList = new String[] { BenchmarkDataset.getSensitiveAttributeCandidates(datafile) [candidateIndex] };
+			}
 			
 		} else {
 			saList = BenchmarkDataset.getSensitiveAttributeCandidates(datafile);

@@ -76,8 +76,9 @@ public class BenchmarkDriver {
     private final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
 
     private final UtilityMeasure<Double> measure;
-    private final UtilityMeasure<Double> measureSoriaComas;
-    private final UtilityMeasure<Double> measureNue;
+    private final UtilityMeasureSoriaComas measureSoriaComas;
+    private final UtilityMeasureNonUniformEntropy<Double> measureNue;
+    private final UtilityMeasureLoss<Double> measureLoss;
     private final DataConverter converter;
     private final BenchmarkSetup.BenchmarkMeasure benchmarkMeasure;
     private final String[] header;
@@ -118,6 +119,7 @@ public class BenchmarkDriver {
 
         this.measureSoriaComas	= new UtilityMeasureSoriaComas(inputArray);
         this.measureNue 		= new UtilityMeasureNonUniformEntropy<Double>(header, inputArray);
+        this.measureLoss 		= new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
 	}
 
 	/**
@@ -618,6 +620,7 @@ public class BenchmarkDriver {
 
         String[][] outputArray = null;
         String ilNueStr = "NaN";
+        String ilLossStr = "NaN";
         String ilScStr  = "NaN";
         DisclosureRiskCalculator.prepare();
         DataHandle outHandle = null;
@@ -628,11 +631,8 @@ public class BenchmarkDriver {
         	numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
         	Locale deLoc = new Locale ("DE", "de");
 
-        	double ilNueAbs = measureNue.evaluate(outputArray, optNode.getTransformation()).getUtility();
-        	double ilNueRel =                                       (ilNueAbs - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY)) /
-        			(dataset.getMaxInfoLoss(BenchmarkMeasure.ENTROPY) - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY));
-
-        	ilNueStr = String.format(deLoc, "%.3f", ilNueRel);
+        	ilNueStr  = getRelativeInfoLoss(dataset, optNode, outputArray, deLoc, BenchmarkMeasure.ENTROPY);
+        	ilLossStr = getRelativeInfoLoss(dataset, optNode, outputArray, deLoc, BenchmarkMeasure.LOSS);
 
         	if (isNumericDatafile) {
         		ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(outputArray, optNode.getTransformation()).getUtility());
@@ -649,7 +649,7 @@ public class BenchmarkDriver {
         if (absPA == -Double.MAX_VALUE) absPA = Double.NaN;
         String absPAStr = String.format(new Locale("DE", "de"), "%.3f", absPA);
         String relPAStr = String.format(new Locale("DE", "de"), "%.3f", relPA);
-        String[] ilMeasureValues = new String[] { ilNueStr, ilScStr };
+        String[] ilMeasureValues = new String[] { ilNueStr, ilLossStr, ilScStr };
 
 
         String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
@@ -662,7 +662,32 @@ public class BenchmarkDriver {
 	}
 
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
+		return BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-Loss", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
+	}
+
+	private String getRelativeInfoLoss(BenchmarkDataset dataset, ARXNode optNode, String[][] outputArray,
+			Locale deLoc, BenchmarkMeasure bmMeasure) {
+		
+		UtilityMeasure<Double> utilityMeasure = null;
+		
+		switch (bmMeasure) {
+		case ENTROPY:
+			utilityMeasure = measureNue;
+			break;
+		case LOSS:
+			utilityMeasure = measureLoss;
+			break;
+		default:
+			break;
+		
+		}
+		
+		String ilStr;
+		double ilAbs = utilityMeasure.evaluate(outputArray, optNode.getTransformation()).getUtility();
+		double ilRel =                      (ilAbs - dataset.getMinInfoLoss(bmMeasure)) /
+				(dataset.getMaxInfoLoss(bmMeasure) - dataset.getMinInfoLoss(bmMeasure));
+		ilStr = String.format(deLoc, "%.3f", ilRel);
+		return ilStr;
 	}
 
 	/**
