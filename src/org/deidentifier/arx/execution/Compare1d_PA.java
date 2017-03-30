@@ -49,11 +49,14 @@ public class Compare1d_PA {
 		BenchmarkDatafile datafile = null;
 		String dataFileName = args[0];
 		if ("ACS13".equals(dataFileName)) {
-			datafile = BenchmarkDatafile.ACS13_NUM;
+			datafile = BenchmarkDatafile.ACS13;
+//			datafile = BenchmarkDatafile.ACS13_NUM;
 		} else if ("ATUS".equals(dataFileName)) {
-			datafile = BenchmarkDatafile.ATUS_NUM;
+			datafile = BenchmarkDatafile.ATUS;
+//			datafile = BenchmarkDatafile.ATUS_NUM;
 		} else if ("IHIS".equals(dataFileName)) {
-			datafile = BenchmarkDatafile.IHIS_NUM;
+			datafile = BenchmarkDatafile.IHIS;
+//			datafile = BenchmarkDatafile.IHIS_NUM;
 		} else throw new RuntimeException("Unsupported datafile: '" + dataFileName + "'");
 		
 		String[] allowedPrivacyMeasures = new String[] { "ld", "lr", "le", "t", "d", "b" };		

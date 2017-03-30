@@ -21,8 +21,10 @@
 package org.deidentifier.arx;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.bouncycastle.util.Arrays;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 
 import de.linearbits.subframe.Benchmark;
@@ -33,6 +35,75 @@ import de.linearbits.subframe.analyzer.ValueBuffer;
  * @author Fabian Prasser
  */
 public class BenchmarkSetup {
+
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa) {
+	    	
+	    	Integer[] dim1Vals =     { 5 };
+	
+			Double [] dim2ValsForL_SaMarStat = { 3d, 1d, 2d, 4d, 5d };
+	//		Double [] dim2ValsForL_SaMarStat = { 5d, 4d, 2d, 1d, 3d };
+			
+			Double [] dim2ValsForL_SaEduc    = {  3d,  1d,  6d,  9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
+	//		Double [] dim2ValsForL_SaEduc    = { 30d, 27d, 24d, 21d, 18d, 15d, 12d,  9d,  6d,  1d,  3d };
+	
+			Double [] dim2ValsForT = { 0.2,  1d,  0.8, 0.6, 0.4, 0d  };
+	//		Double [] dim2ValsForT = { 0d,   0.4, 0.6, 0.8, 1d,  0.2 };
+	
+			Double [] dim2ValsForD = { 1d,    6d, 5d, 4d, 3d, 2d, 0.001 };
+	//		Double [] dim2ValsForD = { 0.001, 2d, 3d, 4d, 5d, 6d, 1d    };
+			
+			
+			
+			Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
+			
+			Double[] dim2Vals = null;
+	
+			if ("t".equals(dim2Qualifier)) {
+				dim2Vals = dim2ValsForT;
+			} else if ("ld".equals(dim2Qualifier) || "lr".equals(dim2Qualifier) || "le".equals(dim2Qualifier)) {
+				if ("Marital status".equals(sa) || "MARSTAT".equals(sa)) {
+					dim2Vals = dim2ValsForL_SaMarStat;
+				} else if ("Education".equals(sa) || "EDUC".equals(sa) || "Highest level of school completed".equals(sa)) {
+					dim2Vals = dim2ValsForL_SaEduc;
+				} else {
+					throw new RuntimeException("This should not happen");
+				}
+					
+			} else if ("d".equals(dim2Qualifier)) {
+				dim2Vals = dim2ValsForD;
+			} else if ("b".equals(dim2Qualifier)) {
+				dim2Vals = dim2ValsForB;
+			} else {
+				throw new RuntimeException("Invalid dim2Qalifier: '" + dim2Qualifier + "'");
+			}
+			
+			PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
+	
+			for (int ki = 0; ki < dim1Vals.length; ki++) {
+				for (int ti = 0; ti < dim2Vals.length; ti++) {
+					pmArr[ki * dim2Vals.length + ti] = new PrivacyModel(dim2Qualifier, dim1Vals[ki], dim2Vals[ti]);
+				}
+			}
+	    	
+	    	return pmArr;
+	    }
+	
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa, boolean reverse) {
+		if (reverse) {
+			
+			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(dim2Qualifier, sa);
+			PrivacyModel[] reversedArray = new PrivacyModel[originalArray.length];
+			
+			for (int i = 0; i < originalArray.length; i++) {
+				reversedArray[i] = originalArray[originalArray.length -1 -i];
+			}
+			
+			return reversedArray;
+			
+		} else {
+			return getPrivacyModelsConfigsForParameterComparison(dim2Qualifier, sa);
+		}
+	}
 
 	/** The benchmark instance - datapoints */
 	public static final Benchmark BENCHMARK    = new Benchmark(new String[] {
@@ -115,58 +186,6 @@ public class BenchmarkSetup {
     	};
     }
 	
-    public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa) {
-    	
-    	Integer[] dim1Vals =     { 5 };
-
-		Double [] dim2ValsForL_SaMarStat = { 3d, 1d, 2d, 4d, 5d };
-//		Double [] dim2ValsForL_SaMarStat = { 5d, 4d, 2d, 1d, 3d };
-		
-		Double [] dim2ValsForL_SaEduc    = {  3d,  1d,  6d,  9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
-//		Double [] dim2ValsForL_SaEduc    = { 30d, 27d, 24d, 21d, 18d, 15d, 12d,  9d,  6d,  1d,  3d };
-
-		Double [] dim2ValsForT = { 0.2,  1d,  0.8, 0.6, 0.4, 0d  };
-//		Double [] dim2ValsForT = { 0d,   0.4, 0.6, 0.8, 1d,  0.2 };
-
-		Double [] dim2ValsForD = { 1d,    6d, 5d, 4d, 3d, 2d, 0.001 };
-//		Double [] dim2ValsForD = { 0.001, 2d, 3d, 4d, 5d, 6d, 1d    };
-		
-		
-		
-		Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
-		
-		Double[] dim2Vals = null;
-
-		if ("t".equals(dim2Qualifier)) {
-			dim2Vals = dim2ValsForT;
-		} else if ("ld".equals(dim2Qualifier) || "lr".equals(dim2Qualifier) || "le".equals(dim2Qualifier)) {
-			if ("Marital status".equals(sa) || "MARSTAT".equals(sa)) {
-				dim2Vals = dim2ValsForL_SaMarStat;
-			} else if ("Education".equals(sa) || "EDUC".equals(sa) || "Highest level of school completed".equals(sa)) {
-				dim2Vals = dim2ValsForL_SaEduc;
-			} else {
-				throw new RuntimeException("This should not happen");
-			}
-				
-		} else if ("d".equals(dim2Qualifier)) {
-			dim2Vals = dim2ValsForD;
-		} else if ("b".equals(dim2Qualifier)) {
-			dim2Vals = dim2ValsForB;
-		} else {
-			throw new RuntimeException("Invalid dim2Qalifier: '" + dim2Qualifier + "'");
-		}
-		
-		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
-
-		for (int ki = 0; ki < dim1Vals.length; ki++) {
-			for (int ti = 0; ti < dim2Vals.length; ti++) {
-				pmArr[ki * dim2Vals.length + ti] = new PrivacyModel(dim2Qualifier, dim1Vals[ki], dim2Vals[ti]);
-			}
-		}
-    	
-    	return pmArr;
-    }
-    
     public static PrivacyModel[] getDifficultyRelevantPrivacyModels() {
     	List<PrivacyModel> _saBasedModelsList = new ArrayList<>();
     	for (PrivacyModel privacyModel : getPrivacyModelsCombinedWithK()) {
