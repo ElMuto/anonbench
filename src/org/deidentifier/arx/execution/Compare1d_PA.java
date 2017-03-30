@@ -89,16 +89,21 @@ public class Compare1d_PA {
 		} else {
 			saList = BenchmarkDataset.getSensitiveAttributeCandidates(datafile);
 		}
+		
+		boolean reverse = false;
+		if (args.length >= 4 && "reverse".equals(args[3])) {
+			reverse = true;
+		}
 
 		for (String sa : saList) {
-			compareParameterValues(datafile, sa, dim2Qual);
+			compareParameterValues(datafile, sa, dim2Qual, reverse);
 		}
 		System.out.println("done.");
 	}
 
-	public static void compareParameterValues(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
+	public static void compareParameterValues(BenchmarkDatafile datafile, String sa, String dim2Qual, boolean reverse) throws IOException {
 
-		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".csv";
+		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + (reverse ? "REVERSE-" : "") + sa + ".csv";
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
@@ -107,7 +112,7 @@ public class Compare1d_PA {
 		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
 
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa, reverse)) {
 			
 			BenchmarkCriterion[] criteria = null;
 			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
