@@ -31,6 +31,16 @@ done
 #java -Xmx5G -jar jars/Compare1d_PA.jar ATUS lr both
 
 #fed2
-java -Xmx5G -jar jars/Compare1d_PA.jar ATUS le both &
-java -Xmx5G -jar jars/Compare1d_PA.jar ATUS t  both &
-java -Xmx5G -jar jars/Compare1d_PA.jar ATUS d  both
+#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS le both &
+#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS t  both &
+#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS d  both
+
+#fed4
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS ld MS &
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr MS
+
+#fed1
+#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS ld MS reverse &
+
+#fed3
+java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr MS reverse
