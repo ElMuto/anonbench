@@ -43,4 +43,7 @@ done
 #java -Xmx5G -jar jars/Compare1d_PA.jar ATUS ld MS reverse &
 
 #fed3
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr MS reverse
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr MS reverse
+
+#fed3
+java -Xmx5G -jar jars/Compare1d_PA.jar IHIS ld ED reverse

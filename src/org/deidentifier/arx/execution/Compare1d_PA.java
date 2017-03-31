@@ -108,7 +108,7 @@ public class Compare1d_PA {
 
 	public static void compareParameterValues(BenchmarkDatafile datafile, String sa, String dim2Qual, boolean reverse) throws IOException {
 
-		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + (reverse ? "REVERSE-" : "") + sa + ".csv";
+		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + sa + (reverse ? "REVERSE-" : "") + ".csv";
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
