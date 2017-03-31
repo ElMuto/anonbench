@@ -66,13 +66,13 @@ public class CompareRelPAs {
 		if (MS) {
 			PrintStream fileOutputStreamMS = new PrintStream("results/resultsRelCAsMS.txt");
 			
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13_NUM, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
 			fileOutputStreamMS.println();
 			
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS_NUM, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
 			fileOutputStreamMS.println();
 			
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS_NUM, BenchmarkMeasure.ENTROPY, "MARSTAT", fileOutputStreamMS, false);
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, BenchmarkMeasure.ENTROPY, "MARSTAT", fileOutputStreamMS, false);
 			fileOutputStreamMS.println();
 			
 
@@ -82,14 +82,14 @@ public class CompareRelPAs {
 		if (ED) {
 			PrintStream fileOutputStreamED = new PrintStream("results/resultsRelCAsED.txt");
 			
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13_NUM, BenchmarkMeasure.ENTROPY, "Education", fileOutputStreamED, false);
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ACS13, BenchmarkMeasure.ENTROPY, "Education", fileOutputStreamED, false);
 			fileOutputStreamED.println("\n");
 
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS_NUM, BenchmarkMeasure.ENTROPY, "Highest level of school completed", fileOutputStreamED, false);
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.ATUS, BenchmarkMeasure.ENTROPY, "Highest level of school completed", fileOutputStreamED, false);
 			fileOutputStreamED.println("\n");
 
 			fileOutputStreamED.println();
-			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS_NUM, BenchmarkMeasure.ENTROPY, "EDUC", fileOutputStreamED, false);
+			BenchmarkDriver.compareRelPAs(BenchmarkDatafile.IHIS, BenchmarkMeasure.ENTROPY, "EDUC", fileOutputStreamED, false);
 			
 
 			fileOutputStreamED.close();

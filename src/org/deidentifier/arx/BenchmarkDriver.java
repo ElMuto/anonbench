@@ -117,7 +117,7 @@ public class BenchmarkDriver {
 			throw new RuntimeException("Invalid measure");
         }
 
-        this.measureSoriaComas	= new UtilityMeasureSoriaComas(inputArray);
+        this.measureSoriaComas	= new UtilityMeasureSoriaComas(dataset.getInputArray(true));
         this.measureNue 		= new UtilityMeasureNonUniformEntropy<Double>(header, inputArray);
         this.measureLoss 		= new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
 	}
@@ -265,7 +265,7 @@ public class BenchmarkDriver {
                                  Double dMax, String sa, Integer ssNum, Double[] accuracies, String resultsFileName, PrivacyModel privacyModel
             ) throws IOException {
 
-        ARXConfiguration config = getConfiguration(dataset, suppFactor, measure, sa, privacyModel, dataset.getCriteria());
+        ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, measure, sa, privacyModel, dataset.getCriteria());
         ARXAnonymizer anonymizer = new ARXAnonymizer();
 //        anonymizer.setMaxTransformations(210000);
         
@@ -472,7 +472,7 @@ public class BenchmarkDriver {
 		System.out.println(printString);
 		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
-		driver.calculateRelPA(0.05, dataset,
+		driver.findOptimalRelPA(0.05, dataset,
 				sa,
 				includeInsensitiveAttributes, null);
 	}
@@ -504,7 +504,7 @@ public class BenchmarkDriver {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
 
-			String maxPAStr[] = driver.calculateRelPA(0.05, dataset,
+			String maxPAStr[] = driver.findOptimalRelPA(0.05, dataset,
 					sa,
 					includeInsensitiveAttributes, privacyModel);
 
@@ -523,13 +523,13 @@ public class BenchmarkDriver {
 	 * @return
 	 * @throws IOException
 	 */
-	public String[] calculateRelPA(
+	public String[] findOptimalRelPA(
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
 			boolean includeInsensitiveAttribute, PrivacyModel privacyModel
 			) throws IOException {
 	
-		ARXConfiguration config = getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel, dataset.getCriteria());
+		ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel,dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 		
 		System.out.println(config.getPrivacyModels());
@@ -556,8 +556,8 @@ public class BenchmarkDriver {
         
 		boolean baselineValuesCaptured = false;
 		
-		int[] exampleTrafo = new int[] { 1, 1, 0 };
-		boolean onlyVisitExampleTrafo = false;
+		int[] exampleTrafo = new int[] { 6, 1, 1 };
+		boolean onlyVisitExampleTrafo = true;
 		
         for (ARXNode[] level : lattice.getLevels()) {
 
@@ -614,10 +614,6 @@ public class BenchmarkDriver {
 
         String trafoStr = Arrays.toString((optNode != null ? optNode.getTransformation() : new int[] {}));
 
-        boolean isNumericDatafile =	BenchmarkDatafile.ACS13_NUM.equals(dataset.getDatafile()) ||
-        		BenchmarkDatafile.ATUS_NUM.equals(dataset.getDatafile()) ||
-        		BenchmarkDatafile.IHIS_NUM.equals(dataset.getDatafile());
-
         String[][] outputArray = null;
         String ilNueStr = "NaN";
         String ilLossStr = "NaN";
@@ -634,11 +630,21 @@ public class BenchmarkDriver {
         	ilNueStr  = getRelativeInfoLoss(dataset, optNode, outputArray, deLoc, BenchmarkMeasure.ENTROPY);
         	ilLossStr = getRelativeInfoLoss(dataset, optNode, outputArray, deLoc, BenchmarkMeasure.LOSS);
 
-        	if (isNumericDatafile) {
-        		ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(outputArray, optNode.getTransformation()).getUtility());
-        	} else {
-        		ilScStr = "";
+        	// calculate SSE
+        	DataDefinition numDataDef = dataset.getArxData(true).getDefinition();
+        	String[] qiS = optNode.getQuasiIdentifyingAttributes();
+        	for (int i = 0; i < qiS.length; i++) {
+        		String qi = qiS[i];
+        		numDataDef.setMinimumGeneralization(qi, optNode.getTransformation()[i]);
+        		numDataDef.setMaximumGeneralization(qi, optNode.getTransformation()[i]);
         	}
+        	
+        	ARXResult numResult = anonymizer.anonymize(dataset.getArxData(true), config);
+        	DataHandle numOutHandle = numResult.getOutput(optNode, false);
+        	String[][] numOutputArray = this.converter.toArray(numOutHandle, dataset.getInputDataDef(true));
+        	ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(numOutputArray, optNode.getTransformation()).getUtility());
+        	
+        	
         }
         DisclosureRiskCalculator.done();
         if (optNode != null) {
@@ -653,7 +659,8 @@ public class BenchmarkDriver {
 
 
         String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
-
+        
+        
         return BenchmarkDriver.concat(
         		BenchmarkDriver.concat(
         				new String[] { relPAStr, absPAStr, minPAStr, maxPAStr, gainStr, trafoStr,  numSupRecsStr },

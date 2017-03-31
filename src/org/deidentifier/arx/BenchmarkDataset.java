@@ -16,7 +16,6 @@ import org.deidentifier.arx.utility.UtilityMeasureAECS;
 import org.deidentifier.arx.utility.UtilityMeasureDiscernibility;
 import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
 import org.deidentifier.arx.utility.UtilityMeasurePrecision;
-import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
 import org.deidentifier.arx.utility.UtilityMeasureLoss;
     
 
@@ -36,12 +35,15 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         private final BenchmarkDatafile datafile;
         private final String sensitiveAttribute;
         private final BenchmarkCriterion[] criteria;
-        
+
         private final Data arxData;
+        private final Data numArxData;
         private final DataHandle inputHandle;
         private final DataDefinition inputDataDef;
-        
+        private final DataDefinition numInputDataDef;
+
         private String[][] inputArray;
+        private String[][] numInputArray;
         private String[][] outputArray;
 
         private final double minAecs;         private final double maxAecs;
@@ -50,8 +52,6 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         private final double minEntr;         private final double maxEntr;
         private final double minPrec;         private final double maxPrec;
         private final double minSoriaComas;   private final double maxSoriaComas;
-        
-        private final boolean isNumCoded;
         
         public void cleanUp () {
         	inputHandle.release();
@@ -72,15 +72,17 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.sensitiveAttribute = sensitiveAttribute;
             this.criteria = criteria;
             
-            this.arxData = toArxData(criteria);
+            this.arxData 	= toArxData(criteria, false);
+            this.numArxData = toArxData(criteria, true);
+            
             this.inputHandle = arxData.getHandle();
             this.inputDataDef = inputHandle.getDefinition();
             
-            this.isNumCoded = datafile.isNumCoded();
-            
+            this.numInputDataDef = numArxData.getHandle().getDefinition();
 
             DataConverter converter = new DataConverter();            
             this.inputArray = converter.toArray(inputHandle, inputDataDef);
+            this.numInputArray = converter.toArray(numArxData.getHandle(), numArxData.getHandle().getDefinition());
             
             this.outputArray = new String[this.inputArray.length][getQuasiIdentifyingAttributes().length];
             for (int i = 0; i < this.inputArray.length; i++) {
@@ -97,11 +99,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.minLoss       = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(inputArray).getUtility();
             this.minEntr       = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(inputArray).getUtility();
             this.minPrec       = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(inputArray).getUtility();
-            if (isNumCoded) {
-            	this.minSoriaComas = new UtilityMeasureSoriaComas(inputArray).evaluate(inputArray).getUtility();
-            } else {
-            	this.minSoriaComas = Double.NaN;
-            }
+            this.minSoriaComas = 0d;
 
             // Compute for output
             this.maxAecs         = new UtilityMeasureAECS().evaluate(outputArray).getUtility();
@@ -109,15 +107,11 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.maxLoss         = new UtilityMeasureLoss<Double>(header, hierarchies, AggregateFunction.GEOMETRIC_MEAN).evaluate(outputArray).getUtility();
             this.maxEntr         = new UtilityMeasureNonUniformEntropy<Double>(header, inputArray).evaluate(outputArray).getUtility();
             this.maxPrec         = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
-            if (isNumCoded) {
-            	this.maxSoriaComas   = new UtilityMeasureSoriaComas(inputArray).evaluate(outputArray).getUtility();
-            } else {
-            	this.maxSoriaComas = Double.NaN;
-            }
+            this.maxSoriaComas   = 1d;
         }
 
 
-        /**
+		/**
          * @param datafile
          * @param customQiCount
          * @param criteria
@@ -130,11 +124,20 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             return datafile;
         }
         
-        public Data getArxData() {
-        	return arxData;
+        /**
+         * @param numeric if true, return numerically coded variant of dataset
+         * @return
+         */
+        public Data getArxData(boolean numeric) {
+        	return numeric ? numArxData : arxData;
         }
         
-        public BenchmarkCriterion[] getCriteria() {
+        public Data getArxData() {
+        	return getArxData (false);
+        }
+
+
+		public BenchmarkCriterion[] getCriteria() {
         	return criteria;
         }
         
@@ -154,16 +157,35 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         /**
          * @return
          */
+        public String[][] getInputArray(boolean numcoded) {
+			return numcoded ? numInputArray : inputArray;
+		}
+        
+        /**
+         * @return
+         */
         public String[][] getInputArray() {
-			return inputArray;
+			return getInputArray(false);
+		}
+
+		/**
+		 * @param numeric if true, return numeric variant
+		 * @return
+		 */
+		public DataDefinition getInputDataDef(boolean numeric) {
+			
+			return numeric ? numInputDataDef : inputDataDef;
+			
 		}
 
 		/**
 		 * @return
 		 */
 		public DataDefinition getInputDataDef() {
-			return inputDataDef;
+			return getInputDataDef(false);
 		}
+
+
 
 		/**
          * @param measure
@@ -272,13 +294,13 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
 
             switch (datafile) {
             case ATUS:
-            case ATUS_NUM:
+//            case ATUS_NUM:
                 return new String[] { "Highest level of school completed", "Marital status",  };
             case IHIS:
-            case IHIS_NUM:
+//            case IHIS_NUM:
                 return new String[] { "EDUC", "MARSTAT",  };
             case ACS13:
-            case ACS13_NUM:
+//            case ACS13_NUM:
                 return new String[] { "Education" , "Marital status",  };
             default:
                 throw new RuntimeException("Invalid dataset");
@@ -289,6 +311,31 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         public String toString() {
             return datafile.toString();
         }
+        
+        
+        /**
+         * Returns the generalization hierarchy for the dataset and attribute
+         * @param attribute
+         * @param numeric if true, the numeric variant of the hierarchies is returned
+         * @return
+         */
+        Hierarchy loadHierarchy(String attribute, boolean numeric) {
+        	
+        	String path;
+        	if (numeric) {
+        		path = "hierarchies/" + datafile.getBaseStringForFilename() + "_numcoded_hierarchy_" + attribute + ".csv";
+        	}
+        	else {
+        		path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
+        	}
+
+        	try {
+        		return Hierarchy.create(path, Charset.forName("UTF-8"), ';');
+        	} catch (IOException e) {
+        		System.err.println("Unable to load hierarchy from file " + path);
+        		return null;
+        	}
+        }
 
         /**
          * Returns the generalization hierarchy for the dataset and attribute
@@ -298,59 +345,73 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
          * @throws IOException
          */
         Hierarchy loadHierarchy(String attribute) {
-        	String path = "hierarchies/" + datafile.getBaseStringForFilename() + "_hierarchy_" + attribute + ".csv";
-        	try {
-        		return Hierarchy.create(path, Charset.forName("UTF-8"), ';');
-        	} catch (IOException e) {
-        		System.err.println("Unable to load hierarchy from file " + path);
-        		return null;
-        	}
+        	
+        	return loadHierarchy(attribute, false);
+        	
         }
+
+
+        /**
+         * Configures and returns the dataset as <code>org.deidentifier.arx.Data</code>
+         * @param criteria
+         * @param numeric if true, the numeric variant of the hierarchies is returned
+         * @return
+         */
+        @SuppressWarnings("incomplete-switch")
+		private Data toArxData(BenchmarkCriterion[] criteria, boolean numeric) {
+        	
+        	String path;
+        	if (numeric) {
+        		path = "data/" + datafile.getBaseStringForFilename() + "_numcoded.csv";
+        	}
+        	else {
+        		path = "data/" + datafile.getBaseStringForFilename() + ".csv";
+        	}
+        	
+        	Data arxData;
+
+            try {
+				arxData = Data.create(path, Charset.forName("UTF-8"), ';');
+			} catch (IOException e) {
+				arxData = null;
+				System.err.println("Unable to load dataset from file " + path);
+			}
+            for (String qi : getQuasiIdentifyingAttributesPrivate()) {
+                arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+                arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi, numeric));
+            }
+            String sensitive = getSensitiveAttribute();
+            arxData.getDefinition().setAttributeType(sensitive, AttributeType.INSENSITIVE_ATTRIBUTE);
+            if (criteria != null) {
+                for (BenchmarkCriterion c : criteria) {
+                    switch (c) {
+                    case L_DIVERSITY_DISTINCT:
+                    case L_DIVERSITY_ENTROPY:
+                    case L_DIVERSITY_RECURSIVE:
+                    case T_CLOSENESS_HD:
+                    case T_CLOSENESS_ED:
+                    case D_DISCLOSURE_PRIVACY:
+                    case BASIC_BETA_LIKENESS:
+                        arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
+                        break;
+                    }
+                }
+            }           
+        
+        return arxData;
+        	
+		}
         
 
         /**
          * Configures and returns the dataset as <code>org.deidentifier.arx.Data</code>
          * @param criteria
-         * @param customQiCount
          * 
          * @return
          */
-        @SuppressWarnings("incomplete-switch")
-		private Data toArxData(BenchmarkCriterion[] criteria) {
-        	Data arxData;
-
-            	String path = "data/" + datafile.getBaseStringForFilename() + ".csv";
-                try {
-					arxData = Data.create(path, Charset.forName("UTF-8"), ';');
-				} catch (IOException e) {
-					arxData = null;
-					System.err.println("Unable to load dataset from file " + path);
-				}
-                for (String qi : getQuasiIdentifyingAttributesPrivate()) {
-                    arxData.getDefinition().setAttributeType(qi, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
-                    arxData.getDefinition().setHierarchy(qi, loadHierarchy(qi));
-                }
-                String sensitive = getSensitiveAttribute();
-                arxData.getDefinition().setAttributeType(sensitive, AttributeType.INSENSITIVE_ATTRIBUTE);
-                if (criteria != null) {
-                    for (BenchmarkCriterion c : criteria) {
-                        switch (c) {
-                        case L_DIVERSITY_DISTINCT:
-                        case L_DIVERSITY_ENTROPY:
-                        case L_DIVERSITY_RECURSIVE:
-                        case T_CLOSENESS_HD:
-                        case T_CLOSENESS_ED:
-                        case D_DISCLOSURE_PRIVACY:
-                        case BASIC_BETA_LIKENESS:
-                            arxData.getDefinition().setAttributeType(sensitive, AttributeType.SENSITIVE_ATTRIBUTE);
-                            break;
-                        }
-                    }
-                }           
-            
-            return arxData;
+        private Data toArxData(BenchmarkCriterion[] criteria) {
+        	return toArxData(criteria, false);
         }
-
 
         private  String[] getQuasiIdentifyingAttributesPrivate() {
         	return getQuasiIdentifyingAttributes(datafile);
@@ -360,13 +421,13 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         public static String[] getQuasiIdentifyingAttributes(BenchmarkDatafile _datafile) {
             switch (_datafile) {
             case ATUS:
-            case ATUS_NUM:
+//            case ATUS_NUM:
                 return new String[] { "Age", "Sex", "Race" };
             case IHIS:
-            case IHIS_NUM:
+//            case IHIS_NUM:
                 return new String[] { "AGE", "SEX", "RACEA" };
             case ACS13:
-            case ACS13_NUM:
+//            case ACS13_NUM:
             	return new String[] { "Age", "Sex", "Race" };
             default:
                 throw new RuntimeException("Invalid dataset: " + _datafile);
@@ -425,34 +486,16 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
                     return "Atus";
                 }
             },
-            ATUS_NUM ("atus_numcoded", true){
-                @Override
-                public String toString() {
-                    return "Atus numcoded";
-                }
-            },
             IHIS ("ihis", false){
                 @Override
                 public String toString() {
                     return "Ihis";
                 }
             },
-            IHIS_NUM ("ihis_numcoded", true){
-                @Override
-                public String toString() {
-                    return "Ihis numcoded";
-                }
-            },
             ACS13 ("ss13acs", false){
                 @Override
                 public String toString() {
                     return "ACS13";
-                }
-            },
-            ACS13_NUM ("ss13acs_numcoded", true){
-                @Override
-                public String toString() {
-                    return "ACS13 numcoded";
                 }
             },
             DUMMY ("dummy", false){
