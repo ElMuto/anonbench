@@ -556,8 +556,8 @@ public class BenchmarkDriver {
         
 		boolean baselineValuesCaptured = false;
 		
-		int[] exampleTrafo = new int[] { 6, 1, 1 };
-		boolean onlyVisitExampleTrafo = true;
+		int[] exampleTrafo = new int[] { 1, 1, 0 };
+		boolean onlyVisitExampleTrafo = false;
 		
         for (ARXNode[] level : lattice.getLevels()) {
 
