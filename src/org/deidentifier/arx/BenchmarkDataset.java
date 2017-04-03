@@ -295,13 +295,13 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             switch (datafile) {
             case ATUS:
 //            case ATUS_NUM:
-                return new String[] { "Highest level of school completed", "Marital status",  };
+                return new String[] { "Marital status", "Highest level of school completed",  };
             case IHIS:
 //            case IHIS_NUM:
-                return new String[] { "EDUC", "MARSTAT",  };
+                return new String[] { "MARSTAT", "EDUC",  };
             case ACS13:
 //            case ACS13_NUM:
-                return new String[] { "Education" , "Marital status",  };
+                return new String[] { "Marital status", "Education" ,  };
             default:
                 throw new RuntimeException("Invalid dataset");
             }
