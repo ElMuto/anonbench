@@ -30,14 +30,14 @@ public class DisclosureRiskCalculator {
 		
 		private DisclosureRisk(String name) {
 			this.name = name;
-		}
+		}		
 
-		private void collect(double value) {
-			avg += value;
+		private void collect(double min, double max, double avg) {
+			avg += avg;
 			numValues ++;
 
-			min = Math.min(min,  value);
-			max = Math.max(max,  value);
+			min = Math.min(min,  min);
+			max = Math.max(max,  max);
 		}
 
 		private void done() {
@@ -228,29 +228,29 @@ public class DisclosureRiskCalculator {
 		
 
 		// For each value in EC
-		// OLD version - does not use definition of Cao et al.
-		double beta = 0d;
-		double numBetas = 0d;
+		// NEW version
+		double minBeta = 1d;
+		double maxBeta = 0d;
+		double avgBeta = 0d;
 		for (int i = 0; i < buckets.length; i += 2) {
 			if (buckets[i] != -1) { // bucket not empty
 				double frequencyInT = distribution[buckets[i]];
 				double frequencyInEC = (double) buckets[i + 1] / count;
-				double value = (frequencyInEC - frequencyInT) / frequencyInT;
-				beta += value;
-				numBetas++;
+				
+				if (frequencyInT < frequencyInEC) {
+					double value = (frequencyInEC - frequencyInT) / frequencyInT;
+					maxBeta = Math.max(value, maxBeta);
+					avgBeta += value;
+					minBeta = Math.min(value, maxBeta);
+				}
 			}
 		}
-		// Average beta for this class
-		beta /= numBetas;
+		avgBeta /= count;
 		
 		
 		if (DisclosureRiskCalculator.beta != null) {
-			DisclosureRiskCalculator.beta.collect(beta);
+			DisclosureRiskCalculator.beta.collect(minBeta, maxBeta, avgBeta);
 		}
-	}
-	
-	public static String toCsv(String sep) {
-		return String.format("%s%s%s%s%s%s%s", l.toCsv(sep), sep, t.toCsv(sep), sep, delta.toCsv(sep), sep, beta.toCsv(sep));
 	}
 	
 	public static String[] toArray() {
