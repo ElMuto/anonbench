@@ -228,37 +228,20 @@ public class DisclosureRiskCalculator {
 		
 
 		// For each value in EC
-//		// OLD version - does not use definition of Cao et al.
-//		double beta = 0d;
-//		double numBetas = 0d;
-//		for (int i = 0; i < buckets.length; i += 2) {
-//			if (buckets[i] != -1) { // bucket not empty
-//				double frequencyInT = distribution[buckets[i]];
-//				double frequencyInEC = (double) buckets[i + 1] / count;
-//				double value = (frequencyInEC - frequencyInT) / frequencyInT;
-//				beta += value;
-//				numBetas++;
-//			}
-//		}
-//		// Average beta for this class
-//		beta /= numBetas;
-		
-		
-		
-		// NEW version
+		// OLD version - does not use definition of Cao et al.
 		double beta = 0d;
+		double numBetas = 0d;
 		for (int i = 0; i < buckets.length; i += 2) {
 			if (buckets[i] != -1) { // bucket not empty
 				double frequencyInT = distribution[buckets[i]];
 				double frequencyInEC = (double) buckets[i + 1] / count;
-				
-				if (frequencyInT < frequencyInEC) {
-					double value = (frequencyInEC - frequencyInT) / frequencyInT;
-					beta = Math.max(value, beta);
-				}
+				double value = (frequencyInEC - frequencyInT) / frequencyInT;
+				beta += value;
+				numBetas++;
 			}
 		}
-		
+		// Average beta for this class
+		beta /= numBetas;
 		
 		
 		if (DisclosureRiskCalculator.beta != null) {
