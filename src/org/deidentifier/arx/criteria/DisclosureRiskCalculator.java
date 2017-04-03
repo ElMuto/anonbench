@@ -253,6 +253,10 @@ public class DisclosureRiskCalculator {
 		}
 	}
 	
+	public static String toCsv(String sep) {
+		return String.format("%s%s%s%s%s%s%s", l.toCsv(sep), sep, t.toCsv(sep), sep, delta.toCsv(sep), sep, beta.toCsv(sep));
+	}
+	
 	public static String[] toArray() {
 		return BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
 	}
