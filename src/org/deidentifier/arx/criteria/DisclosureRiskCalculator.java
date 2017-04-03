@@ -30,11 +30,27 @@ public class DisclosureRiskCalculator {
 		
 		private DisclosureRisk(String name) {
 			this.name = name;
-		}		
+		}
 
-		private void collect(double min, double max, double avg) {
-			avg += avg;
-			numValues ++;
+		/**
+		 * @param value
+		 * @param weight TODO
+		 */
+		private void collect(double value, double weight) {
+
+			collect (value, value, value, weight);
+			
+		}
+
+		/**
+		 * @param min
+		 * @param max
+		 * @param avg
+		 * @param weight
+		 */
+		private void collect(double min, double max, double avg, double weight) {
+			avg += ( avg * weight);
+			numValues += weight;
 
 			min = Math.min(min,  min);
 			max = Math.max(max,  max);
@@ -148,23 +164,72 @@ public class DisclosureRiskCalculator {
         int[] buckets = entry.distributions[index].getBuckets();
         double count = entry.count;
         
-        double _delta = 0d;
-        double _count = 0d;
+        double minDelta = Double.MAX_VALUE;
+        double maxDelta = 0d;
+        double avgDelta = 0d;
+        double numDeltas = 0d;
         // For each value in c
         for (int i = 0; i < buckets.length; i += 2) {
             if (buckets[i] != -1) { // bucket not empty
                 double frequencyInT = distribution[buckets[i]];
                 double frequencyInC = (double) buckets[i + 1] / count;
                 double value = Math.abs(log2(frequencyInC / frequencyInT));
-                _delta += value;
-                _count++;
+                avgDelta += value;
+                numDeltas++;
+                minDelta = Math.min(value, minDelta);
+                maxDelta = Math.max(value, maxDelta);
             }
         }
+        avgDelta /= numDeltas;
 		if (DisclosureRiskCalculator.delta != null) {
-			delta.collect(_delta/_count);
+			delta.collect(minDelta, maxDelta, avgDelta, count);
 		}
 	}
 
+
+	/**
+	 * @param distribution the distribution of the sensitive attribute in the original dataset
+	 * @param entry the equivalence class EC
+	 * @param index the index position of the sensitive attribute
+	 * @param suppressed true, if the EC is suppressed
+	 */
+	public static void calculateBeta(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
+	
+		// Calculate beta
+		// Init
+		int[] buckets = entry.distributions[index].getBuckets();
+		// the number of rows in this EC
+		double count = entry.count;
+		
+		
+	
+		// For each value in EC
+		// NEW version
+		double minBeta = 1d;
+		double maxBeta = 0d;
+		double avgBeta = 0d;
+		double numBetas = 0d;
+		for (int i = 0; i < buckets.length; i += 2) {
+			if (buckets[i] != -1) { // bucket not empty
+				double frequencyInT = distribution[buckets[i]];
+				double frequencyInEC = (double) buckets[i + 1] / count;
+				
+				if (frequencyInT < frequencyInEC) {
+					double value = (frequencyInEC - frequencyInT) / frequencyInT;
+					maxBeta = Math.max(value, maxBeta);
+					minBeta = Math.min(value, maxBeta);
+					avgBeta += value;
+					numBetas++;
+				}
+			}
+		}
+		avgBeta /= numBetas;
+		
+		
+		if (DisclosureRiskCalculator.beta != null) {
+			DisclosureRiskCalculator.beta.collect(minBeta, maxBeta, avgBeta, count);
+		}
+	}
 
 	/**
 	 * @param distribution the distribution of the sensitive attribute in the original dataset
@@ -181,14 +246,15 @@ public class DisclosureRiskCalculator {
         double val = 1.0d;
         for (int i = 0; i < buckets.length; i += 2) {
             if (buckets[i] != -1) { // bucket not empty
-                double frequency = distribution[buckets[i]];
-                val += Math.abs((frequency - ((double) buckets[i + 1] / count))) - frequency;
+                double frequencyinT = distribution[buckets[i]];
+                double frequencyInC = (double) buckets[i + 1] / count;
+                val += Math.abs((frequencyinT - frequencyInC)) - frequencyinT;
             }
         }
         val /= 2;
 
 		if (DisclosureRiskCalculator.t != null) {
-			t.collect(val);
+			t.collect(val, entry.count);
 		}
         
 	}
@@ -205,56 +271,12 @@ public class DisclosureRiskCalculator {
 		int ld = entry.distributions[index].size(); // minSize=(int)l;
 		
 		if (DisclosureRiskCalculator.l != null) {
-			DisclosureRiskCalculator.l.collect(ld);
+			DisclosureRiskCalculator.l.collect(ld, entry.count);
 		}
 		
 	}
 
 
-	/**
-	 * @param distribution the distribution of the sensitive attribute in the original dataset
-	 * @param entry the equivalence class EC
-	 * @param index the index position of the sensitive attribute
-	 * @param suppressed true, if the EC is suppressed
-	 */
-	public static void calculateBeta(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
-
-		// Calculate beta
-		// Init
-		int[] buckets = entry.distributions[index].getBuckets();
-		// the number of rows in this EC
-		double count = entry.count;
-		
-		
-
-		// For each value in EC
-		// NEW version
-		double minBeta = 1d;
-		double maxBeta = 0d;
-		double avgBeta = 0d;
-		double numBetas = 0d;
-		for (int i = 0; i < buckets.length; i += 2) {
-			if (buckets[i] != -1) { // bucket not empty
-				double frequencyInT = distribution[buckets[i]];
-				double frequencyInEC = (double) buckets[i + 1] / count;
-				
-				if (frequencyInT < frequencyInEC) {
-					double value = (frequencyInEC - frequencyInT) / frequencyInT;
-					maxBeta = Math.max(value, maxBeta);
-					avgBeta += value;
-					minBeta = Math.min(value, maxBeta);
-					numBetas++;
-				}
-			}
-		}
-		avgBeta /= numBetas;
-		
-		
-		if (DisclosureRiskCalculator.beta != null) {
-			DisclosureRiskCalculator.beta.collect(minBeta, maxBeta, avgBeta);
-		}
-	}
-	
 	public static String toCsv(String sep) {
 		return String.format("%s%s%s%s%s%s%s", l.toCsv(sep), sep, t.toCsv(sep), sep, delta.toCsv(sep), sep, beta.toCsv(sep));
 	}
