@@ -117,6 +117,12 @@ public class DisclosureRiskCalculator {
 		return delta;
 	}
 
+	/**
+	 * @param distribution the distribution of the sensitive attribute in the original dataset
+	 * @param entry the equivalence class EC
+	 * @param index the index position of the sensitive attribute
+	 * @param suppressed true, if the EC is suppressed
+	 */
 	public static void calculateDisclosureRisk(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
 
 		if (suppressed) {
@@ -129,6 +135,13 @@ public class DisclosureRiskCalculator {
 		calculateDelta(distribution, entry, index, suppressed);
 	}
 
+
+	/**
+	 * @param distribution the distribution of the sensitive attribute in the original dataset
+	 * @param entry the equivalence class EC
+	 * @param index the index position of the sensitive attribute
+	 * @param suppressed true, if the EC is suppressed
+	 */
 	private static void calculateDelta(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
 		
         // Init
@@ -152,6 +165,13 @@ public class DisclosureRiskCalculator {
 		}
 	}
 
+
+	/**
+	 * @param distribution the distribution of the sensitive attribute in the original dataset
+	 * @param entry the equivalence class EC
+	 * @param index the index position of the sensitive attribute
+	 * @param suppressed true, if the EC is suppressed
+	 */
 	private static void calculateT(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
 		
         // Calculate EMD with equal distance
@@ -173,6 +193,13 @@ public class DisclosureRiskCalculator {
         
 	}
 
+
+	/**
+	 * @param distribution the distribution of the sensitive attribute in the original dataset
+	 * @param entry the equivalence class EC
+	 * @param index the index position of the sensitive attribute
+	 * @param suppressed true, if the EC is suppressed
+	 */
 	private static void calculateL(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
 		
 		int ld = entry.distributions[index].size(); // minSize=(int)l;
@@ -183,28 +210,57 @@ public class DisclosureRiskCalculator {
 		
 	}
 
+
+	/**
+	 * @param distribution the distribution of the sensitive attribute in the original dataset
+	 * @param entry the equivalence class EC
+	 * @param index the index position of the sensitive attribute
+	 * @param suppressed true, if the EC is suppressed
+	 */
 	public static void calculateBeta(double[] distribution, HashGroupifyEntry entry, int index, boolean suppressed) {
 
 		// Calculate beta
 		// Init
 		int[] buckets = entry.distributions[index].getBuckets();
+		// the number of rows in this EC
 		double count = entry.count;
+		
+		
 
-		// For each value in c
+		// For each value in EC
+//		// OLD version - does not use definition of Cao et al.
+//		double beta = 0d;
+//		double numBetas = 0d;
+//		for (int i = 0; i < buckets.length; i += 2) {
+//			if (buckets[i] != -1) { // bucket not empty
+//				double frequencyInT = distribution[buckets[i]];
+//				double frequencyInEC = (double) buckets[i + 1] / count;
+//				double value = (frequencyInEC - frequencyInT) / frequencyInT;
+//				beta += value;
+//				numBetas++;
+//			}
+//		}
+//		// Average beta for this class
+//		beta /= numBetas;
+		
+		
+		
+		// NEW version
 		double beta = 0d;
-		double numBetas = 0d;
 		for (int i = 0; i < buckets.length; i += 2) {
 			if (buckets[i] != -1) { // bucket not empty
 				double frequencyInT = distribution[buckets[i]];
-				double frequencyInC = (double) buckets[i + 1] / count;
-				double value = (frequencyInC - frequencyInT) / frequencyInT;
-				beta += value;
-				numBetas++;
+				double frequencyInEC = (double) buckets[i + 1] / count;
+				
+				if (frequencyInT < frequencyInEC) {
+					double value = (frequencyInEC - frequencyInT) / frequencyInT;
+					beta = Math.max(value, beta);
+				}
 			}
 		}
-
-		// Average beta for this class
-		beta /= numBetas;
+		
+		
+		
 		if (DisclosureRiskCalculator.beta != null) {
 			DisclosureRiskCalculator.beta.collect(beta);
 		}
