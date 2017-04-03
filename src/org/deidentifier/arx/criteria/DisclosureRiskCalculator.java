@@ -43,17 +43,17 @@ public class DisclosureRiskCalculator {
 		}
 
 		/**
-		 * @param min
-		 * @param max
-		 * @param avg
-		 * @param weight
+		 * @param _min
+		 * @param _max
+		 * @param _avg
+		 * @param _weight
 		 */
-		private void collect(double min, double max, double avg, double weight) {
-			avg += ( avg * weight);
-			numValues += weight;
+		private void collect(double _min, double _max, double _avg, double _weight) {
+			avg += ( _avg * _weight);
+			numValues += _weight;
 
-			min = Math.min(min,  min);
-			max = Math.max(max,  max);
+			min = Math.min(this.min,  _min);
+			max = Math.max(this.max,  _max);
 		}
 
 		private void done() {
