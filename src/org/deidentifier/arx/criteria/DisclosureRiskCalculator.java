@@ -32,7 +32,7 @@ public class DisclosureRiskCalculator {
 			this.name = name;
 		}
 
-		private void process(double value) {
+		private void collect(double value) {
 			avg += value;
 			numValues ++;
 
@@ -148,7 +148,7 @@ public class DisclosureRiskCalculator {
             }
         }
 		if (DisclosureRiskCalculator.delta != null) {
-			delta.process(_delta/_count);
+			delta.collect(_delta/_count);
 		}
 	}
 
@@ -168,7 +168,7 @@ public class DisclosureRiskCalculator {
         val /= 2;
 
 		if (DisclosureRiskCalculator.t != null) {
-			t.process(val);
+			t.collect(val);
 		}
         
 	}
@@ -178,7 +178,7 @@ public class DisclosureRiskCalculator {
 		int ld = entry.distributions[index].size(); // minSize=(int)l;
 		
 		if (DisclosureRiskCalculator.l != null) {
-			DisclosureRiskCalculator.l.process(ld);
+			DisclosureRiskCalculator.l.collect(ld);
 		}
 		
 	}
@@ -206,7 +206,7 @@ public class DisclosureRiskCalculator {
 		// Average beta for this class
 		beta /= numBetas;
 		if (DisclosureRiskCalculator.beta != null) {
-			DisclosureRiskCalculator.beta.process(beta);
+			DisclosureRiskCalculator.beta.collect(beta);
 		}
 	}
 	
