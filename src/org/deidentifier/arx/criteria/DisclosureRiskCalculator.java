@@ -22,14 +22,17 @@ public class DisclosureRiskCalculator {
 
 	public static class DisclosureRisk {
 		
-		private String name;
-		private double numValues = 0;
-		private double avg = 0;
-		private double min = Double.MAX_VALUE;
-		private double max = -Double.MAX_VALUE;
+		private final String name;
+		private double numValues;
+		private double avg;
+		private double min;
+		private double max;
 		
 		private DisclosureRisk(String name) {
 			this.name = name;
+			this.numValues = 0;
+			this.min = Double.MAX_VALUE;
+			this.max = -Double.MAX_VALUE;
 		}
 
 		/**
@@ -43,17 +46,17 @@ public class DisclosureRiskCalculator {
 		}
 
 		/**
-		 * @param _min
-		 * @param _max
-		 * @param _avg
-		 * @param _weight
+		 * @param min
+		 * @param max
+		 * @param avg
+		 * @param weight
 		 */
-		private void collect(double _min, double _max, double _avg, double _weight) {
-			avg += ( _avg * _weight);
-			numValues += _weight;
+		private void collect(double min, double max, double avg, double weight) {
+			this.avg += ( avg * weight);
+			this.numValues += weight;
 
-			min = Math.min(this.min,  _min);
-			max = Math.max(this.max,  _max);
+			this.min = Math.min(this.min,  min);
+			this.max = Math.max(this.max,  max);
 		}
 
 		private void done() {

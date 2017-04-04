@@ -134,7 +134,7 @@ public class BenchmarkDriver {
 	 * @return
      * @throws IOException
      */
-    private static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
+    static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
                                                      String sa, PrivacyModel privacyModel, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();

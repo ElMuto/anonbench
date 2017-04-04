@@ -452,7 +452,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             case IHIS:
                 return "EDUC";
             case ACS13:
-                return "SCHG";
+                return "Marital status";
             default:
                 throw new RuntimeException("Invalid dataset");
             }
