@@ -59,7 +59,7 @@ public class DisclosureRiskCalculator {
 			this.max = Math.max(this.max,  max);
 		}
 
-		private void done() {
+		private void summarize() {
 			avg /= numValues;
 		}
 
@@ -106,11 +106,11 @@ public class DisclosureRiskCalculator {
 		delta   = new DisclosureRisk("Delta");
 	}
 
-	public static void done() {
-		beta.done();
-		l.done();
-		t.done();
-		delta.done();
+	public static void summarize() {
+		beta.summarize();
+		l.summarize();
+		t.summarize();
+		delta.summarize();
 	}
 	
 	public static DisclosureRisk getBeta() {

@@ -646,7 +646,7 @@ public class BenchmarkDriver {
         	
         	
         }
-        DisclosureRiskCalculator.done();
+        DisclosureRiskCalculator.summarize();
         if (optNode != null) {
         	outHandle.release();
         }    		

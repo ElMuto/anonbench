@@ -89,7 +89,7 @@ public class TestWeightedAvg {
 		try {
 			DisclosureRiskCalculator.prepare();
 			anonymizer.anonymize(arxData, config);
-			DisclosureRiskCalculator.done();
+			DisclosureRiskCalculator.summarize();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
