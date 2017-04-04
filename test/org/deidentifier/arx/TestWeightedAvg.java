@@ -41,7 +41,7 @@ public class TestWeightedAvg {
     
 	/**
 	 * tests solution space with one transformation containing two ECs. One with 35,714 entries and avg=0.240240797. the other
-	 * with 33011 entries and avg=0.380531163. This should result in an weighted average of 0.307627124.
+	 * with 33011 entries and avg=0.380531163. This should result in an weighted average of 0.307627124 (and NOT 0.31038598).
 	 */
 	@Test
 	public void testOneTransformationWithTwosECs() {
