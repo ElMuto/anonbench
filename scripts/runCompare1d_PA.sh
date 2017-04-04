@@ -22,6 +22,6 @@ done
 #java -Xmx5G -jar jars/Compare1d_PA.jar IHIS le
 
 #fed4
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS d  &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS t
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr &
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS d  &
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS t
