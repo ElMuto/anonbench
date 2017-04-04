@@ -76,13 +76,6 @@ public class DisclosureRiskCalculator {
 			System.out.format(new Locale ("DE", "de"), "\t"+name+":\t %.3f %.3f %.3f\n", min, avg, max);
 		}
 
-		public String toCsv(String sep) {
-			String NO_VALUE_FOUND_STRING = "NaN";
-			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
-			String formattedMax = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", max));
-			return String.format(new Locale ("DE", "de"), "%s%s%.3f%s%s", formattedMin, sep, avg, sep, formattedMax);
-		}
-
 		public String[] toArray() {
 			String NO_VALUE_FOUND_STRING = "NaN";
 			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
@@ -274,11 +267,6 @@ public class DisclosureRiskCalculator {
 			DisclosureRiskCalculator.l.collect(ld, entry.count);
 		}
 		
-	}
-
-
-	public static String toCsv(String sep) {
-		return String.format("%s%s%s%s%s%s%s", l.toCsv(sep), sep, t.toCsv(sep), sep, delta.toCsv(sep), sep, beta.toCsv(sep));
 	}
 	
 	public static String[] toArray() {
