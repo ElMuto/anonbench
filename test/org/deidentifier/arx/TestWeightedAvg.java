@@ -21,7 +21,6 @@ public class TestWeightedAvg {
 	static final PrivacyModel			privacyModel= new PrivacyModel("t", 5, 0.2);
 	
 	static Data arxData;
-	static DataDefinition numDataDef;
 	static String[] qiS;	
 	static ARXConfiguration config;
 	static ARXAnonymizer anonymizer;
@@ -38,7 +37,6 @@ public class TestWeightedAvg {
 			e.printStackTrace();
 		}
         arxData = dataset.getArxData();
-        numDataDef = arxData.getDefinition();
         qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(datafile);
         anonymizer = new ARXAnonymizer();
         
@@ -60,9 +58,7 @@ public class TestWeightedAvg {
 		
 		anonymizeTrafos(testTrafo, testTrafo);
 
-		assertEquals(0.307627124, DisclosureRiskCalculator.getDelta().getAvg(), 1e-9);
-		
-		
+		assertEquals(0.307627124, DisclosureRiskCalculator.getDelta().getAvg(), 1e-9);		
 	}
 
     
@@ -81,14 +77,19 @@ public class TestWeightedAvg {
 	}
 
 	private void anonymizeTrafos(int[] minLevels, int[] maxLevels) {
+        DataDefinition dataDef = arxData.getDefinition();
+        
 		for (int i = 0; i < qiS.length; i++) {
 			String qi = qiS[i];
-			numDataDef.setMinimumGeneralization(qi, minLevels[i]);
-			numDataDef.setMaximumGeneralization(qi, maxLevels[i]);
+			dataDef.setMinimumGeneralization(qi, minLevels[i]);
+			dataDef.setMaximumGeneralization(qi, maxLevels[i]);
 		}
+		
 		try {
 			DisclosureRiskCalculator.prepare();
+			
 			anonymizer.anonymize(arxData, config);
+			
 			DisclosureRiskCalculator.summarize();
 		} catch (IOException e) {
 			e.printStackTrace();
