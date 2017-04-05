@@ -73,7 +73,7 @@ public class Compare1d_PA {
 		int candidateIndex = 0;
 		String[] saList = new String[] { };
 		if (args.length >= 3) {
-			String[] allowedSAs = new String[] { "ED", "MS", "both" };		
+			String[] allowedSAs = new String[] { "MS", "ED", "both" };		
 			String saFromCommandLine = args[2];		
 			validInput = false;		
 			for (String s : allowedSAs) {
