@@ -201,16 +201,16 @@ public class DisclosureRiskCalculator {
 	
 		// For each value in EC
 		// NEW version
-		double minBeta = 1d;
-		double maxBeta = 0d;
-		double avgBeta = 0d;
+		double minBeta = Double.MAX_VALUE;
+		double maxBeta = Double.MIN_VALUE;
+		double avgBeta = Double.MAX_VALUE;
 		double numBetas = 0d;
 		for (int i = 0; i < buckets.length; i += 2) {
 			if (buckets[i] != -1) { // bucket not empty
 				double frequencyInT = distribution[buckets[i]];
 				double frequencyInEC = (double) buckets[i + 1] / count;
 				
-				if (frequencyInT < frequencyInEC) {
+				if (frequencyInT <= frequencyInEC) {
 					double value = (frequencyInEC - frequencyInT) / frequencyInT;
 					maxBeta = Math.max(value, maxBeta);
 					minBeta = Math.min(value, maxBeta);

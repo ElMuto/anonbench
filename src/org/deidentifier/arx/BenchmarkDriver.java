@@ -618,9 +618,10 @@ public class BenchmarkDriver {
         String ilNueStr = "NaN";
         String ilLossStr = "NaN";
         String ilScStr  = "NaN";
-        DisclosureRiskCalculator.prepare();
         DataHandle outHandle = null;
         int numOfsuppressedRecords = -1;
+        
+        String[] disclosureRiskResults = null;
         if (optNode != null) {
         	outHandle = result.getOutput(optNode, false);
         	outputArray = this.converter.toArray(outHandle, dataset.getInputDataDef());
@@ -638,15 +639,17 @@ public class BenchmarkDriver {
         		numDataDef.setMinimumGeneralization(qi, optNode.getTransformation()[i]);
         		numDataDef.setMaximumGeneralization(qi, optNode.getTransformation()[i]);
         	}
-        	
+
+            DisclosureRiskCalculator.prepare();
         	ARXResult numResult = anonymizer.anonymize(dataset.getArxData(true), config);
+            DisclosureRiskCalculator.summarize();
+            disclosureRiskResults = DisclosureRiskCalculator.toArray();
         	DataHandle numOutHandle = numResult.getOutput(optNode, false);
         	String[][] numOutputArray = this.converter.toArray(numOutHandle, dataset.getInputDataDef(true));
         	ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(numOutputArray, optNode.getTransformation()).getUtility());
         	
         	
         }
-        DisclosureRiskCalculator.summarize();
         if (optNode != null) {
         	outHandle.release();
         }    		
@@ -665,7 +668,7 @@ public class BenchmarkDriver {
         		BenchmarkDriver.concat(
         				new String[] { relPAStr, absPAStr, minPAStr, maxPAStr, gainStr, trafoStr,  numSupRecsStr },
         				ilMeasureValues),
-        		DisclosureRiskCalculator.toArray());
+        		disclosureRiskResults);
 	}
 
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
