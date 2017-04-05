@@ -33,6 +33,8 @@ import org.deidentifier.arx.framework.lattice.Transformation;
  * @author Florian Kohlmayer
  */
 public class RecursiveCLDiversity extends LDiversity{
+	
+	// dummy comment
 
     /**  SVUID */
     private static final long serialVersionUID = -5893481096346270328L;
