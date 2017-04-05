@@ -22,6 +22,7 @@ package org.deidentifier.arx.execution;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
@@ -46,6 +47,7 @@ public class Compare1d_PA {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		
 		BenchmarkDatafile datafile = null;
 		String dataFileName = args[0];
 		if ("ACS13".equals(dataFileName)) {
@@ -137,7 +139,7 @@ public class Compare1d_PA {
 							datafile.name(),
 							sa,
 							privacyModel.getCriterion().toString(),
-							String.valueOf(privacyModel.getDim2Val())
+							String.format(Locale.GERMAN, "%f", privacyModel.getDim2Val())
 					},
 					relPAStr);
 					
