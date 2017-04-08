@@ -5,14 +5,11 @@ import static org.junit.Assert.*;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator.DisclosureRisk;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author spengler
+ * @author Helmut Spengler
  * make sure that the correct values for min and max privacy guarantees are calculated
  */
 public class TestFindOptimalTrafoForMinPrivGuarantee {

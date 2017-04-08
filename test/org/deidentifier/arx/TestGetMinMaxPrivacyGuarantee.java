@@ -7,8 +7,6 @@ import java.io.IOException;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator.DisclosureRisk;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
