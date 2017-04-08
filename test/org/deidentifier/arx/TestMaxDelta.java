@@ -25,12 +25,12 @@ public class TestMaxDelta {
 	final String				sa			= "Education";
 	final PrivacyModel			privacyModel= new PrivacyModel("ld", 5, 18d);
 
-	private TestSetup testSetup;
+	private Setup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new TestSetup(criteria, datafile, suppFactor, measure, sa, privacyModel);
+    	testSetup =  new Setup(criteria, datafile, suppFactor, measure, sa, privacyModel);
         
     }
     

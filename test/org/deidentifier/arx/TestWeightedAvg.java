@@ -18,12 +18,12 @@ public class TestWeightedAvg {
 	final String					sa			= "Marital status";
 	final PrivacyModel			privacyModel= new PrivacyModel("t", 5, 0.2);
 	
-	private TestSetup testSetup;
+	private Setup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new TestSetup(criteria, datafile, suppFactor, measure, sa, privacyModel);
+    	testSetup =  new Setup(criteria, datafile, suppFactor, measure, sa, privacyModel);
         
     }
     

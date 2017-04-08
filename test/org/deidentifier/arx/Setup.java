@@ -7,7 +7,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 
-public class TestSetup {
+public class Setup {
 	
 	private Data arxData;
 	private String[] qiS;	
@@ -15,7 +15,7 @@ public class TestSetup {
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	
-	public TestSetup(BenchmarkCriterion[] criteria, BenchmarkDatafile datafile, double suppFactor,
+	public Setup(BenchmarkCriterion[] criteria, BenchmarkDatafile datafile, double suppFactor,
 			BenchmarkMeasure measure, String sa, PrivacyModel privacyModel) {
 		super();
 		

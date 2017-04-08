@@ -23,12 +23,12 @@ public class TestAggregatedBetaValues {
 	final String				sa			= "Marital status";
 	final PrivacyModel			privacyModel= new PrivacyModel("le", 5, 3d);
 
-	private TestSetup testSetup;
+	private Setup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new TestSetup(criteria, datafile, suppFactor, measure, sa, privacyModel);
+    	testSetup =  new Setup(criteria, datafile, suppFactor, measure, sa, privacyModel);
         
     }
     
