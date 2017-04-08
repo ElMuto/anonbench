@@ -1,10 +1,14 @@
 package org.deidentifier.arx;
 
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+
 public class AttributeStatistics {
 
-    public final Integer numValues;
+	public final Integer numRows;
+	public final Integer numValues;
     public final Double frequencyDeviation;
-    public final Double frequencySpan;
+    public final Double minFrequency;
+    public final Double maxFrequency;
     public final Double variance;
     public final Double skewness;
     public final Double kurtosis;
@@ -18,9 +22,9 @@ public class AttributeStatistics {
     public final Double entropy;
     
     /**
+     * @param numRows TODO
      * @param numValues
      * @param frequencyDeviation
-     * @param frequencySpan TODO
      * @param variance
      * @param skewness
      * @param kurtosis
@@ -32,10 +36,12 @@ public class AttributeStatistics {
      * @param mean_geom
      * @param median
      * @param entropy
+     * @param minFrequency TODO
+     * @param maxFrequency TODO
      */
-    public AttributeStatistics(Integer numValues,
+    public AttributeStatistics(Integer numRows,
+                               Integer numValues,
                                Double frequencyDeviation,
-                               Double frequencySpan,
                                Double variance,
                                Double skewness,
                                Double kurtosis,
@@ -45,10 +51,15 @@ public class AttributeStatistics {
                                Double quartil_coeff,
                                Double mean_arith,
                                Double mean_geom,
-                               Double median, Double entropy) {
+                               Double median, Double entropy, Double minFrequency, Double maxFrequency) {
+    	
+    	if (minFrequency > maxFrequency) throw new RuntimeException("This should not happen");
+    	
+    	this.numRows = numRows;
         this.numValues = numValues;
         this.frequencyDeviation = frequencyDeviation;
-        this.frequencySpan = frequencySpan;
+        this.minFrequency = minFrequency;
+        this.maxFrequency = maxFrequency;
         this.variance = variance;
         this.skewness = skewness;
         this.kurtosis = kurtosis;
@@ -71,7 +82,7 @@ public class AttributeStatistics {
     }
 
     public Double getFrequencySpan() {
-        return frequencySpan;
+        return this.maxFrequency - this.minFrequency;
     }
 
     public Double getVariance() {
@@ -117,4 +128,69 @@ public class AttributeStatistics {
     public Double getEntropy() {
         return entropy;
     }
+    
+    public Double getMinFrequency() {
+		return minFrequency;
+	}
+
+	public Double getMaxFrequency() {
+		return maxFrequency;
+	}
+	
+
+
+    /** Log 2. */
+    private static final double LOG2             = Math.log(2);
+
+    /**
+     * Computes log 2.
+     *
+     * @param num
+     * @return
+     */
+    static final double log2(final double num) {
+        return Math.log(num) / LOG2;
+    }
+	
+	public Double getMinGuarantee(BenchmarkCriterion crit) {
+		switch (crit) {
+		case BASIC_BETA_LIKENESS:
+			return ((1d - getMinFrequency()) / getMinFrequency());
+		case D_DISCLOSURE_PRIVACY:
+			return Math.abs(log2(1d / (getNumRows() * getMaxFrequency())));
+		case L_DIVERSITY_DISTINCT:
+			return 1d;
+		case L_DIVERSITY_ENTROPY:
+			return 1d;
+		case L_DIVERSITY_RECURSIVE:
+			return 1d;
+		case T_CLOSENESS_ED:
+			return 1d;
+		default:
+			throw new IllegalArgumentException("Unsopported criterion: " + crit);		
+		}
+	}
+	
+	public Double getMaxGuarantee(BenchmarkCriterion crit) {
+		switch (crit) {
+		case BASIC_BETA_LIKENESS:
+			return 0d;
+		case D_DISCLOSURE_PRIVACY:
+			return 0d;
+		case L_DIVERSITY_DISTINCT:
+			return Double.valueOf(getNumValues());
+		case L_DIVERSITY_ENTROPY:
+			return Double.valueOf(getNumValues());
+		case L_DIVERSITY_RECURSIVE:
+			return Double.valueOf(getNumValues());
+		case T_CLOSENESS_ED:
+			return 0d;
+		default:
+			throw new IllegalArgumentException("Unsopported criterion: " + crit);		
+		}
+	}
+
+	private int getNumRows() {
+		return numRows;
+	}
 }

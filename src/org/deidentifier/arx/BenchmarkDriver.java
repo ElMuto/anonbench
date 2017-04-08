@@ -536,6 +536,8 @@ public class BenchmarkDriver {
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
+		AttributeStatistics attrStats = analyzeAttribute(dataset, dataset.getHandle(), sa, 0);
+		
 		ARXNode optNode = null;
 		double relPA = -Double.MAX_VALUE;
 		double absPA = -Double.MAX_VALUE;
@@ -713,9 +715,9 @@ public class BenchmarkDriver {
         if (statsCache.containsKey(statsKey)) {
             return statsCache.get(statsKey);
         } else {
+            Integer numRows = null;
             Integer numValues = null;
             Double  frequencyDeviation = null;
-            Double  frequencySpan = null;
             Double  variance = null;
             Double  skewness = null;
             Double  kurtosis = null;
@@ -727,7 +729,11 @@ public class BenchmarkDriver {
             Double  mean_geom = null; // done
             Double  median = null; // done
 
+            Double minFrequency = null;
+            Double maxFrequency = null;
+
             int attrColIndex = handle.getColumnIndexOf(attr);
+            numRows = handle.getNumRows();
             String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
             numValues = distinctValues.length;
             if (verbosity >= 1) System.out.println("    " + attr + " (domain size: " + distinctValues.length + ")");
@@ -794,7 +800,8 @@ public class BenchmarkDriver {
                     stats.addValue(freqs[i]);
                 }
                 frequencyDeviation = stats.getStandardDeviation();
-                frequencySpan = stats.getMax() - stats.getMin();
+                minFrequency = stats.getMin();
+                maxFrequency = stats.getMax();
                 
                 if (verbosity >= 2) {
                     System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
@@ -806,11 +813,11 @@ public class BenchmarkDriver {
                 }
             }
             
-            statsCache.put(statsKey, new AttributeStatistics(numValues, frequencyDeviation,
-            							   frequencySpan, variance, skewness,
+            statsCache.put(statsKey, new AttributeStatistics(numRows, numValues,
+            							   frequencyDeviation, variance, skewness,
                                            kurtosis, standDeviation, variance_coeff,
                                            deviation_norm, quartil_coeff,
-                                           mean_arith, mean_geom, median, normalizedEntropy));
+                                           mean_arith, mean_geom, median, normalizedEntropy, minFrequency, maxFrequency));
             
             return statsCache.get(statsKey);
         }

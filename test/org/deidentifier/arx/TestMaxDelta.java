@@ -50,6 +50,6 @@ public class TestMaxDelta {
 		
 		DisclosureRisk delta = DisclosureRiskCalculator.getDelta();
 		
-		assertTrue("delta-max = " + delta.getMax(), delta.getMax() <= 9.4);
+		assertTrue("delta-max = " + delta.getMax(), delta.getMax() <= 9.998);
 	}
 }

@@ -10,6 +10,7 @@ import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 public class Setup {
 	
 	private Data arxData;
+	private String sa;
 	private String[] qiS;	
 	private ARXConfiguration config;
 	private ARXAnonymizer anonymizer;
@@ -29,6 +30,12 @@ public class Setup {
         arxData = dataset.getArxData();
         qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(datafile);
         anonymizer = new ARXAnonymizer();
+        this.sa = sa;
+	}
+
+
+	public ARXResult anonymizeTrafos() {
+		return anonymizeTrafos(null, null);
 	}
 
 
@@ -39,8 +46,12 @@ public class Setup {
         
 		for (int i = 0; i < qiS.length; i++) {
 			String qi = qiS[i];
-			dataDef.setMinimumGeneralization(qi, minLevels[i]);
-			dataDef.setMaximumGeneralization(qi, maxLevels[i]);
+			if (minLevels != null) {
+				dataDef.setMinimumGeneralization(qi, minLevels[i]);
+			}
+			if (maxLevels != null) {
+				dataDef.setMaximumGeneralization(qi, maxLevels[i]);
+			}
 		}
 		
 		try {
@@ -61,5 +72,18 @@ public class Setup {
 
 		arxData.getHandle().release();
 		
+	}
+	
+	public DataHandle getHandle() {
+		return arxData.getHandle();
+	}
+	
+	public BenchmarkDataset getDataset() {
+		return dataset;
+	}
+
+
+	public String getSa() {
+		return sa;
 	}
 }
