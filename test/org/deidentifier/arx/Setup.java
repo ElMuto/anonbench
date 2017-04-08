@@ -16,8 +16,8 @@ public class Setup {
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	
-	public Setup(BenchmarkCriterion[] criteria, BenchmarkDatafile datafile, double suppFactor,
-			BenchmarkMeasure measure, String sa, PrivacyModel privacyModel) {
+	public Setup(BenchmarkCriterion[] criteria, PrivacyModel privacyModel, BenchmarkDatafile datafile,
+			double suppFactor, BenchmarkMeasure measure, String sa) {
 		super();
 		
 	   	dataset = new BenchmarkDataset(datafile, criteria, sa);

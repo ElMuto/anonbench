@@ -24,12 +24,12 @@ public class TestGetMinMaxPrivacyGuarantee {
     public void setUp() {
 
     	testSetup =  new Setup(
-    			new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
+    			new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
+    			new PrivacyModel("ld", 5, 0d),
     			BenchmarkDatafile.ACS13,
     			0.05,
     			BenchmarkMeasure.ENTROPY,
-    			"Education",
-    			new PrivacyModel("ld", 5, 18d));
+    			"Education");
     	
 		try {
 			stats = BenchmarkDriver.analyzeAttribute(testSetup.getDataset(), testSetup.getHandle(), testSetup.getSa(), 0);

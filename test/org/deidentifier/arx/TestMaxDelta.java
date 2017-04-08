@@ -30,7 +30,7 @@ public class TestMaxDelta {
     @Before
     public void setUp() {
 
-    	testSetup =  new Setup(criteria, datafile, suppFactor, measure, sa, privacyModel);
+    	testSetup =  new Setup(criteria, privacyModel, datafile, suppFactor, measure, sa);
         
     }
     
