@@ -1,6 +1,9 @@
 package org.deidentifier.arx;
 
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -85,5 +88,30 @@ public class Setup {
 
 	public String getSa() {
 		return sa;
+	}
+
+
+	/**
+	 * @param resultString TODO
+	 * @param
+	 * @return resultString[0] = IL-NUE, resultString[1] = IL-Loss, resultString[2] = IL-SSE
+	 */
+	double[] convertResults(String[] resultString) {
+		
+		double[] doubleArray = null;
+		
+		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+		try {
+			doubleArray = new double[] {
+					format.parse(resultString[7]).doubleValue(),
+					format.parse(resultString[8]).doubleValue(),
+					format.parse(resultString[9]).doubleValue()};
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return doubleArray;
 	}
 }

@@ -532,7 +532,7 @@ public class BenchmarkDriver {
 		ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel,dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 		
-		System.out.println(config.getPrivacyModels());
+//		System.out.println(config.getPrivacyModels());
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
@@ -571,7 +571,8 @@ public class BenchmarkDriver {
         			if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
         				result.getOutput(node).release();
         			}				
-        			if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+        			if (Anonymity.ANONYMOUS == node.getAnonymity() && relPA != 1d) {
+        				
         				try {
 
         					handle = result.getOutput(node);

@@ -3,10 +3,6 @@ package org.deidentifier.arx;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -63,7 +59,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 			e.printStackTrace();
 		}
 
-		double[] doubleResults = convertResults(result);
+		double[] doubleResults = testSetup.convertResults(result);
 
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
@@ -94,7 +90,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 			e.printStackTrace();
 		}
 
-		double[] doubleResults = convertResults(result);
+		double[] doubleResults = testSetup.convertResults(result);
 
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
@@ -126,33 +122,103 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 			e.printStackTrace();
 		}
 
-		double[] doubleResults = convertResults(result);
+		double[] doubleResults = testSetup.convertResults(result);
 
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
 	}
 
-	/**
-	 * @param
-	 * @return resultString[0] = IL-NUE, resultString[1] = IL-Loss, resultString[2] = IL-SSE
-	 */
-	private double[] convertResults(String[] resultString) {
-		
-		double[] doubleArray = null;
-		
-		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+
+	@Test
+	public void testT() {
+
+		privacyModel = new PrivacyModel("t", 5, 1d);
+
+		testSetup =  new Setup(
+				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
+				privacyModel,
+				BenchmarkDatafile.ACS13,
+				0.05,
+				BenchmarkMeasure.ENTROPY,
+				"Education");
+
+		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
+
+		String[] result = null;
+
 		try {
-			doubleArray = new double[] {
-					format.parse(resultString[7]).doubleValue(),
-					format.parse(resultString[8]).doubleValue(),
-					format.parse(resultString[9]).doubleValue()};
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		return doubleArray;
+
+		double[] doubleResults = testSetup.convertResults(result);
+
+		assertEquals(0d, doubleResults[0], epsilon);
+		assertEquals(0d, doubleResults[1], epsilon);
+		assertEquals(0d, doubleResults[2], epsilon);
+	}
+
+
+	@Test
+	public void testD() {
+
+		privacyModel = new PrivacyModel("d", 5, 14d);
+
+		testSetup =  new Setup(
+				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_DISCLOSURE_PRIVACY },
+				privacyModel,
+				BenchmarkDatafile.ACS13,
+				0.05,
+				BenchmarkMeasure.ENTROPY,
+				"Education");
+
+		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
+
+		String[] result = null;
+
+		try {
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		double[] doubleResults = testSetup.convertResults(result);
+
+		assertEquals(0d, doubleResults[0], epsilon);
+		assertEquals(0d, doubleResults[1], epsilon);
+		assertEquals(0d, doubleResults[2], epsilon);
+	}
+
+
+	@Test
+	public void testB() {
+
+		privacyModel = new PrivacyModel("b", 5, 95d);
+
+		testSetup =  new Setup(
+				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.BASIC_BETA_LIKENESS },
+				privacyModel,
+				BenchmarkDatafile.ACS13,
+				0.05,
+				BenchmarkMeasure.ENTROPY,
+				"Education");
+
+		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
+
+		String[] result = null;
+
+		try {
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		double[] doubleResults = testSetup.convertResults(result);
+
+		assertEquals(0d, doubleResults[0], epsilon);
+		assertEquals(0d, doubleResults[1], epsilon);
+		assertEquals(0d, doubleResults[2], epsilon);
 	}
 }
