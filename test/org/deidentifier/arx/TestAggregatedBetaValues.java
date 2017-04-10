@@ -1,10 +1,5 @@
 package org.deidentifier.arx;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
-import org.deidentifier.arx.ARXLattice.ARXNode;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -46,7 +41,7 @@ public class TestAggregatedBetaValues {
     
 
 	@Test
-	public void testMinMax() {
+	public void testBigestFoundBeta() {
 		
 		ARXResult result = testSetup.anonymizeTrafos(new int[] { 6, 1, 2 }, new int[] { 6, 1, 2 });
 		result.getOutput(result.getGlobalOptimum(), false);
