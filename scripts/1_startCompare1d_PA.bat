@@ -1,6 +1,6 @@
 @echo off
 
-Set _path=%WORKSPACE_PATH%\promotion\code-attr-disclosure-criteria-comparison
+Set _path=%WORKSPACE_PATH%\promotion\code-adcc
 
 Set _cluster_node=3
 Set _remote_dir=/home/imse/pc-bench-helmut

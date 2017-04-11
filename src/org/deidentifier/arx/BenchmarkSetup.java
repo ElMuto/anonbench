@@ -38,17 +38,20 @@ public class BenchmarkSetup {
 	    	
 	    	Integer[] dim1Vals =     { 5 };
 	
-			Double [] dim2ValsForL_SaMarStat = { 3d, 1d, 2d, 4d, 5d };
+			Double [] dim2ValsForL_SaMarStat = { 5d, 3d, 1d, 2d, 4d };
 			
-			Double [] dim2ValsForL_SaEduc    = {  3d,  1d,  6d,  9d, 12d, 15d, 18d, 21d, 24d, 27d, 30d };
+			Double [] dim2ValsForL_SaEduc    = {  25d, 1d,  3d,  6d,  9d, 12d, 15d, 18d, 21d, 24d, 27d };
 	
-			Double [] dim2ValsForT = { 0.2,  1d,  0.8, 0.6, 0.4, 0d  };
-	
-			Double [] dim2ValsForD = { 1d,    6d, 5d, 4d, 3d, 2d, 0.001 };
-			
-			
-			
-			Double [] dim2ValsForB = { 10d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
+			Double [] dim2ValsForT = { 1d,  0.8, 0.6, 0.4, 0.2,  0d  };
+
+			Double [] dim2ValsForD = { 10d,  6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
+//			Double [] dim2ValsForD = { 10d, 15d, 18d }; // time use - MS 
+
+			Double [] dim2ValsForB = { 10000d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
+//			Double [] dim2ValsForB = { 20d, 40d, 95d }; // Census - ED
+//			Double [] dim2ValsForB = { 100d, 200d, 333d }; // Time use - ED
+//			Double [] dim2ValsForB = { 100d, 400d, 833d }; // Health - ED
+//			Double [] dim2ValsForB = { 30d, 60d, 100d }; // Time use - MS
 			
 			Double[] dim2Vals = null;
 	
