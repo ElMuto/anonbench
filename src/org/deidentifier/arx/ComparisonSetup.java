@@ -18,6 +18,7 @@ public class ComparisonSetup {
 	private ARXConfiguration config;
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
+	private PrivacyModel privacyModel;
 	
 	public ComparisonSetup(BenchmarkCriterion[] criteria, PrivacyModel privacyModel, BenchmarkDatafile datafile,
 			double suppFactor, BenchmarkMeasure measure, String sa) {
@@ -34,6 +35,7 @@ public class ComparisonSetup {
         qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(datafile);
         anonymizer = new ARXAnonymizer();
         this.sa = sa;
+        this.privacyModel = privacyModel;
 	}
 
 
@@ -113,5 +115,10 @@ public class ComparisonSetup {
 		}
 		
 		return doubleArray;
+	}
+
+
+	public PrivacyModel getPrivacyModel() {
+		return privacyModel;
 	}
 }
