@@ -1,5 +1,8 @@
 package org.deidentifier.arx;
 
+import java.io.IOException;
+import java.util.Locale;
+
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -40,13 +43,30 @@ public class TestNPE_ACS13_lr {
     
 
 	@Test
-	public void testBigestFoundBeta() {
+	public void test() {
 		
-		ARXResult result = testSetup.anonymizeTrafos(new int[] { 0, 0, 0 }, new int[] { 6, 1, 2 });
-		result.getOutput(result.getGlobalOptimum(), false);
+		BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
+		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
+
+		String[] relPAStr = null;
+		try {
+			relPAStr = driver.findOptimalRelPA(0.05, dataset,
+					sa,
+					false, privacyModel);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		DisclosureRisk beta = DisclosureRiskCalculator.getBeta();
+		String[] finalResultArray = BenchmarkDriver.concat(
+				new String[] {
+						datafile.name(),
+						sa,
+						privacyModel.getCriterion().toString(),
+						String.format(Locale.GERMAN, "%f", privacyModel.getDim2Val())
+				},
+				relPAStr);
+
 		
-		assert((beta.getMin() == Double.MAX_VALUE && beta.getMax() == Double.MIN_VALUE) || beta.getMin() <= beta.getMax());
+		assert(true); // if we arrived here, we had no Exception!!!!
 	}
 }

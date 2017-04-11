@@ -649,9 +649,11 @@ public class BenchmarkDriver {
             disclosureRiskResults = DisclosureRiskCalculator.toArray();
         	DataHandle numOutHandle = numResult.getOutput(optNode, false);
         	String[][] numOutputArray = this.converter.toArray(numOutHandle, dataset.getInputDataDef(true));
-        	ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(numOutputArray, optNode.getTransformation()).getUtility());
-        	
-        	
+        	ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(numOutputArray, optNode.getTransformation()).getUtility());        	
+        } else {
+        	DisclosureRiskCalculator.prepare();
+            DisclosureRiskCalculator.summarize();
+            disclosureRiskResults = DisclosureRiskCalculator.toArray();
         }
         if (optNode != null) {
         	outHandle.release();

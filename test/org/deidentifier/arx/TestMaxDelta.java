@@ -43,7 +43,7 @@ public class TestMaxDelta {
     
 
 	@Test
-	public void testMinMax() {
+	public void testDelta() {
 		
 		ARXResult result = testSetup.anonymizeTrafos(new int[] { 0, 0, 0 }, new int[] { 6, 1, 2 });
 		result.getOutput(result.getGlobalOptimum(), false);
