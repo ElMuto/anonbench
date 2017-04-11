@@ -17,13 +17,13 @@ import org.junit.Test;
  */
 public class TestGetMinMaxPrivacyGuarantee {
 
-	private Setup testSetup = null;	
+	private ComparisonSetup testSetup = null;	
 	AttributeStatistics stats = null;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new Setup(
+    	testSetup =  new ComparisonSetup(
     			new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
     			new PrivacyModel("ld", 5, 0d),
     			BenchmarkDatafile.ACS13,

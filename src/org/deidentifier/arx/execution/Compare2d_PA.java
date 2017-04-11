@@ -96,7 +96,7 @@ public class Compare2d_PA {
 			
 			String[] relPAStr = driver.findOptimalRelPA(0.05, dataset,
 					sa,
-					false, privacyModel);
+					false, privacyModel, null, null);
 						
 			System.out.format(new Locale("de", "de"), "%d\t%.5f\t%s\n", privacyModel.getK(), privacyModel.getDim2Val(), relPAStr[0]);
 			fos       .format(new Locale("de", "de"), "%d\t%.5f\t%s\n", privacyModel.getK(), privacyModel.getDim2Val(), relPAStr[0]);

@@ -132,7 +132,7 @@ public class Compare1d_PA {
 
 			String[] relPAStr = driver.findOptimalRelPA(0.05, dataset,
 					sa,
-					false, privacyModel);
+					false, privacyModel, null, null);
 			
 			String[] finalResultArray = BenchmarkDriver.concat(
 					new String[] {

@@ -22,12 +22,12 @@ public class TestNPE_ACS13_lr {
 	final String				sa			= "Marital status";
 	final PrivacyModel			privacyModel= new PrivacyModel("lr", 5, 5d);
 
-	private Setup testSetup;
+	private ComparisonSetup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new Setup(criteria, privacyModel, datafile, suppFactor, measure, sa);
+    	testSetup =  new ComparisonSetup(criteria, privacyModel, datafile, suppFactor, measure, sa);
         
     }
     
@@ -48,7 +48,7 @@ public class TestNPE_ACS13_lr {
 		try {
 			driver.findOptimalRelPA(0.05, dataset,
 					sa,
-					false, privacyModel);
+					false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

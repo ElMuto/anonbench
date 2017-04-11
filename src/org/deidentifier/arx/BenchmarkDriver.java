@@ -474,7 +474,7 @@ public class BenchmarkDriver {
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 		driver.findOptimalRelPA(0.05, dataset,
 				sa,
-				includeInsensitiveAttributes, null);
+				includeInsensitiveAttributes, null, null, null);
 	}
 
 	/**
@@ -506,7 +506,7 @@ public class BenchmarkDriver {
 
 			String maxPAStr[] = driver.findOptimalRelPA(0.05, dataset,
 					sa,
-					includeInsensitiveAttributes, privacyModel);
+					includeInsensitiveAttributes, privacyModel, null, null);
 
 			System.out.  format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
 			outputStream.format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
@@ -520,19 +520,34 @@ public class BenchmarkDriver {
 	 * @param sa
 	 * @param includeInsensitiveAttribute
 	 * @param privacyModel
+	 * @param minLevels TODO
+	 * @param maxLevels TODO
 	 * @return
 	 * @throws IOException
 	 */
 	public String[] findOptimalRelPA(
 			double suppFactor, BenchmarkDataset dataset,
 			String sa,
-			boolean includeInsensitiveAttribute, PrivacyModel privacyModel
+			boolean includeInsensitiveAttribute, PrivacyModel privacyModel, int[] minLevels, int[] maxLevels
 			) throws IOException {
 	
 		ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel,dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 		
 //		System.out.println(config.getPrivacyModels());
+		
+        DataDefinition dataDef = dataset.getArxData().getDefinition();
+        
+        String[] qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(dataset.getDatafile());
+		for (int i = 0; i < qiS.length; i++) {
+			String qi = qiS[i];
+			if (minLevels != null) {
+				dataDef.setMinimumGeneralization(qi, minLevels[i]);
+			}
+			if (maxLevels != null) {
+				dataDef.setMaximumGeneralization(qi, maxLevels[i]);
+			}
+		}
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
@@ -634,7 +649,7 @@ public class BenchmarkDriver {
 
         	// calculate SSE
         	DataDefinition numDataDef = dataset.getArxData(true).getDefinition();
-        	String[] qiS = optNode.getQuasiIdentifyingAttributes();
+        	qiS = optNode.getQuasiIdentifyingAttributes();
         	for (int i = 0; i < qiS.length; i++) {
         		String qi = qiS[i];
         		numDataDef.setMinimumGeneralization(qi, optNode.getTransformation()[i]);

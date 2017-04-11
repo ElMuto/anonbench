@@ -19,7 +19,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 	
 	private final double epsilon = 0.01;
 
-	private Setup testSetup;
+	private ComparisonSetup testSetup;
 	private BenchmarkDriver driver;
 	private PrivacyModel privacyModel;
 	
@@ -41,7 +41,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("ld", 5, 1d);
 
-		testSetup =  new Setup(
+		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
 				privacyModel,
 				BenchmarkDatafile.ACS13,
@@ -54,7 +54,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		String[] result = null;
 
 		try {
-			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -73,7 +73,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("lr", 5, 1d);
 
-		testSetup =  new Setup(
+		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
 				privacyModel,
 				BenchmarkDatafile.ACS13,
@@ -86,7 +86,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		String[] result = null;
 
 		try {
-			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -106,7 +106,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("le", 5, 1d);
 
-		testSetup =  new Setup(
+		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_ENTROPY },
 				privacyModel,
 				BenchmarkDatafile.ACS13,
@@ -119,7 +119,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		String[] result = null;
 
 		try {
-			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -138,7 +138,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("t", 5, 1d);
 
-		testSetup =  new Setup(
+		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
 				privacyModel,
 				BenchmarkDatafile.ACS13,
@@ -151,7 +151,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		String[] result = null;
 
 		try {
-			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -170,7 +170,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("d", 5, 14d);
 
-		testSetup =  new Setup(
+		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_DISCLOSURE_PRIVACY },
 				privacyModel,
 				BenchmarkDatafile.ACS13,
@@ -183,7 +183,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		String[] result = null;
 
 		try {
-			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -202,7 +202,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("b", 5, 95d);
 
-		testSetup =  new Setup(
+		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.BASIC_BETA_LIKENESS },
 				privacyModel,
 				BenchmarkDatafile.ACS13,
@@ -215,7 +215,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		String[] result = null;
 
 		try {
-			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel);
+			result = driver.findOptimalRelPA(0.05, testSetup.getDataset(), testSetup.getSa(), false, privacyModel, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

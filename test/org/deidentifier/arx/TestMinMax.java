@@ -25,12 +25,12 @@ public class TestMinMax {
 	final String				sa			= "Education";
 	final PrivacyModel			privacyModel= new PrivacyModel("ld", 5, 18d);
 
-	private Setup testSetup;
+	private ComparisonSetup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new Setup(criteria, privacyModel, datafile, suppFactor, measure, sa);
+    	testSetup =  new ComparisonSetup(criteria, privacyModel, datafile, suppFactor, measure, sa);
         
     }
     
