@@ -3,7 +3,6 @@ package org.deidentifier.arx.execution;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDriver;
@@ -13,7 +12,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 
-public class ParametrizationChecker {
+public class CalcBetaMaxAndDeltaMax {
 
 	public static void main(String[] args) {
 		

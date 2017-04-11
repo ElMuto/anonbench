@@ -32,7 +32,7 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
  * 
  * @author Helmut Spengler
  */
-public class GetClassificationBaseline {
+public class CalcClassificationBaseline {
 	
 	/**
 	 * Main entry point

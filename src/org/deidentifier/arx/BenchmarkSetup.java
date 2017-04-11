@@ -47,11 +47,7 @@ public class BenchmarkSetup {
 			Double [] dim2ValsForD = { 10d,  6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
 //			Double [] dim2ValsForD = { 10d, 15d, 18d }; // time use - MS 
 
-			Double [] dim2ValsForB = { 10000d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
-//			Double [] dim2ValsForB = { 20d, 40d, 95d }; // Census - ED
-//			Double [] dim2ValsForB = { 100d, 200d, 333d }; // Time use - ED
-//			Double [] dim2ValsForB = { 100d, 400d, 833d }; // Health - ED
-//			Double [] dim2ValsForB = { 30d, 60d, 100d }; // Time use - MS
+			Double [] dim2ValsForB = { 76d, 57d, 38d, 19d, 0.001 }; // Census - MS
 			
 			Double[] dim2Vals = null;
 	
