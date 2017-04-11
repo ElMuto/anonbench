@@ -536,8 +536,6 @@ public class BenchmarkDriver {
 	
 		ARXResult result = anonymizer.anonymize(dataset.getArxData(), config);
 		
-		AttributeStatistics attrStats = analyzeAttribute(dataset, dataset.getHandle(), sa, 0);
-		
 		ARXNode optNode = null;
 		double relPA = -Double.MAX_VALUE;
 		double absPA = -Double.MAX_VALUE;

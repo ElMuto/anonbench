@@ -60,7 +60,8 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		}
 
 		double[] doubleResults = testSetup.convertResults(result);
-
+		
+		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
@@ -91,7 +92,8 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		}
 
 		double[] doubleResults = testSetup.convertResults(result);
-
+		
+		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
@@ -124,6 +126,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		double[] doubleResults = testSetup.convertResults(result);
 
+		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
@@ -155,6 +158,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		double[] doubleResults = testSetup.convertResults(result);
 
+		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
@@ -186,6 +190,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		double[] doubleResults = testSetup.convertResults(result);
 
+		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
@@ -217,6 +222,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		double[] doubleResults = testSetup.convertResults(result);
 
+		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
 		assertEquals(0d, doubleResults[2], epsilon);
