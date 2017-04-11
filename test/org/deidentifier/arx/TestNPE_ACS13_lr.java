@@ -1,13 +1,10 @@
 package org.deidentifier.arx;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator.DisclosureRisk;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,24 +45,13 @@ public class TestNPE_ACS13_lr {
 		BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
-		String[] relPAStr = null;
 		try {
-			relPAStr = driver.findOptimalRelPA(0.05, dataset,
+			driver.findOptimalRelPA(0.05, dataset,
 					sa,
 					false, privacyModel);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		String[] finalResultArray = BenchmarkDriver.concat(
-				new String[] {
-						datafile.name(),
-						sa,
-						privacyModel.getCriterion().toString(),
-						String.format(Locale.GERMAN, "%f", privacyModel.getDim2Val())
-				},
-				relPAStr);
-
 		
 		assert(true); // if we arrived here, we had no Exception!!!!
 	}
