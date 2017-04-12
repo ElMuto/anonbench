@@ -177,7 +177,7 @@ public class DisclosureRiskCalculator {
             }
         }
         avgDelta /= numDeltas;
-		if (DisclosureRiskCalculator.delta != null) {
+		if (DisclosureRiskCalculator.delta != null && numDeltas != 0d) {
 			delta.collect(minDelta, maxDelta, avgDelta, count);
 		}
 	}
@@ -203,7 +203,7 @@ public class DisclosureRiskCalculator {
 		// NEW version
 		double minBeta = Double.MAX_VALUE;
 		double maxBeta = Double.MIN_VALUE;
-		double avgBeta = Double.MAX_VALUE;
+		double avgBeta  = 0d;
 		double numBetas = 0d;
 		for (int i = 0; i < buckets.length; i += 2) {
 			if (buckets[i] != -1) { // bucket not empty
@@ -222,7 +222,7 @@ public class DisclosureRiskCalculator {
 		avgBeta /= numBetas;
 		
 		
-		if (DisclosureRiskCalculator.beta != null) {
+		if (DisclosureRiskCalculator.beta != null && numBetas != 0d) {
 			DisclosureRiskCalculator.beta.collect(minBeta, maxBeta, avgBeta, count);
 		}
 	}
