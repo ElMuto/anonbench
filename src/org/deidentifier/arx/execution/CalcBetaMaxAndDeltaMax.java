@@ -47,7 +47,7 @@ public class CalcBetaMaxAndDeltaMax {
 						e.printStackTrace();
 					}
 
-					String[] finalResultArray = BenchmarkDriver.concat(
+					String[] finalResultArray = (String[]) BenchmarkDriver.concat(
 							new String[] {
 									compSetup.getDataset().getDatafile().name(),
 									compSetup.getSa(),
@@ -118,7 +118,7 @@ public class CalcBetaMaxAndDeltaMax {
 
 
 	public static String[] getCsvHeader() {
-		return BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
+		return (String[]) BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
 	}
 
 }

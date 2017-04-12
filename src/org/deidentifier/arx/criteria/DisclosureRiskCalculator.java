@@ -79,12 +79,16 @@ public class DisclosureRiskCalculator {
 			System.out.format(new Locale ("DE", "de"), "\t"+name+":\t %.3f %.3f %.3f\n", min, avg, max);
 		}
 
-		public String[] toArray() {
+		public String[] toStringArray() {
 			String NO_VALUE_FOUND_STRING = "NaN";
 			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
 			String formattedMax = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", max));
 			String formattedAvg= (min == Double.MAX_VALUE && max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", avg));
 			return new String[] { formattedMin, formattedAvg, formattedMax };
+		}
+
+		public Double[] toArray() {
+			return new Double[] { min, avg, max};
 		}
 
 		public String[] getHeader() {
@@ -272,13 +276,17 @@ public class DisclosureRiskCalculator {
 		
 	}
 	
-	public static String[] toArray() {
-		return BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
+	public static String[] toStringArray() {
+		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toStringArray(), t.toStringArray()), delta.toStringArray()), beta.toStringArray());
+	}
+	
+	public static Double[] toArray() {
+		return (Double[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
 	}
 	
 	public static String[] getHeader() {
 		DisclosureRiskCalculator.prepare();
-		return BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
+		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
 	}
 
 	public static void println() {

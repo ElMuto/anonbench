@@ -659,14 +659,14 @@ public class BenchmarkDriver {
             DisclosureRiskCalculator.prepare();
         	ARXResult numResult = anonymizer.anonymize(dataset.getArxData(true), config);
             DisclosureRiskCalculator.summarize();
-            disclosureRiskResults = DisclosureRiskCalculator.toArray();
+            disclosureRiskResults = DisclosureRiskCalculator.toStringArray();
         	DataHandle numOutHandle = numResult.getOutput(optNode, false);
         	String[][] numOutputArray = this.converter.toArray(numOutHandle, dataset.getInputDataDef(true));
         	ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(numOutputArray, optNode.getTransformation()).getUtility());        	
         } else {
         	DisclosureRiskCalculator.prepare();
             DisclosureRiskCalculator.summarize();
-            disclosureRiskResults = DisclosureRiskCalculator.toArray();
+            disclosureRiskResults = DisclosureRiskCalculator.toStringArray();
         }
         if (optNode != null) {
         	outHandle.release();
@@ -682,7 +682,7 @@ public class BenchmarkDriver {
         String numSupRecsStr = String.valueOf(numOfsuppressedRecords);
         
         
-        return BenchmarkDriver.concat(
+        return (String[]) BenchmarkDriver.concat(
         		BenchmarkDriver.concat(
         				new String[] { relPAStr, absPAStr, minPAStr, maxPAStr, gainStr, trafoStr,  numSupRecsStr },
         				ilMeasureValues),
@@ -690,7 +690,7 @@ public class BenchmarkDriver {
 	}
 
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-Loss", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
+		return (String[]) BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-Loss", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
 	}
 
 	private String getRelativeInfoLoss(BenchmarkDataset dataset, ARXNode optNode, String[][] outputArray,
@@ -865,8 +865,8 @@ public class BenchmarkDriver {
 		return formatter;
 	}
     
-    public static String[] concat(String[] first, String[] second) {
-	    List<String> both = new ArrayList<String>(first.length + second.length);
+    public static Object[] concat(Object[] first, Object[] second) {
+	    List<Object> both = new ArrayList<Object>(first.length + second.length);
 	    Collections.addAll(both, first);
 	    Collections.addAll(both, second);
 	    return both.toArray(new String[both.size()]);

@@ -9,8 +9,11 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 public class ParamTransformer {
 
 	private static Map<String, Integer>				dimSa		= new HashMap<>();
+	private static Map<String, Integer>				dimMinMax	= new HashMap<>();
+
+	public static enum PG { min, max };
 	
-	private static double[][][] maxVals;
+	private static double[][][][] minMaxVals;
 	
 	static {
 		
@@ -23,33 +26,107 @@ public class ParamTransformer {
 		dimSa.put("Highest level of school completed",	        1);
 		dimSa.put("EDUC",								        1);
 		
-		maxVals = new double[BenchmarkDatafile.values().length][dimSa.size()][BenchmarkCriterion.values().length];
+		minMaxVals = new double[BenchmarkDatafile.values().length][dimSa.size()][BenchmarkCriterion.values().length][2];
 
-		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   7.161;
-		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		=  28.527;
-		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   6.362;
-		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		=  75.361;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   7.161;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  28.527;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   6.362;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  75.361;
 
-		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   9.697;
-		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		=  27.852;
-		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=  27.852;
-		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		= 133.561;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   9.697;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  27.852;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=  27.852;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 133.561;
 
-		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=  10.68;
-		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		= 683.349;
-		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   7.812;
-		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		= 160.612;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=  10.68;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 683.349;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   7.812;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 160.612;
+		
+
+
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.max.ordinal()]	= 0d;
+
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.max.ordinal()]	= 0d;
+
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.max.ordinal()]	= 0d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.max.ordinal()]	= 0d;
+		
+		
+
+
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.max.ordinal()]		=   5d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.max.ordinal()]	=   5d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.max.ordinal()]		=   5d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.max.ordinal()]		=  25d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.max.ordinal()]	=  25d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.max.ordinal()]		=  25d;
+
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.max.ordinal()]	=   7d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.max.ordinal()]	=   7d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.max.ordinal()]	=   7d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.max.ordinal()]	=  18d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.max.ordinal()]	=  18d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.max.ordinal()]	=  18d;
+		
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.max.ordinal()]	=  10d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.max.ordinal()]	=  10d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.max.ordinal()]	=  10d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.max.ordinal()]	=  26d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.max.ordinal()]	=  26d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.max.ordinal()]	=  26d;
+
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.min.ordinal()]		=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]		=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.min.ordinal()]		=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]		=   1d;
+
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]	=   1d;
+		
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_DISTINCT.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_RECURSIVE.ordinal()][PG.min.ordinal()]	=   1d;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]	=   1d;
 	}
 	
-	public static double getNormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {
+	public static double getNormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value, PG m) {
 		
-		return maxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()] / value;
+		return minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][m.ordinal()] / value;
 		
 	}
 	
-	public static double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {
+	public static double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value, PG m) {
 		
-		return maxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()] * value;
+		return minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][m.ordinal()] * value;
 		
 	}
 }
