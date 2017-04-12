@@ -8,16 +8,11 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 
 public class ParamTransformer {
 
-	private static Map<BenchmarkDatafile, Integer>	dimDatafile = new HashMap<>();
 	private static Map<String, Integer>				dimSa		= new HashMap<>();
-	private static Map<BenchmarkCriterion, Integer>	dimCrit		= new HashMap<>();
 	
 	private static double[][][] maxVals;
 	
 	static {
-		dimDatafile.put(BenchmarkDatafile.ACS13,	            0);
-		dimDatafile.put(BenchmarkDatafile.ATUS,		            1);
-		dimDatafile.put(BenchmarkDatafile.IHIS,		            2);
 		
 		dimSa.put("MS",									        0);
 		dimSa.put("Marital status",						        0);
@@ -27,37 +22,34 @@ public class ParamTransformer {
 		dimSa.put("Education",							        1);
 		dimSa.put("Highest level of school completed",	        1);
 		dimSa.put("EDUC",								        1);
-
-		dimCrit.put(BenchmarkCriterion.D_DISCLOSURE_PRIVACY,	0);
-		dimCrit.put(BenchmarkCriterion.BASIC_BETA_LIKENESS,		1);
 		
-		maxVals = new double[dimDatafile.size()][dimSa.size()][dimCrit.size()];
+		maxVals = new double[BenchmarkDatafile.values().length][dimSa.size()][BenchmarkCriterion.values().length];
 
-		maxVals[dimDatafile.get(BenchmarkDatafile.ACS13)][dimSa.get("MS")][dimCrit.get(BenchmarkCriterion.D_DISCLOSURE_PRIVACY)]	=   7.161;
-		maxVals[dimDatafile.get(BenchmarkDatafile.ACS13)][dimSa.get("MS")][dimCrit.get(BenchmarkCriterion.BASIC_BETA_LIKENESS)]		=  28.527;
-		maxVals[dimDatafile.get(BenchmarkDatafile.ACS13)][dimSa.get("ED")][dimCrit.get(BenchmarkCriterion.D_DISCLOSURE_PRIVACY)]	=   6.362;
-		maxVals[dimDatafile.get(BenchmarkDatafile.ACS13)][dimSa.get("ED")][dimCrit.get(BenchmarkCriterion.BASIC_BETA_LIKENESS)]		=  75.361;
+		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   7.161;
+		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		=  28.527;
+		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   6.362;
+		maxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		=  75.361;
 
-		maxVals[dimDatafile.get(BenchmarkDatafile.ATUS)] [dimSa.get("MS")][dimCrit.get(BenchmarkCriterion.D_DISCLOSURE_PRIVACY)]	=   9.697;
-		maxVals[dimDatafile.get(BenchmarkDatafile.ATUS)] [dimSa.get("MS")][dimCrit.get(BenchmarkCriterion.BASIC_BETA_LIKENESS)]		=  27.852;
-		maxVals[dimDatafile.get(BenchmarkDatafile.ATUS)] [dimSa.get("ED")][dimCrit.get(BenchmarkCriterion.D_DISCLOSURE_PRIVACY)]	=  27.852;
-		maxVals[dimDatafile.get(BenchmarkDatafile.ATUS)] [dimSa.get("ED")][dimCrit.get(BenchmarkCriterion.BASIC_BETA_LIKENESS)]		= 133.561;
+		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   9.697;
+		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		=  27.852;
+		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=  27.852;
+		maxVals[BenchmarkDatafile.ATUS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		= 133.561;
 
-		maxVals[dimDatafile.get(BenchmarkDatafile.IHIS)] [dimSa.get("MS")][dimCrit.get(BenchmarkCriterion.D_DISCLOSURE_PRIVACY)]	=  10.68;
-		maxVals[dimDatafile.get(BenchmarkDatafile.IHIS)] [dimSa.get("MS")][dimCrit.get(BenchmarkCriterion.BASIC_BETA_LIKENESS)]		= 683.349;
-		maxVals[dimDatafile.get(BenchmarkDatafile.IHIS)] [dimSa.get("ED")][dimCrit.get(BenchmarkCriterion.D_DISCLOSURE_PRIVACY)]	=   7.812;
-		maxVals[dimDatafile.get(BenchmarkDatafile.IHIS)] [dimSa.get("ED")][dimCrit.get(BenchmarkCriterion.BASIC_BETA_LIKENESS)]		= 160.612;
+		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=  10.68;
+		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		= 683.349;
+		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()]	=   7.812;
+		maxVals[BenchmarkDatafile.IHIS.ordinal()] [dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()]		= 160.612;
 	}
 	
 	public static double getNormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {
 		
-		return maxVals[dimDatafile.get(datafile)][dimSa.get(sa)][dimCrit.get(crit)] / value;
+		return maxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()] / value;
 		
 	}
 	
 	public static double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {
 		
-		return maxVals[dimDatafile.get(datafile)][dimSa.get(sa)][dimCrit.get(crit)] * value;
+		return maxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()] * value;
 		
 	}
 }
