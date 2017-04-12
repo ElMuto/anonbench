@@ -8,20 +8,20 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-#fed4
+#fed1
 #java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 ld &
 #java -Xmx5G -jar jars/Compare1d_PA.jar ACS13  d
 
-#fed3
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 lr &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 le &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13  t 
+#fed2
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 lr &
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 le &
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13  t 
 
 #fed2
 #java -Xmx5G -jar jars/Compare1d_PA.jar IHIS ld &
 #java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  d
 
 #fed1
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS le &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  t 
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr &
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS le &
+#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  t 

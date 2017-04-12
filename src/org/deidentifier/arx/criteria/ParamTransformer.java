@@ -9,7 +9,6 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 public class ParamTransformer {
 
 	private static Map<String, Integer>				dimSa		= new HashMap<>();
-	private static Map<String, Integer>				dimMinMax	= new HashMap<>();
 
 	public static enum PG { min, max };
 	
@@ -123,16 +122,22 @@ public class ParamTransformer {
 		double minPg = minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][PG.min.ordinal()];
 		double maxPg = minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][PG.max.ordinal()];
 		
+		Double result = null;
+		
 		if (	BenchmarkCriterion.T_CLOSENESS_ED.equals(crit) ||
 				BenchmarkCriterion.D_DISCLOSURE_PRIVACY.equals(crit) ||
 				BenchmarkCriterion.BASIC_BETA_LIKENESS.equals(crit)) {
-			return (minPg - value) / (minPg - maxPg);
+			result =  (minPg - value) / (minPg - maxPg);
 		} else if (	BenchmarkCriterion.L_DIVERSITY_DISTINCT.equals(crit) ||
 					BenchmarkCriterion.L_DIVERSITY_RECURSIVE.equals(crit) ||
 					BenchmarkCriterion.L_DIVERSITY_ENTROPY.equals(crit)) {
-			return (maxPg - value) / (maxPg - minPg);
+			result = (value - minPg) / (maxPg - minPg);
 		} else {
 			throw new IllegalArgumentException("Invalid crit: " + crit);
 		}
+
+		System.out.println(crit + "-minPg=" + minPg + ", maxPg=" + maxPg + ", value=" + value + ", result=" + result);
+		
+		return result;
 	}
 }

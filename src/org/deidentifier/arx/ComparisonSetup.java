@@ -96,7 +96,9 @@ public class ComparisonSetup {
 	/**
 	 * @param resultString TODO
 	 * @param
-	 * @return resultString[0] = IL-NUE, resultString[1] = IL-Loss, resultString[2] = IL-SSE, resultString[3] = Delta-max, resultString[4] = Beta-max
+	 * @return resultString[0] = IL-NUE, resultString[1] = IL-Loss, resultString[2] = IL-SSE, resultString[3] = Delta-max, resultString[4] = Beta-max,
+	 * resultString[5] = t-max, resultString[6] = t-max-norm, resultString[7] = Beta-max-norm, resultString[8] = lMin, , resultString[9] = lMin-norm,
+	 * resultString[10] = dMax-norm
 	 */
 	double[] convertResults(String[] resultString) {
 		
@@ -108,9 +110,15 @@ public class ComparisonSetup {
 					format.parse(resultString[7]).doubleValue(),
 					format.parse(resultString[8]).doubleValue(),
 					format.parse(resultString[9]).doubleValue(),
-					format.parse(resultString[18]).doubleValue(),
-					format.parse(resultString[21]).doubleValue(),
-					};
+					"NaN".equals(resultString[24]) ? Double.NaN : format.parse(resultString[24]).doubleValue(),
+					"NaN".equals(resultString[30]) ? Double.NaN : format.parse(resultString[30]).doubleValue(),
+					"NaN".equals(resultString[18]) ? Double.NaN : format.parse(resultString[18]).doubleValue(),
+					"NaN".equals(resultString[21]) ? Double.NaN : format.parse(resultString[21]).doubleValue(),
+					"NaN".equals(resultString[33]) ? Double.NaN : format.parse(resultString[33]).doubleValue(),
+					"NaN".equals(resultString[10]) ? Double.NaN : format.parse(resultString[10]).doubleValue(),
+					"NaN".equals(resultString[13]) ? Double.NaN : format.parse(resultString[13]).doubleValue(),
+					"NaN".equals(resultString[27]) ? Double.NaN : format.parse(resultString[27]).doubleValue(),
+			};
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		} catch (ParseException e) {

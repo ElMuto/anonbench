@@ -305,11 +305,14 @@ public class DisclosureRiskCalculator {
 	}
 	
 	public static String[] toStringArray() {
-		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toStringArray(), t.toStringArray()), delta.toStringArray()), beta.toStringArray());
+		
+		String[] tString = getT().toStringArray();
+		
+		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(getL().toStringArray(), tString), getDelta().toStringArray()), getBeta().toStringArray());
 	}
 	
 	public static Double[] toArray() {
-		return (Double[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.toArray(), t.toArray()), delta.toArray()), beta.toArray());
+		return (Double[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(getL().toArray(), getT().toArray()), getDelta().toArray()), getBeta().toArray());
 	}
 	
 	public static String[] getHeader() {
