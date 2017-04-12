@@ -118,15 +118,21 @@ public class ParamTransformer {
 		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.L_DIVERSITY_ENTROPY.ordinal()][PG.min.ordinal()]	=   1d;
 	}
 	
-	public static double getNormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value, PG m) {
+	public static double getNormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {
 		
-		return minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][m.ordinal()] / value;
+		double minPg = minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][PG.min.ordinal()];
+		double maxPg = minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][PG.max.ordinal()];
 		
-	}
-	
-	public static double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value, PG m) {
-		
-		return minMaxVals[datafile.ordinal()][dimSa.get(sa)][crit.ordinal()][m.ordinal()] * value;
-		
+		if (	BenchmarkCriterion.T_CLOSENESS_ED.equals(crit) ||
+				BenchmarkCriterion.D_DISCLOSURE_PRIVACY.equals(crit) ||
+				BenchmarkCriterion.BASIC_BETA_LIKENESS.equals(crit)) {
+			return (minPg - value) / (minPg - maxPg);
+		} else if (	BenchmarkCriterion.L_DIVERSITY_DISTINCT.equals(crit) ||
+					BenchmarkCriterion.L_DIVERSITY_RECURSIVE.equals(crit) ||
+					BenchmarkCriterion.L_DIVERSITY_ENTROPY.equals(crit)) {
+			return (maxPg - value) / (maxPg - minPg);
+		} else {
+			throw new IllegalArgumentException("Invalid crit: " + crit);
+		}
 	}
 }

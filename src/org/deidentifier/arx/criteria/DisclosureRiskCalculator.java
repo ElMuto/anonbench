@@ -2,7 +2,9 @@ package org.deidentifier.arx.criteria;
 
 import java.util.Locale;
 
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.framework.check.groupify.HashGroupifyEntry;
 
 public class DisclosureRiskCalculator {
@@ -28,11 +30,19 @@ public class DisclosureRiskCalculator {
 		private double min;
 		private double max;
 		
-		private DisclosureRisk(String name) {
+		final BenchmarkDatafile datafile;
+		final String sa;
+		final BenchmarkCriterion crit;
+		
+		private DisclosureRisk(String name, BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
 			this.name = name;
 			this.numValues = 0;
 			this.min = Double.MAX_VALUE;
 			this.max = -Double.MAX_VALUE;
+			
+			this.datafile = datafile;
+			this.sa = sa;
+			this.crit = crit;
 		}
 
 		/**
@@ -67,12 +77,24 @@ public class DisclosureRiskCalculator {
 			return avg;
 		}
 
+		public double getAvgNormalized() {
+			return ParamTransformer.getNormalizedParamVal(datafile, sa, crit, avg);
+		}
+
 		public double getMin() {
 			return min;
 		}
 
+		public double getMinNormalized() {
+			return ParamTransformer.getNormalizedParamVal(datafile, sa, crit, min);
+		}
+
 		public double getMax() {
 			return max;
+		}
+
+		public double getMaxNormalized() {
+			return ParamTransformer.getNormalizedParamVal(datafile, sa, crit, max);
 		}
 
 		public void println() {
@@ -84,15 +106,21 @@ public class DisclosureRiskCalculator {
 			String formattedMin = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", min));
 			String formattedMax = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", max));
 			String formattedAvg= (min == Double.MAX_VALUE && max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", avg));
-			return new String[] { formattedMin, formattedAvg, formattedMax };
+			
+
+			String formattedMinN = (min == Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", getMinNormalized()));
+			String formattedMaxN = (max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", getMaxNormalized()));
+			String formattedAvgN = (min == Double.MAX_VALUE && max == -Double.MAX_VALUE ? NO_VALUE_FOUND_STRING : String.format(new Locale ("DE", "de"), "%.3f", getAvgNormalized()));
+			
+			return new String[] { formattedMin, formattedAvg, formattedMax, formattedMinN, formattedAvgN, formattedMaxN };
 		}
 
 		public Double[] toArray() {
-			return new Double[] { min, avg, max};
+			return new Double[] { min, avg, max, getMinNormalized(), getAvgNormalized(), getMaxNormalized()};
 		}
 
 		public String[] getHeader() {
-			return new String[] { name + "-min", name + "-avg", name + "-max" };
+			return new String[] { name + "-min", name + "-avg", name + "-max", name + "-min-norm", name + "-avg-norm", name + "-max-norm" };
 		}
 
 	}
@@ -102,12 +130,12 @@ public class DisclosureRiskCalculator {
 	private static DisclosureRisk l;
 	private static DisclosureRisk delta;
 
-	public static void prepare() {
+	public static void prepare(BenchmarkDatafile datafile, String sa) {
 
-		beta = new DisclosureRisk("Beta");
-		l   = new DisclosureRisk("L");
-		t   = new DisclosureRisk("T");
-		delta   = new DisclosureRisk("Delta");
+		beta = new DisclosureRisk("Beta", datafile, sa, BenchmarkCriterion.BASIC_BETA_LIKENESS);
+		l   = new DisclosureRisk("L", datafile, sa, BenchmarkCriterion.L_DIVERSITY_DISTINCT);
+		t   = new DisclosureRisk("T", datafile, sa, BenchmarkCriterion.T_CLOSENESS_ED);
+		delta   = new DisclosureRisk("Delta", datafile, sa, BenchmarkCriterion.D_DISCLOSURE_PRIVACY);
 	}
 
 	public static void summarize() {
@@ -285,7 +313,7 @@ public class DisclosureRiskCalculator {
 	}
 	
 	public static String[] getHeader() {
-		DisclosureRiskCalculator.prepare();
+		DisclosureRiskCalculator.prepare(null, null);
 		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
 	}
 

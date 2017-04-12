@@ -656,7 +656,7 @@ public class BenchmarkDriver {
         		numDataDef.setMaximumGeneralization(qi, optNode.getTransformation()[i]);
         	}
 
-            DisclosureRiskCalculator.prepare();
+            DisclosureRiskCalculator.prepare(dataset.getDatafile(), sa);
         	ARXResult numResult = anonymizer.anonymize(dataset.getArxData(true), config);
             DisclosureRiskCalculator.summarize();
             disclosureRiskResults = DisclosureRiskCalculator.toStringArray();
@@ -664,7 +664,7 @@ public class BenchmarkDriver {
         	String[][] numOutputArray = this.converter.toArray(numOutHandle, dataset.getInputDataDef(true));
         	ilScStr  = String.format(deLoc, "%.3f", this.measureSoriaComas.evaluate(numOutputArray, optNode.getTransformation()).getUtility());        	
         } else {
-        	DisclosureRiskCalculator.prepare();
+        	DisclosureRiskCalculator.prepare(dataset.getDatafile(), sa);
             DisclosureRiskCalculator.summarize();
             disclosureRiskResults = DisclosureRiskCalculator.toStringArray();
         }

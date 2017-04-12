@@ -60,7 +60,7 @@ public class ComparisonSetup {
 		}
 		
 		try {
-			DisclosureRiskCalculator.prepare();
+			DisclosureRiskCalculator.prepare(getDataset().getDatafile(), getSa());
 			
 			result = anonymizer.anonymize(arxData, config);
 			
