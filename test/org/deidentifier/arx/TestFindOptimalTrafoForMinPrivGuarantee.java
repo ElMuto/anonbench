@@ -225,6 +225,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		assertEquals("[0, 0, 0]", result[5]);
 		assertEquals(0d, doubleResults[0], epsilon);
 		assertEquals(0d, doubleResults[1], epsilon);
-		assertEquals(0d, doubleResults[2], epsilon);
+		assertEquals(6.362, doubleResults[3], epsilon);
+		assertEquals(75.361, doubleResults[4], epsilon);
 	}
 }
