@@ -28,9 +28,9 @@ public class CalcBetaMaxAndDeltaMax {
 		}
 		System.out.println("Name of output file is " + outFileName);
 
-
-		System.out.println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
-		fos.       println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
+		String header = "Datafile;sa;Delta-max;Beta-max";
+		System.out.println(header);
+		fos.       println(header);
 
 		for (BenchmarkDatafile datafile : new BenchmarkDatafile[] { BenchmarkDatafile.ACS13, BenchmarkDatafile.ATUS, BenchmarkDatafile.IHIS }) {
 
@@ -57,9 +57,14 @@ public class CalcBetaMaxAndDeltaMax {
 							relPAStr);
 
 
-
-					fos.       println(BenchmarkDriver.toCsvString(finalResultArray, ";"));	
-					System.out.println(BenchmarkDriver.toCsvString(finalResultArray, ";"));		
+					String printResult = String.format(Locale.GERMAN, "%s;%s;%s;%s",
+							compSetup.getDataset().getDatafile().name(),
+							compSetup.getSa(),
+							finalResultArray[22],
+							finalResultArray[25]
+							);
+					fos.       println(printResult);	
+					System.out.println(printResult);		
 
 				}
 		}
