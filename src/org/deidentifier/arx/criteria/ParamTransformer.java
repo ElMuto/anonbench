@@ -136,7 +136,7 @@ public class ParamTransformer {
 			throw new IllegalArgumentException("Invalid crit: " + crit);
 		}
 
-		System.out.println(crit + "-minPg=" + minPg + ", maxPg=" + maxPg + ", value=" + value + ", result=" + result);
+//		System.out.println(crit + "-minPg=" + minPg + ", maxPg=" + maxPg + ", value=" + value + ", result=" + result);
 		
 		return result;
 	}

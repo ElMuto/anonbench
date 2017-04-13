@@ -72,11 +72,6 @@ public class DisclosureRiskCalculator {
 		private void summarize() {
 			avg /= numValues;
 		}
-		
-		@Override
-		public String toString() {
-			return String.format("%s:\n\t%s=%d", name, "min", getMin());
-		}
 
 		public double getAvg() {
 			return avg;

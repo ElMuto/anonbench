@@ -95,6 +95,40 @@ public class PrivacyModel {
 		this.dim2Val = null;
 	}
 
+	public PrivacyModel(BenchmarkCriterion criterion2) {
+		
+		this(criterion2, 5, getParam2(criterion2));
+		
+	}
+
+	private static Double getParam2(BenchmarkCriterion criterion2) {
+		double param2;
+		switch (criterion2) {
+		case BASIC_BETA_LIKENESS:
+			param2=Double.MAX_VALUE;
+			break;
+		case D_DISCLOSURE_PRIVACY:
+			param2=Double.MAX_VALUE;
+			break;
+		case L_DIVERSITY_DISTINCT:
+			param2=1d;
+			break;
+		case L_DIVERSITY_ENTROPY:
+			param2=1d;
+			break;
+		case L_DIVERSITY_RECURSIVE:
+			param2=1d;
+			break;
+		case T_CLOSENESS_ED:
+			param2=1d;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid criterion: " + criterion2);
+		}
+		
+		return param2;
+	}
+
 	public BenchmarkCriterion getCriterion() {
 		return criterion;
 	}
