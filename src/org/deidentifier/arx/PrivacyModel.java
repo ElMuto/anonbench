@@ -95,13 +95,7 @@ public class PrivacyModel {
 		this.dim2Val = null;
 	}
 
-	public PrivacyModel(BenchmarkCriterion criterion) {
-		
-		this(criterion, 5, getParam2(criterion));
-		
-	}
-
-	private static Double getParam2(BenchmarkCriterion criterion2) {
+	public static Double getDefaultParam2(BenchmarkCriterion criterion2) {
 		double param2;
 		switch (criterion2) {
 		case BASIC_BETA_LIKENESS:
@@ -127,6 +121,10 @@ public class PrivacyModel {
 		}
 		
 		return param2;
+	}
+
+	public static Integer getDefaultK() {
+		return 1;
 	}
 
 	public BenchmarkCriterion getCriterion() {

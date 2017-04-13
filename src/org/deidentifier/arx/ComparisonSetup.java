@@ -25,7 +25,13 @@ public class ComparisonSetup {
 	   	dataset = new BenchmarkDataset(datafile, criteria, sa);
 
         try {
-			config = BenchmarkDriver.getConfiguration(dataset, suppFactor, measure, dataset.getSensitiveAttribute(), new PrivacyModel(criteria[1]), dataset.getCriteria());
+			config = BenchmarkDriver.getConfiguration(
+					dataset, suppFactor, measure, dataset.getSensitiveAttribute(),
+					new PrivacyModel(
+							criteria[1],
+							PrivacyModel.getDefaultK(),
+							PrivacyModel.getDefaultParam2(criteria[1])),
+					dataset.getCriteria());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

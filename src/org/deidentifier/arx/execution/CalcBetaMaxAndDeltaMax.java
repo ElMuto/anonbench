@@ -21,26 +21,25 @@ public class CalcBetaMaxAndDeltaMax {
 				BenchmarkCriterion criterion = BenchmarkCriterion.T_CLOSENESS_ED;
 				ComparisonSetup compSetup =  new ComparisonSetup(
 						new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, criterion },
-						datafile, 0.05d, BenchmarkMeasure.ENTROPY, sa);
+						datafile, 0.00d, BenchmarkMeasure.ENTROPY, sa);
 				
-				ARXResult result = compSetup.anonymizeTrafos(
-						new int[] { 0, 0, 0 },
-						new int[] { 0, 0, 0 }
-//						new int[] { 3, 1, 0 },
-//						new int[] { 3, 1, 0 }
-						);
+				int[] traFo = { 0, 0, 0 };
+				ARXResult result = compSetup.anonymizeTrafos(traFo, traFo);
 
-	        	DataHandle outHandle = result.getOutput(result.getGlobalOptimum(), false);
-	        	int numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
-
+				DataHandle outHandle;
+				int numOfsuppressedRecords = 0;
+				if (result.getGlobalOptimum() != null) {
+					outHandle = result.getOutput(result.getGlobalOptimum(), false);
+					numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
+		            outHandle.release();
+				}
 	            
 	            System.out.printf("%s - %s:\t%s=%.4f,\t%s=%.4f,\t%s=%s,\t%s=%d\n", datafile, sa,
 	            		"dMax", DisclosureRiskCalculator.getDelta().getMax(),
 	            		"bMax", DisclosureRiskCalculator.getBeta().getMax(),
-	            		"traFo", Arrays.toString(result.getGlobalOptimum().getTransformation()),
+	            		"traFo", Arrays.toString(traFo),
 	            		"numSupRecs", numOfsuppressedRecords);
 	            
-	            outHandle.release();
 			}
 
 		}
