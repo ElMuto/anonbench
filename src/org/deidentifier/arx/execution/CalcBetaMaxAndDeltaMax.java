@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.ComparisonSetup;
 import org.deidentifier.arx.DataHandle;
-import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -19,7 +18,10 @@ public class CalcBetaMaxAndDeltaMax {
 
 			for (String sa : new String[] { "MS", "ED" } ) {
 
-				ComparisonSetup compSetup =  createCompSetup(datafile, sa, 0.05d, BenchmarkCriterion.T_CLOSENESS_ED);
+				BenchmarkCriterion criterion = BenchmarkCriterion.T_CLOSENESS_ED;
+				ComparisonSetup compSetup =  new ComparisonSetup(
+						new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, criterion },
+						datafile, 0.05d, BenchmarkMeasure.ENTROPY, sa);
 				
 				ARXResult result = compSetup.anonymizeTrafos(
 						new int[] { 0, 0, 0 },
@@ -43,51 +45,5 @@ public class CalcBetaMaxAndDeltaMax {
 
 		}
 
-	}
-	
-	static ComparisonSetup createCompSetup(BenchmarkDatafile datafile, String sa, double sf, BenchmarkCriterion criterion) {
-		
-		PrivacyModel privacyModel = new PrivacyModel(criterion);
-
-		String convertedSA = null;
-		switch(datafile) {
-		case ACS13:
-			if ("MS".equals(sa)) {
-				convertedSA = "Marital status";
-			} else if ("ED".equals(sa)) {
-				convertedSA = "Education";
-			} else {
-				throw new RuntimeException("Invalid SA: " + sa);
-			}
-			break;
-		case ATUS:
-			if ("MS".equals(sa)) {
-				convertedSA = "Marital status";
-			} else if ("ED".equals(sa)) {
-				convertedSA = "Highest level of school completed";
-			} else {
-				throw new RuntimeException("Invalid SA: " + sa);
-			}
-			break;
-		case IHIS:
-			if ("MS".equals(sa)) {
-				convertedSA = "MARSTAT";
-			} else if ("ED".equals(sa)) {
-				convertedSA = "EDUC";
-			} else {
-				throw new RuntimeException("Invalid SA: " + sa);
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid datafile: " + datafile);
-		}
-
-		return new  ComparisonSetup(
-    			new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, criterion },
-    			privacyModel,
-    			datafile,
-    			sf,
-    			BenchmarkMeasure.ENTROPY,
-    			convertedSA);
 	}
 }

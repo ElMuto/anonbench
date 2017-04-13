@@ -43,7 +43,6 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,
@@ -75,7 +74,6 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,
@@ -108,7 +106,6 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_ENTROPY },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,
@@ -140,7 +137,6 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,
@@ -172,7 +168,6 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_DISCLOSURE_PRIVACY },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,
@@ -204,7 +199,6 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.BASIC_BETA_LIKENESS },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,

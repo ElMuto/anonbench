@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,7 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
          */
         public BenchmarkDataset(BenchmarkDatafile datafile, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
             this.datafile = datafile;
-            this.sensitiveAttribute = sensitiveAttribute;
+            this.sensitiveAttribute = mapSa(datafile, sensitiveAttribute);
             this.criteria = criteria;
             
             this.arxData 	= toArxData(criteria, false);
@@ -109,6 +110,37 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
             this.maxPrec         = new UtilityMeasurePrecision<Double>(header, hierarchies).evaluate(outputArray).getUtility();
             this.maxSoriaComas   = 1d;
         }
+
+
+		private String mapSa(BenchmarkDatafile datafile, String sensitiveAttribute) {
+			
+
+			Map<BenchmarkDatafile, String> edMap = new HashMap<>();
+			edMap.put(BenchmarkDatafile.ACS13, "Education");
+			edMap.put(BenchmarkDatafile.ATUS,  "Highest level of school completed");
+			edMap.put(BenchmarkDatafile.IHIS,  "EDUC");
+			
+			Map<BenchmarkDatafile, String> msMap = new HashMap<>();
+			msMap.put(BenchmarkDatafile.ACS13, "Marital status");
+			msMap.put(BenchmarkDatafile.ATUS,  "Marital status");
+			msMap.put(BenchmarkDatafile.IHIS,  "MARSTAT");
+			
+
+			switch (datafile) {
+			case ACS13:
+			case ATUS:
+			case IHIS:
+				if ("ED".equals(sensitiveAttribute)) {					
+					return edMap.get(datafile);
+				} else if ("MS".equals(sensitiveAttribute)) {
+					return msMap.get(datafile);
+				} else {
+					return sensitiveAttribute;
+				}		
+			default:
+				return sensitiveAttribute;			
+			}
+		}
 
 
 		/**

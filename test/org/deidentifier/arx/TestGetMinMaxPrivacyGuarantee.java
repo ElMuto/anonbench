@@ -25,7 +25,6 @@ public class TestGetMinMaxPrivacyGuarantee {
 
     	testSetup =  new ComparisonSetup(
     			new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
-    			new PrivacyModel("ld", 5, 0d),
     			BenchmarkDatafile.ACS13,
     			0.05,
     			BenchmarkMeasure.ENTROPY,

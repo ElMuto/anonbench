@@ -32,7 +32,6 @@ public class TestNormalization {
 
 		testSetup =  new ComparisonSetup(
 				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
-				privacyModel,
 				BenchmarkDatafile.ACS13,
 				0.05,
 				BenchmarkMeasure.ENTROPY,

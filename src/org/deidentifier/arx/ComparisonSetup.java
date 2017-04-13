@@ -13,29 +13,25 @@ import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 public class ComparisonSetup {
 	
 	private Data arxData;
-	private String sa;
 	private String[] qiS;	
 	private ARXConfiguration config;
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
-	private PrivacyModel privacyModel;
 	
-	public ComparisonSetup(BenchmarkCriterion[] criteria, PrivacyModel privacyModel, BenchmarkDatafile datafile,
-			double suppFactor, BenchmarkMeasure measure, String sa) {
+	public ComparisonSetup(BenchmarkCriterion[] criteria, BenchmarkDatafile datafile, double suppFactor,
+			BenchmarkMeasure measure, String sa) {
 		super();
 		
 	   	dataset = new BenchmarkDataset(datafile, criteria, sa);
 
         try {
-			config = BenchmarkDriver.getConfiguration(dataset, suppFactor, measure, sa, privacyModel, dataset.getCriteria());
+			config = BenchmarkDriver.getConfiguration(dataset, suppFactor, measure, dataset.getSensitiveAttribute(), new PrivacyModel(criteria[1]), dataset.getCriteria());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
         arxData = dataset.getArxData();
         qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(datafile);
         anonymizer = new ARXAnonymizer();
-        this.sa = sa;
-        this.privacyModel = privacyModel;
 	}
 
 
@@ -60,7 +56,7 @@ public class ComparisonSetup {
 		}
 		
 		try {
-			DisclosureRiskCalculator.prepare(getDataset().getDatafile(), getSa());
+			DisclosureRiskCalculator.prepare(getDataset().getDatafile(), getDataset().getSensitiveAttribute());
 			
 			result = anonymizer.anonymize(arxData, config);
 			
@@ -85,11 +81,6 @@ public class ComparisonSetup {
 	
 	public BenchmarkDataset getDataset() {
 		return dataset;
-	}
-
-
-	public String getSa() {
-		return sa;
 	}
 
 
@@ -129,7 +120,8 @@ public class ComparisonSetup {
 	}
 
 
-	public PrivacyModel getPrivacyModel() {
-		return privacyModel;
+	public String getSa() {
+		return getDataset().getSensitiveAttribute();
 	}
+
 }

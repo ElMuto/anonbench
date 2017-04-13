@@ -95,9 +95,9 @@ public class PrivacyModel {
 		this.dim2Val = null;
 	}
 
-	public PrivacyModel(BenchmarkCriterion criterion2) {
+	public PrivacyModel(BenchmarkCriterion criterion) {
 		
-		this(criterion2, 5, getParam2(criterion2));
+		this(criterion, 5, getParam2(criterion));
 		
 	}
 
