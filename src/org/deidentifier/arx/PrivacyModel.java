@@ -39,6 +39,7 @@ public class PrivacyModel {
 			break;
 		case L_DIVERSITY_RECURSIVE:
 			this.l = (int) Math.ceil(dim2Val);
+			this.c = 4d;
 			break;
 		case T_CLOSENESS_ED:
 			this.t= dim2Val;
@@ -56,24 +57,6 @@ public class PrivacyModel {
 		
 	}
 	
-	private static BenchmarkCriterion toCrit(String critString) {
-		if ("t".equals(critString)) {
-			return BenchmarkCriterion.T_CLOSENESS_ED;
-		} else if ("ld".equals(critString)) {
-			return BenchmarkCriterion.L_DIVERSITY_DISTINCT;
-		} else if ("lr".equals(critString)) {
-			return BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
-		} else if ("le".equals(critString)) {
-			return BenchmarkCriterion.L_DIVERSITY_ENTROPY;
-		} else if ("d".equals(critString)) {
-			return BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
-		} else if ("b".equals(critString)) {
-			return BenchmarkCriterion.BASIC_BETA_LIKENESS;
-		} else {
-			throw new IllegalArgumentException("Illegal crtiString: " + critString);
-		}
-	}
-
 	/**
 	 * @param criterion
 	 * @param k
@@ -123,8 +106,22 @@ public class PrivacyModel {
 		return param2;
 	}
 
-	public static Integer getDefaultK() {
-		return 1;
+	private static BenchmarkCriterion toCrit(String critString) {
+		if ("t".equals(critString)) {
+			return BenchmarkCriterion.T_CLOSENESS_ED;
+		} else if ("ld".equals(critString)) {
+			return BenchmarkCriterion.L_DIVERSITY_DISTINCT;
+		} else if ("lr".equals(critString)) {
+			return BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
+		} else if ("le".equals(critString)) {
+			return BenchmarkCriterion.L_DIVERSITY_ENTROPY;
+		} else if ("d".equals(critString)) {
+			return BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
+		} else if ("b".equals(critString)) {
+			return BenchmarkCriterion.BASIC_BETA_LIKENESS;
+		} else {
+			throw new IllegalArgumentException("Illegal crtiString: " + critString);
+		}
 	}
 
 	public BenchmarkCriterion getCriterion() {

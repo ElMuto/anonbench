@@ -15,7 +15,7 @@ import org.junit.Test;
 public class TestNPE_ACS13_lr {
 
 	
-	final BenchmarkCriterion[]	criteria	= new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE };
+	final BenchmarkCriterion	criterion	= BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
 	final BenchmarkDatafile		datafile	= BenchmarkDatafile.ACS13;
 	final double				suppFactor	= 0.05;
 	final BenchmarkMeasure		measure		= BenchmarkMeasure.ENTROPY;
@@ -27,7 +27,7 @@ public class TestNPE_ACS13_lr {
     @Before
     public void setUp() {
 
-    	testSetup =  new ComparisonSetup(criteria, datafile, suppFactor, measure, sa);
+    	testSetup =  new ComparisonSetup(criterion, datafile, suppFactor, 1, measure, sa, PrivacyModel.getDefaultParam2(criterion));
         
     }
     
@@ -42,7 +42,7 @@ public class TestNPE_ACS13_lr {
 	@Test
 	public void test() {
 		
-		BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
+		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, criterion }, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
 		try {

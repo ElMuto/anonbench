@@ -11,7 +11,7 @@ import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 
 public class TestWeightedAvg {
 	
-	final BenchmarkCriterion[]	criteria	= new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED };
+	final BenchmarkCriterion	criterion	= BenchmarkCriterion.T_CLOSENESS_ED;
 	final BenchmarkDatafile		datafile	= BenchmarkDatafile.ACS13;
 	final double					suppFactor	= 0.05;
 	final BenchmarkMeasure		measure		= BenchmarkMeasure.ENTROPY;
@@ -23,7 +23,7 @@ public class TestWeightedAvg {
     @Before
     public void setUp() {
 
-    	testSetup =  new ComparisonSetup(criteria, datafile, suppFactor, measure, sa);
+    	testSetup =  new ComparisonSetup(criterion, datafile, suppFactor, 1, measure, sa, PrivacyModel.getDefaultParam2(criterion));
         
     }
     

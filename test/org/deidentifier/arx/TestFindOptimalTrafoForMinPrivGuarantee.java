@@ -42,11 +42,11 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		privacyModel = new PrivacyModel("ld", 5, 1d);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT },
+				BenchmarkCriterion.L_DIVERSITY_DISTINCT,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				privacyModel.getK(),
+				BenchmarkMeasure.ENTROPY, "Education", privacyModel.getDim2Val());
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 
@@ -70,14 +70,13 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 	@Test
 	public void testLR() {
 
-		privacyModel = new PrivacyModel("lr", 5, 1d);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_RECURSIVE },
+				BenchmarkCriterion.L_DIVERSITY_RECURSIVE,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				5,
+				BenchmarkMeasure.ENTROPY, "Education", 1d);
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 
@@ -105,11 +104,11 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		privacyModel = new PrivacyModel("le", 5, 1d);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_ENTROPY },
+				BenchmarkCriterion.L_DIVERSITY_ENTROPY,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				1,
+				BenchmarkMeasure.ENTROPY, "Education", PrivacyModel.getDefaultParam2(BenchmarkCriterion.L_DIVERSITY_ENTROPY));
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 
@@ -136,11 +135,11 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		privacyModel = new PrivacyModel("t", 5, 1d);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
+				BenchmarkCriterion.T_CLOSENESS_ED,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				1,
+				BenchmarkMeasure.ENTROPY, "Education", PrivacyModel.getDefaultParam2(BenchmarkCriterion.T_CLOSENESS_ED));
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 
@@ -167,11 +166,11 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		privacyModel = new PrivacyModel("d", 5, 14d);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.D_DISCLOSURE_PRIVACY },
+				 BenchmarkCriterion.D_DISCLOSURE_PRIVACY,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				1,
+				BenchmarkMeasure.ENTROPY, "Education", PrivacyModel.getDefaultParam2(BenchmarkCriterion.D_DISCLOSURE_PRIVACY));
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 
@@ -198,11 +197,11 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 		privacyModel = new PrivacyModel("b", 5, 95d);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.BASIC_BETA_LIKENESS },
+				BenchmarkCriterion.BASIC_BETA_LIKENESS,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				1,
+				BenchmarkMeasure.ENTROPY, "Education", PrivacyModel.getDefaultParam2(BenchmarkCriterion.BASIC_BETA_LIKENESS));
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 

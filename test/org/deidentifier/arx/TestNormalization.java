@@ -31,11 +31,11 @@ public class TestNormalization {
 		privacyModel = new PrivacyModel("t", 5, 0.2);
 
 		testSetup =  new ComparisonSetup(
-				new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
+				BenchmarkCriterion.T_CLOSENESS_ED,
 				BenchmarkDatafile.ACS13,
 				0.05,
-				BenchmarkMeasure.ENTROPY,
-				"Education");
+				1,
+				BenchmarkMeasure.ENTROPY, "Education", PrivacyModel.getDefaultParam2(BenchmarkCriterion.T_CLOSENESS_ED));
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 

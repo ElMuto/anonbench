@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.ComparisonSetup;
 import org.deidentifier.arx.DataHandle;
+import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -18,11 +19,10 @@ public class CalcBetaMaxAndDeltaMax {
 
 			for (String sa : new String[] { "MS", "ED" } ) {
 
-				BenchmarkCriterion criterion = BenchmarkCriterion.T_CLOSENESS_ED;
+				BenchmarkCriterion crit = BenchmarkCriterion.T_CLOSENESS_ED;
 				ComparisonSetup compSetup =  new ComparisonSetup(
-						new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, criterion },
-						datafile, 0.00d, BenchmarkMeasure.ENTROPY, sa);
-				
+						crit,
+						datafile, 0.05d, 5, BenchmarkMeasure.ENTROPY, sa, PrivacyModel.getDefaultParam2(crit));
 				int[] traFo = { 0, 0, 0 };
 				ARXResult result = compSetup.anonymizeTrafos(traFo, traFo);
 

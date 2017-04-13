@@ -18,7 +18,7 @@ import org.junit.Test;
 public class TestMaxDelta {
 
 	
-	final BenchmarkCriterion[]	criteria	= new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_DISTINCT };
+	final BenchmarkCriterion	criterion	= BenchmarkCriterion.L_DIVERSITY_DISTINCT;
 	final BenchmarkDatafile		datafile	= BenchmarkDatafile.ACS13;
 	final double				suppFactor	= 0.05;
 	final BenchmarkMeasure		measure		= BenchmarkMeasure.ENTROPY;
@@ -30,7 +30,7 @@ public class TestMaxDelta {
     @Before
     public void setUp() {
 
-    	testSetup =  new ComparisonSetup(criteria, datafile, suppFactor, measure, sa);
+    	testSetup =  new ComparisonSetup(criterion, datafile, suppFactor, 1, measure, sa, PrivacyModel.getDefaultParam2(criterion));
         
     }
     

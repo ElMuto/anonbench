@@ -18,19 +18,19 @@ public class ComparisonSetup {
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	
-	public ComparisonSetup(BenchmarkCriterion[] criteria, BenchmarkDatafile datafile, double suppFactor,
-			BenchmarkMeasure measure, String sa) {
+	public ComparisonSetup(BenchmarkCriterion criterion, BenchmarkDatafile datafile, double suppFactor,
+			Integer k, BenchmarkMeasure measure, String sa, Double param2Val) {
 		super();
 		
-	   	dataset = new BenchmarkDataset(datafile, criteria, sa);
+	   	dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, criterion }, sa);
 
         try {
 			config = BenchmarkDriver.getConfiguration(
 					dataset, suppFactor, measure, dataset.getSensitiveAttribute(),
 					new PrivacyModel(
-							criteria[1],
-							PrivacyModel.getDefaultK(),
-							PrivacyModel.getDefaultParam2(criteria[1])),
+							criterion,
+							k,
+							param2Val),
 					dataset.getCriteria());
 		} catch (IOException e) {
 			e.printStackTrace();

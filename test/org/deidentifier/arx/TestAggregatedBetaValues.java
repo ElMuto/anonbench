@@ -16,7 +16,7 @@ import org.junit.Test;
 public class TestAggregatedBetaValues {
 
 	
-	final BenchmarkCriterion[]	criteria	= new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.L_DIVERSITY_ENTROPY };
+	final BenchmarkCriterion	criterion	= BenchmarkCriterion.L_DIVERSITY_ENTROPY;
 	final BenchmarkDatafile		datafile	= BenchmarkDatafile.ACS13;
 	final double				suppFactor	= 0.05;
 	final BenchmarkMeasure		measure		= BenchmarkMeasure.ENTROPY;
@@ -28,7 +28,7 @@ public class TestAggregatedBetaValues {
     @Before
     public void setUp() {
 
-    	testSetup =  new ComparisonSetup(criteria, datafile, suppFactor, measure, sa);
+    	testSetup =  new ComparisonSetup(criterion, datafile, suppFactor, 1, measure, sa, PrivacyModel.getDefaultParam2(criterion));
         
     }
     
