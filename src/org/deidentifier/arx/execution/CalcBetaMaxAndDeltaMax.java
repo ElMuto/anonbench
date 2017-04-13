@@ -1,26 +1,15 @@
 package org.deidentifier.arx.execution;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Locale;
 
-import org.deidentifier.arx.ARXAnonymizer;
-import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXResult;
-import org.deidentifier.arx.BenchmarkDataset;
-import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.ComparisonSetup;
-import org.deidentifier.arx.Data;
-import org.deidentifier.arx.DataDefinition;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
-import org.deidentifier.arx.utility.DataConverter;
 
 public class CalcBetaMaxAndDeltaMax {
 
@@ -29,39 +18,15 @@ public class CalcBetaMaxAndDeltaMax {
 		for (BenchmarkDatafile datafile : new BenchmarkDatafile[] { BenchmarkDatafile.ACS13, BenchmarkDatafile.ATUS, BenchmarkDatafile.IHIS }) {
 
 			for (String sa : new String[] { "MS", "ED" } ) {
+
+				ComparisonSetup compSetup =  createCompSetup(datafile, sa, 0.05d, BenchmarkCriterion.T_CLOSENESS_ED);
 				
-				double sf=0d;
-
-				ComparisonSetup compSetup =  createCompSetup(datafile, sa, sf, BenchmarkCriterion.T_CLOSENESS_ED);
-
-				ARXConfiguration config = null;
-				try {
-					config = BenchmarkDriver.getConfiguration(
-							compSetup.getDataset(), sf, BenchmarkMeasure.ENTROPY, compSetup.getSa(), 
-							compSetup.getPrivacyModel(), compSetup.getPrivacyModel().getCriterion());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				Data arxData = compSetup.getDataset().getArxData(true);
-				DataDefinition dataDef1 = arxData.getDefinition();
-				String[] qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(compSetup.getDataset().getDatafile());
-				for (int i = 0; i < qiS.length; i++) {
-					String qi = qiS[i];
-					dataDef1.setMinimumGeneralization(qi, 0);
-					dataDef1.setMaximumGeneralization(qi, 0);
-				}
-				
-				ARXAnonymizer anonymizer = new ARXAnonymizer();
-
-	            DisclosureRiskCalculator.prepare(compSetup.getDataset().getDatafile(), sa);
-	            ARXResult result = null;
-	        	try {
-					result = anonymizer.anonymize(arxData, config);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-	            DisclosureRiskCalculator.summarize();	            
+				ARXResult result = compSetup.anonymizeTrafos(
+						new int[] { 0, 0, 0 },
+						new int[] { 0, 0, 0 }
+//						new int[] { 3, 1, 0 },
+//						new int[] { 3, 1, 0 }
+						);
 
 	        	DataHandle outHandle = result.getOutput(result.getGlobalOptimum(), false);
 	        	int numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
@@ -125,11 +90,4 @@ public class CalcBetaMaxAndDeltaMax {
     			BenchmarkMeasure.ENTROPY,
     			convertedSA);
 	}
-	
-
-
-	public static String[] getCsvHeader() {
-		return (String[]) BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
-	}
-
 }
