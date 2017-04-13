@@ -71,6 +71,8 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 	public void testLR() {
 
 
+		privacyModel = new PrivacyModel("lr", 5, 1d);
+
 		testSetup =  new ComparisonSetup(
 				BenchmarkCriterion.L_DIVERSITY_RECURSIVE,
 				BenchmarkDatafile.ACS13,
