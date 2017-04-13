@@ -5,61 +5,72 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 public class PrivacyModel {
 	private final BenchmarkCriterion criterion;
 	private final Integer k;
-	private final Double  c;
-	private final Integer l;
-	private final Double  t;
-	private final Double  d;
-	private final Double  b;
-	private final Double  dim2Val;
+	private       Double  c;
+	private       Integer l;
+	private       Double  t;
+	private       Double  d;
+	private       Double  b;
+	private       Double  dim2Val;
 	
-	public PrivacyModel(String dim2Qualifier, Integer dim1Val, Double dim2Val) {
+	public PrivacyModel(BenchmarkCriterion criterion, Integer dim1Val, Double dim2Val) {
 		super();
 		this.k = dim1Val;
 		this.dim2Val = dim2Val;
-		if ("t".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.T_CLOSENESS_ED;
-			this.c = null;
-			this.l = null;
-			this.t = dim2Val;
-			this.d = null;
-			this.b = null;
-		} else if ("ld".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.L_DIVERSITY_DISTINCT;
-			this.c = null;
-			this.l = (int) Math.round(dim2Val);
-			this.t = null;
-			this.d = null;
-			this.b = null;
-		} else if ("lr".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
-			this.c = 4d;
-			this.l = (int) Math.round(dim2Val);
-			this.t = null;
-			this.d = null;
-			this.b = null;
-		} else if ("le".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.L_DIVERSITY_ENTROPY;
-			this.c = null;
-			this.l = (int) Math.round(dim2Val);
-			this.t = null;
-			this.d = null;
-			this.b = null;
-		} else if ("d".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
-			this.c = null;
-			this.l = null;
-			this.t = null;
-			this.d = dim2Val;
-			this.b = null;
-		} else if ("b".equals(dim2Qualifier)) {
-			this.criterion = BenchmarkCriterion.BASIC_BETA_LIKENESS;
-			this.c = null;
-			this.l = null;
-			this.t = null;
-			this.d = null;
+		this.criterion = criterion;	
+
+		this.c = null;
+		this.l = null;
+		this.t = null;
+		this.d = null;
+		this.b = null;
+		
+		switch(criterion) {
+		case BASIC_BETA_LIKENESS:
 			this.b = dim2Val;
+			break;
+		case D_DISCLOSURE_PRIVACY:
+			this.d = dim2Val;
+			break;
+		case L_DIVERSITY_DISTINCT:
+			this.l = (int) Math.ceil(dim2Val);
+			break;
+		case L_DIVERSITY_ENTROPY:
+			this.l = (int) Math.ceil(dim2Val);
+			break;
+		case L_DIVERSITY_RECURSIVE:
+			this.l = (int) Math.ceil(dim2Val);
+			break;
+		case T_CLOSENESS_ED:
+			this.t= dim2Val;
+			break;
+		case T_CLOSENESS_HD:
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported criterion: " + criterion);
+		}
+	}
+	
+	public PrivacyModel(String dim2Qualifier, Integer dim1Val, Double dim2Val) {
+		
+		this(toCrit(dim2Qualifier), dim1Val, dim2Val);
+		
+	}
+	
+	private static BenchmarkCriterion toCrit(String critString) {
+		if ("t".equals(critString)) {
+			return BenchmarkCriterion.T_CLOSENESS_ED;
+		} else if ("ld".equals(critString)) {
+			return BenchmarkCriterion.L_DIVERSITY_DISTINCT;
+		} else if ("lr".equals(critString)) {
+			return BenchmarkCriterion.L_DIVERSITY_RECURSIVE;
+		} else if ("le".equals(critString)) {
+			return BenchmarkCriterion.L_DIVERSITY_ENTROPY;
+		} else if ("d".equals(critString)) {
+			return BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
+		} else if ("b".equals(critString)) {
+			return BenchmarkCriterion.BASIC_BETA_LIKENESS;
 		} else {
-			throw new RuntimeException("invalid parameter for constructor: '" + dim2Qualifier + "'");
+			throw new IllegalArgumentException("Illegal crtiString: " + critString);
 		}
 	}
 

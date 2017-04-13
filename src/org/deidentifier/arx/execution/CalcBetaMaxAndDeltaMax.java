@@ -5,12 +5,18 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Locale;
 
+import org.deidentifier.arx.ARXAnonymizer;
+import org.deidentifier.arx.ARXConfiguration;
+import org.deidentifier.arx.ARXResult;
+import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.ComparisonSetup;
+import org.deidentifier.arx.DataDefinition;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 
 public class CalcBetaMaxAndDeltaMax {
 
@@ -34,48 +40,49 @@ public class CalcBetaMaxAndDeltaMax {
 
 		for (BenchmarkDatafile datafile : new BenchmarkDatafile[] { BenchmarkDatafile.ACS13, BenchmarkDatafile.ATUS, BenchmarkDatafile.IHIS }) {
 
-				for (String sa : new String[] { "MS", "ED" } ) {
+			for (String sa : new String[] { "MS", "ED" } ) {
 
-					ComparisonSetup compSetup =  createCompSetup(datafile, sa);
-					BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, compSetup.getDataset());
+				ComparisonSetup compSetup =  createCompSetup(datafile, sa, 0d, BenchmarkCriterion.BASIC_BETA_LIKENESS);
 
-					String[] relPAStr = null;
-					try {
-						relPAStr = driver.findOptimalRelPA(0.05, compSetup.getDataset(), compSetup.getSa(), false, compSetup.getPrivacyModel(),
-								new int[] { 0, 0, 0 }, new int[] { 0, 0, 0 });
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-					String[] finalResultArray = (String[]) BenchmarkDriver.concat(
-							new String[] {
-									compSetup.getDataset().getDatafile().name(),
-									compSetup.getSa(),
-									compSetup.getPrivacyModel().getCriterion().toString(),
-									String.format(Locale.GERMAN, "%f", compSetup.getPrivacyModel().getDim2Val())
-							},
-							relPAStr);
-
-
-					String printResult = String.format(Locale.GERMAN, "%s;%s;%s;%s",
-							compSetup.getDataset().getDatafile().name(),
-							compSetup.getSa(),
-							finalResultArray[22],
-							finalResultArray[25]
-							);
-					fos.       println(printResult);	
-					System.out.println(printResult);		
-
+				ARXConfiguration config = null;
+				try {
+					config = BenchmarkDriver.getConfiguration(
+							compSetup.getDataset(), 0d, BenchmarkMeasure.ENTROPY, sa, 
+							compSetup.getPrivacyModel(), compSetup.getPrivacyModel().getCriterion());
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+
+				DataDefinition dataDef = compSetup.getDataset().getArxData().getDefinition();
+				String[] qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(compSetup.getDataset().getDatafile());
+				for (int i = 0; i < qiS.length; i++) {
+					String qi = qiS[i];
+					dataDef.setMinimumGeneralization(qi, 0);
+					dataDef.setMaximumGeneralization(qi, 0);
+				}
+				
+				ARXAnonymizer anonymizer = new ARXAnonymizer();
+
+	            DisclosureRiskCalculator.prepare(compSetup.getDataset().getDatafile(), sa);
+	        	try {
+					anonymizer.anonymize(compSetup.getDataset().getArxData(true), config);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	            DisclosureRiskCalculator.summarize();
+	            
+	            System.out.println(DisclosureRiskCalculator.getBeta());
+			}
+
 		}
 
 		fos.close();
 
 	}
 	
-	static ComparisonSetup createCompSetup(BenchmarkDatafile datafile, String sa) {
+	static ComparisonSetup createCompSetup(BenchmarkDatafile datafile, String sa, double sf, BenchmarkCriterion criterion) {
 		
-		PrivacyModel privacyModel = new PrivacyModel("t", 5, 1d);
+		PrivacyModel privacyModel = new PrivacyModel(criterion, 5, 1d);
 		
 		String convertedSA = null;
 		if (datafile.equals(BenchmarkDatafile.ACS13)) {
@@ -107,10 +114,10 @@ public class CalcBetaMaxAndDeltaMax {
 		}
 		
 		return new  ComparisonSetup(
-    			new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.T_CLOSENESS_ED },
+    			new BenchmarkCriterion[] {BenchmarkCriterion.K_ANONYMITY, criterion },
     			privacyModel,
     			datafile,
-    			0.05,
+    			sf,
     			BenchmarkMeasure.ENTROPY,
     			convertedSA);
 	}

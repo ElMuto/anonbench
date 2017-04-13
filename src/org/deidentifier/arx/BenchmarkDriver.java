@@ -134,7 +134,7 @@ public class BenchmarkDriver {
 	 * @return
      * @throws IOException
      */
-    static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
+    public static ARXConfiguration getConfiguration(BenchmarkDataset dataset, Double suppFactor,  BenchmarkMeasure metric,
                                                      String sa, PrivacyModel privacyModel, BenchmarkCriterion... criteria) throws IOException {
 
         ARXConfiguration config = ARXConfiguration.create();
@@ -530,11 +530,11 @@ public class BenchmarkDriver {
 			String sa,
 			boolean includeInsensitiveAttribute, PrivacyModel privacyModel, int[] minLevels, int[] maxLevels
 			) throws IOException {
+		
+//		System.out.println(config.getPrivacyModels());
 	
 		ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel,dataset.getCriteria());
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
-		
-//		System.out.println(config.getPrivacyModels());
 		
         DataDefinition dataDef = dataset.getArxData().getDefinition();
         
