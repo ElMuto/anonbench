@@ -301,7 +301,7 @@ public class BenchmarkDriver {
 
         AttributeStatistics attrStats = null;
         DataHandle handle = dataset.getHandle();
-        if (sa != null) attrStats = AttributeStatistics.analyzeAttribute(dataset, handle, sa, 0);
+        if (sa != null) attrStats = AttributeStatistics.get(dataset, sa);
 
 
 

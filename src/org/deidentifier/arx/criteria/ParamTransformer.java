@@ -29,24 +29,24 @@ public class ParamTransformer {
 
 		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
 		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   7.161;
-		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  28.527;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  72.8185; // korrigiert von 28.527 auf 72.8185
 		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
-		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   6.362;
-		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  75.361;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   6.5767; // urspr.: 6.362;
+		minMaxVals[BenchmarkDatafile.ACS13.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  94.4514;; // korrigert. Urspr.: 75.361;
 
 		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
 		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   9.697;
-		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  27.852;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	=  99.9837; // urspr. 27.852;
 		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
-		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=  27.852;
-		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 133.561;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=  9.0936; // urspr. 9.094;
+		minMaxVals[BenchmarkDatafile.ATUS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 335.4024; // urspr. 133.561;
 
 		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
 		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=  10.68;
-		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 683.349;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("MS")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 683.34862; // urspr. 683.349;
 		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.T_CLOSENESS_ED.ordinal()]      [PG.min.ordinal()]	=   1d;
-		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   7.812;
-		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 160.612;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.D_DISCLOSURE_PRIVACY.ordinal()][PG.min.ordinal()]	=   9.6583; // urspr. 7.812;
+		minMaxVals[BenchmarkDatafile.IHIS.ordinal()][dimSa.get("ED")][BenchmarkCriterion.BASIC_BETA_LIKENESS.ordinal()][PG.min.ordinal()]	= 807.0596; // urspr. 160.612;
 		
 
 

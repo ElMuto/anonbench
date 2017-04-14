@@ -22,7 +22,7 @@ public class TestAttributeStatistics {
     	testSetupMs =  new TestSetup(
     			BenchmarkDatafile.ACS13,
     			"MS");   
-    	statsMs = AttributeStatistics.analyzeAttribute(testSetupMs.getDataset(), testSetupMs.getHandle(), testSetupMs.getSa(), 0);        
+    	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());        
 
 		assertEquals(5, 	statsMs.getDomainSize(),	0d);
     	assertEquals(0.014, statsMs.getMinFrequency(),	epsilon);
@@ -32,7 +32,7 @@ public class TestAttributeStatistics {
     	testSetupEd =  new TestSetup(
     			BenchmarkDatafile.ACS13,
     			"ED");   
-    	statsEd = AttributeStatistics.analyzeAttribute(testSetupEd.getDataset(), testSetupEd.getHandle(), testSetupEd.getSa(), 0);        
+    	statsEd = AttributeStatistics.get(testSetupEd.getDataset(), testSetupEd.getSa());        
 
 		assertEquals(25, 	statsEd.getDomainSize(),	0d);
     	assertEquals(0.010, statsEd.getMinFrequency(),	epsilon);
@@ -46,7 +46,7 @@ public class TestAttributeStatistics {
     	testSetupMs =  new TestSetup(
     			BenchmarkDatafile.ATUS,
     			"MS");   
-    	statsMs = AttributeStatistics.analyzeAttribute(testSetupMs.getDataset(), testSetupMs.getHandle(), testSetupMs.getSa(), 0);        
+    	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());        
 
 		assertEquals(7, 	statsMs.getDomainSize(),	0d);
     	assertEquals(0.010, statsMs.getMinFrequency(),	epsilon);
@@ -56,7 +56,7 @@ public class TestAttributeStatistics {
     	testSetupEd =  new TestSetup(
     			BenchmarkDatafile.ATUS,
     			"ED");   
-    	statsEd = AttributeStatistics.analyzeAttribute(testSetupEd.getDataset(), testSetupEd.getHandle(), testSetupEd.getSa(), 0);        
+    	statsEd = AttributeStatistics.get(testSetupEd.getDataset(), testSetupEd.getSa());        
 
 		assertEquals(18, 	statsEd.getDomainSize(),	0d);
     	assertEquals(0.003, statsEd.getMinFrequency(),	epsilon);
@@ -71,7 +71,7 @@ public class TestAttributeStatistics {
     	testSetupMs =  new TestSetup(
     			BenchmarkDatafile.IHIS,
     			"MS");   
-    	statsMs = AttributeStatistics.analyzeAttribute(testSetupMs.getDataset(), testSetupMs.getHandle(), testSetupMs.getSa(), 0);        
+    	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());        
 
 		assertEquals(10, 	statsMs.getDomainSize(),	0d);
     	assertEquals(0.000, statsMs.getMinFrequency(),	epsilon);
@@ -81,7 +81,7 @@ public class TestAttributeStatistics {
     	testSetupEd =  new TestSetup(
     			BenchmarkDatafile.IHIS,
     			"ED");   
-    	statsEd = AttributeStatistics.analyzeAttribute(testSetupEd.getDataset(), testSetupEd.getHandle(), testSetupEd.getSa(), 0);        
+    	statsEd = AttributeStatistics.get(testSetupEd.getDataset(), testSetupEd.getSa());        
 
 		assertEquals(26, 	statsEd.getDomainSize(),	0d);
     	assertEquals(0.001, statsEd.getMinFrequency(),	epsilon);

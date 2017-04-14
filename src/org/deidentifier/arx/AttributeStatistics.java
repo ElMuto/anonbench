@@ -1,11 +1,13 @@
 package org.deidentifier.arx;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
+import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
+import org.deidentifier.arx.testutil.TestSetup;
 
 
 /**
@@ -18,22 +20,24 @@ public class AttributeStatistics {
 
     final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
 
-	public final Integer numRows;
-	public final Integer domainSize;
-    public final Double frequencyDeviation;
-    public final Double minFrequency;
-    public final Double maxFrequency;
-    public final Double variance;
-    public final Double skewness;
-    public final Double kurtosis;
-    public final Double standDeviation;
-    public final Double variance_coeff;
-    public final Double deviation_norm;
-    public final Double quartil_coeff;
-    public final Double mean_arith;
-    public final Double mean_geom;
-    public final Double median;
-    public final Double entropy;
+	private final Integer numRows;
+	private final Integer domainSize;
+	private final Double frequencyDeviation;
+	private final Double minFrequency;
+    private final Double maxFrequency;
+    private final Double variance;
+    private final Double skewness;
+    private final Double kurtosis;
+    private final Double standDeviation;
+    private final Double variance_coeff;
+    private final Double deviation_norm;
+    private final Double quartil_coeff;
+    private final Double mean_arith;
+    private final Double mean_geom;
+    private final Double median;
+    private final Double entropy;
+
+    private final Double rpgLmin, rpgLmax, rpgTmin, rpgTmax, rpgBmin, rpgBmax, rpgDmin, rpgDmax;
     
     /**
      * @param numRows TODO
@@ -52,8 +56,16 @@ public class AttributeStatistics {
      * @param entropy
      * @param minFrequency
      * @param maxFrequency
+     * @param rpgLmin TODO
+     * @param rpgLmax TODO
+     * @param rpgTmin TODO
+     * @param rpgTmax TODO
+     * @param rpgBmin TODO
+     * @param rpgBmax TODO
+     * @param rpgDmin TODO
+     * @param rpgDmax TODO
      */
-    public AttributeStatistics(Integer numRows,
+    private AttributeStatistics(Integer numRows,
                                Integer numValues,
                                Double frequencyDeviation,
                                Double variance,
@@ -65,33 +77,66 @@ public class AttributeStatistics {
                                Double quartil_coeff,
                                Double mean_arith,
                                Double mean_geom,
-                               Double median, Double entropy, Double minFrequency, Double maxFrequency) {
+                               Double median, Double entropy,
+                               Double minFrequency, Double maxFrequency,
+                               Double rpgLmin, Double rpgLmax, Double rpgTmin, Double rpgTmax,
+                               Double rpgBmin, Double rpgBmax, Double rpgDmin, Double rpgDmax) {
     	
     	if (minFrequency > maxFrequency) throw new RuntimeException("This should not happen");
     	
-    	this.numRows = numRows;
-        this.domainSize = numValues;
-        this.frequencyDeviation = frequencyDeviation;
-        this.minFrequency = minFrequency;
-        this.maxFrequency = maxFrequency;
-        this.variance = variance;
-        this.skewness = skewness;
-        this.kurtosis = kurtosis;
-        this.standDeviation = standDeviation;
-        this.variance_coeff = variance_coeff;
-        this.deviation_norm = deviation_norm;
-        this.quartil_coeff = quartil_coeff;
-        this.mean_arith = mean_arith;
-        this.mean_geom = mean_geom;
-        this.median = median;
-        this.entropy = entropy;
+    	this.numRows = numRows;  this.domainSize = numValues; this.frequencyDeviation = frequencyDeviation;
+        this.minFrequency = minFrequency; this.maxFrequency = maxFrequency;
+        this.variance = variance; this.skewness = skewness; this.kurtosis = kurtosis;
+        this.standDeviation = standDeviation; this.variance_coeff = variance_coeff;
+        this.deviation_norm = deviation_norm;  this.quartil_coeff = quartil_coeff;
+        this.mean_arith = mean_arith; this.mean_geom = mean_geom; this.median = median; this.entropy = entropy;
+        this.rpgLmin = rpgLmin; this.rpgLmax = rpgLmax;
+        this.rpgTmin = rpgTmin; this.rpgTmax = rpgTmax;
+        this.rpgBmin = rpgBmin; this.rpgBmax = rpgBmax;
+        this.rpgDmin = rpgDmin; this.rpgDmax = rpgDmax;
     }
 
     public Integer getDomainSize() {
         return domainSize;
     }
 
-    public Double getFrequencyDeviation() {
+    public Double getRpgLmin() {
+		return rpgLmin;
+	}
+
+    public Double getRpgLmax() {
+		return rpgLmax;
+	}
+
+	public Integer getNumRows() {
+		return numRows;
+	}
+
+	public Double getRpgTmin() {
+		return rpgTmin;
+	}
+
+	public Double getRpgTmax() {
+		return rpgTmax;
+	}
+
+	public Double getRpgBmin() {
+		return rpgBmin;
+	}
+
+	public Double getRpgBmax() {
+		return rpgBmax;
+	}
+
+	public Double getRpgDmin() {
+		return rpgDmin;
+	}
+
+	public Double getRpgDmax() {
+		return rpgDmax;
+	}
+
+	public Double getFrequencyDeviation() {
         return frequencyDeviation;
     }
 
@@ -165,61 +210,18 @@ public class AttributeStatistics {
     static final double log2(final double num) {
         return Math.log(num) / LOG2;
     }
-	
-	public Double getMinGuarantee(BenchmarkCriterion crit) {
-		switch (crit) {
-		case BASIC_BETA_LIKENESS:
-			return ((1d - getMinFrequency()) / getMinFrequency());
-		case D_DISCLOSURE_PRIVACY:
-			return Math.abs(log2(1d / (getNumRows() * getMaxFrequency())));
-		case L_DIVERSITY_DISTINCT:
-			return 1d;
-		case L_DIVERSITY_ENTROPY:
-			return 1d;
-		case L_DIVERSITY_RECURSIVE:
-			return 1d;
-		case T_CLOSENESS_ED:
-			return 1d;
-		default:
-			throw new IllegalArgumentException("Unsopported criterion: " + crit);		
-		}
-	}
-	
-	public Double getMaxGuarantee(BenchmarkCriterion crit) {
-		switch (crit) {
-		case BASIC_BETA_LIKENESS:
-			return 0d;
-		case D_DISCLOSURE_PRIVACY:
-			return 0d;
-		case L_DIVERSITY_DISTINCT:
-			return Double.valueOf(getDomainSize());
-		case L_DIVERSITY_ENTROPY:
-			return Double.valueOf(getDomainSize());
-		case L_DIVERSITY_RECURSIVE:
-			return Double.valueOf(getDomainSize());
-		case T_CLOSENESS_ED:
-			return 0d;
-		default:
-			throw new IllegalArgumentException("Unsopported criterion: " + crit);		
-		}
-	}
-
-	private int getNumRows() {
-		return numRows;
-	}
 
 	/**
 	 * @param dataset
-	 * @param handle
 	 * @param attr
-	 * @param verbosity
 	 * @return
 	 */
-	public static AttributeStatistics analyzeAttribute(BenchmarkDataset dataset, DataHandle handle, String attr, int verbosity) {
+	public static AttributeStatistics get(BenchmarkDataset dataset, String attr) {
 	    String statsKey = dataset.toString() + "-" + attr;
 	    if (statsCache.containsKey(statsKey)) {
 	        return statsCache.get(statsKey);
 	    } else {
+	    	DataHandle handle = dataset.getArxData().getHandle();
 	        Integer numRows = null;
 	        Integer domainSize = null;
 	        Double  frequencyDeviation = null;
@@ -236,19 +238,26 @@ public class AttributeStatistics {
 	
 	        Double minFrequency = null;
 	        Double maxFrequency = null;
-	
+	        
+	        Double rpgLmax, rpgLmin;
+	        Double rpgTmin = 1d, rpgTmax = 0d;
+//	        Double rpgBmax, rpgDmax = 0d;
+//	        Double rpgBmin, rpgDmin;
+	        	
 	        int attrColIndex = handle.getColumnIndexOf(attr);
 	        numRows = handle.getNumRows();
 	        String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
 	        domainSize = distinctValues.length;
-	        if (verbosity >= 1) System.out.println("    " + attr + " (domain size: " + distinctValues.length + ")");
+	        
+	        rpgLmin = 1d;
+	        rpgLmax = Double.valueOf(domainSize);
 	        
 	        // get the frequencies of attribute instantiations
 	        double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
 	        
 	        double normalizedEntropy = BenchmarkDriver.calcNormalizedEntropy(freqs);
 	        
-	        if (
+	        if (  // the attribute has interval scale
 	                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
 	                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(attr.toString()) ||
 	                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "INTP".equals(attr.toString()) ||
@@ -283,21 +292,8 @@ public class AttributeStatistics {
 	            mean_geom = stats.getGeometricMean();
 	            quartil_coeff = (stats.getPercentile(75) - stats.getPercentile(25)) / (stats.getPercentile(75) + stats.getPercentile(25));
 	            median = stats.getPercentile(50);
-	            
-	            // print
-	            if (verbosity >= 2) {
-	                System.out.println("      stand. dev.        = " + standDeviation);
-	                System.out.println("      stand. dev. norm.  = " + deviation_norm);
-	                System.out.println("      variance_coeff     = " + variance_coeff);
-	                System.out.println("      quartil coeff.     = " + quartil_coeff);
-	                System.out.println("      skewness           = " + skewness);
-	                System.out.println("      kurtosis           = " + kurtosis);
-	                System.out.println("      arith. mean        = " + mean_arith);
-	                System.out.println("      geom. mean         = " + mean_geom);
-	                System.out.println("      median             = " + median);
-	                System.out.println("      normalized entropy = " + normalizedEntropy);
-	            }
-	        } else {
+
+	        } else { // the attribute has nominal scale
 	            
 	            // initialize stats package and read values for calculating standard deviation
 	            DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -307,22 +303,33 @@ public class AttributeStatistics {
 	            frequencyDeviation = stats.getStandardDeviation();
 	            minFrequency = stats.getMin();
 	            maxFrequency = stats.getMax();
-	            
-	            if (verbosity >= 2) {
-	                System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
-	                System.out.println("      normalized entropy            = " + normalizedEntropy);
-	            }
-	            if (verbosity >= 3) {
-	                System.out.println("      " + Arrays.toString(distinctValues));
-	                System.out.println("      " + Arrays.toString(freqs));
-	            }
 	        }
 	        
+	        // calc dMax and bMax
+			BenchmarkCriterion crit = BenchmarkCriterion.T_CLOSENESS_ED;
+			TestSetup compSetup =  new TestSetup(
+					dataset.getDatafile(),
+					attr, 1, PrivacyModel.getDefaultParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0d);
+			int[] traFo = { 0, 0, 0 };
+			/*ARXResult result = */compSetup.anonymizeTrafos(traFo, traFo);
+
+//			DataHandle outHandle;
+//			int numOfsuppressedRecords = 0;
+//			if (result.getGlobalOptimum() != null) {
+//				outHandle = result.getOutput(result.getGlobalOptimum(), false);
+//				numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
+//	            outHandle.release();
+//			}
+            
 	        statsCache.put(statsKey, new AttributeStatistics(numRows, domainSize,
 	        							   frequencyDeviation, variance, skewness,
 	                                       kurtosis, standDeviation, variance_coeff,
 	                                       deviation_norm, quartil_coeff,
-	                                       mean_arith, mean_geom, median, normalizedEntropy, minFrequency, maxFrequency));
+	                                       mean_arith, mean_geom, median, normalizedEntropy,
+	                                       minFrequency, maxFrequency,
+	                                       rpgLmin, rpgLmax, rpgTmin, rpgTmax,
+	                                       DisclosureRiskCalculator.getBeta().getMax(), 0d,
+	                                       DisclosureRiskCalculator.getDelta().getMax(), 0d));
 	        
 	        return statsCache.get(statsKey);
 	    }
