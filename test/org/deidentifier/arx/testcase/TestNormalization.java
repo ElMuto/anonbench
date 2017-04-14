@@ -1,9 +1,12 @@
-package org.deidentifier.arx;
+package org.deidentifier.arx.testcase;
 
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 
+import org.deidentifier.arx.BenchmarkDriver;
+import org.deidentifier.arx.ComparisonSetup;
+import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;

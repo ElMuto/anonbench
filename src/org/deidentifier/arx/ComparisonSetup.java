@@ -97,7 +97,7 @@ public class ComparisonSetup {
 	 * resultString[5] = t-max, resultString[6] = t-max-norm, resultString[7] = Beta-max-norm, resultString[8] = lMin, , resultString[9] = lMin-norm,
 	 * resultString[10] = dMax-norm
 	 */
-	double[] convertResults(String[] resultString) {
+	public double[] convertResults(String[] resultString) {
 		
 		double[] doubleArray = null;
 		

@@ -1,7 +1,19 @@
 package org.deidentifier.arx;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 
+
+/**
+ * Summarizes statistical properties of a given attribute in a certain dataset
+ * 
+ * @author Helmut Spengler
+ *
+ */
 public class AttributeStatistics {
 
 	public final Integer numRows;
@@ -36,8 +48,8 @@ public class AttributeStatistics {
      * @param mean_geom
      * @param median
      * @param entropy
-     * @param minFrequency TODO
-     * @param maxFrequency TODO
+     * @param minFrequency
+     * @param maxFrequency
      */
     public AttributeStatistics(Integer numRows,
                                Integer numValues,
@@ -192,5 +204,126 @@ public class AttributeStatistics {
 
 	private int getNumRows() {
 		return numRows;
+	}
+
+	/**
+	 * @param dataset
+	 * @param handle
+	 * @param attr
+	 * @param verbosity
+	 * @return
+	 * @throws IOException
+	 */
+	public static AttributeStatistics analyzeAttribute(BenchmarkDataset dataset, DataHandle handle, String attr, int verbosity) throws IOException {
+	    String statsKey = dataset.toString() + "-" + attr;
+	    if (BenchmarkDriver.statsCache.containsKey(statsKey)) {
+	        return BenchmarkDriver.statsCache.get(statsKey);
+	    } else {
+	        Integer numRows = null;
+	        Integer numValues = null;
+	        Double  frequencyDeviation = null;
+	        Double  variance = null;
+	        Double  skewness = null;
+	        Double  kurtosis = null;
+	        Double  standDeviation = null;
+	        Double  deviation_norm = null;
+	        Double  variance_coeff = null;
+	        Double  quartil_coeff = null;
+	        Double  mean_arith = null;
+	        Double  mean_geom = null; // done
+	        Double  median = null; // done
+	
+	        Double minFrequency = null;
+	        Double maxFrequency = null;
+	
+	        int attrColIndex = handle.getColumnIndexOf(attr);
+	        numRows = handle.getNumRows();
+	        String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
+	        numValues = distinctValues.length;
+	        if (verbosity >= 1) System.out.println("    " + attr + " (domain size: " + distinctValues.length + ")");
+	        
+	        // get the frequencies of attribute instantiations
+	        double[] freqs  = handle.getStatistics().getFrequencyDistribution(handle.getColumnIndexOf(attr)).frequency;
+	        
+	        double normalizedEntropy = BenchmarkDriver.calcNormalizedEntropy(freqs);
+	        
+	        if (
+	                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "AGEP".equals(attr.toString()) ||
+	                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "PWGTP".equals(attr.toString()) ||
+	                BenchmarkDatafile.ACS13.equals(dataset.getDatafile()) && "INTP".equals(attr.toString()) ||
+	                BenchmarkDatafile.ADULT.equals(dataset.getDatafile()) && "age".equals(attr.toString()) ||
+	                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "AGE".equals(attr.toString()) ||
+	                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "INCOME".equals(attr.toString()) ||
+	                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "MINRAMNT".equals(attr.toString()) ||
+	                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "NGIFTALL".equals(attr.toString()) ||
+	                BenchmarkDatafile.CUP.equals(dataset.getDatafile()) && "RAMNTALL".equals(attr.toString()) ||
+	                BenchmarkDatafile.FARS.equals(dataset.getDatafile()) && "iage".equals(attr.toString()) ||
+	                BenchmarkDatafile.ATUS.equals(dataset.getDatafile()) && "Age".equals(attr.toString()) ||
+	                BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "AGE".equals(attr.toString()) ||
+	                BenchmarkDatafile.IHIS.equals(dataset.getDatafile()) && "YEAR".equals(attr.toString())
+	                ) {
+	
+	            // initialize stats package and read values
+	            DescriptiveStatistics stats = new DescriptiveStatistics();
+	            for (int rowNum = 0; rowNum < handle.getNumRows(); rowNum++) {
+	                try {
+	                    stats.addValue(Double.parseDouble(handle.getValue(rowNum, attrColIndex)));
+	                } catch (java.lang.NumberFormatException e) { /* just ignore those entries */ }
+	            }
+	
+	            // calculate stats
+	            variance = stats.getVariance();
+	            skewness = stats.getSkewness();
+	            kurtosis = stats.getKurtosis();
+	            standDeviation = stats.getStandardDeviation();
+	            variance_coeff = standDeviation / stats.getMean();
+	            deviation_norm = standDeviation / (stats.getMax() - stats.getMin());
+	            mean_arith = stats.getMean();
+	            mean_geom = stats.getGeometricMean();
+	            quartil_coeff = (stats.getPercentile(75) - stats.getPercentile(25)) / (stats.getPercentile(75) + stats.getPercentile(25));
+	            median = stats.getPercentile(50);
+	            
+	            // print
+	            if (verbosity >= 2) {
+	                System.out.println("      stand. dev.        = " + standDeviation);
+	                System.out.println("      stand. dev. norm.  = " + deviation_norm);
+	                System.out.println("      variance_coeff     = " + variance_coeff);
+	                System.out.println("      quartil coeff.     = " + quartil_coeff);
+	                System.out.println("      skewness           = " + skewness);
+	                System.out.println("      kurtosis           = " + kurtosis);
+	                System.out.println("      arith. mean        = " + mean_arith);
+	                System.out.println("      geom. mean         = " + mean_geom);
+	                System.out.println("      median             = " + median);
+	                System.out.println("      normalized entropy = " + normalizedEntropy);
+	            }
+	        } else {
+	            
+	            // initialize stats package and read values for calculating standard deviation
+	            DescriptiveStatistics stats = new DescriptiveStatistics();
+	            for (int i = 0; i < freqs.length; i++) {
+	                stats.addValue(freqs[i]);
+	            }
+	            frequencyDeviation = stats.getStandardDeviation();
+	            minFrequency = stats.getMin();
+	            maxFrequency = stats.getMax();
+	            
+	            if (verbosity >= 2) {
+	                System.out.println("      std. deviation of frequencies = " + frequencyDeviation);
+	                System.out.println("      normalized entropy            = " + normalizedEntropy);
+	            }
+	            if (verbosity >= 3) {
+	                System.out.println("      " + Arrays.toString(distinctValues));
+	                System.out.println("      " + Arrays.toString(freqs));
+	            }
+	        }
+	        
+	        BenchmarkDriver.statsCache.put(statsKey, new AttributeStatistics(numRows, numValues,
+	        							   frequencyDeviation, variance, skewness,
+	                                       kurtosis, standDeviation, variance_coeff,
+	                                       deviation_norm, quartil_coeff,
+	                                       mean_arith, mean_geom, median, normalizedEntropy, minFrequency, maxFrequency));
+	        
+	        return BenchmarkDriver.statsCache.get(statsKey);
+	    }
 	}
 }
