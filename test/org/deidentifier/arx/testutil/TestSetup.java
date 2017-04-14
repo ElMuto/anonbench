@@ -1,16 +1,25 @@
-package org.deidentifier.arx;
+package org.deidentifier.arx.testutil;
 
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
+import org.deidentifier.arx.ARXAnonymizer;
+import org.deidentifier.arx.ARXConfiguration;
+import org.deidentifier.arx.ARXResult;
+import org.deidentifier.arx.BenchmarkDataset;
+import org.deidentifier.arx.BenchmarkDriver;
+import org.deidentifier.arx.Data;
+import org.deidentifier.arx.DataDefinition;
+import org.deidentifier.arx.DataHandle;
+import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 
-public class ComparisonSetup {
+public class TestSetup {
 	
 	private Data arxData;
 	private String[] qiS;	
@@ -18,8 +27,8 @@ public class ComparisonSetup {
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	
-	public ComparisonSetup(BenchmarkCriterion criterion, BenchmarkDatafile datafile, double suppFactor,
-			Integer k, BenchmarkMeasure measure, String sa, Double param2Val) {
+	public TestSetup(BenchmarkDatafile datafile, String sa, Integer k,
+			Double param2Val, BenchmarkCriterion criterion, BenchmarkMeasure measure, double suppFactor) {
 		super();
 		
 	   	dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, criterion }, sa);

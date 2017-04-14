@@ -3,13 +3,13 @@ package org.deidentifier.arx.execution;
 import java.util.Arrays;
 
 import org.deidentifier.arx.ARXResult;
-import org.deidentifier.arx.ComparisonSetup;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
+import org.deidentifier.arx.testutil.TestSetup;
 
 public class CalcBetaMaxAndDeltaMax {
 
@@ -20,9 +20,9 @@ public class CalcBetaMaxAndDeltaMax {
 			for (String sa : new String[] { "MS", "ED" } ) {
 
 				BenchmarkCriterion crit = BenchmarkCriterion.T_CLOSENESS_ED;
-				ComparisonSetup compSetup =  new ComparisonSetup(
-						crit,
-						datafile, 0.05d, 5, BenchmarkMeasure.ENTROPY, sa, PrivacyModel.getDefaultParam2(crit));
+				TestSetup compSetup =  new TestSetup(
+						datafile,
+						sa, 5, PrivacyModel.getDefaultParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0.05d);
 				int[] traFo = { 0, 0, 0 };
 				ARXResult result = compSetup.anonymizeTrafos(traFo, traFo);
 

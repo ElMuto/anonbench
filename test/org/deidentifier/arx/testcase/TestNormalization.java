@@ -5,11 +5,11 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkDriver;
-import org.deidentifier.arx.ComparisonSetup;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.testutil.TestSetup;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class TestNormalization {
 	
 	private final double epsilon = 0.01;
 
-	private static ComparisonSetup testSetup;
+	private static TestSetup testSetup;
 	private static BenchmarkDriver driver;
 	private static PrivacyModel privacyModel;
 	static String[] result = null;
@@ -33,12 +33,12 @@ public class TestNormalization {
 
 		privacyModel = new PrivacyModel("t", 5, 0.2);
 
-		testSetup =  new ComparisonSetup(
-				BenchmarkCriterion.T_CLOSENESS_ED,
+		testSetup =  new TestSetup(
 				BenchmarkDatafile.ACS13,
-				0.05,
+				"Education",
 				1,
-				BenchmarkMeasure.ENTROPY, "Education", PrivacyModel.getDefaultParam2(BenchmarkCriterion.T_CLOSENESS_ED));
+				PrivacyModel.getDefaultParam2(BenchmarkCriterion.T_CLOSENESS_ED),
+				BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.ENTROPY, 0.05);
 
 		driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, testSetup.getDataset());
 

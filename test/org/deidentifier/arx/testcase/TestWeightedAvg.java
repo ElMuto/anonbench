@@ -4,12 +4,12 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 
-import org.deidentifier.arx.ComparisonSetup;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
+import org.deidentifier.arx.testutil.TestSetup;
 
 public class TestWeightedAvg {
 	
@@ -20,12 +20,12 @@ public class TestWeightedAvg {
 	final String					sa			= "Marital status";
 	final PrivacyModel			privacyModel= new PrivacyModel("t", 5, 0.2);
 	
-	private ComparisonSetup testSetup;
+	private TestSetup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new ComparisonSetup(criterion, datafile, suppFactor, 1, measure, sa, PrivacyModel.getDefaultParam2(criterion));
+    	testSetup =  new TestSetup(datafile, sa, 1, PrivacyModel.getDefaultParam2(criterion), criterion, measure, suppFactor);
         
     }
     

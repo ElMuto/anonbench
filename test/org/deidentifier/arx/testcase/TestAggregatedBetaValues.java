@@ -4,10 +4,10 @@ import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.ComparisonSetup;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator.DisclosureRisk;
+import org.deidentifier.arx.testutil.TestSetup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,12 +26,12 @@ public class TestAggregatedBetaValues {
 	final String				sa			= "Marital status";
 	final PrivacyModel			privacyModel= new PrivacyModel("le", 5, 3d);
 
-	private ComparisonSetup testSetup;
+	private TestSetup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new ComparisonSetup(criterion, datafile, suppFactor, 1, measure, sa, PrivacyModel.getDefaultParam2(criterion));
+    	testSetup =  new TestSetup(datafile, sa, 1, PrivacyModel.getDefaultParam2(criterion), criterion, measure, suppFactor);
         
     }
     
