@@ -7,8 +7,8 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.testutil.TestSetup;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.ParametrizationSetup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,12 +26,12 @@ public class TestNPE_ACS13_lr {
 	final String				sa			= "Marital status";
 	final PrivacyModel			privacyModel= new PrivacyModel("lr", 5, 5d);
 
-	private TestSetup testSetup;
+	private ParametrizationSetup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new TestSetup(datafile, sa, 1, PrivacyModel.getDefaultParam2(criterion), criterion, measure, suppFactor);
+    	testSetup =  new ParametrizationSetup(datafile, sa, 1, PrivacyModel.getDefaultParam2(criterion), criterion, measure, suppFactor);
         
     }
     

@@ -1,4 +1,4 @@
-package org.deidentifier.arx.testutil;
+package org.deidentifier.arx;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -19,7 +19,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 
-public class TestSetup {
+public class ParametrizationSetup {
 	
 	private Data arxData;
 	private String[] qiS;	
@@ -28,15 +28,15 @@ public class TestSetup {
 	private BenchmarkDataset dataset;
 	private final BenchmarkCriterion dim2Crit;
 	
-	public TestSetup(BenchmarkDatafile datafile, String sa) {
+	public ParametrizationSetup(BenchmarkDatafile datafile, String sa) {
 		this(datafile, sa, BenchmarkCriterion.T_CLOSENESS_ED);
 	}
 	
-	public TestSetup(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
+	public ParametrizationSetup(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
 		this(datafile, sa, 1, 0d, crit, BenchmarkMeasure.ENTROPY, 0d);
 	}
 	
-	public TestSetup(BenchmarkDatafile datafile, String sa, Integer k,
+	public ParametrizationSetup(BenchmarkDatafile datafile, String sa, Integer k,
 			Double param2Val, BenchmarkCriterion criterion, BenchmarkMeasure measure, double suppFactor) {
 		super();
 		
