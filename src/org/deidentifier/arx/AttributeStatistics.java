@@ -1,6 +1,5 @@
 package org.deidentifier.arx;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -212,9 +211,8 @@ public class AttributeStatistics {
 	 * @param attr
 	 * @param verbosity
 	 * @return
-	 * @throws IOException
 	 */
-	public static AttributeStatistics analyzeAttribute(BenchmarkDataset dataset, DataHandle handle, String attr, int verbosity) throws IOException {
+	public static AttributeStatistics analyzeAttribute(BenchmarkDataset dataset, DataHandle handle, String attr, int verbosity) {
 	    String statsKey = dataset.toString() + "-" + attr;
 	    if (BenchmarkDriver.statsCache.containsKey(statsKey)) {
 	        return BenchmarkDriver.statsCache.get(statsKey);

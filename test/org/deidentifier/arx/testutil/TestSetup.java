@@ -27,6 +27,10 @@ public class TestSetup {
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	
+	public TestSetup(BenchmarkDatafile datafile, String sa) {
+		this(datafile, sa, 1, 0d, BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.ENTROPY, 0d);
+	}
+	
 	public TestSetup(BenchmarkDatafile datafile, String sa, Integer k,
 			Double param2Val, BenchmarkCriterion criterion, BenchmarkMeasure measure, double suppFactor) {
 		super();
