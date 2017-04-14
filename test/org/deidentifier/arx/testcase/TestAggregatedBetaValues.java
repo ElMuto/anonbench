@@ -44,7 +44,7 @@ public class TestAggregatedBetaValues {
     
 
 	@Test
-	public void testBigestFoundBeta() {
+	public void testMinMaxConsistency() {
 		
 		ARXResult result = testSetup.anonymizeTrafos(new int[] { 6, 1, 2 }, new int[] { 6, 1, 2 });
 		result.getOutput(result.getGlobalOptimum(), false);
