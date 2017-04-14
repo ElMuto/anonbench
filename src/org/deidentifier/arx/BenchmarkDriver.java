@@ -509,7 +509,7 @@ public class BenchmarkDriver {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
 
-			String maxPAStr[] = driver.findOptimalRelPA(0.05, dataset,
+			String maxPAStr[] = driver.findOptimalRelPA(0d, dataset,
 					sa,
 					includeInsensitiveAttributes, privacyModel, null, null);
 
@@ -536,13 +536,13 @@ public class BenchmarkDriver {
 			boolean includeInsensitiveAttribute, PrivacyModel privacyModel, int[] minLevels, int[] maxLevels
 			) throws IOException {
 		
-//		System.out.println(config.getPrivacyModels());
 	
 		ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel,dataset.getCriteria());
+		System.out.println(config.getPrivacyModels());
+		
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 		
-        DataDefinition dataDef = dataset.getArxData().getDefinition();
-        
+        DataDefinition dataDef = dataset.getArxData().getDefinition();        
         String[] qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(dataset.getDatafile());
 		for (int i = 0; i < qiS.length; i++) {
 			String qi = qiS[i];
@@ -694,8 +694,8 @@ public class BenchmarkDriver {
         		disclosureRiskResults);
 	}
 
-	public static String[] getCombinedRelPaAndDisclosureRiskHeader() {
-		return (String[]) BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-Loss", "IL-SSE" }, DisclosureRiskCalculator.getHeader());
+	public static String[] getCombinedRelPaAndDisclosureRiskHeader(BenchmarkDataset dataset) {
+		return (String[]) BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-Loss", "IL-SSE" }, DisclosureRiskCalculator.getHeader(dataset));
 	}
 
 	private String getRelativeInfoLoss(BenchmarkDataset dataset, ARXNode optNode, String[][] outputArray,

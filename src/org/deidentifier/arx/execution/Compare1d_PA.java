@@ -96,7 +96,7 @@ public class Compare1d_PA {
 		System.out.println("Name of output file is " + outFileName);
 		
 
-		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(), ";"));
+		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(new BenchmarkDataset(BenchmarkDatafile.ACS13, new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_ED }, "MS")), ";"));
 
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa, reverse)) {
@@ -130,7 +130,7 @@ public class Compare1d_PA {
 		fos.close();
 	}
 
-	public static String[] getCsvHeader() {
-		return (String[]) BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader());
+	public static String[] getCsvHeader(BenchmarkDataset dataset) {
+		return (String[]) BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader(dataset));
 	}
 }

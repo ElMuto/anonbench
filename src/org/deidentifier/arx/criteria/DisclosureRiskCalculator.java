@@ -315,8 +315,8 @@ public class DisclosureRiskCalculator {
 		return (Double[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(getL().toArray(), getT().toArray()), getDelta().toArray()), getBeta().toArray());
 	}
 	
-	public static String[] getHeader() {
-		DisclosureRiskCalculator.prepare(null);
+	public static String[] getHeader(BenchmarkDataset dataset) {
+		DisclosureRiskCalculator.prepare(dataset);
 		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
 	}
 
