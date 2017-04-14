@@ -18,12 +18,34 @@ public class ParamTransformer {
 		case BASIC_BETA_LIKENESS:
 		case D_DISCLOSURE_PRIVACY:
 		case T_CLOSENESS_ED:
-			result =  (rpgMin - value) / (rpgMin - rpgMax);
-			break;
 		case L_DIVERSITY_DISTINCT:
 		case L_DIVERSITY_ENTROPY:
 		case L_DIVERSITY_RECURSIVE:
 			result = (value - rpgMin) / (rpgMax - rpgMin);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid crit: " + crit);	
+		}
+		
+		return result;
+	}
+	
+	public static double getDenormalizedParamVal(BenchmarkDataset dataset, String sa, BenchmarkCriterion crit, double value) {		
+		
+		Double[] minMax = getRpgMinAndMax(dataset, sa, crit);
+		Double rpgMin = minMax[0];
+		Double rpgMax = minMax[1];
+
+		Double result = null;
+		
+		switch (crit) {
+		case BASIC_BETA_LIKENESS:
+		case D_DISCLOSURE_PRIVACY:
+		case T_CLOSENESS_ED:
+		case L_DIVERSITY_DISTINCT:
+		case L_DIVERSITY_ENTROPY:
+		case L_DIVERSITY_RECURSIVE:
+			result = (value * (rpgMax - rpgMin)) + rpgMin;
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid crit: " + crit);	

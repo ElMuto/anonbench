@@ -1,6 +1,7 @@
 package org.deidentifier.arx.testsuite;
 
 import org.deidentifier.arx.testcase.TestAggregatedBetaValues;
+import org.deidentifier.arx.testcase.TestDenormalization;
 import org.deidentifier.arx.testcase.TestFindOptimalTrafoForMinPrivGuarantee;
 import org.deidentifier.arx.testcase.TestMaxDelta;
 import org.deidentifier.arx.testcase.TestNPE_ACS13_lr;
@@ -20,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestWeightedAvg.class,
 	TestAttributeStatistics.class,
 	TestNormalization.class,
+	TestDenormalization.class,
 	
 	// longrunners
 	TestFindOptimalTrafoForMinPrivGuarantee.class,

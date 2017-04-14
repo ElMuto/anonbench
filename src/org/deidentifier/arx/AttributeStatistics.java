@@ -310,15 +310,7 @@ public class AttributeStatistics {
 					dataset.getDatafile(),
 					attr, 1, PrivacyModel.getDefaultParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0d);
 			int[] traFo = { 0, 0, 0 };
-			/*ARXResult result = */compSetup.anonymizeTrafos(traFo, traFo);
-
-//			DataHandle outHandle;
-//			int numOfsuppressedRecords = 0;
-//			if (result.getGlobalOptimum() != null) {
-//				outHandle = result.getOutput(result.getGlobalOptimum(), false);
-//				numOfsuppressedRecords = outHandle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples();
-//	            outHandle.release();
-//			}
+			compSetup.anonymizeTrafos(traFo, traFo);
             
 	        statsCache.put(statsKey, new AttributeStatistics(numRows, domainSize,
 	        							   frequencyDeviation, variance, skewness,
