@@ -3,13 +3,12 @@ package org.deidentifier.arx.testcase;
 import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkDataset;
-import org.deidentifier.arx.BenchmarkDriver;
-import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.ComparisonSetup;
-import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
+import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
+import org.deidentifier.arx.ComparisonSetup;
+import org.deidentifier.arx.PrivacyModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
