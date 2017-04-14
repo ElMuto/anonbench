@@ -7,9 +7,9 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.ParametrizationSetup;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator.DisclosureRisk;
-import org.deidentifier.arx.testutil.TestSetup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,12 +28,12 @@ public class TestMaxDelta {
 	final String				sa			= "Education";
 	final PrivacyModel			privacyModel= new PrivacyModel("ld", 5, 18d);
 
-	private TestSetup testSetup;
+	private ParametrizationSetup testSetup;
 	
     @Before
     public void setUp() {
 
-    	testSetup =  new TestSetup(datafile, sa, 1, PrivacyModel.getDefaultParam2(criterion), criterion, measure, suppFactor);
+    	testSetup =  new ParametrizationSetup(datafile, sa, 1, PrivacyModel.getDefaultParam2(criterion), criterion, measure, suppFactor);
         
     }
     

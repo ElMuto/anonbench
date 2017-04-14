@@ -6,10 +6,10 @@ import java.io.IOException;
 
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.ParametrizationSetup;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.testutil.TestSetup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 	
 	private final double epsilon = 0.01;
 
-	private TestSetup testSetup;
+	private ParametrizationSetup testSetup;
 	private BenchmarkDriver driver;
 	private PrivacyModel privacyModel;
 	
@@ -44,7 +44,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("ld", 5, 1d);
 
-		testSetup =  new TestSetup(
+		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"Education",
 				privacyModel.getK(),
@@ -76,7 +76,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("lr", 5, 1d);
 
-		testSetup =  new TestSetup(
+		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"Education",
 				5,
@@ -108,7 +108,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("le", 5, 1d);
 
-		testSetup =  new TestSetup(
+		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"Education",
 				1,
@@ -139,7 +139,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("t", 5, 1d);
 
-		testSetup =  new TestSetup(
+		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"Education",
 				1,
@@ -170,7 +170,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("d", 5, 14d);
 
-		testSetup =  new TestSetup(
+		testSetup =  new ParametrizationSetup(
 				 BenchmarkDatafile.ACS13,
 				"Education",
 				1,
@@ -201,7 +201,7 @@ public class TestFindOptimalTrafoForMinPrivGuarantee {
 
 		privacyModel = new PrivacyModel("b", 5, 95d);
 
-		testSetup =  new TestSetup(
+		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"Education",
 				1,

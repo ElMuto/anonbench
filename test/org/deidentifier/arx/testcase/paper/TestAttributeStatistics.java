@@ -3,15 +3,15 @@ package org.deidentifier.arx.testcase.paper;
 import static org.junit.Assert.assertEquals;
 
 import org.deidentifier.arx.AttributeStatistics;
+import org.deidentifier.arx.ParametrizationSetup;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
-import org.deidentifier.arx.testutil.TestSetup;
 import org.junit.Test;
 
 public class TestAttributeStatistics {
 
-	private TestSetup testSetupMs;
+	private ParametrizationSetup testSetupMs;
 	private AttributeStatistics statsMs;
-	private TestSetup testSetupEd;
+	private ParametrizationSetup testSetupEd;
 	private AttributeStatistics statsEd;
 	
 	private static final double epsilon = 1e-3;
@@ -19,7 +19,7 @@ public class TestAttributeStatistics {
 	@Test
 	public void Census() {
 
-    	testSetupMs =  new TestSetup(
+    	testSetupMs =  new ParametrizationSetup(
     			BenchmarkDatafile.ACS13,
     			"MS");   
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());        
@@ -37,7 +37,7 @@ public class TestAttributeStatistics {
 		assertEquals(7.1605,	statsMs.getRpgDmin(),	    epsilon);
 		assertEquals(0, 		statsMs.getRpgDmax(),	    epsilon);
 
-    	testSetupEd =  new TestSetup(
+    	testSetupEd =  new ParametrizationSetup(
     			BenchmarkDatafile.ACS13,
     			"ED");   
     	statsEd = AttributeStatistics.get(testSetupEd.getDataset(), testSetupEd.getSa());        
@@ -59,7 +59,7 @@ public class TestAttributeStatistics {
 	@Test
 	public void TimeUse() {
 
-    	testSetupMs =  new TestSetup(
+    	testSetupMs =  new ParametrizationSetup(
     			BenchmarkDatafile.ATUS,
     			"MS");   
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());        
@@ -77,7 +77,7 @@ public class TestAttributeStatistics {
 		assertEquals(9.6972,	statsMs.getRpgDmin(),       epsilon);
 		assertEquals(0, 		statsMs.getRpgDmax(),       epsilon);
 
-    	testSetupEd =  new TestSetup(
+    	testSetupEd =  new ParametrizationSetup(
     			BenchmarkDatafile.ATUS,
     			"ED");   
     	statsEd = AttributeStatistics.get(testSetupEd.getDataset(), testSetupEd.getSa());        
@@ -100,7 +100,7 @@ public class TestAttributeStatistics {
 	@Test
 	public void HealthInterviews() {
 
-    	testSetupMs =  new TestSetup(
+    	testSetupMs =  new ParametrizationSetup(
     			BenchmarkDatafile.IHIS,
     			"MS");   
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());        
@@ -118,7 +118,7 @@ public class TestAttributeStatistics {
 		assertEquals(10.68043,	statsMs.getRpgDmin(),	    epsilon);
 		assertEquals(0, 		statsMs.getRpgDmax(),	    epsilon);
 
-    	testSetupEd =  new TestSetup(
+    	testSetupEd =  new ParametrizationSetup(
     			BenchmarkDatafile.IHIS,
     			"ED");   
     	statsEd = AttributeStatistics.get(testSetupEd.getDataset(), testSetupEd.getSa());        

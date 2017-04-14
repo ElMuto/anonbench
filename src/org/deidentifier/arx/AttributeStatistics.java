@@ -7,7 +7,6 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
-import org.deidentifier.arx.testutil.TestSetup;
 
 
 /**
@@ -307,7 +306,7 @@ public class AttributeStatistics {
 	        
 	        // calc dMax and bMax
 			BenchmarkCriterion crit = BenchmarkCriterion.T_CLOSENESS_ED;
-			TestSetup compSetup =  new TestSetup(
+			ParametrizationSetup compSetup =  new ParametrizationSetup(
 					dataset.getDatafile(),
 					attr, 1, PrivacyModel.getDefaultParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0d);
 			int[] traFo = { 0, 0, 0 };

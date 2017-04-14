@@ -3,10 +3,10 @@ package org.deidentifier.arx.testcase;
 import static org.junit.Assert.assertEquals;
 
 import org.deidentifier.arx.AttributeStatistics;
+import org.deidentifier.arx.ParametrizationSetup;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.criteria.ParamTransformer;
-import org.deidentifier.arx.testutil.TestSetup;
 import org.junit.Test;
 
 /**
@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class TestNormalization {
 
-	private TestSetup testSetupMs;
+	private ParametrizationSetup testSetupMs;
 	private AttributeStatistics statsMs;
 	
 	private static final double epsilon = 1e-3;
@@ -26,7 +26,7 @@ public class TestNormalization {
 	@Test
 	public void testL() {
 				
-    	testSetupMs =  new TestSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.L_DIVERSITY_DISTINCT);
+    	testSetupMs =  new ParametrizationSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.L_DIVERSITY_DISTINCT);
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 1d; double expOutVal = 0d;		
@@ -45,7 +45,7 @@ public class TestNormalization {
 	@Test
 	public void testT() {
 				
-    	testSetupMs =  new TestSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.T_CLOSENESS_ED);
+    	testSetupMs =  new ParametrizationSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.T_CLOSENESS_ED);
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 1d; double expOutVal = 0d;		
@@ -64,7 +64,7 @@ public class TestNormalization {
 	@Test
 	public void testB() {
 				
-    	testSetupMs =  new TestSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.BASIC_BETA_LIKENESS);
+    	testSetupMs =  new ParametrizationSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.BASIC_BETA_LIKENESS);
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 0d; double expOutVal = 1d;		
@@ -83,7 +83,7 @@ public class TestNormalization {
 	@Test
 	public void testD() {
 				
-    	testSetupMs =  new TestSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.D_DISCLOSURE_PRIVACY);
+    	testSetupMs =  new ParametrizationSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.D_DISCLOSURE_PRIVACY);
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 0d; double expOutVal = 1d;		
