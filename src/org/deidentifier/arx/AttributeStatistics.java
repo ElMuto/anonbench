@@ -16,7 +16,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 public class AttributeStatistics {
 
 	public final Integer numRows;
-	public final Integer numValues;
+	public final Integer domainSize;
     public final Double frequencyDeviation;
     public final Double minFrequency;
     public final Double maxFrequency;
@@ -67,7 +67,7 @@ public class AttributeStatistics {
     	if (minFrequency > maxFrequency) throw new RuntimeException("This should not happen");
     	
     	this.numRows = numRows;
-        this.numValues = numValues;
+        this.domainSize = numValues;
         this.frequencyDeviation = frequencyDeviation;
         this.minFrequency = minFrequency;
         this.maxFrequency = maxFrequency;
@@ -84,8 +84,8 @@ public class AttributeStatistics {
         this.entropy = entropy;
     }
 
-    public Integer getNumValues() {
-        return numValues;
+    public Integer getDomainSize() {
+        return domainSize;
     }
 
     public Double getFrequencyDeviation() {
@@ -189,11 +189,11 @@ public class AttributeStatistics {
 		case D_DISCLOSURE_PRIVACY:
 			return 0d;
 		case L_DIVERSITY_DISTINCT:
-			return Double.valueOf(getNumValues());
+			return Double.valueOf(getDomainSize());
 		case L_DIVERSITY_ENTROPY:
-			return Double.valueOf(getNumValues());
+			return Double.valueOf(getDomainSize());
 		case L_DIVERSITY_RECURSIVE:
-			return Double.valueOf(getNumValues());
+			return Double.valueOf(getDomainSize());
 		case T_CLOSENESS_ED:
 			return 0d;
 		default:
@@ -218,7 +218,7 @@ public class AttributeStatistics {
 	        return BenchmarkDriver.statsCache.get(statsKey);
 	    } else {
 	        Integer numRows = null;
-	        Integer numValues = null;
+	        Integer domainSize = null;
 	        Double  frequencyDeviation = null;
 	        Double  variance = null;
 	        Double  skewness = null;
@@ -237,7 +237,7 @@ public class AttributeStatistics {
 	        int attrColIndex = handle.getColumnIndexOf(attr);
 	        numRows = handle.getNumRows();
 	        String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
-	        numValues = distinctValues.length;
+	        domainSize = distinctValues.length;
 	        if (verbosity >= 1) System.out.println("    " + attr + " (domain size: " + distinctValues.length + ")");
 	        
 	        // get the frequencies of attribute instantiations
@@ -315,7 +315,7 @@ public class AttributeStatistics {
 	            }
 	        }
 	        
-	        BenchmarkDriver.statsCache.put(statsKey, new AttributeStatistics(numRows, numValues,
+	        BenchmarkDriver.statsCache.put(statsKey, new AttributeStatistics(numRows, domainSize,
 	        							   frequencyDeviation, variance, skewness,
 	                                       kurtosis, standDeviation, variance_coeff,
 	                                       deviation_norm, quartil_coeff,
