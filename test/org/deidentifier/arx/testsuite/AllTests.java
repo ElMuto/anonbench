@@ -19,10 +19,10 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestNPE_ACS13_lr.class,
 	TestWeightedAvg.class,
 	TestAttributeStatistics.class,
+	TestNormalization.class,
 	
 	// longrunners
 	TestFindOptimalTrafoForMinPrivGuarantee.class,
-	TestNormalization.class,
 	TestBaseCAs.class,
 	})
 public class AllTests {

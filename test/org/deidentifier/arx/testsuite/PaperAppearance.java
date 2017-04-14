@@ -11,6 +11,6 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestAttributeStatistics.class,
 	TestBaseCAs.class,
 	})
-public class Paper {
+public class PaperAppearance {
 
 }

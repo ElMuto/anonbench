@@ -26,14 +26,21 @@ public class TestSetup {
 	private ARXConfiguration config;
 	private ARXAnonymizer anonymizer;
 	private BenchmarkDataset dataset;
+	private final BenchmarkCriterion dim2Crit;
 	
 	public TestSetup(BenchmarkDatafile datafile, String sa) {
-		this(datafile, sa, 1, 0d, BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.ENTROPY, 0d);
+		this(datafile, sa, BenchmarkCriterion.T_CLOSENESS_ED);
+	}
+	
+	public TestSetup(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
+		this(datafile, sa, 1, 0d, crit, BenchmarkMeasure.ENTROPY, 0d);
 	}
 	
 	public TestSetup(BenchmarkDatafile datafile, String sa, Integer k,
 			Double param2Val, BenchmarkCriterion criterion, BenchmarkMeasure measure, double suppFactor) {
 		super();
+		
+		this.dim2Crit = criterion;
 		
 	   	dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, criterion }, sa);
 
@@ -75,7 +82,7 @@ public class TestSetup {
 		}
 		
 		try {
-			DisclosureRiskCalculator.prepare(getDataset().getDatafile(), getDataset().getSensitiveAttribute());
+			DisclosureRiskCalculator.prepare(getDataset());
 			
 			result = anonymizer.anonymize(arxData, config);
 			
@@ -141,6 +148,10 @@ public class TestSetup {
 
 	public String getSa() {
 		return getDataset().getSensitiveAttribute();
+	}
+
+	public BenchmarkCriterion getDim2Crit() {
+		return dim2Crit;
 	}
 
 }

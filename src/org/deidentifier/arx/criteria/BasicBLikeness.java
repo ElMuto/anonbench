@@ -52,8 +52,8 @@ public class BasicBLikeness extends ExplicitPrivacyCriterion {
      */
     public BasicBLikeness(String attribute, double beta) {
         super(attribute, false, true);
-        if (beta <= 0) {
-            throw new IllegalArgumentException("Beta (" + beta + ") must be > 0");
+        if (beta < 0) {
+            throw new IllegalArgumentException("Beta (" + beta + ") must be >= 0");
         }
         this.b = beta;
     }

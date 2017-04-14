@@ -2,7 +2,7 @@ package org.deidentifier.arx.criteria;
 
 import java.util.Locale;
 
-import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
+import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.framework.check.groupify.HashGroupifyEntry;
@@ -30,18 +30,18 @@ public class DisclosureRiskCalculator {
 		private double min;
 		private double max;
 		
-		final BenchmarkDatafile datafile;
+		final BenchmarkDataset dataset;
 		final String sa;
 		final BenchmarkCriterion crit;
 		
-		private DisclosureRisk(String name, BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
+		private DisclosureRisk(String name, BenchmarkDataset dataset, BenchmarkCriterion crit) {
 			this.name = name;
 			this.numValues = 0;
 			this.min = Double.MAX_VALUE;
 			this.max = -Double.MAX_VALUE;
 			
-			this.datafile = datafile;
-			this.sa = sa;
+			this.dataset = dataset;
+			this.sa = dataset.getSensitiveAttribute();
 			this.crit = crit;
 		}
 
@@ -78,7 +78,7 @@ public class DisclosureRiskCalculator {
 		}
 
 		public double getAvgNormalized() {
-			return ParamTransformer.getNormalizedParamVal(datafile, sa, crit, avg);
+			return ParamTransformer.getNormalizedParamVal(dataset, sa, crit, avg);
 		}
 
 		public double getMin() {
@@ -86,7 +86,7 @@ public class DisclosureRiskCalculator {
 		}
 
 		public double getMinNormalized() {
-			return ParamTransformer.getNormalizedParamVal(datafile, sa, crit, min);
+			return ParamTransformer.getNormalizedParamVal(dataset, sa, crit, min);
 		}
 
 		public double getMax() {
@@ -94,7 +94,7 @@ public class DisclosureRiskCalculator {
 		}
 
 		public double getMaxNormalized() {
-			return ParamTransformer.getNormalizedParamVal(datafile, sa, crit, max);
+			return ParamTransformer.getNormalizedParamVal(dataset, sa, crit, max);
 		}
 
 		public void println() {
@@ -130,12 +130,12 @@ public class DisclosureRiskCalculator {
 	private static DisclosureRisk l;
 	private static DisclosureRisk delta;
 
-	public static void prepare(BenchmarkDatafile datafile, String sa) {
+	public static void prepare(BenchmarkDataset dataset) {
 
-		beta = new DisclosureRisk("Beta", datafile, sa, BenchmarkCriterion.BASIC_BETA_LIKENESS);
-		l   = new DisclosureRisk("L", datafile, sa, BenchmarkCriterion.L_DIVERSITY_DISTINCT);
-		t   = new DisclosureRisk("T", datafile, sa, BenchmarkCriterion.T_CLOSENESS_ED);
-		delta   = new DisclosureRisk("Delta", datafile, sa, BenchmarkCriterion.D_DISCLOSURE_PRIVACY);
+		beta	= new DisclosureRisk("Beta", dataset, BenchmarkCriterion.BASIC_BETA_LIKENESS);
+		l   	= new DisclosureRisk("L", dataset, BenchmarkCriterion.L_DIVERSITY_DISTINCT);
+		t   	= new DisclosureRisk("T", dataset, BenchmarkCriterion.T_CLOSENESS_ED);
+		delta   = new DisclosureRisk("Delta", dataset, BenchmarkCriterion.D_DISCLOSURE_PRIVACY);
 	}
 
 	public static void summarize() {
@@ -316,7 +316,7 @@ public class DisclosureRiskCalculator {
 	}
 	
 	public static String[] getHeader() {
-		DisclosureRiskCalculator.prepare(null, null);
+		DisclosureRiskCalculator.prepare(null);
 		return (String[]) BenchmarkDriver.concat(BenchmarkDriver.concat(BenchmarkDriver.concat(l.getHeader(), t.getHeader()), delta.getHeader()), beta.getHeader());
 	}
 
