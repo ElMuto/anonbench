@@ -1,6 +1,7 @@
 package org.deidentifier.arx;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
@@ -14,6 +15,8 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
  *
  */
 public class AttributeStatistics {
+
+    final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
 
 	public final Integer numRows;
 	public final Integer domainSize;
@@ -214,8 +217,8 @@ public class AttributeStatistics {
 	 */
 	public static AttributeStatistics analyzeAttribute(BenchmarkDataset dataset, DataHandle handle, String attr, int verbosity) {
 	    String statsKey = dataset.toString() + "-" + attr;
-	    if (BenchmarkDriver.statsCache.containsKey(statsKey)) {
-	        return BenchmarkDriver.statsCache.get(statsKey);
+	    if (statsCache.containsKey(statsKey)) {
+	        return statsCache.get(statsKey);
 	    } else {
 	        Integer numRows = null;
 	        Integer domainSize = null;
@@ -315,13 +318,13 @@ public class AttributeStatistics {
 	            }
 	        }
 	        
-	        BenchmarkDriver.statsCache.put(statsKey, new AttributeStatistics(numRows, domainSize,
+	        statsCache.put(statsKey, new AttributeStatistics(numRows, domainSize,
 	        							   frequencyDeviation, variance, skewness,
 	                                       kurtosis, standDeviation, variance_coeff,
 	                                       deviation_norm, quartil_coeff,
 	                                       mean_arith, mean_geom, median, normalizedEntropy, minFrequency, maxFrequency));
 	        
-	        return BenchmarkDriver.statsCache.get(statsKey);
+	        return statsCache.get(statsKey);
 	    }
 	}
 }

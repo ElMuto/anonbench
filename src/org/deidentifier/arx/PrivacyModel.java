@@ -12,6 +12,11 @@ public class PrivacyModel {
 	private       Double  b;
 	private       Double  dim2Val;
 	
+	/**
+	 * @param criterion
+	 * @param dim1Val
+	 * @param dim2Val
+	 */
 	public PrivacyModel(BenchmarkCriterion criterion, Integer dim1Val, Double dim2Val) {
 		super();
 		this.k = dim1Val;
@@ -51,6 +56,11 @@ public class PrivacyModel {
 		}
 	}
 	
+	/**
+	 * @param dim2Qualifier
+	 * @param dim1Val
+	 * @param dim2Val
+	 */
 	public PrivacyModel(String dim2Qualifier, Integer dim1Val, Double dim2Val) {
 		
 		this(toCrit(dim2Qualifier), dim1Val, dim2Val);

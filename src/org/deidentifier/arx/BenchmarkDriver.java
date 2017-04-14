@@ -28,7 +28,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -72,7 +71,6 @@ import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
  *
  */
 public class BenchmarkDriver {
-    final static HashMap<String, AttributeStatistics> statsCache = new HashMap<String, AttributeStatistics>();
 
     private final UtilityMeasure<Double> measure;
     private final UtilityMeasureSoriaComas measureSoriaComas;
@@ -464,16 +462,24 @@ public class BenchmarkDriver {
 
 
 
-    public static void getBasePAs(BenchmarkDatafile datafile, String sa, PrintStream outputStream, boolean includeInsensitiveAttributes)
-			throws IOException {
-		String printString = "Running " + datafile.toString() + " with SA=" + sa;
-		outputStream.println(printString);
-		System.out.println(printString);
-		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY }, sa);
+    public static String[] getBaseCAs(BenchmarkDatafile datafile, String sa, boolean includeInsensitiveAttributes) {
+		PrivacyModel pm = new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED, 1, 1d);
+		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, pm.getCriterion() }, sa);
 		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
-		driver.findOptimalRelPA(0.05, dataset,
-				sa,
-				includeInsensitiveAttributes, null, null, null);
+		
+		String[] result = new String[3];
+		try {
+			String[] output = driver.findOptimalRelPA(0d, dataset,
+					sa,
+					includeInsensitiveAttributes, pm, null, null);
+			result[0] = output[2];
+			result[1] = output[3];
+			result[2] = output[4];
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -597,9 +603,9 @@ public class BenchmarkDriver {
         							.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
 
         					if (!baselineValuesCaptured) {
-        						minPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getZeroRAccuracy());
-        						maxPAStr = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy());
-        						gainStr  = String.format(new Locale("de", "DE"), "%.3f", stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
+        						minPAStr = String.format(new Locale("de", "DE"), "%.4f", stats.getZeroRAccuracy());
+        						maxPAStr = String.format(new Locale("de", "DE"), "%.4f", stats.getOriginalAccuracy());
+        						gainStr  = String.format(new Locale("de", "DE"), "%.4f", stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
         					}        				
         					baselineValuesCaptured = true;
 
