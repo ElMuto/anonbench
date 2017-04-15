@@ -1,4 +1,4 @@
-package org.deidentifier.arx.testcase.il;
+package org.deidentifier.arx.testcase.paper;
 
 import static org.junit.Assert.*;
 
