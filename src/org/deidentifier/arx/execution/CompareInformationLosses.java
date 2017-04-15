@@ -27,7 +27,7 @@ public class CompareInformationLosses {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY, BenchmarkMeasure.LOSS}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY}) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
@@ -56,7 +56,7 @@ public class CompareInformationLosses {
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
 									privacyModel.getD(), privacyModel.getB(), null,
-									null, sa, null, "results/resultsBetaLikeness.csv", false, privacyModel);
+									null, sa, null, "results/resultsIL.csv", false, privacyModel);
 						}
 						dataset.getArxData().getHandle().release();
 					}
