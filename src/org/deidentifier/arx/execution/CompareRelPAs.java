@@ -5,7 +5,7 @@ import java.io.PrintStream;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.util.Classification;
+import org.deidentifier.arx.util.Classificator;
 
 
 public class CompareRelPAs {
@@ -38,39 +38,39 @@ public class CompareRelPAs {
 		}
 
 		
-		if (MS) {
-			PrintStream fileOutputStreamMS = new PrintStream("results/resultsRelCAsMS.txt");
-			
-			Classification.compareRelPAs(BenchmarkDatafile.ACS13, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
-			fileOutputStreamMS.println();
-			
-			Classification.compareRelPAs(BenchmarkDatafile.ATUS, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
-			fileOutputStreamMS.println();
-			
-			Classification.compareRelPAs(BenchmarkDatafile.IHIS, BenchmarkMeasure.ENTROPY, "MARSTAT", fileOutputStreamMS, false);
-			fileOutputStreamMS.println();
-			
-
-			fileOutputStreamMS.close();
-		}
-
-		if (ED) {
-			PrintStream fileOutputStreamED = new PrintStream("results/resultsRelCAsED.txt");
-			
-			Classification.compareRelPAs(BenchmarkDatafile.ACS13, BenchmarkMeasure.ENTROPY, "Education", fileOutputStreamED, false);
-			fileOutputStreamED.println("\n");
-
-			Classification.compareRelPAs(BenchmarkDatafile.ATUS, BenchmarkMeasure.ENTROPY, "Highest level of school completed", fileOutputStreamED, false);
-			fileOutputStreamED.println("\n");
-
-			fileOutputStreamED.println();
-			Classification.compareRelPAs(BenchmarkDatafile.IHIS, BenchmarkMeasure.ENTROPY, "EDUC", fileOutputStreamED, false);
-			
-
-			fileOutputStreamED.close();
-		}
-		
-		System.out.println("done.");
-		
+//		if (MS) {
+//			PrintStream fileOutputStreamMS = new PrintStream("results/resultsRelCAsMS.txt");
+//			
+//			Classificator.compareRelPAs(BenchmarkDatafile.ACS13, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
+//			fileOutputStreamMS.println();
+//			
+//			Classificator.compareRelPAs(BenchmarkDatafile.ATUS, BenchmarkMeasure.ENTROPY, "Marital status", fileOutputStreamMS, false);
+//			fileOutputStreamMS.println();
+//			
+//			Classificator.compareRelPAs(BenchmarkDatafile.IHIS, BenchmarkMeasure.ENTROPY, "MARSTAT", fileOutputStreamMS, false);
+//			fileOutputStreamMS.println();
+//			
+//
+//			fileOutputStreamMS.close();
+//		}
+//
+//		if (ED) {
+//			PrintStream fileOutputStreamED = new PrintStream("results/resultsRelCAsED.txt");
+//			
+//			Classificator.compareRelPAs(BenchmarkDatafile.ACS13, BenchmarkMeasure.ENTROPY, "Education", fileOutputStreamED, false);
+//			fileOutputStreamED.println("\n");
+//
+//			Classificator.compareRelPAs(BenchmarkDatafile.ATUS, BenchmarkMeasure.ENTROPY, "Highest level of school completed", fileOutputStreamED, false);
+//			fileOutputStreamED.println("\n");
+//
+//			fileOutputStreamED.println();
+//			Classificator.compareRelPAs(BenchmarkDatafile.IHIS, BenchmarkMeasure.ENTROPY, "EDUC", fileOutputStreamED, false);
+//			
+//
+//			fileOutputStreamED.close();
+//		}
+//		
+//		System.out.println("done.");
+//		
 	}
 }

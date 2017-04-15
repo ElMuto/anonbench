@@ -20,7 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestNormalization.class,
 	TestDenormalization.class,
 // 	TestRelIlEntrMs.class,  // FAILURE !!!
-//	TestRelIlEntrMs.class, // FAILURE !!!!
+//	TestRelIlEntrLoss.class, // FAILURE !!!!
 //	TestAttributeStatistics.class,
 })
 public class Shortrunners {

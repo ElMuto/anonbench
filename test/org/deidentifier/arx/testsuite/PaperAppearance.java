@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestAttributeStatistics.class,
 	TestBaseCAs.class,
 // 	TestRelIlEntrMs.class,  // FAILURE !!!
-//	TestRelIlEntrMs.class, // FAILURE !!!!
+//	TestRelIlEntrLoss.class, // FAILURE !!!!
 	})
 public class PaperAppearance {
 

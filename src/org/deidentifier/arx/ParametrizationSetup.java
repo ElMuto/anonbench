@@ -166,4 +166,8 @@ public class ParametrizationSetup {
 		return anonymizer;
 	}
 
+	public ARXConfiguration getConfig() {
+		return config;
+	}
+
 }

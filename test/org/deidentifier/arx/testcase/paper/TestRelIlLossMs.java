@@ -60,15 +60,15 @@ public class TestRelIlLossMs {
 	
 	//////// Time Use ///////////////////////
 
-//	@Test
-//	public void testTimeUseMsLd() {
-//		testSetupMs =  new ParametrizationSetup(
-//				BenchmarkDatafile.ATUS,
-//				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
-//		testSetupMs.anonymize();
-//		assertEquals(0.0411573544704593, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-//	}
-//
+	@Test
+	public void testTimeUseMsLd() {
+		testSetupMs =  new ParametrizationSetup(
+				BenchmarkDatafile.ATUS,
+				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
+		testSetupMs.anonymize();
+		assertEquals(0.0411573544704593, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+	}
+
 //	@Test
 //	public void testTimeUseMsLr() {
 //		testSetupMs =  new ParametrizationSetup(
@@ -105,50 +105,50 @@ public class TestRelIlLossMs {
 //		assertEquals(1d, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
 //	}
 	
-	//////// Health Interviews ///////////////////////
-
-	@Test
-	public void testHealthInterviewMsLd() {
-		testSetupMs =  new ParametrizationSetup(
-				BenchmarkDatafile.IHIS,
-				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
-		testSetupMs.anonymize();
-		assertEquals(0.0603368694725842, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-	}
-
-	@Test
-	public void testHealthInterviewMsLr() {
-		testSetupMs =  new ParametrizationSetup(
-				BenchmarkDatafile.IHIS,
-				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_RECURSIVE, BenchmarkMeasure.LOSS, 0.05);
-		testSetupMs.anonymize();
-		assertEquals(0.25992104989477, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-	}
-
-	@Test
-	public void testHealthInterviewMsLe() {
-		testSetupMs =  new ParametrizationSetup(
-				BenchmarkDatafile.IHIS,
-				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_ENTROPY, BenchmarkMeasure.LOSS, 0.05);
-		testSetupMs.anonymize();
-		assertEquals(0.25992104989477, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-	}
-
-	@Test
-	public void testHealthInterviewMsTc() {
-		testSetupMs =  new ParametrizationSetup(
-				BenchmarkDatafile.IHIS,
-				"MS", 5, 0.2, BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.LOSS, 0.05);
-		testSetupMs.anonymize();
-		assertEquals(0.28818332090059, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-	}
-
-	@Test
-	public void testHealthInterviewMsDp() {
-		testSetupMs =  new ParametrizationSetup(
-				BenchmarkDatafile.IHIS,
-				"MS", 5, 1d, BenchmarkCriterion.D_DISCLOSURE_PRIVACY, BenchmarkMeasure.LOSS, 0.05);
-		testSetupMs.anonymize();
-		assertEquals(1d, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-	}
+//	//////// Health Interviews ///////////////////////
+//
+//	@Test
+//	public void testHealthInterviewMsLd() {
+//		testSetupMs =  new ParametrizationSetup(
+//				BenchmarkDatafile.IHIS,
+//				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
+//		testSetupMs.anonymize();
+//		assertEquals(0.0603368694725842, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+//	}
+//
+//	@Test
+//	public void testHealthInterviewMsLr() {
+//		testSetupMs =  new ParametrizationSetup(
+//				BenchmarkDatafile.IHIS,
+//				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_RECURSIVE, BenchmarkMeasure.LOSS, 0.05);
+//		testSetupMs.anonymize();
+//		assertEquals(0.25992104989477, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+//	}
+//
+//	@Test
+//	public void testHealthInterviewMsLe() {
+//		testSetupMs =  new ParametrizationSetup(
+//				BenchmarkDatafile.IHIS,
+//				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_ENTROPY, BenchmarkMeasure.LOSS, 0.05);
+//		testSetupMs.anonymize();
+//		assertEquals(0.25992104989477, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+//	}
+//
+//	@Test
+//	public void testHealthInterviewMsTc() {
+//		testSetupMs =  new ParametrizationSetup(
+//				BenchmarkDatafile.IHIS,
+//				"MS", 5, 0.2, BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.LOSS, 0.05);
+//		testSetupMs.anonymize();
+//		assertEquals(0.28818332090059, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+//	}
+//
+//	@Test
+//	public void testHealthInterviewMsDp() {
+//		testSetupMs =  new ParametrizationSetup(
+//				BenchmarkDatafile.IHIS,
+//				"MS", 5, 1d, BenchmarkCriterion.D_DISCLOSURE_PRIVACY, BenchmarkMeasure.LOSS, 0.05);
+//		testSetupMs.anonymize();
+//		assertEquals(1d, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+//	}
 }
