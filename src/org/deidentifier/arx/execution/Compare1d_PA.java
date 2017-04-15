@@ -8,6 +8,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.util.Classification;
 import org.deidentifier.arx.util.CommandLineParser;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
@@ -126,6 +127,6 @@ public class Compare1d_PA {
 	}
 
 	public static String[] getCsvHeader(BenchmarkDataset dataset) {
-		return (String[]) BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, BenchmarkDriver.getCombinedRelPaAndDisclosureRiskHeader(dataset));
+		return (String[]) BenchmarkDriver.concat(new String[] { "datafile", "sa", "pm", "param"}, Classification.getCombinedRelPaAndDisclosureRiskHeader(dataset));
 	}
 }

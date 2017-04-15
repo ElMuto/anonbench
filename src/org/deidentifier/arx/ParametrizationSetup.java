@@ -18,13 +18,14 @@ import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
+import org.deidentifier.arx.util.Anonymizer;
 
 public class ParametrizationSetup {
 	
 	private Data arxData;
 	private String[] qiS;	
 	private ARXConfiguration config;
-	private ARXAnonymizer anonymizer;
+	private Anonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	private final BenchmarkCriterion dim2Crit;
 	
@@ -71,7 +72,7 @@ public class ParametrizationSetup {
 		}
         arxData = dataset.getArxData();
         qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(datafile);
-        anonymizer = new ARXAnonymizer();
+        anonymizer = new Anonymizer();
 	}
 
 
@@ -81,10 +82,10 @@ public class ParametrizationSetup {
 
 
 	public ARXResult anonymize(int[] minLevels, int[] maxLevels) {
-        DataDefinition dataDef = arxData.getDefinition();
-        
-        ARXResult result = null;
-        
+		DataDefinition dataDef = arxData.getDefinition();
+
+		ARXResult result = null;
+
 		for (int i = 0; i < qiS.length; i++) {
 			String qi = qiS[i];
 			if (minLevels != null) {
@@ -94,17 +95,12 @@ public class ParametrizationSetup {
 				dataDef.setMaximumGeneralization(qi, maxLevels[i]);
 			}
 		}
-		
-		try {
-			DisclosureRiskCalculator.prepare(getDataset());
-			
-			result = anonymizer.anonymize(arxData, config);
-			
-			DisclosureRiskCalculator.summarize();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		DisclosureRiskCalculator.prepare(getDataset());
+
+		result = anonymizer.anonymize(arxData, config);
+
+		DisclosureRiskCalculator.summarize();
+
 		return result; 
 	}
 
@@ -166,6 +162,10 @@ public class ParametrizationSetup {
 
 	public BenchmarkCriterion getDim2Crit() {
 		return dim2Crit;
+	}
+
+	public Anonymizer getAnonymizer() {
+		return anonymizer;
 	}
 
 }

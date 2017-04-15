@@ -22,7 +22,6 @@ package org.deidentifier.arx;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import java.util.Map;
 
 import org.deidentifier.arx.ARXLattice.ARXNode;
 import org.deidentifier.arx.ARXLattice.Anonymity;
-import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.aggregates.StatisticsClassification;
@@ -48,6 +46,7 @@ import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.Metric.AggregateFunction;
+import org.deidentifier.arx.util.Difficulties;
 import org.deidentifier.arx.utility.DataConverter;
 import org.deidentifier.arx.utility.UtilityMeasure;
 import org.deidentifier.arx.utility.UtilityMeasureAECS;
@@ -337,7 +336,7 @@ public class BenchmarkDriver {
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.INFO_LOSS_MAX,         formatter.format( dataset.getMaxInfoLoss(this.benchmarkMeasure)));
         
         // report solution ratio
-        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, calculateDifficulty(result));
+        BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.DIFFICULTY, Difficulties.calculateDifficulty(result));
         
         // put stats for sensitive attributes into results-file
         BenchmarkSetup.BENCHMARK.addValue(BenchmarkSetup.NUM_VALUES, sa != null && attrStats.getDomainSize() != null ?
@@ -430,89 +429,6 @@ public class BenchmarkDriver {
 		return assemblePrivacyModelString(pm.getCriterion(), pm.getK(), pm.getC(), pm.getL(), pm.getT(), new Double(suppFactor), pm.getD(), pm.getB());
 	}
 
-	private double calculateDifficulty(ARXResult result) {
-        int numSolutions = 0;
-        ARXLattice lattice = result.getLattice();
-        for (ARXNode[] level : lattice.getLevels()) {
-            for (ARXNode node : level) {
-         
-            	// Make sure that every transformation is classified correctly
-            	if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-            		result.getOutput(node).release();
-            	}
-            	
-            	if (node.getAnonymity() == Anonymity.ANONYMOUS) {
-            		numSolutions++;
-            		
-            	// Sanity check
-            	} else if (node.getAnonymity() != Anonymity.NOT_ANONYMOUS) {
-	            	throw new RuntimeException("Solution space is still not classified completely");   
-                }
-            }
-        }
-        
-        return 1- (((double) numSolutions) / ((double) lattice.getSize()));
-    }
-
-
-
-    public static String[] getBaseCAs(BenchmarkDatafile datafile, String sa, boolean includeInsensitiveAttributes) {
-		PrivacyModel pm = new PrivacyModel(BenchmarkCriterion.T_CLOSENESS_ED, 1, 1d);
-		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, pm.getCriterion() }, sa);
-		BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
-		
-		String[] result = new String[3];
-		try {
-			String[] output = driver.findOptimalRelPA(0d, dataset,
-					sa,
-					includeInsensitiveAttributes, pm, null, null);
-			result[0] = output[2];
-			result[1] = output[3];
-			result[2] = output[4];
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
-
-	/**
-	 * @param datafile
-	 * @param bmMeasure
-	 * @param sa
-	 * @param outputStream
-	 * @param includeInsensitiveAttributes
-	 * @throws IOException
-	 */
-	public static void compareRelPAs(BenchmarkDatafile datafile, BenchmarkMeasure bmMeasure, String sa, PrintStream outputStream, boolean includeInsensitiveAttributes) throws IOException {
-		String printString = "Running " + datafile.toString() + " with SA=" + sa;
-		outputStream.println(printString);
-		System.out.println(printString);
-		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsCombinedWithK()) {
-
-
-
-			BenchmarkCriterion[] criteria = null;
-			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
-				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-			} else {
-				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
-			}
-
-			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
-			BenchmarkDriver driver = new BenchmarkDriver(bmMeasure, dataset);
-
-			String maxPAStr[] = driver.findOptimalRelPA(0d, dataset,
-					sa,
-					includeInsensitiveAttributes, privacyModel, null, null);
-
-			System.out.  format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
-			outputStream.format(new Locale("de", "DE"), "%s;%s%n", privacyModel.toString(), maxPAStr[0]);
-		}
-	}
-	
-	
 	/**
 	 * @param suppFactor
 	 * @param dataset
@@ -686,10 +602,6 @@ public class BenchmarkDriver {
         				new String[] { relPAStr, absPAStr, minPAStr, maxPAStr, gainStr, trafoStr,  numSupRecsStr },
         				ilMeasureValues),
         		disclosureRiskResults);
-	}
-
-	public static String[] getCombinedRelPaAndDisclosureRiskHeader(BenchmarkDataset dataset) {
-		return (String[]) BenchmarkDriver.concat(new String[] { "RelPA", "AbsPA", "MinPA", "MaxPA", "Gain", "Trafo", "NumSuppRecs", "IL-NUE", "IL-Loss", "IL-SSE" }, DisclosureRiskCalculator.getHeader(dataset));
 	}
 
 	private String getRelativeInfoLoss(BenchmarkDataset dataset, ARXNode optNode, String[][] outputArray,

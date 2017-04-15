@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestAttributeStatistics.class,
 	TestNormalization.class,
 	TestDenormalization.class,
-//	TestRelNueFromUtilityPackage.class,
+	TestRelNueFromUtilityPackage.class,
 	
 	// longrunners
 	TestFindOptimalTrafoForMinPrivGuarantee.class,
