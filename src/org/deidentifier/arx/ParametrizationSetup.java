@@ -95,11 +95,9 @@ public class ParametrizationSetup {
 				dataDef.setMaximumGeneralization(qi, maxLevels[i]);
 			}
 		}
-		DisclosureRiskCalculator.prepare(getDataset());
 
-		result = anonymizer.anonymize(arxData, config);
+		result = anonymizer.anonymize(dataset, config);
 
-		DisclosureRiskCalculator.summarize();
 
 		return result; 
 	}

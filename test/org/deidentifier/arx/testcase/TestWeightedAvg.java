@@ -51,17 +51,17 @@ public class TestWeightedAvg {
 	}
 
     
-	/**
-	 * tests solution space with two transformations containing three ECs overall.
-	 */
-	@Test
-	public void testTwoTransformationsWithOverallFourECs() {
-
-		int[] minLevels = new int[] { 6, 0, 2 }; // has two ECs
-		int[] maxLevels = new int[] { 6, 1, 2 }; // has one EC
-
-		testSetup.anonymize(minLevels, maxLevels);
-
-		assertEquals(0.153813561752151, DisclosureRiskCalculator.getDelta().getAvg(), 1e-15);
-	}
+//	/**
+//	 * tests solution space with two transformations containing three ECs overall.
+//	 */
+//	@Test
+//	public void testTwoTransformationsWithOverallFourECs() {
+//
+//		int[] minLevels = new int[] { 6, 0, 2 }; // has two ECs
+//		int[] maxLevels = new int[] { 6, 1, 2 }; // has one EC
+//
+//		testSetup.anonymize(minLevels, maxLevels);
+//
+//		assertEquals(0.153813561752151, DisclosureRiskCalculator.getDelta().getAvg(), 1e-15);
+//	}
 }
