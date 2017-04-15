@@ -31,6 +31,8 @@ public class Anonymizer {
     private Double ilArx = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
     private Double ilAbsEntr = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
     private Double ilRelEntr = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+    private Double ilAbsLoss = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
+    private Double ilRelLoss = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
     private Double ilSorCom  = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
 
 	public Anonymizer() {
@@ -61,7 +63,7 @@ public class Anonymizer {
 		    String[] header = dataset.getQuasiIdentifyingAttributes();
 	    	DataConverter converter = new DataConverter();
 		    Map<String, String[][]> hierarchies = converter.toMap(dataset.getInputDataDef());
-			UtilityMeasureNonUniformEntropy<Double> measureNue 		= new UtilityMeasureNonUniformEntropy<Double>(header, dataset.getInputArray());
+			UtilityMeasureNonUniformEntropy<Double> measureEntr 		= new UtilityMeasureNonUniformEntropy<Double>(header, dataset.getInputArray());
 			UtilityMeasureLoss<Double> measureLoss = new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
 	
 			
@@ -73,8 +75,11 @@ public class Anonymizer {
 		        	DataHandle handle = result.getOutput(arxOptimum, false);
 		        	String[][]  scOutputData = converter.toArray(handle,dataset.getInputDataDef());
 		        	handle.release();
-		        	this.ilAbsEntr = measureNue.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+		        	this.ilAbsEntr = measureEntr.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
 		        	this.ilRelEntr = (this.ilAbsEntr - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.ENTROPY) - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY));
+
+		        	this.ilAbsLoss = measureLoss.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+		        	this.ilRelLoss = (this.ilAbsLoss - dataset.getMinInfoLoss(BenchmarkMeasure.LOSS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.LOSS) - dataset.getMinInfoLoss(BenchmarkMeasure.LOSS));
 	
 	//	        	ilSorCom = getOptimumsAbsIlByFullTraversal(BenchmarkMeasure.SORIA_COMAS, dataset, result);
 		        } else {
@@ -182,6 +187,14 @@ public class Anonymizer {
 
 	public Double getIlRelEntr() {
 		return ilRelEntr;
+	}
+
+	public Double getIlAbsLoss() {
+		return ilAbsLoss;
+	}
+
+	public Double getIlRelLoss() {
+		return ilRelLoss;
 	}
 
 	public Double getIlSorCom() {
