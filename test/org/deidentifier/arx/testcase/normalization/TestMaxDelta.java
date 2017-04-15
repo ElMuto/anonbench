@@ -48,7 +48,7 @@ public class TestMaxDelta {
 	@Test
 	public void testDelta() {
 		
-		ARXResult result = testSetup.anonymizeTrafos(new int[] { 0, 0, 0 }, new int[] { 6, 1, 2 });
+		ARXResult result = testSetup.anonymize(new int[] { 0, 0, 0 }, new int[] { 6, 1, 2 });
 		result.getOutput(result.getGlobalOptimum(), false);
 		
 		DisclosureRisk delta = DisclosureRiskCalculator.getDelta();

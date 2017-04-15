@@ -310,7 +310,7 @@ public class AttributeStatistics {
 					dataset.getDatafile(),
 					attr, 1, PrivacyModel.getDefaultParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0d);
 			int[] traFo = { 0, 0, 0 };
-			compSetup.anonymizeTrafos(traFo, traFo);
+			compSetup.anonymize(traFo, traFo);
             
 	        statsCache.put(statsKey, new AttributeStatistics(numRows, domainSize,
 	        							   frequencyDeviation, variance, skewness,

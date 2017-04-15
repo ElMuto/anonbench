@@ -45,7 +45,7 @@ public class TestWeightedAvg {
 		
 		int[] testTrafo = new int[] { 6, 0, 2 }; // has two ECs
 		
-		testSetup.anonymizeTrafos(testTrafo, testTrafo);
+		testSetup.anonymize(testTrafo, testTrafo);
 
 		assertEquals(0.307627124, DisclosureRiskCalculator.getDelta().getAvg(), 1e-9);		
 	}
@@ -60,7 +60,7 @@ public class TestWeightedAvg {
 		int[] minLevels = new int[] { 6, 0, 2 }; // has two ECs
 		int[] maxLevels = new int[] { 6, 1, 2 }; // has one EC
 
-		testSetup.anonymizeTrafos(minLevels, maxLevels);
+		testSetup.anonymize(minLevels, maxLevels);
 
 		assertEquals(0.153813561752151, DisclosureRiskCalculator.getDelta().getAvg(), 1e-15);
 	}

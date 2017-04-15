@@ -32,10 +32,24 @@ public class ParametrizationSetup {
 		this(datafile, sa, BenchmarkCriterion.T_CLOSENESS_ED);
 	}
 	
+	/**
+	 * @param datafile
+	 * @param sa
+	 * @param crit
+	 */
 	public ParametrizationSetup(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
 		this(datafile, sa, 1, 0d, crit, BenchmarkMeasure.ENTROPY, 0d);
 	}
 	
+	/**
+	 * @param datafile
+	 * @param sa
+	 * @param k
+	 * @param param2Val
+	 * @param criterion
+	 * @param measure
+	 * @param suppFactor
+	 */
 	public ParametrizationSetup(BenchmarkDatafile datafile, String sa, Integer k,
 			Double param2Val, BenchmarkCriterion criterion, BenchmarkMeasure measure, double suppFactor) {
 		super();
@@ -61,12 +75,12 @@ public class ParametrizationSetup {
 	}
 
 
-	public ARXResult anonymizeTrafos() {
-		return anonymizeTrafos(null, null);
+	public ARXResult anonymize() {
+		return anonymize(null, null);
 	}
 
 
-	public ARXResult anonymizeTrafos(int[] minLevels, int[] maxLevels) {
+	public ARXResult anonymize(int[] minLevels, int[] maxLevels) {
         DataDefinition dataDef = arxData.getDefinition();
         
         ARXResult result = null;

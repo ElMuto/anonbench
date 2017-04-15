@@ -46,7 +46,7 @@ public class TestAggregatedBetaValues {
 	@Test
 	public void testMinMaxConsistency() {
 		
-		ARXResult result = testSetup.anonymizeTrafos(new int[] { 6, 1, 2 }, new int[] { 6, 1, 2 });
+		ARXResult result = testSetup.anonymize(new int[] { 6, 1, 2 }, new int[] { 6, 1, 2 });
 		result.getOutput(result.getGlobalOptimum(), false);
 		
 		DisclosureRisk beta = DisclosureRiskCalculator.getBeta();
