@@ -77,7 +77,7 @@ public class TestRelCAsCensus {
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.849, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.8509, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class TestRelCAsCensus {
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.5584, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.5574, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test

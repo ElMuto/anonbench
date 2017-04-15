@@ -1,7 +1,6 @@
 package org.deidentifier.arx.criteria;
 
 import org.deidentifier.arx.AttributeStatistics;
-import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 
@@ -31,7 +30,7 @@ public class ParamTransformer {
 		return result;
 	}
 	
-	public static double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {		
+	public static Double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {		
 		
 		Double[] minMax = getRpgMinAndMax(datafile, sa, crit);
 		Double rpgMin = minMax[0];
