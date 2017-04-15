@@ -35,9 +35,9 @@ public class Classificator {
 	private ARXConfiguration config;
 	private BenchmarkDataset dataset;
 	
-	public Classificator (ParametrizationSetup setup, ARXConfiguration config) {
+	public Classificator (ParametrizationSetup setup) {
 		this.setup = setup;
-		this.config = config;
+		this.config = setup.getConfig();
 		this.dataset = setup.getDataset();
 	}
 
@@ -71,8 +71,7 @@ public class Classificator {
 			e1.printStackTrace();
 		}
 		
-		ARXNode optNode = null;
-		double relPA = -Double.MAX_VALUE;
+		this.maxRelPa = -Double.MAX_VALUE;
 		double absPA = -Double.MAX_VALUE;
 
 		ARXLattice lattice = result.getLattice();
@@ -85,10 +84,6 @@ public class Classificator {
         }
 
         DataHandle handle = null;
-        String minPAStr = "NaN";
-        String maxPAStr = "NaN";
-        String gainStr = "NaN";
-        
 		boolean baselineValuesCaptured = false;
 		
 		int[] exampleTrafo = new int[] { 1, 1, 0 };
@@ -104,7 +99,7 @@ public class Classificator {
         			if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
         				result.getOutput(node).release();
         			}				
-        			if (Anonymity.ANONYMOUS == node.getAnonymity() && relPA != 1d) {
+        			if (Anonymity.ANONYMOUS == node.getAnonymity() && this.maxRelPa != 1d) {
         				
         				try {
 
@@ -116,24 +111,14 @@ public class Classificator {
         							predictingAttrs.toArray(new String[predictingAttrs.size()]), setup.getSa(), ARXLogisticRegressionConfiguration.create()
         							.setNumFolds(3).setMaxRecords(Integer.MAX_VALUE).setSeed(0xDEADBEEF));
 
-        					if (!baselineValuesCaptured) {
-        						minPAStr = String.format(new Locale("de", "DE"), "%.4f", stats.getZeroRAccuracy());
-        						maxPAStr = String.format(new Locale("de", "DE"), "%.4f", stats.getOriginalAccuracy());
-        						gainStr  = String.format(new Locale("de", "DE"), "%.4f", stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
-        					}        				
-        					baselineValuesCaptured = true;
-
         					double epsilon = 0.05;
         					double absAccuracy = stats.getAccuracy();
         					double relAccuracy = (absAccuracy - stats.getZeroRAccuracy() ) / (stats.getOriginalAccuracy() - stats.getZeroRAccuracy());
         					if (!Double.isNaN(relAccuracy) && !Double.isInfinite(relAccuracy)) {
-        						if (relAccuracy > relPA) {
-        							optNode = node;
-        						}
         						absPA = Math.max(absAccuracy, absPA);
-        						this.maxRelPa = Math.max(relAccuracy, relPA);
-        						if (relPA < 0d && relPA > 0d - epsilon) relPA = 0d;
-        						if (relPA > 1d && relPA <= 1d + epsilon) relPA = 1d;
+        						this.maxRelPa = Math.max(relAccuracy, this.maxRelPa);
+        						if (this.maxRelPa < 0d && this.maxRelPa > 0d - epsilon) this.maxRelPa = 0d;
+        						if (this.maxRelPa > 1d && this.maxRelPa <= 1d + epsilon) this.maxRelPa = 1d;
         					}
 
 

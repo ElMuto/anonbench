@@ -9,6 +9,9 @@ import org.deidentifier.arx.testcase.normalization.TestMaxDelta;
 import org.deidentifier.arx.testcase.normalization.TestNormalization;
 import org.deidentifier.arx.testcase.paper.TestAttributeStatistics;
 import org.deidentifier.arx.testcase.paper.TestBaseCAs;
+import org.deidentifier.arx.testcase.paper.TestRelCAsCensus;
+import org.deidentifier.arx.testcase.paper.TestRelCAsHealthInterview;
+import org.deidentifier.arx.testcase.paper.TestRelCAsTimeUse;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -26,6 +29,9 @@ import org.junit.runners.Suite.SuiteClasses;
 //	TestRelIlEntrLoss.class, // FAILURE !!!!
 	
 	// longrunners
+	TestRelCAsCensus.class,
+	TestRelCAsTimeUse.class,
+	TestRelCAsHealthInterview.class,
 	TestFindOptimalTrafoForMinPrivGuarantee.class,
 	TestBaseCAs.class,
 	})
