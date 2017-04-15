@@ -319,8 +319,8 @@ public class AttributeStatistics {
 	                                       mean_arith, mean_geom, median, normalizedEntropy,
 	                                       minFrequency, maxFrequency,
 	                                       rpgLmin, rpgLmax, rpgTmin, rpgTmax,
-	                                       DisclosureRiskCalculator.getBeta().getMax(), 0d,
-	                                       DisclosureRiskCalculator.getDelta().getMax(), 0d));
+	                                       DisclosureRiskCalculator.getBeta().getMax(), 1e-9,
+	                                       DisclosureRiskCalculator.getDelta().getMax(), 1e-9));
 	        
 	        return statsCache.get(statsKey);
 	    }

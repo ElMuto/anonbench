@@ -24,9 +24,11 @@ public class CommandLineParser {
 				crit = BenchmarkCriterion.T_CLOSENESS_ED;
 			} else if ("d".equals(dim2Qual)) {
 				crit = BenchmarkCriterion.D_DISCLOSURE_PRIVACY;
-			} else if ("le".equals(dim2Qual)) {
+			} else if ("b".equals(dim2Qual)) {
 				crit = BenchmarkCriterion.BASIC_BETA_LIKENESS;
-			}			
+			} else {
+				throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
+			}	
 		} else {
 			throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
 		}

@@ -29,27 +29,14 @@ import org.deidentifier.arx.criteria.ParamTransformer;
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.ValueBuffer;
 
-/**
- * This class encapsulates most of the parameters of a benchmark run
- * @author Fabian Prasser
- */
+
 public class BenchmarkSetup {
 
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, BenchmarkDatafile datafile) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, BenchmarkDatafile datafile, int numValues) {
 
 		int[] dim1Vals = { 5 };
 		
-		int numValues = 10;
-		double[] dim2Vals = new double[numValues];
-
-		AttributeStatistics stats = AttributeStatistics.get(datafile, sa);
-		double rpgMin = stats.getRpgMin(crit);
-		double rpgMax = stats.getRpgMax(crit);
-		
-		dim2Vals[0] = ParamTransformer.getDenormalizedParamVal(datafile, sa, crit, 0d);
-		for (int i = 0; i <= numValues; i++) {
-			
-		}
+		Double[] dim2Vals = createParamArray(crit, sa, datafile, numValues);
 
 		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
 
@@ -62,10 +49,10 @@ public class BenchmarkSetup {
 		return pmArr;
 	}
 	
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, boolean reverse, BenchmarkDatafile datafile) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, boolean reverse, BenchmarkDatafile datafile, int numValues) {
 		if (reverse) {
 			
-			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile);
+			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile, numValues);
 			PrivacyModel[] reversedArray = new PrivacyModel[originalArray.length];
 			
 			for (int i = 0; i < originalArray.length; i++) {
@@ -75,8 +62,23 @@ public class BenchmarkSetup {
 			return reversedArray;
 			
 		} else {
-			return getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile);
+			return getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile, numValues);
 		}
+	}
+
+	public static Double[] createParamArray(BenchmarkCriterion crit, String sa, BenchmarkDatafile datafile, int numValues) {
+
+		if (numValues < 2) {
+			throw new IllegalArgumentException("Need to specify numval >= 2, but it was only " + numValues);
+		}
+				
+		Double[] dim2Vals = new Double[numValues];
+		double segSize = 1 / ((double)numValues - 1);
+		for (int i = 0; i < numValues; i++) {
+			dim2Vals[i] = ParamTransformer.getDenormalizedParamVal(datafile, sa, crit, i * segSize);
+		}
+		
+		return dim2Vals;
 	}
 
 	/** The benchmark instance - datapoints */
