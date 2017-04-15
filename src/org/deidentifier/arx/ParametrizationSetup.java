@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
+import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.BenchmarkDataset;
