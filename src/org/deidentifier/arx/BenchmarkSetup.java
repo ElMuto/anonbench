@@ -34,57 +34,32 @@ import de.linearbits.subframe.analyzer.ValueBuffer;
  */
 public class BenchmarkSetup {
 
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa) {
-	    	
-	    	Integer[] dim1Vals =     { 5 };
-	
-			Double [] dim2ValsForL_SaMarStat = { 5d, 3d, 1d, 2d, 4d };
-			
-			Double [] dim2ValsForL_SaEduc    = {  25d, 1d,  3d,  6d,  9d, 12d, 15d, 18d, 21d, 24d, 27d };
-	
-			Double [] dim2ValsForT = { 1d,  0.8, 0.6, 0.4, 0.2,  0d  };
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa) {
 
-			Double [] dim2ValsForD = { 10d,  6d, 5d, 4d, 3d, 2d, 1d, 0.001 };
-//			Double [] dim2ValsForD = { 10d, 15d, 18d }; // time use - MS 
+		int[] dim1Vals = { 5 };
+		
+		int numValues = 10;
+		double[] dim2Vals = { 1d };
+		
+		for (int i = 0; i <= numValues; i++) {
+//			AttributeStatistics stats = AttributeStatistics.get(crit, sa);
+		}
 
-			Double [] dim2ValsForB = { 95d, 76d, 57d, 38d, 19d, 0.001 }; // Census - MS
-			
-			Double[] dim2Vals = null;
-	
-			if ("t".equals(dim2Qualifier)) {
-				dim2Vals = dim2ValsForT;
-			} else if ("ld".equals(dim2Qualifier) || "lr".equals(dim2Qualifier) || "le".equals(dim2Qualifier)) {
-				if ("Marital status".equals(sa) || "MARSTAT".equals(sa)) {
-					dim2Vals = dim2ValsForL_SaMarStat;
-				} else if ("Education".equals(sa) || "EDUC".equals(sa) || "Highest level of school completed".equals(sa)) {
-					dim2Vals = dim2ValsForL_SaEduc;
-				} else {
-					throw new RuntimeException("This should not happen");
-				}
-					
-			} else if ("d".equals(dim2Qualifier)) {
-				dim2Vals = dim2ValsForD;
-			} else if ("b".equals(dim2Qualifier)) {
-				dim2Vals = dim2ValsForB;
-			} else {
-				throw new RuntimeException("Invalid dim2Qalifier: '" + dim2Qualifier + "'");
+		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
+
+		for (int ki = 0; ki < dim1Vals.length; ki++) {
+			for (int ti = 0; ti < dim2Vals.length; ti++) {
+				pmArr[ki * dim2Vals.length + ti] = new PrivacyModel(crit, dim1Vals[ki], dim2Vals[ti]);
 			}
-			
-			PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
+		}
+
+		return pmArr;
+	}
 	
-			for (int ki = 0; ki < dim1Vals.length; ki++) {
-				for (int ti = 0; ti < dim2Vals.length; ti++) {
-					pmArr[ki * dim2Vals.length + ti] = new PrivacyModel(dim2Qualifier, dim1Vals[ki], dim2Vals[ti]);
-				}
-			}
-	    	
-	    	return pmArr;
-	    }
-	
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(String dim2Qualifier, String sa, boolean reverse) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, boolean reverse) {
 		if (reverse) {
 			
-			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(dim2Qualifier, sa);
+			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(crit, sa);
 			PrivacyModel[] reversedArray = new PrivacyModel[originalArray.length];
 			
 			for (int i = 0; i < originalArray.length; i++) {
@@ -94,7 +69,7 @@ public class BenchmarkSetup {
 			return reversedArray;
 			
 		} else {
-			return getPrivacyModelsConfigsForParameterComparison(dim2Qualifier, sa);
+			return getPrivacyModelsConfigsForParameterComparison(crit, sa);
 		}
 	}
 

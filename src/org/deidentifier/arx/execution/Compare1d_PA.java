@@ -8,6 +8,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.util.CommandLineParser;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -41,17 +42,9 @@ public class Compare1d_PA {
 //			datafile = BenchmarkDatafile.IHIS_NUM;
 		} else throw new RuntimeException("Unsupported datafile: '" + dataFileName + "'");
 		
-		String[] allowedPrivacyMeasures = new String[] { "ld", "lr", "le", "t", "d", "b" };		
-		String dim2Qual = args[1];		
-		boolean validInput = false;		
-		for (String s : allowedPrivacyMeasures) {
-			if (dim2Qual != null && s.equals(dim2Qual)) {
-				validInput = true;
-				break;
-			}
-		}		
-		if (!validInput) throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
+		BenchmarkCriterion crit = CommandLineParser.parseCritString(args[1]);
 
+		boolean validInput = false;
 		int candidateIndex = 0;
 		String[] saList = new String[] { };
 		if (args.length >= 3) {
@@ -59,7 +52,7 @@ public class Compare1d_PA {
 			String saFromCommandLine = args[2];		
 			validInput = false;		
 			for (String s : allowedSAs) {
-				if (dim2Qual != null && s.equals(saFromCommandLine)) {
+				if (args[1] != null && s.equals(saFromCommandLine)) {
 					validInput = true;
 					break;
 				}
@@ -83,14 +76,16 @@ public class Compare1d_PA {
 		}
 
 		for (String sa : saList) {
-			compareParameterValues(datafile, sa, dim2Qual, reverse);
+			compareParameterValues(datafile, sa, crit, reverse);
 		}
 		System.out.println("done.");
 	}
 
-	public static void compareParameterValues(BenchmarkDatafile datafile, String sa, String dim2Qual, boolean reverse) throws IOException {
 
-		String outFileName = "RelCA1d-" + datafile.name() + "-" + dim2Qual + "-" + sa + (reverse ? "-REVERSE" : "") + ".csv";
+
+	public static void compareParameterValues(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, boolean reverse) throws IOException {
+
+		String outFileName = "RelCA1d-" + datafile.name() + "-" + crit + "-" + sa + (reverse ? "-REVERSE" : "") + ".csv";
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
@@ -99,7 +94,7 @@ public class Compare1d_PA {
 		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(new BenchmarkDataset(BenchmarkDatafile.ACS13, new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_ED }, "MS")), ";"));
 
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa, reverse)) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(crit, sa, reverse)) {
 			
 			BenchmarkCriterion[] criteria = null;
 			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {

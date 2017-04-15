@@ -8,6 +8,7 @@ import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
 import org.deidentifier.arx.PrivacyModel;
+import org.deidentifier.arx.util.CommandLineParser;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -32,32 +33,23 @@ public class Compare2d_PA {
 			datafile = BenchmarkDatafile.IHIS;
 		} else throw new RuntimeException("Unsupported datafile: '" + dataFileName + "'");
 		
-		String[] allowedInputStrings = new String[] { "ld", "lr", "le", "t", "d" };		
-		String dim2Qual = args[1];		
-		boolean validInput = false;		
-		for (String s : allowedInputStrings) {
-			if (dim2Qual != null && s.equals(dim2Qual)) {
-				validInput = true;
-				break;
-			}
-		}		
-		if (!validInput) throw new RuntimeException("Unsupported input string: '" + dim2Qual + "'");
-
+		BenchmarkCriterion crit = CommandLineParser.parseCritString(args[1]);
+		
 		for (String sa : BenchmarkDataset.getSensitiveAttributeCandidates(datafile)) {
-			compareRelPAsTK(datafile, sa, dim2Qual);
+			compareRelPAsTK(datafile, sa, crit);
 		}
 		System.out.println("done.");
 	}
 
-	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, String dim2Qual) throws IOException {
+	public static void compareRelPAsTK(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) throws IOException {
 
-		String outFileName = "RelCA2d-" + datafile.name() + "-" + dim2Qual + "-" + sa + ".dat";
+		String outFileName = "RelCA2d-" + datafile.name() + "-" + crit + "-" + sa + ".dat";
 
 		PrintStream fos = new PrintStream("results/" + outFileName);
 		System.out.println("Name of output file is " + outFileName);
 
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(dim2Qual, sa)) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(crit, sa)) {
 			
 			BenchmarkCriterion[] criteria = null;
 			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
