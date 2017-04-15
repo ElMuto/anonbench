@@ -325,4 +325,43 @@ public class AttributeStatistics {
 	        return statsCache.get(statsKey);
 	    }
 	}
+
+	public static AttributeStatistics get(BenchmarkDatafile datafile, String sa) {
+		BenchmarkDataset dataset = new BenchmarkDataset(datafile, new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, BenchmarkCriterion.BASIC_BETA_LIKENESS }, sa );
+		return get (dataset, sa);
+	}
+	
+	public double getRpgMin(BenchmarkCriterion crit) {
+		switch (crit) {
+		case BASIC_BETA_LIKENESS:
+			return rpgBmin;
+		case D_DISCLOSURE_PRIVACY:
+			return rpgDmin;
+		case L_DIVERSITY_DISTINCT:
+		case L_DIVERSITY_ENTROPY:
+		case L_DIVERSITY_RECURSIVE:
+			return rpgLmin;
+		case T_CLOSENESS_ED:
+			return rpgTmin;
+		default:
+			throw new IllegalArgumentException("Invalid crit: " + crit);
+		}
+	}
+	
+	public double getRpgMax(BenchmarkCriterion crit) {
+		switch (crit) {
+		case BASIC_BETA_LIKENESS:
+			return rpgBmax;
+		case D_DISCLOSURE_PRIVACY:
+			return rpgDmax;
+		case L_DIVERSITY_DISTINCT:
+		case L_DIVERSITY_ENTROPY:
+		case L_DIVERSITY_RECURSIVE:
+			return rpgLmax;
+		case T_CLOSENESS_ED:
+			return rpgTmax;
+		default:
+			throw new IllegalArgumentException("Invalid crit: " + crit);
+		}
+	}
 }

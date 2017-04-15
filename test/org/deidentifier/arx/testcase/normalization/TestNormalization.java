@@ -30,13 +30,13 @@ public class TestNormalization {
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 1d; double expOutVal = 0d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 5d; expOutVal = inVal / statsMs.getRpgLmax();		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 3d; expOutVal = (inVal - statsMs.getRpgLmin()) / (statsMs.getRpgLmax() - statsMs.getRpgLmin());		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
 	}
     
 	/**
@@ -49,13 +49,13 @@ public class TestNormalization {
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 1d; double expOutVal = 0d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 0d; expOutVal = 1d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 0.2; expOutVal = 1d - inVal;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
 	}
     
 	/**
@@ -68,13 +68,13 @@ public class TestNormalization {
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 0d; double expOutVal = 1d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = statsMs.getRpgBmin(); expOutVal = 0d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 42d; expOutVal = (statsMs.getRpgBmin() - inVal) / (statsMs.getRpgBmin() - statsMs.getRpgBmax());		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
 	}
     
 	/**
@@ -87,12 +87,12 @@ public class TestNormalization {
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
 		double inVal = 0d; double expOutVal = 1d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = statsMs.getRpgDmin(); expOutVal = 0d;		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 3d; expOutVal = (statsMs.getRpgDmin() - inVal) / (statsMs.getRpgDmin() - statsMs.getRpgDmax());		
-    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
+    	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
 	}
 }

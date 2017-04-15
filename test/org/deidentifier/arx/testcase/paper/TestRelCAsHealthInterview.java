@@ -11,11 +11,11 @@ import org.junit.Test;
 
 public class TestRelCAsHealthInterview {
 
-	private double epsilon = 1e-4;
+	private double epsilon = 1e-3;
 	private ParametrizationSetup testSetup;
 
 	@Test
-	public void HealthInterviewMsLd() {
+	public void HealthInterviewMsXLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.IHIS,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);
@@ -70,7 +70,7 @@ public class TestRelCAsHealthInterview {
 	}
 	
 	@Test
-	public void HealthInterviewEdLd() {
+	public void HealthInterviewEdXLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.IHIS,
 				"ED", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);

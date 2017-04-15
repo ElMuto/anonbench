@@ -61,12 +61,11 @@ import org.deidentifier.arx.utility.UtilityMeasureLoss;
         }
 
 
+       
         /**
          * @param datafile
          * @param criteria
          * @param sensitiveAttribute
-         * @param isNumCoded TODO
-         * @param customQiCount
          */
         public BenchmarkDataset(BenchmarkDatafile datafile, BenchmarkCriterion[] criteria, String sensitiveAttribute) {
             this.datafile = datafile;

@@ -11,11 +11,11 @@ import org.junit.Test;
 
 public class TestRelCAsCensus {
 
-	private double epsilon = 1e-4;
+	private double epsilon = 1e-3;
 	private ParametrizationSetup testSetup;
 
 	@Test
-	public void CensusMsLd() {
+	public void CensusMsXLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);
@@ -70,7 +70,7 @@ public class TestRelCAsCensus {
 	}
 	
 	@Test
-	public void CensusEdLd() {
+	public void CensusEdXLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"ED", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);

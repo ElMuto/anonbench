@@ -2,13 +2,14 @@ package org.deidentifier.arx.criteria;
 
 import org.deidentifier.arx.AttributeStatistics;
 import org.deidentifier.arx.BenchmarkDataset;
+import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 
 public class ParamTransformer {
 	
-	public static double getNormalizedParamVal(BenchmarkDataset dataset, String sa, BenchmarkCriterion crit, double value) {		
+	public static double getNormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {		
 		
-		Double[] minMax = getRpgMinAndMax(dataset, sa, crit);
+		Double[] minMax = getRpgMinAndMax(datafile, sa, crit);
 		Double rpgMin = minMax[0];
 		Double rpgMax = minMax[1];
 
@@ -30,9 +31,9 @@ public class ParamTransformer {
 		return result;
 	}
 	
-	public static double getDenormalizedParamVal(BenchmarkDataset dataset, String sa, BenchmarkCriterion crit, double value) {		
+	public static double getDenormalizedParamVal(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit, double value) {		
 		
-		Double[] minMax = getRpgMinAndMax(dataset, sa, crit);
+		Double[] minMax = getRpgMinAndMax(datafile, sa, crit);
 		Double rpgMin = minMax[0];
 		Double rpgMax = minMax[1];
 
@@ -54,27 +55,27 @@ public class ParamTransformer {
 		return result;
 	}
 
-	private static Double[] getRpgMinAndMax(BenchmarkDataset dataset, String sa, BenchmarkCriterion crit) {
+	private static Double[] getRpgMinAndMax(BenchmarkDatafile datafile, String sa, BenchmarkCriterion crit) {
 		Double rpgMin;
 		Double rpgMax;
 		switch(crit) {
 		case BASIC_BETA_LIKENESS:
-			rpgMin = AttributeStatistics.get(dataset, sa).getRpgBmin();
-			rpgMax = AttributeStatistics.get(dataset, sa).getRpgBmax();
+			rpgMin = AttributeStatistics.get(datafile, sa).getRpgBmin();
+			rpgMax = AttributeStatistics.get(datafile, sa).getRpgBmax();
 			break;
 		case D_DISCLOSURE_PRIVACY:
-			rpgMin = AttributeStatistics.get(dataset, sa).getRpgDmin();
-			rpgMax = AttributeStatistics.get(dataset, sa).getRpgDmax();
+			rpgMin = AttributeStatistics.get(datafile, sa).getRpgDmin();
+			rpgMax = AttributeStatistics.get(datafile, sa).getRpgDmax();
 			break;
 		case T_CLOSENESS_ED:
-			rpgMin = AttributeStatistics.get(dataset, sa).getRpgTmin();
-			rpgMax = AttributeStatistics.get(dataset, sa).getRpgTmax();
+			rpgMin = AttributeStatistics.get(datafile, sa).getRpgTmin();
+			rpgMax = AttributeStatistics.get(datafile, sa).getRpgTmax();
 			break;
 		case L_DIVERSITY_DISTINCT:
 		case L_DIVERSITY_ENTROPY:
 		case L_DIVERSITY_RECURSIVE:
-			rpgMin = AttributeStatistics.get(dataset, sa).getRpgLmin();
-			rpgMax = AttributeStatistics.get(dataset, sa).getRpgLmax();
+			rpgMin = AttributeStatistics.get(datafile, sa).getRpgLmin();
+			rpgMax = AttributeStatistics.get(datafile, sa).getRpgLmax();
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid crit: " + crit);		

@@ -78,7 +78,7 @@ public class DisclosureRiskCalculator {
 		}
 
 		public double getAvgNormalized() {
-			return ParamTransformer.getNormalizedParamVal(dataset, sa, crit, avg);
+			return ParamTransformer.getNormalizedParamVal(dataset.getDatafile(), sa, crit, avg);
 		}
 
 		public double getMin() {
@@ -86,7 +86,7 @@ public class DisclosureRiskCalculator {
 		}
 
 		public double getMinNormalized() {
-			return ParamTransformer.getNormalizedParamVal(dataset, sa, crit, min);
+			return ParamTransformer.getNormalizedParamVal(dataset.getDatafile(), sa, crit, min);
 		}
 
 		public double getMax() {
@@ -94,7 +94,7 @@ public class DisclosureRiskCalculator {
 		}
 
 		public double getMaxNormalized() {
-			return ParamTransformer.getNormalizedParamVal(dataset, sa, crit, max);
+			return ParamTransformer.getNormalizedParamVal(dataset.getDatafile(), sa, crit, max);
 		}
 
 		public void println() {

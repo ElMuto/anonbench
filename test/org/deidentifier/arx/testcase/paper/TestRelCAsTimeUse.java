@@ -11,11 +11,11 @@ import org.junit.Test;
 
 public class TestRelCAsTimeUse {
 
-	private double epsilon = 1e-4;
+	private double epsilon = 1e-3;
 	private ParametrizationSetup testSetup;
 
 	@Test
-	public void TimeUseMsLd() {
+	public void TimeUseMsXLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ATUS,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);

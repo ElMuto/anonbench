@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
+import org.deidentifier.arx.criteria.ParamTransformer;
 
 import de.linearbits.subframe.Benchmark;
 import de.linearbits.subframe.analyzer.ValueBuffer;
@@ -34,15 +35,20 @@ import de.linearbits.subframe.analyzer.ValueBuffer;
  */
 public class BenchmarkSetup {
 
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, BenchmarkDatafile datafile) {
 
 		int[] dim1Vals = { 5 };
 		
 		int numValues = 10;
-		double[] dim2Vals = { 1d };
+		double[] dim2Vals = new double[numValues];
+
+		AttributeStatistics stats = AttributeStatistics.get(datafile, sa);
+		double rpgMin = stats.getRpgMin(crit);
+		double rpgMax = stats.getRpgMax(crit);
 		
+		dim2Vals[0] = ParamTransformer.getDenormalizedParamVal(datafile, sa, crit, 0d);
 		for (int i = 0; i <= numValues; i++) {
-//			AttributeStatistics stats = AttributeStatistics.get(crit, sa);
+			
 		}
 
 		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
@@ -56,10 +62,10 @@ public class BenchmarkSetup {
 		return pmArr;
 	}
 	
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, boolean reverse) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, boolean reverse, BenchmarkDatafile datafile) {
 		if (reverse) {
 			
-			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(crit, sa);
+			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile);
 			PrivacyModel[] reversedArray = new PrivacyModel[originalArray.length];
 			
 			for (int i = 0; i < originalArray.length; i++) {
@@ -69,7 +75,7 @@ public class BenchmarkSetup {
 			return reversedArray;
 			
 		} else {
-			return getPrivacyModelsConfigsForParameterComparison(crit, sa);
+			return getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile);
 		}
 	}
 
