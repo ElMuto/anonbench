@@ -321,7 +321,7 @@ public class BenchmarkDriver {
         	il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
         	il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
 
-        	il_sc = getOptimumsAbsIlByFullTraversal(measure, dataset, result);
+        	il_sc = getOptimumsAbsIlByFullTraversal(BenchmarkMeasure.SORIA_COMAS, dataset, result);
         } else {
         	il_sc = il_rel = il_arx = il_abs_from_utility = il_rel = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
         }
@@ -412,7 +412,6 @@ public class BenchmarkDriver {
 		}
 		if (scOptimumNode != null) {
 			ret = scOptimumVal;
-			System.out.println(";" + Arrays.toString(scOptimumNode.getTransformation()) + ";" + formatter.format(ret));
 		}
 		return ret;
 	}

@@ -1,4 +1,4 @@
-package org.deidentifier.arx.testcase;
+package org.deidentifier.arx.testcase.normalization;
 
 import static org.junit.Assert.assertTrue;
 
