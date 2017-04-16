@@ -94,8 +94,10 @@ public class Compare1d_PA {
 
 		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(new BenchmarkDataset(BenchmarkDatafile.ACS13, new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_ED }, "MS")), ";"));
 
+		int numParams = 11;
+		double sf = 0.05;
 		// for each privacy model
-		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(crit, sa, reverse, datafile, 3)) {
+		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(crit, sa, reverse, datafile, numParams)) {
 			
 			BenchmarkCriterion[] criteria = null;
 			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
@@ -106,7 +108,7 @@ public class Compare1d_PA {
 			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
 			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
-			String[] relPAStr = driver.findOptimalRelPA(0.05, dataset,
+			String[] relPAStr = driver.findOptimalRelPA(sf, dataset,
 					sa,
 					false, privacyModel, null, null);
 			

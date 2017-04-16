@@ -1,10 +1,10 @@
 package org.deidentifier.arx.testsuite;
 
-import org.deidentifier.arx.testcase.paper.TestAttributeStatistics;
-import org.deidentifier.arx.testcase.paper.TestBaseCAs;
-import org.deidentifier.arx.testcase.paper.TestRelCAsCensus;
-import org.deidentifier.arx.testcase.paper.TestRelCAsHealthInterview;
-import org.deidentifier.arx.testcase.paper.TestRelCAsTimeUse;
+import org.deidentifier.arx.testcase.TestAttributeStatistics;
+import org.deidentifier.arx.testcase.classification.TestBaseCAs;
+import org.deidentifier.arx.testcase.classification.TestRelCAsCensus;
+import org.deidentifier.arx.testcase.classification.TestRelCAsHealthInterview;
+import org.deidentifier.arx.testcase.classification.TestRelCAsTimeUse;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;

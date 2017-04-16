@@ -1,4 +1,4 @@
-package org.deidentifier.arx.testcase.paper;
+package org.deidentifier.arx.testcase.classification;
 
 import static org.junit.Assert.*;
 
@@ -9,119 +9,119 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.util.Classificator;
 import org.junit.Test;
 
-public class TestRelCAsTimeUse {
+public class TestRelCAsCensus {
 
 	private double epsilon = 1e-3;
 	private ParametrizationSetup testSetup;
 
 	@Test
-	public void TimeUseMsXLd() {
+	public void CensusMsXLd() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.9617, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.9114, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseMsLr() {
+	public void CensusMsLr() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_RECURSIVE, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.3599, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.0672, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseMsLe() {
+	public void CensusMsLe() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_ENTROPY, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.0442, classi.getMaxRelPa(), epsilon);
+		assertEquals(0d, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseMsTc() {
+	public void CensusMsTc() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"MS", 5, 0.2, BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.0416, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.0548, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseMsDp() {
+	public void CensusMsDp() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"MS", 5, 1d, BenchmarkCriterion.D_DISCLOSURE_PRIVACY, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0d, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.0548, classi.getMaxRelPa(), epsilon);
 	}
 	
 	@Test
-	public void TimeUseEdLd() {
+	public void CensusEdXLd() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"ED", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.8606, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.8509, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseEdLr() {
+	public void CensusEdLr() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"ED", 5, 3d, BenchmarkCriterion.L_DIVERSITY_RECURSIVE, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.5354, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.5574, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseEdLe() {
+	public void CensusEdLe() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"ED", 5, 3d, BenchmarkCriterion.L_DIVERSITY_ENTROPY, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0.5354, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.5557, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseEdTc() {
+	public void CensusEdTc() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"ED", 5, 0.2, BenchmarkCriterion.T_CLOSENESS_ED, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0d, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.0933, classi.getMaxRelPa(), epsilon);
 	}
 
 	@Test
-	public void TimeUseEdDp() {
+	public void CensusEdDp() {
 		testSetup =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
+				BenchmarkDatafile.ACS13,
 				"ED", 5, 1d, BenchmarkCriterion.D_DISCLOSURE_PRIVACY, BenchmarkMeasure.ENTROPY, 0.05);
 
 		Classificator classi = new Classificator(testSetup);
 		classi.findOptimalRelCa();
-		assertEquals(0d, classi.getMaxRelPa(), epsilon);
+		assertEquals(0.0236, classi.getMaxRelPa(), epsilon);
 	}
 }
 

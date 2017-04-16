@@ -598,7 +598,7 @@ public class BenchmarkSetup {
         BASIC_BETA_LIKENESS {
             @Override
             public String toString() {
-                return "BBL";
+                return "6_BBL";
             }
         }
     }
