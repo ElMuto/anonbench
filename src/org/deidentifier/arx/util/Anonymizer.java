@@ -45,21 +45,22 @@ public class Anonymizer {
 	}
 
 	public ARXResult anonymize(BenchmarkDataset dataset, ARXConfiguration config) {
-		ARXResult result = null;
+		ARXResult resultNom = null;
+		ARXResult resultNum = null;
 		try {
-			result = arxAnonymizer.anonymize(dataset.getArxData(), config);
+			resultNom = arxAnonymizer.anonymize(dataset.getArxData(false), config);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		this.difficulty = Difficulties.calculateDifficulty(result);
-		calcInfLosses(dataset, result);
-		calcDisclosureRisks(dataset, result, config);
+		this.difficulty = Difficulties.calculateDifficulty(resultNom);
+		calcInfLosses(dataset, resultNom, resultNum, config);
+		calcDisclosureRisks(dataset, resultNom, config);
 		
-		return result;
+		return resultNom;
 	}
 
-	private void calcInfLosses(BenchmarkDataset dataset, ARXResult result) {
+	private void calcInfLosses(BenchmarkDataset dataset, ARXResult resultNom, ARXResult resultNum, ARXConfiguration config) {
 		    String[] header = dataset.getQuasiIdentifyingAttributes();
 	    	DataConverter converter = new DataConverter();
 		    Map<String, String[][]> hierarchies = converter.toMap(dataset.getInputDataDef());
@@ -67,12 +68,12 @@ public class Anonymizer {
 			UtilityMeasureLoss<Double> measureLoss = new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
 	
 			
-		       if (result.getGlobalOptimum() != null) {
+		       if (resultNom.getGlobalOptimum() != null) {
 	
-		        	ARXNode arxOptimum = result.getGlobalOptimum();
+		        	ARXNode arxOptimum = resultNom.getGlobalOptimum();
 	
 		        	this.ilArx = Double.valueOf(arxOptimum.getLowestScore().toString());
-		        	DataHandle handle = result.getOutput(arxOptimum, false);
+		        	DataHandle handle = resultNom.getOutput(arxOptimum, false);
 		        	String[][]  scOutputData = converter.toArray(handle,dataset.getInputDataDef());
 		        	handle.release();
 		        	this.ilAbsEntr = measureEntr.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
@@ -81,7 +82,7 @@ public class Anonymizer {
 		        	this.ilAbsLoss = measureLoss.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
 		        	this.ilRelLoss = (this.ilAbsLoss - dataset.getMinInfoLoss(BenchmarkMeasure.LOSS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.LOSS) - dataset.getMinInfoLoss(BenchmarkMeasure.LOSS));
 	
-	//	        	ilSorCom = getOptimumsAbsIlByFullTraversal(BenchmarkMeasure.SORIA_COMAS, dataset, result);
+		        	ilSorCom = getIlSorComByFullTraversal(dataset, config);
 		        } else {
 		        	ilSorCom = ilRelEntr = ilArx = ilAbsEntr = ilRelEntr = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
 		        }
@@ -92,6 +93,70 @@ public class Anonymizer {
 				e.printStackTrace();
 			}
 		}
+
+	private Double getIlSorComByFullTraversal(BenchmarkDataset dataset, ARXConfiguration config) {
+		Double ret 					= null;      
+		ARXNode scOptimumNode		= null;
+		Double  scOptimumVal  		= Double.MAX_VALUE;
+		
+		BenchmarkDataset datasetNum = new BenchmarkDataset(dataset.getDatafile(), dataset.getCriteria(), dataset.getInSensitiveAttribute());
+		ARXResult resultNum = null;
+		try {
+			resultNum = arxAnonymizer.anonymize(dataset.getArxData(true), config);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	
+		ARXLattice lattice = resultNum.getLattice();
+	    int minLevel = 0;
+	    int maxLevel = lattice.getTop().getTotalGeneralizationLevel();
+	    
+	    // Expand nodes such that all anonymous nodes are being materialized
+	    for (int level = minLevel; level < maxLevel; level++) {
+	        for (ARXNode node : lattice.getLevels()[level]) {
+	            node.expand();
+	        }
+	    }
+	
+	    DataConverter converter = new DataConverter();
+	    UtilityMeasureSoriaComas measureSoriaComas = new UtilityMeasureSoriaComas((datasetNum.getInputArray(true)));
+	
+		for (ARXNode[] level : lattice.getLevels()) {
+	
+			// For each transformation
+			for (ARXNode node : level) {
+	
+				// Make sure that every transformation is classified correctly
+				if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
+					
+					resultNum.getOutput(node, false).release();
+				}				
+				
+				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
+	
+					String[][]  scOutputData = converter.toArray(resultNum.getOutput(node, false),datasetNum.getInputDataDef(true));
+					//result.getOutput(node).release();
+					Double il = measureSoriaComas.evaluate(scOutputData, node.getTransformation()).getUtility();
+	
+					if (il < scOptimumVal) {
+						scOptimumNode = node;
+						scOptimumVal = il;
+					}
+	
+				}
+	
+			}
+		}
+		if (scOptimumNode != null) {
+			ret = scOptimumVal;
+		}
+		try {
+			datasetNum.getHandle().release();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
 
 	private void calcDisclosureRisks(BenchmarkDataset dataset, ARXResult result, ARXConfiguration config) {
 		ARXNode optNode = result.getGlobalOptimum();
@@ -126,58 +191,7 @@ public class Anonymizer {
 		}
 	}
 
-		private Double getOptimumsAbsIlByFullTraversal(BenchmarkMeasure bmMeasure, BenchmarkDataset dataset, ARXResult result) {
-		Double ret 					= null;      
-		ARXNode scOptimumNode		= null;
-		Double  scOptimumVal  		= Double.MAX_VALUE;
-
-		ARXLattice lattice = result.getLattice();
-        int minLevel = 0;
-        int maxLevel = lattice.getTop().getTotalGeneralizationLevel();
-        
-        // Expand nodes such that all anonymous nodes are being materialized
-        for (int level = minLevel; level < maxLevel; level++) {
-            for (ARXNode node : lattice.getLevels()[level]) {
-                node.expand();
-            }
-        }
-
-        DataConverter converter = new DataConverter();
-        UtilityMeasureSoriaComas measureSoriaComas = new UtilityMeasureSoriaComas((dataset.getInputArray(true)));
-
-		for (ARXNode[] level : lattice.getLevels()) {
-
-			// For each transformation
-			for (ARXNode node : level) {
-				
-
-				// Make sure that every transformation is classified correctly
-				if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-					result.getOutput(node).release();
-				}				
-				
-				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
-
-					String[][]  scOutputData = converter.toArray(result.getOutput(node, false),dataset.getInputDataDef());
-					//result.getOutput(node).release();
-					Double il = measureSoriaComas.evaluate(scOutputData, node.getTransformation()).getUtility();
-
-					if (il < scOptimumVal) {
-						scOptimumNode = node;
-						scOptimumVal = il;
-					}
-
-				}
-
-			}
-		}
-		if (scOptimumNode != null) {
-			ret = scOptimumVal;
-		}
-		return ret;
-	}
-
-	public Double getIlArx() {
+		public Double getIlArx() {
 		return ilArx;
 	}
 
