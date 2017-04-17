@@ -131,6 +131,7 @@ public class Classificator {
         		}
         	}
         }
+        dataset.getArxData().getHandle().release();
 	}
 
 	public static String[] getCombinedRelPaAndDisclosureRiskHeader(BenchmarkDataset dataset) {

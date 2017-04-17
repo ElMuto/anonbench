@@ -28,6 +28,8 @@ public class ParametrizationSetup {
 	private Anonymizer anonymizer;
 	private BenchmarkDataset dataset;
 	private final BenchmarkCriterion dim2Crit;
+	private final BenchmarkMeasure measure;
+	private final int k;
 	
 	public ParametrizationSetup(BenchmarkDatafile datafile, String sa) {
 		this(datafile, sa, BenchmarkCriterion.T_CLOSENESS_ED);
@@ -73,6 +75,8 @@ public class ParametrizationSetup {
         arxData = dataset.getArxData();
         qiS = BenchmarkDataset.getQuasiIdentifyingAttributes(datafile);
         anonymizer = new Anonymizer();
+        this.measure = measure;
+        this.k = k;
 	}
 
 
@@ -170,4 +174,21 @@ public class ParametrizationSetup {
 		return config;
 	}
 
+	public BenchmarkMeasure getMeasure() {
+		return measure;
+	}
+
+	public void setDim2Param(double p) {
+	       try {
+				config = BenchmarkDriver.getConfiguration(
+						dataset, config.getMaxOutliers(), measure, dataset.getSensitiveAttribute(),
+						new PrivacyModel(
+								getDim2Crit(),
+								k,
+								p),
+						dataset.getCriteria());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
 }
