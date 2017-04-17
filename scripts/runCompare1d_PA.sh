@@ -8,32 +8,6 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-#fed1
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 ld &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13  d &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13  b
-
-#fed2
-#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS lr &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS le &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS  t
-
 #fed3
-#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS ld &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS  d &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ATUS  b
-
-#fed4
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 lr &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 le &
-#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13  t
-
-#fed1
-#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS ld &
-#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  d &
-#java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  b
-
-#fed4
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS lr &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS le &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  t
+java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  d &
+java -Xmx5G -jar jars/Compare1d_PA.jar IHIS ld
