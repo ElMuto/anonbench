@@ -21,14 +21,15 @@ public class FindBestParamForGivenMinRelCa {
 	static double epsilon = 0.01;
 //	static double epsilon = 0.3;
 	static int    k = 5;
-	
-	static BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
+
+//	static BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
+	static BenchmarkDatafile datafile = BenchmarkDatafile.IHIS;
 	static BenchmarkMeasure measure = BenchmarkMeasure.ENTROPY;
 	static double sf = 0.05;
 	
 	static String[] sas = {
 			"MS",
-//			"ED",
+			"ED",
 			};
 	static BenchmarkCriterion[] criteria = {
 			BenchmarkCriterion.L_DIVERSITY_DISTINCT,
@@ -59,6 +60,7 @@ public class FindBestParamForGivenMinRelCa {
 			e.printStackTrace();
 		}
 		pw.println(header);
+		pw.flush();
 
 		for (String sa : sas) {
 
@@ -66,7 +68,7 @@ public class FindBestParamForGivenMinRelCa {
 
 				ParametrizationSetup setup = new ParametrizationSetup(datafile,sa, k, 1d, criterion, measure, sf);
 
-				System.out.format("Calculating parameters for %s-%s - %s (targetCa %.2f)\n",
+				System.out.format("Calculating parameters for %s-%s - %s (targetCa=%.2f)\n",
 						datafile, sa, criterion, targetValue);
 				
 				double[] result = binarySearch(targetValue, 0.000001, 1d, setup, 0d);
@@ -81,8 +83,8 @@ public class FindBestParamForGivenMinRelCa {
 
 				System.out.format("Norm. param is %.4f, actual param is %.4f, actual Ca is %.4f\n\n",
 						normalizedParam, denormalizedParam, actualCa);
-				pw.format("%s;%s;%s;%.4f;%.4f;%.4f;%.4f;%.4f", datafile, sa, criterion, normalizedParam, denormalizedParam, targetValue, actualCa, epsilon);
-
+				pw.format("%s;%s;%s;%.4f;%.4f;%.4f;%.4f;%.4f\n", datafile, sa, criterion, normalizedParam, denormalizedParam, targetValue, actualCa, epsilon);
+				pw.flush();
 			}
 
 		}

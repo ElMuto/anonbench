@@ -179,7 +179,7 @@
 
 	
 	  <target name="FindBestParamForGivenMinRelCa" depends="compile,buildExternalLibs">
-	    <jar destfile="FindBestParamForGivenMinRelCa" duplicate="preserve">
+	    <jar destfile="FindBestParamForGivenMinRelCa.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
 	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
@@ -189,7 +189,7 @@
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
 	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.FindBestParamForGivenMinRelca" />
+	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.FindBestParamForGivenMinRelCa" />
 	      </manifest>
 	    </jar>
 	    <delete dir="build" failonerror="true" />
