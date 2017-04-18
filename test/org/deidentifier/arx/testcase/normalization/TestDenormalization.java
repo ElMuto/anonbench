@@ -29,7 +29,7 @@ public class TestDenormalization {
     	testSetupMs =  new ParametrizationSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.L_DIVERSITY_DISTINCT);
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
-		double inVal = 0d; double expOutVal = 1d;		
+		double inVal = 0d; double expOutVal = 0d;		
     	assertEquals(expOutVal, ParamTransformer.getDenormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 1d; expOutVal = 5d;		

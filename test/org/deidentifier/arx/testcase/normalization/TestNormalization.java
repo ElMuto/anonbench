@@ -29,7 +29,7 @@ public class TestNormalization {
     	testSetupMs =  new ParametrizationSetup(BenchmarkDatafile.ACS13, "MS", BenchmarkCriterion.L_DIVERSITY_DISTINCT);
     	statsMs = AttributeStatistics.get(testSetupMs.getDataset(), testSetupMs.getSa());
     	
-		double inVal = 1d; double expOutVal = 0d;		
+		double inVal = 0d; double expOutVal = 0d;		
     	assertEquals(expOutVal, ParamTransformer.getNormalizedParamVal(testSetupMs.getDataset().getDatafile(), testSetupMs.getSa(), testSetupMs.getDim2Crit(), inVal), epsilon);
     	
 		inVal = 5d; expOutVal = inVal / statsMs.getRpgLmax();		
