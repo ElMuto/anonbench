@@ -13,12 +13,12 @@ import org.deidentifier.arx.util.Classificator;
 public class FindBestParamForGivenMinRelCa {
 	
 	static double targetValue = 0.8;
-	static double minIntervalSize = 0.01;
+	static double minIntervalSize = 0.005;
 	static int    k = 5;
 	
-	static BenchmarkCriterion criterion = BenchmarkCriterion.BASIC_BETA_LIKENESS;
+	static BenchmarkCriterion criterion = BenchmarkCriterion.L_DIVERSITY_ENTROPY;
 	static BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
-	static String sa = "ED";
+	static String sa = "MS";
 	static BenchmarkMeasure measure = BenchmarkMeasure.ENTROPY;
 	static double sf = 0.05;
 	

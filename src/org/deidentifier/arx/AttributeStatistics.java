@@ -248,7 +248,7 @@ public class AttributeStatistics {
 	        String[] distinctValues = handle.getStatistics().getDistinctValues(attrColIndex);
 	        domainSize = distinctValues.length;
 	        
-	        rpgLmin = 1d;
+	        rpgLmin = 1e-6;
 	        rpgLmax = Double.valueOf(domainSize);
 	        
 	        // get the frequencies of attribute instantiations
