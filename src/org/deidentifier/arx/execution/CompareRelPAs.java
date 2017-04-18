@@ -1,11 +1,6 @@
 package org.deidentifier.arx.execution;
 
 import java.io.IOException;
-import java.io.PrintStream;
-
-import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
-import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.util.Classificator;
 
 
 public class CompareRelPAs {

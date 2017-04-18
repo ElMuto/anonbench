@@ -1,12 +1,10 @@
 package org.deidentifier.arx.util;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
@@ -16,8 +14,6 @@ import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkDriver;
-import org.deidentifier.arx.BenchmarkSetup;
-import org.deidentifier.arx.DataDefinition;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
@@ -84,7 +80,7 @@ public class Classificator {
         }
 
         DataHandle handle = null;
-		boolean baselineValuesCaptured = false;
+//		boolean baselineValuesCaptured = false;
 		
 		int[] exampleTrafo = new int[] { 1, 1, 0 };
 		boolean onlyVisitExampleTrafo = false;
