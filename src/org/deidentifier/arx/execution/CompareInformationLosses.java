@@ -27,7 +27,7 @@ public class CompareInformationLosses {
 
 	private static void comparePrivacyModels() throws IOException {
 
-		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.ENTROPY}) {
+		for (BenchmarkMeasure measure : new BenchmarkMeasure[] {BenchmarkMeasure.LOSS}) {
 
 			// For each dataset
 			for (BenchmarkDatafile datafile : BenchmarkSetup.getDatafiles()) {
