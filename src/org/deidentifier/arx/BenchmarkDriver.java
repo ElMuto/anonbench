@@ -315,9 +315,9 @@ public class BenchmarkDriver {
 
         	il_arx = Double.valueOf(arxOptimum.getLowestScore().toString());
 
-        	String[][]  scOutputData = this.converter.toArray(result.getOutput(arxOptimum),dataset.getInputDataDef());
+        	String[][]  scOutputData = this.converter.toArray(result.getOutput(),dataset.getInputDataDef());
         	result.getOutput(arxOptimum).release();
-        	il_abs_from_utility = this.measure.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
+        	il_abs_from_utility = this.measure.evaluate(scOutputData).getUtility();
         	il_rel = (il_abs_from_utility - dataset.getMinInfoLoss(this.benchmarkMeasure)) / (dataset.getMaxInfoLoss(this.benchmarkMeasure) - dataset.getMinInfoLoss(this.benchmarkMeasure));
 
         	il_sc = getOptimumsAbsIlByFullTraversal(BenchmarkMeasure.SORIA_COMAS, dataset, result);

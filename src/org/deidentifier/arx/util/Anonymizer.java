@@ -14,6 +14,7 @@ import org.deidentifier.arx.DataDefinition;
 import org.deidentifier.arx.DataHandle;
 
 import org.deidentifier.arx.utility.DataConverter;
+import org.deidentifier.arx.utility.UtilityMeasure;
 import org.deidentifier.arx.utility.UtilityMeasureLoss;
 import org.deidentifier.arx.utility.UtilityMeasureNonUniformEntropy;
 import org.deidentifier.arx.utility.UtilityMeasureSoriaComas;
@@ -61,28 +62,20 @@ public class Anonymizer {
 	}
 
 	private void calcInfLosses(BenchmarkDataset dataset, ARXResult resultNom, ARXResult resultNum, ARXConfiguration config) {
-		    String[] header = dataset.getQuasiIdentifyingAttributes();
-	    	DataConverter converter = new DataConverter();
-		    Map<String, String[][]> hierarchies = converter.toMap(dataset.getInputDataDef());
-			UtilityMeasureNonUniformEntropy<Double> measureEntr 		= new UtilityMeasureNonUniformEntropy<Double>(header, dataset.getInputArray());
-			UtilityMeasureLoss<Double> measureLoss = new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
-	
-			
 		       if (resultNom.getGlobalOptimum() != null) {
 	
 		        	ARXNode arxOptimum = resultNom.getGlobalOptimum();
 	
 		        	this.ilArx = Double.valueOf(arxOptimum.getLowestScore().toString());
 		        	DataHandle handle = resultNom.getOutput(arxOptimum, false);
+		        	DataConverter converter = new DataConverter();
 		        	String[][]  scOutputData = converter.toArray(handle,dataset.getInputDataDef());
 		        	handle.release();
-		        	this.ilAbsEntr = measureEntr.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
-		        	this.ilRelEntr = (this.ilAbsEntr - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.ENTROPY) - dataset.getMinInfoLoss(BenchmarkMeasure.ENTROPY));
-
-		        	this.ilAbsLoss = measureLoss.evaluate(scOutputData, arxOptimum.getTransformation()).getUtility();
-		        	this.ilRelLoss = (this.ilAbsLoss - dataset.getMinInfoLoss(BenchmarkMeasure.LOSS)) / (dataset.getMaxInfoLoss(BenchmarkMeasure.LOSS) - dataset.getMinInfoLoss(BenchmarkMeasure.LOSS));
-	
-		        	ilSorCom = getIlSorComByFullTraversal(dataset, config);
+		        	
+		        	ilRelEntr = performEvaluationWithUtilityPackage(dataset, BenchmarkMeasure.ENTROPY, scOutputData);
+		        	ilRelLoss = performEvaluationWithUtilityPackage(dataset, BenchmarkMeasure.LOSS, scOutputData);	
+		        	ilSorCom  = getIlSorComByFullTraversal(dataset, config);
+		        	
 		        } else {
 		        	ilSorCom = ilRelEntr = ilArx = ilAbsEntr = ilRelEntr = BenchmarkSetup.NO_RESULT_FOUND_DOUBLE_VAL;
 		        }
@@ -93,6 +86,33 @@ public class Anonymizer {
 				e.printStackTrace();
 			}
 		}
+
+	private double performEvaluationWithUtilityPackage(BenchmarkDataset dataset, BenchmarkMeasure bMeasure,
+			String[][] scOutputData) {
+		
+	    String[] header = dataset.getQuasiIdentifyingAttributes();
+    	DataConverter converter = new DataConverter();
+	    Map<String, String[][]> hierarchies = converter.toMap(dataset.getInputDataDef());
+		
+
+		UtilityMeasure<Double> uMeasure = null;
+		switch (bMeasure) {
+		case ENTROPY:
+			uMeasure = new UtilityMeasureNonUniformEntropy<Double>(header, dataset.getInputArray());
+			break;
+		case LOSS:
+			uMeasure = new UtilityMeasureLoss<Double>(header, hierarchies, org.deidentifier.arx.utility.AggregateFunction.GEOMETRIC_MEAN);
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported BenchmarkMeasure: " + bMeasure);	
+		}
+		
+		double ilAbs = uMeasure.evaluate(scOutputData).getUtility();
+		double ilRel = (ilAbs - dataset.getMinInfoLoss(bMeasure)) / (dataset.getMaxInfoLoss(bMeasure) - dataset.getMinInfoLoss(bMeasure));
+
+		return ilRel;
+		
+	}
 
 	private Double getIlSorComByFullTraversal(BenchmarkDataset dataset, ARXConfiguration config) {
 		Double ret 					= null;      

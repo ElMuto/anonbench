@@ -9,6 +9,8 @@ import org.deidentifier.arx.testcase.classification.TestBaseCAs;
 import org.deidentifier.arx.testcase.classification.TestRelCAsCensus;
 import org.deidentifier.arx.testcase.classification.TestRelCAsHealthInterview;
 import org.deidentifier.arx.testcase.classification.TestRelCAsTimeUse;
+import org.deidentifier.arx.testcase.infoloss.TestRelIlEntrMs;
+import org.deidentifier.arx.testcase.infoloss.TestRelIlLossMs;
 import org.deidentifier.arx.testcase.normalization.TestDenormalization;
 import org.deidentifier.arx.testcase.normalization.TestMaxDelta;
 import org.deidentifier.arx.testcase.normalization.TestNormalization;
@@ -25,8 +27,8 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestAttributeStatistics.class,
 	TestNormalization.class,
 	TestDenormalization.class,
-// 	TestRelIlEntrMs.class,  // FAILURE !!!
-//	TestRelIlEntrLoss.class, // FAILURE !!!!
+ 	TestRelIlEntrMs.class,
+	TestRelIlLossMs.class,
 	
 	// longrunners
 	TestRelCAsCensus.class,

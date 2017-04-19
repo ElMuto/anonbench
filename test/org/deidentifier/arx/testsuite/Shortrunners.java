@@ -19,8 +19,6 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestWeightedAvg.class,
 	TestNormalization.class,
 	TestDenormalization.class,
-// 	TestRelIlEntrMs.class,  // FAILURE !!!
-//	TestRelIlEntrLoss.class, // FAILURE !!!!
 //	TestAttributeStatistics.class,
 })
 public class Shortrunners {
