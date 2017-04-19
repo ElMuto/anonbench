@@ -13,15 +13,15 @@ public class TestRelIlLossMs {
 	private double epsilon = 1e-9;
 	private ParametrizationSetup testSetupMs;
 
-//	@Test
-//	public void testCensusMsLd() {
-//		testSetupMs =  new ParametrizationSetup(
-//				BenchmarkDatafile.ACS13,
-//				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
-//		testSetupMs.anonymize();
-//		assertEquals(0.110379438793558, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-//	}
-//
+	@Test
+	public void testCensusMsLd() {
+		testSetupMs =  new ParametrizationSetup(
+				BenchmarkDatafile.ACS13,
+				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
+		testSetupMs.anonymize();
+		assertEquals(0.110379438793558, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+	}
+
 //	@Test
 //	public void testCensusMsLr() {
 //		testSetupMs =  new ParametrizationSetup(
@@ -57,18 +57,18 @@ public class TestRelIlLossMs {
 //		testSetupMs.anonymize();
 //		assertEquals(0.664545944308246, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
 //	}
-	
-	//////// Time Use ///////////////////////
-
-	@Test
-	public void testTimeUseMsLd() {
-		testSetupMs =  new ParametrizationSetup(
-				BenchmarkDatafile.ATUS,
-				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
-		testSetupMs.anonymize();
-		assertEquals(0.0411573544704593, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
-	}
-
+//	
+//	//////// Time Use ///////////////////////
+//
+//	@Test
+//	public void testTimeUseMsLd() {
+//		testSetupMs =  new ParametrizationSetup(
+//				BenchmarkDatafile.ATUS,
+//				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.LOSS, 0.05);
+//		testSetupMs.anonymize();
+//		assertEquals(0.0411573544704593, testSetupMs.getAnonymizer().getIlRelLoss(), epsilon);
+//	}
+//
 //	@Test
 //	public void testTimeUseMsLr() {
 //		testSetupMs =  new ParametrizationSetup(
