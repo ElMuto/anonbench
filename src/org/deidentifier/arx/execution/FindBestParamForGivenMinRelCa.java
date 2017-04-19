@@ -23,7 +23,9 @@ public class FindBestParamForGivenMinRelCa {
 	static int    k = 5;
 
 //	static BenchmarkDatafile datafile = BenchmarkDatafile.ACS13;
-	static BenchmarkDatafile datafile = BenchmarkDatafile.IHIS;
+//	static BenchmarkDatafile datafile = BenchmarkDatafile.IHIS;
+	static BenchmarkDatafile datafile = BenchmarkDatafile.ATUS
+			;
 	static BenchmarkMeasure measure = BenchmarkMeasure.ENTROPY;
 	static double sf = 0.05;
 	
