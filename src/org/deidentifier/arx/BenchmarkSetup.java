@@ -32,11 +32,47 @@ import de.linearbits.subframe.analyzer.ValueBuffer;
 
 public class BenchmarkSetup {
 
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, BenchmarkDatafile datafile, int numValues) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(
+			BenchmarkCriterion crit, String sa, BenchmarkDatafile datafile, Integer numValues) {
 
 		int[] dim1Vals = { 5 };
 		
-		Double[] dim2Vals = createParamArray(crit, sa, datafile, numValues);
+		Double[] dim2Vals = null;
+		if (numValues != null) {
+			dim2Vals = createParamArray(crit, sa, datafile, numValues);
+		} else {
+			switch (crit) {
+			case L_DIVERSITY_DISTINCT:
+			case L_DIVERSITY_RECURSIVE:
+			case L_DIVERSITY_ENTROPY:
+				switch (datafile) {
+				case ACS13:
+					if ("Marital status".equals(sa)) {
+						dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d };
+					} else if ("Education".equals(sa)) {
+						dim2Vals = new Double[] { 1e-3, 3d, 5d, 8d, 10d, 13d, 15d, 20d, 23d, 25d };
+					} else {
+						throw new IllegalArgumentException("Unsupported sa: " + sa);
+					}
+					break;
+				case ATUS:
+					break;
+				case IHIS:
+					break;
+				default:
+					throw new IllegalArgumentException("Unsupported datafile: " + datafile);
+				}
+				break;
+			case T_CLOSENESS_ED:
+				dim2Vals = new Double[] { 0d, 0.2, 0.4, 0.6, 0.8, 1d };
+				break;
+			case D_DISCLOSURE_PRIVACY:
+				dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d, 6d };
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported criterion: " + crit);
+			}
+		}
 
 		PrivacyModel[] pmArr = new PrivacyModel[dim1Vals.length * dim2Vals.length];
 
@@ -49,7 +85,9 @@ public class BenchmarkSetup {
 		return pmArr;
 	}
 	
-	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(BenchmarkCriterion crit, String sa, boolean reverse, BenchmarkDatafile datafile, int numValues) {
+	public static PrivacyModel[] getPrivacyModelsConfigsForParameterComparison(
+			BenchmarkCriterion crit, String sa, boolean reverse,
+			BenchmarkDatafile datafile, Integer numValues) {
 		if (reverse) {
 			
 			PrivacyModel[] originalArray = getPrivacyModelsConfigsForParameterComparison(crit, sa, datafile, numValues);

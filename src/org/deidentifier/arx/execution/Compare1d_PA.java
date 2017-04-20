@@ -94,7 +94,7 @@ public class Compare1d_PA {
 
 		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(new BenchmarkDataset(BenchmarkDatafile.ACS13, new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_ED }, "MS")), ";"));
 
-		int numParams = 11;
+		Integer numParams = null;
 		double sf = 0.05;
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(crit, sa, reverse, datafile, numParams)) {

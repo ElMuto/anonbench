@@ -8,6 +8,6 @@ done
 #run benchmark
 #Usage: java -Xmx5G -jar <jar>
 
-#fed3
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS  d &
-java -Xmx5G -jar jars/Compare1d_PA.jar IHIS ld
+#fed1
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 lr &
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 le

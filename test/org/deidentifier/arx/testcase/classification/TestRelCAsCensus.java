@@ -15,7 +15,7 @@ public class TestRelCAsCensus {
 	private ParametrizationSetup testSetup;
 
 	@Test
-	public void CensusMsXLd() {
+	public void CensusMsLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"MS", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);
@@ -24,7 +24,7 @@ public class TestRelCAsCensus {
 		classi.findOptimalRelCa();
 		assertEquals(0.9114, classi.getMaxRelPa(), epsilon);
 	}
-
+	
 	@Test
 	public void CensusMsLr() {
 		testSetup =  new ParametrizationSetup(
@@ -70,7 +70,7 @@ public class TestRelCAsCensus {
 	}
 	
 	@Test
-	public void CensusEdXLd() {
+	public void CensusEdLd() {
 		testSetup =  new ParametrizationSetup(
 				BenchmarkDatafile.ACS13,
 				"ED", 5, 3d, BenchmarkCriterion.L_DIVERSITY_DISTINCT, BenchmarkMeasure.ENTROPY, 0.05);

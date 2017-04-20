@@ -448,7 +448,7 @@ public class BenchmarkDriver {
 		
 	
 		ARXConfiguration config = BenchmarkDriver.getConfiguration(dataset, suppFactor, this.benchmarkMeasure, sa, privacyModel,dataset.getCriteria());
-//		System.out.println(config.getPrivacyModels());
+		System.out.println(config.getPrivacyModels());
 		
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 		
