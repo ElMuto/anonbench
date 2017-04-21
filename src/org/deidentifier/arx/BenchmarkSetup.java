@@ -50,14 +50,29 @@ public class BenchmarkSetup {
 					if ("Marital status".equals(sa)) {
 						dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d };
 					} else if ("Education".equals(sa)) {
-						dim2Vals = new Double[] { 1e-3, 3d, 5d, 8d, 10d, 13d, 15d, 20d, 23d, 25d };
+						dim2Vals = new Double[] { 1e-3, 3d, 5d, 8d, 10d, 13d, 15d, 18d, 20d, 23d, 25d };
 					} else {
 						throw new IllegalArgumentException("Unsupported sa: " + sa);
 					}
 					break;
 				case ATUS:
+					if ("Marital status".equals(sa)) {
+//						dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d, 6d, 7d };
+						dim2Vals = new Double[] { 6d, 7d, 1e-3, 1d, 2d, 3d, 4d, 5d };
+					} else if ("Highest level of school completed".equals(sa)) {
+						dim2Vals = new Double[] { 1e-3, 3d, 5d, 8d, 10d, 13d, 15d, 18d };
+					} else {
+						throw new IllegalArgumentException("Unsupported sa: " + sa);
+					}
 					break;
 				case IHIS:
+					if ("MARSTAT".equals(sa)) {
+						dim2Vals = new Double[] { 10d, 8d, 6d, 5d, 4d, 2d, 1e-3 };
+					} else if ("EDUC".equals(sa)) {
+						dim2Vals = new Double[] { 26d, 20d, 15d, 10d, 5d, 1e-3 };
+					} else {
+						throw new IllegalArgumentException("Unsupported sa: " + sa);
+					}
 					break;
 				default:
 					throw new IllegalArgumentException("Unsupported datafile: " + datafile);
@@ -67,7 +82,18 @@ public class BenchmarkSetup {
 				dim2Vals = new Double[] { 1d, 0.8, 0.6, 0.4, 0.2, 1e-3 };
 				break;
 			case D_DISCLOSURE_PRIVACY:
-				dim2Vals = new Double[] { 6d, 5d, 4d, 3d, 2d, 1d, 1e-3 };
+				switch (datafile) {
+				case ACS13:
+					dim2Vals = new Double[] { 6d, 5d, 4d, 3d, 2d, 1d, 1e-3 };
+				case ATUS:
+					dim2Vals = new Double[] { 10d, 8d, 6d, 4d, 2d, 1e-3 };
+					break;
+				case IHIS:
+					dim2Vals = new Double[] { 11d, 10d, 8d, 6d, 4d, 2d, 1e-3 };
+					break;
+				default:
+					throw new IllegalArgumentException("Unsupported datafile: " + datafile);
+				}
 				break;
 			default:
 				throw new IllegalArgumentException("Unsupported criterion: " + crit);
