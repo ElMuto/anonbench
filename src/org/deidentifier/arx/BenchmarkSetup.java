@@ -64,10 +64,10 @@ public class BenchmarkSetup {
 				}
 				break;
 			case T_CLOSENESS_ED:
-				dim2Vals = new Double[] { 0d, 0.2, 0.4, 0.6, 0.8, 1d };
+				dim2Vals = new Double[] { 1d, 0.8, 0.6, 0.4, 0.2, 1e-3 };
 				break;
 			case D_DISCLOSURE_PRIVACY:
-				dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d, 6d };
+				dim2Vals = new Double[] { 6d, 5d, 4d, 3d, 2d, 1d, 1e-3 };
 				break;
 			default:
 				throw new IllegalArgumentException("Unsupported criterion: " + crit);

@@ -9,5 +9,10 @@ done
 #Usage: java -Xmx5G -jar <jar>
 
 #fed1
-java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 lr &
-java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 le
+#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 lr ED &
+#java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 le ED
+
+#fed2
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 ld ED &
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 d  ED &
+java -Xmx5G -jar jars/Compare1d_PA.jar ACS13 t  ED
