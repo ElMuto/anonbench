@@ -2,10 +2,11 @@
 <project name="privacy-models-helmut" default="release" basedir=".">
 
   <property environment="env"/>
-  
-  <property name="arx" value="/root/arx-test/arx" />
-  <property name="subframe" value="/root/arx-test/subframe" />
-  <property name="utility" value="/root/arx-test/utility" />
+
+  <property name="project-base" value="/root/arx-test" />
+  <property name="arx" value="${project-base}/arx" />
+  <property name="subframe" value="${project-base}/subframe" />
+  <property name="utility" value="${project-base}/utility" />
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">
@@ -36,8 +37,14 @@
     	
     </or>
   </fileset>
-  <fileset id="local.lib.jars" dir="lib">
-      <filename name="**/weka.jar" />
+	  <fileset id="local.lib.jars" dir="lib">
+	      <filename name="**/weka.jar" />
+	  </fileset>
+	
+  <fileset id="arx.lib.jars" dir="${project-base}">
+    <filename name="subframe/jars/subframe-0.2-lib.jar" />
+    <filename name="arx/jars/arx-3.6.0.jar" />
+    <filename name="utility/jars/utility.jar" />
   </fileset>
 
 
@@ -55,12 +62,10 @@
   <target name="compile" depends="prepare" description="compile the source ">
     <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="build/">
       <classpath>
-        <path path="${subframe}/jars/subframe-0.2-lib.jar" />
-        <path path="${arx}/jars/libarx-3.6.0.jar" />
-        <path path="${utility}/jars/utility.jar" />
         <path path="src/" />
         <fileset refid="lib.jars" />
         <fileset refid="local.lib.jars" />
+        <fileset refid="arx.lib.jars" />
       </classpath>
     </javac>
   </target>
@@ -77,9 +82,8 @@
 	    <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+	      <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -94,9 +98,8 @@
 	    <jar destfile="CompareRelPAs.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+		  <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -112,9 +115,8 @@
 	    <jar destfile="CompareRelPAsSoriaComas.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+		  <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -129,9 +131,8 @@
 	    <jar destfile="CompareRelPAsIncludingAllPossiblePredictors.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+		      <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -146,9 +147,8 @@
 	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+		      <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -164,9 +164,8 @@
 	    <jar destfile="Compare1d_PA.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+		      <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -182,9 +181,8 @@
 	    <jar destfile="FindBestParamForGivenMinRelCa.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
+
+		      <fileset refid="arx.lib.jars" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
