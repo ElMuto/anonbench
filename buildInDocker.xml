@@ -55,9 +55,9 @@
   <target name="compile" depends="prepare" description="compile the source ">
     <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="build/">
       <classpath>
-        <path path="${subframe}/bin/" />
-        <path path="${arx}/bin/" />
-        <path path="${utility}/bin/" />
+        <path path="${subframe}/jars/subframe-0.2-lib.jar" />
+        <path path="${arx}/jars/libarx-3.5.1.jar" />
+        <path path="${utility}/jars/utility.jar" />
         <path path="src/" />
         <fileset refid="lib.jars" />
         <fileset refid="local.lib.jars" />
