@@ -14,6 +14,4 @@
 /Compare1d_PA.jar
 /CompareRelPAsIncludingAllPossiblePredictors.jar
 /FindBestParamForGivenMinRelCa.jar
-/Docker/resources/utility
-/Docker/resources/data
-/Docker/resources/hierarchies
+/Docker/resources
