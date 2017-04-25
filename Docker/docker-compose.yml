@@ -1,4 +1,5 @@
 version: "2"
 services:
-  test:
+  arx-test:
     build: .
+    container_name: arx-test
