@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CLASSIFICATION" default="release" basedir=".">
+
+	<description>Builds a JAR file</description>
+
+	<target name="release" depends="jars">
+	</target>
+
+	<target name="clean">
+		<delete dir="build" failonerror="true" />
+		<delete dir="tmpdoc" failonerror="true" />
+	</target>
+
+	<target name="prepare" depends="clean">
+		<mkdir dir="tmpdoc" />
+		<mkdir dir="build" />
+	</target>
+
+	<target name="compile" depends="prepare" description="compile the source">
+		<javac srcdir="src/" destdir="build/" includeantruntime="false" encoding="iso-8859-1">
+			<classpath>
+				<path path="lib/hamcrest-core-1.3.jar" />
+				<path path="lib/junit-4.11.jar" />
+				<path path="lib/libarx-3.6.0.jar" />
+				<path path="lib/weka.jar" />
+				<path path="src/" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="jars" depends="compile">
+		<jar destfile="jars/utility.jar">
+			<zipfileset src="lib/hamcrest-core-1.3.jar" excludes="META-INF/*.SF" />
+			<zipfileset src="lib/junit-4.11.jar" excludes="META-INF/*.SF" />
+			<zipfileset src="lib/libarx-3.6.0.jar" excludes="META-INF/*.SF" />
+			<zipfileset src="lib/weka.jar" excludes="META-INF/*.SF" />
+			<fileset dir="build" defaultexcludes="no">
+			</fileset>
+		</jar>
+		<delete dir="build" failonerror="true" />
+		<delete dir="tmpdoc" failonerror="true" />
+	</target>
+</project>

@@ -1,0 +1,9 @@
+Married-civ-spouse;Is married;*
+Divorced;Was married;*
+Never-married;Never-married;*
+Separated;Was married;*
+Widowed;Was married;*
+Married-spouse-absent;Is married;*
+Married-AF-spouse;Is married;*
+NULL;NULL;*
+?;?;*

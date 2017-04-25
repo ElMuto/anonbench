@@ -1,0 +1,5 @@
+Married;{Married, Separated};{Married, Separated, Divorced, Never married};*
+Separated;{Married, Separated};{Married, Separated, Divorced, Never married};*
+Divorced;{Divorced, Never married};{Married, Separated, Divorced, Never married};*
+Never married;{Divorced, Never married};{Married, Separated, Divorced, Never married};*
+Widowed;{Widowed};{Widowed};*

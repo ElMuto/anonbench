@@ -1,0 +1,5 @@
+N/A;{N/A};*
+Never;{Never, Veteran};*
+Veteran;{Never, Veteran};*
+Active duty;{Active duty, Reserves};*
+Reserves;{Active duty, Reserves};*
