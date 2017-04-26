@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		vim \
 	&& rm -rf /var/lib/apt/lists/*
 
+# Set the timezone.
+RUN mv /etc/localtime /etc/localtime.bak && \
+    ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+
 RUN mkdir /root/arx-test
 WORKDIR /root
 
