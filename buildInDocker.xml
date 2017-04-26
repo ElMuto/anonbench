@@ -90,6 +90,7 @@
 	            <include name="**/arx-3.6.0.jar"/>
 	            <include name="**/utility/jars/utility.jar"/>
 	        </fileset>
+	          <pathelement location="${build.dir}"/>
 	      </classpath>
 	    </javac>
 	  </target>
