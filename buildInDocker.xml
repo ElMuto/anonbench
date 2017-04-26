@@ -78,6 +78,7 @@
 	  </target>
 
 	  <target name="test-compile" depends="compile" description="compile the source ">
+	    <mkdir dir="${test.build.dir}"/>
 	    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="${test.src.dir}" destdir="${test.build.dir}">
 	      <classpath>
 	        <path path="src/" />
