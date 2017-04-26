@@ -6,7 +6,10 @@
   <property name="project-base" value="/root/arx-test" />
   <property name="arx" value="${project-base}/arx" />
   <property name="subframe" value="${project-base}/subframe" />
-  <property name="utility" value="${project-base}/utility" />
+	  <property name="utility" value="${project-base}/utility" />
+	  <property name="test.build.dir" value="test-build/" />
+	  <property name="test.src.dir" value="test/" />
+	
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">
@@ -59,20 +62,56 @@
     <mkdir dir="build" />
   </target>
 
-  <target name="compile" depends="prepare" description="compile the source ">
-    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="build/">
-      <classpath>
-        <path path="src/" />
-        <fileset refid="lib.jars" />
-        <fileset refid="local.lib.jars" />
-        <fileset dir="${project-base}">
-            <include name="**/subframe-0.2-lib.jar"/>
-            <include name="**/arx-3.6.0.jar"/>
-            <include name="**/utility/jars/utility.jar"/>
-        </fileset>
-      </classpath>
-    </javac>
-  </target>
+	  <target name="compile" depends="prepare" description="compile the source ">
+	    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="build/">
+	      <classpath>
+	        <path path="src/" />
+	        <fileset refid="lib.jars" />
+	        <fileset refid="local.lib.jars" />
+	        <fileset dir="${project-base}">
+	            <include name="**/subframe-0.2-lib.jar"/>
+	            <include name="**/arx-3.6.0.jar"/>
+	            <include name="**/utility/jars/utility.jar"/>
+	        </fileset>
+	      </classpath>
+	    </javac>
+	  </target>
+
+	  <target name="test-compile" depends="compile" description="compile the source ">
+	    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="${test.src.dir}" destdir="${test.build.dir}">
+	      <classpath>
+	        <path path="src/" />
+	        <fileset refid="lib.jars" />
+	        <fileset refid="local.lib.jars" />
+	        <fileset dir="${project-base}">
+	            <include name="**/subframe-0.2-lib.jar"/>
+	            <include name="**/arx-3.6.0.jar"/>
+	            <include name="**/utility/jars/utility.jar"/>
+	        </fileset>
+	      </classpath>
+	    </javac>
+	  </target>
+	
+
+
+	  <target name="test" depends="test-compile">
+	    <junit printsummary="on" haltonfailure="yes" fork="true">
+	        <classpath>
+		        <fileset refid="lib.jars" />
+		        <fileset refid="local.lib.jars" />
+		        <fileset dir="${project-base}">
+		            <include name="**/subframe-0.2-lib.jar"/>
+		            <include name="**/arx-3.6.0.jar"/>
+		            <include name="**/utility/jars/utility.jar"/>
+		        </fileset>
+	          <pathelement location="${test.build.dir}"/>
+	        </classpath>
+	        <formatter type="brief" usefile="false" />
+	        <batchtest>
+	            <fileset dir="${test.src.dir}" includes="**/Shortrunners.java" />
+	        </batchtest>
+	    </junit>
+	  </target>
 
   <target name="buildExternalLibs">
     <jar jarfile="build/extLibs/lib.jar">
