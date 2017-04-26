@@ -65,7 +65,11 @@
         <path path="src/" />
         <fileset refid="lib.jars" />
         <fileset refid="local.lib.jars" />
-        <fileset refid="arx.lib.jars" />
+        <fileset dir="${project-base}">
+            <include name="**/subframe-0.2-lib.jar"/>
+            <include name="**/arx-3.6.0.jar"/>
+            <include name="**/utility/jars/utility.jar"/>
+        </fileset>
       </classpath>
     </javac>
   </target>
