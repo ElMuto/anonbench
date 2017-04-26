@@ -7,6 +7,7 @@
   <property name="arx" value="${project-base}/arx" />
   <property name="subframe" value="${project-base}/subframe" />
 	  <property name="utility" value="${project-base}/utility" />
+	  <property name="build.dir" value="build/" />
 	  <property name="test.build.dir" value="test-build/" />
 	  <property name="test.src.dir" value="test/" />
 	
@@ -63,7 +64,7 @@
   </target>
 
 	  <target name="compile" depends="prepare" description="compile the source ">
-	    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="build/">
+	    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="${build.dir}">
 	      <classpath>
 	        <path path="src/" />
 	        <fileset refid="lib.jars" />
@@ -105,7 +106,8 @@
 		            <include name="**/arx-3.6.0.jar"/>
 		            <include name="**/utility/jars/utility.jar"/>
 		        </fileset>
-	          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${build.dir}"/>
 	        </classpath>
 	        <formatter type="brief" usefile="false" />
 	        <batchtest>
