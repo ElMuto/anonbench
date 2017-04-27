@@ -103,7 +103,7 @@
 
 
 	  <target name="test" depends="test-compile">
-	    <junit printsummary="on" howoutput="true" haltonfailure="yes" fork="true">
+	    <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
 	        <classpath>
 		        <fileset refid="lib.jars" />
 		        <fileset refid="local.lib.jars" />
