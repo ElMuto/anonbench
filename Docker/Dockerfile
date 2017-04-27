@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		subversion \
 		git \
 		ant \
+		ant-optional \
 		vim \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -28,9 +29,14 @@ ADD resources/utility		/root/arx-test/utility
 WORKDIR /root/arx-test/utility
 RUN ant
 
+ENV REBUILD 4
+ENV ANT_HOME /usr/share/ant
+
 WORKDIR /
 WORKDIR /root/arx-test
 RUN git clone --branch pcc              https://github.com/ElMuto/anonbench.git
+ADD resources/hamcrest-core-1.3.jar 	${ANT_HOME}/lib/
+ADD resources/junit-4.12.jar 		${ANT_HOME}/lib/
 ADD resources/data/*    	/root/arx-test/anonbench/data/
 ADD resources/hierarchies/*	/root/arx-test/anonbench/hierarchies/
 WORKDIR /root/arx-test/anonbench
