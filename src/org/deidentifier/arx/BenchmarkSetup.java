@@ -57,8 +57,7 @@ public class BenchmarkSetup {
 					break;
 				case ATUS:
 					if ("Marital status".equals(sa)) {
-//						dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d, 6d, 7d };
-						dim2Vals = new Double[] { 6d, 7d, 1e-3, 1d, 2d, 3d, 4d, 5d };
+						dim2Vals = new Double[] { 1e-3, 1d, 2d, 3d, 4d, 5d, 6d, 7d };
 					} else if ("Highest level of school completed".equals(sa)) {
 						dim2Vals = new Double[] { 1e-3, 3d, 5d, 8d, 10d, 13d, 15d, 18d };
 					} else {
@@ -85,6 +84,7 @@ public class BenchmarkSetup {
 				switch (datafile) {
 				case ACS13:
 					dim2Vals = new Double[] { 6d, 5d, 4d, 3d, 2d, 1d, 1e-3 };
+					break;
 				case ATUS:
 					dim2Vals = new Double[] { 10d, 8d, 6d, 4d, 2d, 1e-3 };
 					break;
