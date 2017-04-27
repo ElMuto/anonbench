@@ -29,7 +29,7 @@ ADD resources/utility		/root/arx-test/utility
 WORKDIR /root/arx-test/utility
 RUN ant
 
-ENV REBUILD 5
+ENV REBUILD 6
 ENV ANT_HOME /usr/share/ant
 
 WORKDIR /
