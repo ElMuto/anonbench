@@ -19,7 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestWeightedAvg.class,
 	TestNormalization.class,
 	TestDenormalization.class,
-	TestAttributeStatistics.class,
+//	TestAttributeStatistics.class,
 })
 public class Shortrunners {
 
