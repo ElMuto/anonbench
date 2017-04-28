@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile 'org.postgresql:postgresql:9.4.1212'
+	testCompile 'junit:junit:4.12'
+}

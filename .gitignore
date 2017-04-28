@@ -17,3 +17,5 @@
 /Docker/resources
 /data/
 /hierarchies/
+/build/
+/.gradle/
