@@ -3,7 +3,7 @@
 
   <property environment="env"/>
 
-  <property name="project-base" value="/root/arx-test" />
+  <property name="project-base" value="${env.TEST_BASE}" />
   <property name="arx" value="${project-base}/arx" />
   <property name="subframe" value="${project-base}/subframe" />
 	  <property name="utility" value="${project-base}/utility" />

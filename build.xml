@@ -3,9 +3,9 @@
 
   <property environment="env"/>
   
-  <property name="arx" value="C:\dev\eclipse_workspaces\promotion\arx" />
-  <property name="subframe" value="C:\dev\eclipse_workspaces\promotion\subframe-fork" />
-  <property name="utility" value="C:\dev\eclipse_workspaces\promotion\utility" />
+  <property name="arx" value="${env.PROMOTION_WS}/arx" />
+  <property name="subframe" value="${env.PROMOTION_WS}/subframe-fork" />
+  <property name="utility" value="${env.PROMOTION_WS}/utility" />
 
   <!-- defines the to be included libraries -->
   <fileset id="lib.jars" dir="${arx}/lib">
