@@ -1,7 +1,5 @@
 version: "2"
 services:
   arx-test:
-    environment:
-      - ANT_TARGET=test-shortrunners
     image: elmuto/arx-test
     container_name: arx-test
