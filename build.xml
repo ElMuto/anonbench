@@ -1,85 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="privacy-models-helmut" default="release" basedir=".">
+<project name="privacy-models-helmut" default="test-shortrunners" basedir=".">
 
-  <property environment="env"/>
-  
-  <property name="arx" value="${env.PROMOTION_WS}/arx" />
-  <property name="subframe" value="${env.PROMOTION_WS}/subframe-fork" />
-  <property name="utility" value="${env.PROMOTION_WS}/utility" />
-
-  <!-- defines the to be included libraries -->
-  <fileset id="lib.jars" dir="${arx}/lib">
-    <or>
-      <filename name="**/colt-1.2.0.jar" />
-      <filename name="**/commons-math3-3.1.1.jar" />
-      <filename name="**/Jama-1.0.2.jar" />
-      <filename name="**/commons-io-2.4.jar" />
-      <filename name="**/commons-codec-1.5.jar" />
-      <filename name="**/commons-logging-1.1.jar" />
-      <filename name="**/dom4j-1.6.1.jar" />
-      <filename name="**/stax-api-1.0.1.jar" />
-      <filename name="**/xmlbeans-2.3.0.jar" />
-      <filename name="**/poi-3.10-FINAL-20140208.jar" />
-      <filename name="**/poi-ooxml-3.10-FINAL-20140208.jar" />
-      <filename name="**/poi-ooxml-schemas-3.10-FINAL-20140208.jar" />
-      <filename name="**/junit-4.11.jar" />
-      <filename name="**/hppc-0.6.0.jar" />
-      <filename name="**/objectselector-0.1-lib.jar" />
-      <filename name="**/univocity-parsers-1.3.1.jar" />
-      <filename name="**/newtonraphson-0.0.1.jar" />
-        <filename name="**/jhpl-0.0.1.jar" />
-        <filename name="**/mahout-core-0.9.jar" />
-        <filename name="**/mahout-math-0.11.1.jar" />  
-        <filename name="**/guava-18.0.jar" />  
-            <filename name="**/hadoop-core-1.2.1.jar" />   
-        <filename name="**/slf4j-api-1.7.13.jar" />  	
-    	
-    </or>
-  </fileset>
-  <fileset id="local.lib.jars" dir="lib">
-      <filename name="**/weka.jar" />
-  </fileset>
-
-
-  <target name="release" depends="CompareRelPAs">
-  </target>
-
-  <target name="clean">
-    <delete dir="build" failonerror="true" />
-  </target>
-
-  <target name="prepare" depends="clean">
-    <mkdir dir="build" />
-  </target>
-
-  <target name="compile" depends="prepare" description="compile the source ">
-    <javac source="1.7" target="1.7" includeantruntime="false" srcdir="src/" destdir="build/">
-      <classpath>
-        <path path="${subframe}/bin/" />
-        <path path="${arx}/bin/" />
-        <path path="${utility}/bin/" />
-        <path path="src/" />
-        <fileset refid="lib.jars" />
-        <fileset refid="local.lib.jars" />
-      </classpath>
-    </javac>
-  </target>
-
-  <target name="buildExternalLibs">
-    <jar jarfile="build/extLibs/lib.jar">
-      <zipgroupfileset refid="lib.jars" />
-      <zipgroupfileset refid="local.lib.jars" />
-    </jar>
-  </target>
-
+	<property environment="env"/>
+	
+	<property name="project-base" value="${env.CODE_ADCC}" />
+	<property name="stripped.arx.jar" value="lib/libarx-3.6.0-stripped.jar" />
+	<property name="stripped.utility.jar" value="lib/utility-stripped.jar" />
+	<property name="build.dir" value="build/" />
+	<property name="test.build.dir" value="test-build/" />
+	<property name="build.dir" value="build/" />
+	<property name="test.src.dir" value="test/" />
+		
+	
+	<!-- defines the to be included libraries -->
+	<fileset id="lib.jars" dir="lib">
+	  <or>
+	    <filename name="**/colt-1.2.0.jar" />
+	    <filename name="**/Jama-1.0.2.jar" />
+	    <filename name="**/commons-io-2.4.jar" />
+	    <filename name="**/commons-codec-1.5.jar" />
+	    <filename name="**/commons-logging-1.1.jar" />
+	    <filename name="**/commons-math3-3.1.1.jar" />
+	    <filename name="**/dom4j-1.6.1.jar" />
+	    <filename name="**/stax-api-1.0.1.jar" />
+	    <filename name="**/xmlbeans-2.3.0.jar" />
+	    <filename name="**/poi-3.10-FINAL-20140208.jar" />
+	    <filename name="**/poi-ooxml-3.10-FINAL-20140208.jar" />
+	    <filename name="**/poi-ooxml-schemas-3.10-FINAL-20140208.jar" />
+	    <filename name="**/junit-4.12.jar" />
+	    <filename name="**/hamcrest-core-1.3.jar" />
+	    <filename name="**/hppc-0.6.0.jar" />
+	    <filename name="**/objectselector-0.1-lib.jar" />
+	    <filename name="**/univocity-parsers-1.3.1.jar" />
+	    <filename name="**/newtonraphson-0.0.1.jar" />
+	    <filename name="**/jhpl-0.0.1.jar" />
+	    <filename name="**/mahout-core-0.9.jar" />
+	    <filename name="**/mahout-math-0.11.1.jar" />  
+	    <filename name="**/guava-18.0.jar" />  
+	    <filename name="**/hadoop-core-1.2.1.jar" />   
+	    <filename name="**/slf4j-api-1.7.13.jar" />
+	  	
+	    <filename name="**/libarx-3.6.0-stripped.jar" />     
+	    <filename name="**/subframe-0.2-lib.jar" />  	   
+	    <filename name="**/utility-stripped.jar" />  		
+	  	
+	  </or>
+	</fileset>
+	<fileset id="local.lib.jars" dir="lib">
+		  <filename name="**/weka.jar" />
+	</fileset>
+	
+	<target name="strip-jars">
+		<jar destfile="${stripped.arx.jar}">
+		    <zipfileset src="lib/libarx-3.6.0-min.jar" excludesfile="excludeClasses.txt"/>
+		</jar>
+		<jar destfile="${stripped.utility.jar}">
+		    <zipfileset src="lib/utility.jar" excludesfile="excludeClasses.txt"/>
+		</jar>
+	</target>
+	
+	<target name="clean">
+	  <delete dir="${build.dir}" failonerror="true" />
+	  <delete dir="${test.build.dir}" failonerror="true" />
+	  <delete file="${stripped.arx.jar}" failonerror="true" />
+	  <delete file="${stripped.utility.jar}" failonerror="true" />
+	</target>
+	
+	<target name="prepare" depends="clean, strip-jars">
+		  <mkdir dir="${build.dir}" />
+		  <mkdir dir="${test.build.dir}" />
+	</target>
+	
+	<target name="compile" depends="prepare" description="compile the source ">
+		<path id="lib.path.ref">
+		    <fileset dir="lib" includes="*.jar"/>
+		  </path>
+	  <javac source="1.8" target="1.8" includeantruntime="false" srcdir="src/" destdir="${build.dir}">
+	  	<classpath>
+	      <path path="src/" />
+	      <fileset refid="lib.jars" />
+	      <fileset refid="local.lib.jars" />
+	    </classpath>
+	  </javac>
+	</target>
+	
+	<target name="test-compile" depends="compile" description="compile the source ">
+	  <javac source="1.8" target="1.8" includeantruntime="false" srcdir="${test.src.dir}" destdir="${test.build.dir}">
+	    <classpath>
+	      <path path="src/" />
+	      <path path="${build.dir}" />
+	      <fileset refid="lib.jars" />
+	      <fileset refid="local.lib.jars" />
+	        <pathelement location="${build.dir}"/>
+	    </classpath>
+	  </javac>
+	</target>
+	
+		
+		
+	<target name="test-shortrunners" depends="test-compile">
+	  <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
+	      <classpath>
+		        <fileset refid="lib.jars" />
+		        <fileset refid="local.lib.jars" />
+		          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${build.dir}"/>
+	      </classpath>
+	      <formatter type="brief" usefile="false" />
+	      <batchtest>
+	          <fileset dir="${test.src.dir}" includes="**/Shortrunners.java" />
+	      </batchtest>
+	  </junit>
+	</target>
+		
+	<target name="buildExternalLibs">
+	  <jar jarfile="build/extLibs/lib.jar">
+	    <zipgroupfileset refid="lib.jars" />
+	    <zipgroupfileset refid="local.lib.jars" />
+	  </jar>
+	</target>
+		
 
 	  <target name="ComparePrivacyModels" depends="compile,buildExternalLibs">
 	    <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
-
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -93,10 +137,6 @@
 	  <target name="CompareRelPAs" depends="compile,buildExternalLibs">
 	    <jar destfile="CompareRelPAs.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
-
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -112,10 +152,6 @@
 	    <jar destfile="CompareRelPAsSoriaComas.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
 
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
-
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
 	      <manifest>
@@ -128,11 +164,7 @@
 	  <target name="CompareRelPAsIncludingAllPossiblePredictors" depends="compile,buildExternalLibs">
 	    <jar destfile="CompareRelPAsIncludingAllPossiblePredictors.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
-
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
-
+	    	
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
 	      <manifest>
@@ -145,10 +177,6 @@
 	  <target name="Compare2d_PA" depends="compile,buildExternalLibs">
 	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
-
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
@@ -163,11 +191,6 @@
 	  <target name="Compare1d_PA" depends="compile,buildExternalLibs">
 	    <jar destfile="Compare1d_PA.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
-
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
-
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
 	      <manifest>
@@ -181,10 +204,6 @@
 	  <target name="FindBestParamForGivenMinRelCa" depends="compile,buildExternalLibs">
 	    <jar destfile="FindBestParamForGivenMinRelCa.jar" duplicate="preserve">
 	      <fileset dir="build" defaultexcludes="no" />
-
-	      <fileset dir="${subframe}/bin/" defaultexcludes="no" />
-	      <fileset dir="${arx}/bin/" defaultexcludes="no" />
-	      <fileset dir="${utility}/bin/" defaultexcludes="no" />
 
 	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 

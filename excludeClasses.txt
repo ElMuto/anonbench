@@ -1,0 +1,7 @@
+org/deidentifier/arx/criteria/BasicBLikeness.class
+org/deidentifier/arx/criteria/DDisclosurePrivacy.class
+org/deidentifier/arx/criteria/DistinctLDiversity.class
+org/deidentifier/arx/criteria/DistinctLDiversity.class
+org/deidentifier/arx/criteria/EntropyLDiversity*.class
+org/deidentifier/arx/criteria/EqualDistanceTCloseness.class
+org/deidentifier/arx/criteria/RecursiveCLDiversity.class

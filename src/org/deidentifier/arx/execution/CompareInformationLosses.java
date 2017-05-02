@@ -51,7 +51,7 @@ public class CompareInformationLosses {
 						// for each suppression factor
 						for (double suppFactor : new double[] { 0.05d }) {
 							// Print status info
-							System.out.println("Running " + privacyModel.toString() + " on " + datafile.toString() + " with SA=" + sa + " and IL-Measure " + measure);
+//							System.out.println("Running " + privacyModel.toString() + " on " + datafile.toString() + " with SA=" + sa + " and IL-Measure " + measure);
 							driver.anonymize(measure, suppFactor, dataset, false,
 									privacyModel.getK(),
 									privacyModel.getL(), privacyModel.getC(), privacyModel.getT(), 
