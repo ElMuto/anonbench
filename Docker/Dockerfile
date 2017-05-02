@@ -28,4 +28,4 @@ WORKDIR ${CODE_ADCC}
 
 RUN echo "alias ll='ls -l'" >> /root/.bashrc
 
-CMD ["ant"]
+CMD ["ant" "${ANT_TARGET}"]
