@@ -136,7 +136,7 @@
       </classpath>
       <formatter type="brief" usefile="false" />
       <batchtest>
-          <fileset dir="${test.src.dir}" includes="**/Paper-Appearance.java" />
+          <fileset dir="${test.src.dir}" includes="**/PaperAppearance.java" />
       </batchtest>
   </junit>
 </target>
