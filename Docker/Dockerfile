@@ -1,4 +1,4 @@
-FROM oracle-java8
+FROM openjdk:8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		subversion \
