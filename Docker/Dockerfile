@@ -25,9 +25,7 @@ ADD resources/data/*    	/root/arx-test/anonbench/data/
 
 ADD resources/hierarchies/*	/root/arx-test/anonbench/hierarchies/
 WORKDIR ${CODE_ADCC}
-#RUN ant
 
 RUN echo "alias ll='ls -l'" >> /root/.bashrc
 
-ENTRYPOINT ["top", "-b"]
-CMD ["-c"]
+CMD ["ant"]
