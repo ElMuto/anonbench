@@ -20,12 +20,14 @@ ENV CODE_ADCC ${BASEDIR}/anonbench
 
 WORKDIR /
 WORKDIR ${BASEDIR}
+
+ENV GIT_RECLONE 1
 RUN git clone --branch pcc              https://github.com/ElMuto/anonbench.git
 ADD resources/data/*    	/root/arx-test/anonbench/data/
-
 ADD resources/hierarchies/*	/root/arx-test/anonbench/hierarchies/
+
 WORKDIR ${CODE_ADCC}
+ADD startup.sh ${CODE_ADCC}/
+RUN chmod 700 ${CODE_ADCC}/startup.sh
 
-RUN echo "alias ll='ls -l'" >> /root/.bashrc
-
-CMD ["ant" "${ANT_TARGET}"]
+CMD ${CODE_ADCC}/startup.sh
