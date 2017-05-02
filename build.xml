@@ -84,7 +84,7 @@
 	  </javac>
 	</target>
 	
-	<target name="test-compile" depends="compile" description="compile the source ">
+	<target name="compile-test" depends="compile" description="compile the source ">
 	  <javac source="1.8" target="1.8" includeantruntime="false" srcdir="${test.src.dir}" destdir="${test.build.dir}">
 	    <classpath>
 	      <path path="src/" />
@@ -96,7 +96,7 @@
 	  </javac>
 	</target>
 	
-<target name="test-shortrunners" depends="test-compile">
+<target name="test-shortrunners" depends="compile-test">
   <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
       <classpath>
 	        <fileset refid="lib.jars" />
@@ -111,7 +111,7 @@
   </junit>
 </target>
 	
-<target name="test-all" depends="test-compile">
+<target name="test-all" depends="compile-test">
   <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
       <classpath>
 	        <fileset refid="lib.jars" />
@@ -126,7 +126,7 @@
   </junit>
 </target>
 	
-<target name="test-paper-appearances" depends="test-compile">
+<target name="test-paper-appearances" depends="compile-test">
   <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
       <classpath>
 	        <fileset refid="lib.jars" />
