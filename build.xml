@@ -50,6 +50,13 @@
 		  <filename name="**/weka.jar" />
 	</fileset>
 	
+	<target name="clean">
+	  <delete dir="${build.dir}" failonerror="true" />
+	  <delete dir="${test.build.dir}" failonerror="true" />
+	  <delete file="${stripped.arx.jar}" failonerror="true" />
+	  <delete file="${stripped.utility.jar}" failonerror="true" />
+	</target>
+		
 	<target name="strip-jars">
 		<jar destfile="${stripped.arx.jar}">
 		    <zipfileset src="lib/libarx-3.6.0-min.jar" excludesfile="excludeClasses.txt"/>
@@ -57,13 +64,6 @@
 		<jar destfile="${stripped.utility.jar}">
 		    <zipfileset src="lib/utility.jar" excludesfile="excludeClasses.txt"/>
 		</jar>
-	</target>
-	
-	<target name="clean">
-	  <delete dir="${build.dir}" failonerror="true" />
-	  <delete dir="${test.build.dir}" failonerror="true" />
-	  <delete file="${stripped.arx.jar}" failonerror="true" />
-	  <delete file="${stripped.utility.jar}" failonerror="true" />
 	</target>
 	
 	<target name="prepare" depends="clean, strip-jars">
@@ -95,8 +95,6 @@
 	    </classpath>
 	  </javac>
 	</target>
-	
-		
 		
 	<target name="test-shortrunners" depends="test-compile">
 	  <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
