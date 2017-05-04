@@ -96,50 +96,50 @@
 	  </javac>
 	</target>
 	
-<target name="test-shortrunners" depends="compile-test">
-  <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
-      <classpath>
-	        <fileset refid="lib.jars" />
-	        <fileset refid="local.lib.jars" />
-	          <pathelement location="${test.build.dir}"/>
-	          <pathelement location="${build.dir}"/>
-      </classpath>
-      <formatter type="brief" usefile="false" />
-      <batchtest>
-          <fileset dir="${test.src.dir}" includes="**/Shortrunners.java" />
-      </batchtest>
-  </junit>
-</target>
-	
-<target name="test-all" depends="compile-test">
-  <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
-      <classpath>
-	        <fileset refid="lib.jars" />
-	        <fileset refid="local.lib.jars" />
-	          <pathelement location="${test.build.dir}"/>
-	          <pathelement location="${build.dir}"/>
-      </classpath>
-      <formatter type="brief" usefile="false" />
-      <batchtest>
-          <fileset dir="${test.src.dir}" includes="**/AllTests.java" />
-      </batchtest>
-  </junit>
-</target>
-	
-<target name="test-paper-appearances" depends="compile-test">
-  <junit showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
-      <classpath>
-	        <fileset refid="lib.jars" />
-	        <fileset refid="local.lib.jars" />
-	          <pathelement location="${test.build.dir}"/>
-	          <pathelement location="${build.dir}"/>
-      </classpath>
-      <formatter type="brief" usefile="false" />
-      <batchtest>
-          <fileset dir="${test.src.dir}" includes="**/PaperAppearance.java" />
-      </batchtest>
-  </junit>
-</target>
+	<target name="test-shortrunners" depends="compile-test">
+	  <junit maxmemory="4096m" showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
+	      <classpath>
+		        <fileset refid="lib.jars" />
+		        <fileset refid="local.lib.jars" />
+		          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${build.dir}"/>
+	      </classpath>
+	      <formatter type="brief" usefile="false" />
+	      <batchtest>
+	          <fileset dir="${test.src.dir}" includes="**/Shortrunners.java" />
+	      </batchtest>
+	  </junit>
+	</target>
+		
+	<target name="test-all" depends="compile-test">
+	  <junit maxmemory="4096m" showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
+	      <classpath>
+		        <fileset refid="lib.jars" />
+		        <fileset refid="local.lib.jars" />
+		          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${build.dir}"/>
+	      </classpath>
+	      <formatter type="brief" usefile="false" />
+	      <batchtest>
+	          <fileset dir="${test.src.dir}" includes="**/AllTests.java" />
+	      </batchtest>
+	  </junit>
+	</target>
+		
+	<target name="test-paper-appearances" depends="compile-test">
+	  <junit maxmemory="4096m" showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
+	      <classpath>
+		        <fileset refid="lib.jars" />
+		        <fileset refid="local.lib.jars" />
+		          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${build.dir}"/>
+	      </classpath>
+	      <formatter type="brief" usefile="false" />
+	      <batchtest>
+	          <fileset dir="${test.src.dir}" includes="**/PaperAppearance.java" />
+	      </batchtest>
+	  </junit>
+	</target>
 		
 	<target name="buildExternalLibs">
 	  <jar jarfile="build/extLibs/lib.jar">
@@ -149,98 +149,98 @@
 	</target>
 		
 
-	  <target name="ComparePrivacyModels" depends="compile,buildExternalLibs">
-	    <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
+	<target name="ComparePrivacyModels" depends="compile,buildExternalLibs">
+	  <jar destfile="ComparePrivacyModels.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
 
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.ComparePrivacyModels" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 
-	  <target name="CompareRelPAs" depends="compile,buildExternalLibs">
-	    <jar destfile="CompareRelPAs.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
+	<target name="CompareRelPAs" depends="compile,buildExternalLibs">
+	  <jar destfile="CompareRelPAs.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
 
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAs" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAs" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 
 
-	  <target name="CompareRelPAsSoriaComas" depends="compile,buildExternalLibs">
-	    <jar destfile="CompareRelPAsSoriaComas.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
+	<target name="CompareRelPAsSoriaComas" depends="compile,buildExternalLibs">
+	  <jar destfile="CompareRelPAsSoriaComas.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
 
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAsSoriaComas" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAsSoriaComas" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 
-	  <target name="CompareRelPAsIncludingAllPossiblePredictors" depends="compile,buildExternalLibs">
-	    <jar destfile="CompareRelPAsIncludingAllPossiblePredictors.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
-	    	
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	<target name="CompareRelPAsIncludingAllPossiblePredictors" depends="compile,buildExternalLibs">
+	  <jar destfile="CompareRelPAsIncludingAllPossiblePredictors.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
+	  	
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAsIncludingAllPossiblePredictors" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.CompareRelPAsIncludingAllPossiblePredictors" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 
-	  <target name="Compare2d_PA" depends="compile,buildExternalLibs">
-	    <jar destfile="Compare2d_PA.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
+	<target name="Compare2d_PA" depends="compile,buildExternalLibs">
+	  <jar destfile="Compare2d_PA.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
 
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare2d_PA" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 	
 
-	  <target name="Compare1d_PA" depends="compile,buildExternalLibs">
-	    <jar destfile="Compare1d_PA.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	<target name="Compare1d_PA" depends="compile,buildExternalLibs">
+	  <jar destfile="Compare1d_PA.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare1d_PA" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.Compare1d_PA" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 
 	
-	  <target name="FindBestParamForGivenMinRelCa" depends="compile,buildExternalLibs">
-	    <jar destfile="FindBestParamForGivenMinRelCa.jar" duplicate="preserve">
-	      <fileset dir="build" defaultexcludes="no" />
+	<target name="FindBestParamForGivenMinRelCa" depends="compile,buildExternalLibs">
+	  <jar destfile="FindBestParamForGivenMinRelCa.jar" duplicate="preserve">
+	    <fileset dir="build" defaultexcludes="no" />
 
-	      <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
+	    <zipfileset src="build/extLibs/lib.jar" excludes="META-INF/*.RSA,META-INF/*.SF,META-INF/*.DSA" />
 
-	      <manifest>
-	    	<attribute name="Main-Class" value="org.deidentifier.arx.execution.FindBestParamForGivenMinRelCa" />
-	      </manifest>
-	    </jar>
-	    <delete dir="build" failonerror="true" />
-	  </target>
+	    <manifest>
+	  	<attribute name="Main-Class" value="org.deidentifier.arx.execution.FindBestParamForGivenMinRelCa" />
+	    </manifest>
+	  </jar>
+	  <delete dir="build" failonerror="true" />
+	</target>
 
 	
 	
