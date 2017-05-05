@@ -12,22 +12,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mv /etc/localtime /etc/localtime.bak && \
     ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 
-ENV BASEDIR /root/arx-test
+ENV BASEDIR /root/test
 RUN mkdir ${BASEDIR}
 
 ENV ANT_HOME /usr/share/ant
-ENV CODE_ADCC ${BASEDIR}/anonbench
 
-WORKDIR /
+ENV GIT_BRANCH			pcc
+ENV GIT_URL				https://github.com/ElMuto/anonbench.git
+ENV PROJECT_NAME	 	adcc
+ENV CUSTOM_TEST_CLASS	"**/Shortrunners.java"
+ENV ANT_TARGET			custom-test
+
 WORKDIR ${BASEDIR}
 
-ENV GIT_RECLONE 1
-RUN git clone --branch pcc              https://github.com/ElMuto/anonbench.git
-ADD resources/data/*    	/root/arx-test/anonbench/data/
-ADD resources/hierarchies/*	/root/arx-test/anonbench/hierarchies/
+ADD resources/data/*    	/root/test/data/
+ADD resources/hierarchies/*	/root/test/hierarchies/
 
-WORKDIR ${CODE_ADCC}
-ADD startup.sh ${CODE_ADCC}/
-RUN chmod 700 ${CODE_ADCC}/startup.sh
+WORKDIR ${BASEDIR}
+ADD startup.sh ${BASEDIR}/
+RUN chmod 700 ${BASEDIR}/startup.sh
 
-CMD ${CODE_ADCC}/startup.sh
+CMD ${BASEDIR}/startup.sh
