@@ -110,6 +110,22 @@
 	      </batchtest>
 	  </junit>
 	</target>
+	
+	<target name="custom-test" depends="compile-test">
+	  <echo message="CUSTOM_TEST_CLASS=${CUSTOM_TEST_CLASS}"/>
+	  <junit maxmemory="4096m" showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
+	      <classpath>
+		        <fileset refid="lib.jars" />
+		        <fileset refid="local.lib.jars" />
+		          <pathelement location="${test.build.dir}"/>
+		          <pathelement location="${build.dir}"/>
+	      </classpath>
+	      <formatter type="brief" usefile="false" />
+	      <batchtest>
+	          <fileset dir="${test.src.dir}" includes="${CUSTOM_TEST_CLASS}" />
+	      </batchtest>
+	  </junit>
+	</target>
 		
 	<target name="test-all" depends="compile-test">
 	  <junit maxmemory="4096m" showoutput="true" printsummary="on" enabletestlistenerevents="true" haltonfailure="yes" fork="true">
