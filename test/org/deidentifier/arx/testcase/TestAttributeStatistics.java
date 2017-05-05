@@ -127,7 +127,7 @@ public class TestAttributeStatistics {
     	assertEquals(0.001,     statsEd.getMinFrequency(),	epsilon);
 		assertEquals(0.192,     statsEd.getMaxFrequency(),	epsilon);
 		assertEquals(0.871,     statsEd.getEntropy(),		epsilon);
-		assertEquals(1, 		statsEd.getRpgLmin(),	    epsilon);
+		assertEquals(0, 		statsEd.getRpgLmin(),	    epsilon);
 		assertEquals(26, 		statsEd.getRpgLmax(),	    epsilon);
 		assertEquals(1, 		statsEd.getRpgTmin(),	    epsilon);
 		assertEquals(0, 		statsEd.getRpgTmax(),	    epsilon);
