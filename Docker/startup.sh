@@ -2,4 +2,4 @@
 
 cd ${CODE_ADCC}
 git pull
-ant ${ANT_TARGET}
+ant -DCUSTOM_TEST_CLASS="${CUSTOM_TEST_CLASS}" ${ANT_TARGET}
