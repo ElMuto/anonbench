@@ -391,7 +391,7 @@ public class BenchmarkDriver {
 
 				// Make sure that every transformation is classified correctly
 				if (!(node.getAnonymity() == Anonymity.ANONYMOUS || node.getAnonymity() == Anonymity.NOT_ANONYMOUS)) {
-					result.getOutput(node).release();
+					result.getOutput(node, false).release();
 				}				
 				
 				if (Anonymity.ANONYMOUS == node.getAnonymity()) {
