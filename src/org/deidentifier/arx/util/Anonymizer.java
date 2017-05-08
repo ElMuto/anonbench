@@ -110,6 +110,7 @@ public class Anonymizer {
 		double ilAbs = uMeasure.evaluate(scOutputData).getUtility();
 		double ilRel = (ilAbs - dataset.getMinInfoLoss(bMeasure)) / (dataset.getMaxInfoLoss(bMeasure) - dataset.getMinInfoLoss(bMeasure));
 
+		if (ilRel < 0 && ilRel >= -0.034471000693341206) ilRel = 0d;
 		return ilRel;
 		
 	}

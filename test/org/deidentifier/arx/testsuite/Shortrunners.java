@@ -1,7 +1,6 @@
 package org.deidentifier.arx.testsuite;
 
 import org.deidentifier.arx.testcase.TestAggregatedBetaValues;
-import org.deidentifier.arx.testcase.TestAttributeStatistics;
 import org.deidentifier.arx.testcase.TestNPE_ACS13_lr;
 import org.deidentifier.arx.testcase.TestWeightedAvg;
 import org.deidentifier.arx.testcase.normalization.TestDenormalization;

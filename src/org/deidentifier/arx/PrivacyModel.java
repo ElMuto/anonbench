@@ -95,19 +95,19 @@ public class PrivacyModel {
 			param2=Double.MAX_VALUE;
 			break;
 		case D_DISCLOSURE_PRIVACY:
-			param2=Double.MAX_VALUE;
+			param2=1d;
 			break;
 		case L_DIVERSITY_DISTINCT:
-			param2=1d;
+			param2=3d;
 			break;
 		case L_DIVERSITY_ENTROPY:
-			param2=1d;
+			param2=3d;
 			break;
 		case L_DIVERSITY_RECURSIVE:
-			param2=1d;
+			param2=3d;
 			break;
 		case T_CLOSENESS_ED:
-			param2=1d;
+			param2=0.2;
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid criterion: " + criterion2);
