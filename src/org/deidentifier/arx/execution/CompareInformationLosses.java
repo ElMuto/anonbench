@@ -63,7 +63,7 @@ public class CompareInformationLosses {
 							throw new RuntimeException("Invalid measure: " + measure);
 						
 						}
-						System.out.format(new Locale ("DE", "de"), "%s;%s;%s;%.5f\n", measure, datafile, sa, il);
+						System.out.format(new Locale ("DE", "de"), "%s;%s;%s;%.9f\n", measure, datafile, sa, il);
 					}
 				}
 			}

@@ -9,10 +9,7 @@ import org.deidentifier.arx.testcase.classification.TestBaseCAs;
 import org.deidentifier.arx.testcase.classification.TestRelCAsCensus;
 import org.deidentifier.arx.testcase.classification.TestRelCAsHealthInterview;
 import org.deidentifier.arx.testcase.classification.TestRelCAsTimeUse;
-import org.deidentifier.arx.testcase.infoloss.TestRelIlEntrEd;
-import org.deidentifier.arx.testcase.infoloss.TestRelIlEntrMs;
-import org.deidentifier.arx.testcase.infoloss.TestRelIlLossEd;
-import org.deidentifier.arx.testcase.infoloss.TestRelIlLossMs;
+import org.deidentifier.arx.testcase.infoloss.TestInfoLosses;
 import org.deidentifier.arx.testcase.normalization.TestDenormalization;
 import org.deidentifier.arx.testcase.normalization.TestMaxDelta;
 import org.deidentifier.arx.testcase.normalization.TestNormalization;
@@ -29,10 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestAttributeStatistics.class,
 	TestNormalization.class,
 	TestDenormalization.class,
- 	TestRelIlEntrMs.class,
- 	TestRelIlEntrEd.class,
-	TestRelIlLossMs.class,
-	TestRelIlLossEd.class,
 	
 	// longrunners
 	TestRelCAsCensus.class,
@@ -40,6 +33,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestRelCAsHealthInterview.class,
 	TestFindOptimalTrafoForMinPrivGuarantee.class,
 	TestBaseCAs.class,
+ 	TestInfoLosses.class,
 	})
 public class AllTests {
 
