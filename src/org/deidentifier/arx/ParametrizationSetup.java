@@ -18,6 +18,13 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
 import org.deidentifier.arx.util.Anonymizer;
 
+/**
+ * This class encapsulates the detailed parametrization for a specific
+ * privacy model including dataset configurations
+ * 
+ * @author Helmut Spengler
+ *
+ */
 public class ParametrizationSetup {
 	
 	private Data arxData;
