@@ -1,5 +1,7 @@
 package org.deidentifier.arx.execution;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Locale;
@@ -7,6 +9,7 @@ import java.util.Locale;
 import org.deidentifier.arx.BenchmarkDataset;
 import org.deidentifier.arx.BenchmarkDriver;
 import org.deidentifier.arx.BenchmarkSetup;
+import org.deidentifier.arx.ParametrizationSetup;
 import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.util.Classificator;
 import org.deidentifier.arx.util.CommandLineParser;
@@ -20,7 +23,7 @@ import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
  * 
  * @author Fabian Prasser
  */
-public class Compare1d_PA {
+public class ComparePmParams {
 	
 	/**
 	 * Main entry point
@@ -95,35 +98,19 @@ public class Compare1d_PA {
 		fos.println(BenchmarkDriver.toCsvString(getCsvHeader(new BenchmarkDataset(BenchmarkDatafile.ACS13, new BenchmarkCriterion[] { BenchmarkCriterion.T_CLOSENESS_ED }, "MS")), ";"));
 
 		Integer numParams = null;
-		double sf = 0.05;
 		// for each privacy model
 		for (PrivacyModel privacyModel : BenchmarkSetup.getPrivacyModelsConfigsForParameterComparison(crit, sa, reverse, datafile, numParams)) {
 			
-			BenchmarkCriterion[] criteria = null;
-			if (BenchmarkCriterion.K_ANONYMITY.equals(privacyModel.getCriterion())) {
-				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY };
-			} else {
-				criteria = new BenchmarkCriterion[] { BenchmarkCriterion.K_ANONYMITY, privacyModel.getCriterion() };
-			}
-			BenchmarkDataset dataset = new BenchmarkDataset(datafile, criteria, sa);
-			BenchmarkDriver driver = new BenchmarkDriver(BenchmarkMeasure.ENTROPY, dataset);
 
-			String[] relPAStr = driver.findOptimalRelPA(sf, dataset,
-					sa,
-					false, privacyModel, null, null);
-			
-			String[] finalResultArray = (String[]) BenchmarkDriver.concat(
-					new String[] {
-							datafile.name(),
-							sa,
-							privacyModel.getCriterion().toString(),
-							String.format(Locale.GERMAN, "%f", privacyModel.getDim2Val())
-					},
-					relPAStr);
-					
-			
-			
-			fos.println(BenchmarkDriver.toCsvString(finalResultArray, ";"));
+			ParametrizationSetup pSetup =  new ParametrizationSetup(
+					datafile,
+					sa, 5, privacyModel.getDim2Val(), crit, BenchmarkMeasure.ENTROPY, 0.05);
+			Classificator classi = new Classificator(pSetup);
+			classi.findOptimalRelCa();
+			double orc = classi.getMaxRelPa() != -Double.MAX_VALUE ? classi.getMaxRelPa() : 0d;			
+
+			fos.format(new Locale ("de", "DE"), "%.2f;%.2f", privacyModel.getDim2Val(), orc);
+			System.out.format(new Locale ("de", "DE"), "%.2f;%.2f", privacyModel.getDim2Val(), orc);
 		}
 		fos.close();
 	}
