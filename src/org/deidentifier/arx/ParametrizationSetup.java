@@ -5,7 +5,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.BenchmarkDataset;
@@ -17,7 +16,6 @@ import org.deidentifier.arx.PrivacyModel;
 import org.deidentifier.arx.BenchmarkDataset.BenchmarkDatafile;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkCriterion;
 import org.deidentifier.arx.BenchmarkSetup.BenchmarkMeasure;
-import org.deidentifier.arx.criteria.DisclosureRiskCalculator;
 import org.deidentifier.arx.util.Anonymizer;
 
 public class ParametrizationSetup {

@@ -1,6 +1,7 @@
 package org.deidentifier.arx.testsuite;
 
 import org.deidentifier.arx.testcase.TestAttributeStatistics;
+import org.deidentifier.arx.testcase.TestComparePmParams;
 import org.deidentifier.arx.testcase.classification.TestBaseCAs;
 import org.deidentifier.arx.testcase.classification.TestRelCAsCensus;
 import org.deidentifier.arx.testcase.classification.TestRelCAsHealthInterview;
@@ -18,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestRelCAsHealthInterview.class,
 	TestBaseCAs.class,
  	TestInfoLosses.class,
+ 	TestComparePmParams.class
 	})
 public class PaperAppearance {
 

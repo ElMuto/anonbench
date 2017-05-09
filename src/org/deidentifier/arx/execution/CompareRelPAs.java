@@ -13,26 +13,26 @@ public class CompareRelPAs {
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		Boolean MS = null;
-		Boolean ED = null;
-		
-		if (args.length != 1) {
-			throw new RuntimeException("missing SA specification");
-		} else {
-			if (args[0].equals("MS")) {
-					MS = true;
-					ED = false;
-			} else if (args[0].equals("ED")) {
-				ED = true;
-				MS = false;
-			} else if (args[0].equals("both")) {
-				ED = MS = true;
-			} else {
-				throw new RuntimeException("invalid SA specification");
-			}
-		}
-
-		
+//		Boolean MS = null;
+//		Boolean ED = null;
+//		
+//		if (args.length != 1) {
+//			throw new RuntimeException("missing SA specification");
+//		} else {
+//			if (args[0].equals("MS")) {
+//					MS = true;
+//					ED = false;
+//			} else if (args[0].equals("ED")) {
+//				ED = true;
+//				MS = false;
+//			} else if (args[0].equals("both")) {
+//				ED = MS = true;
+//			} else {
+//				throw new RuntimeException("invalid SA specification");
+//			}
+//		}
+//
+//		
 //		if (MS) {
 //			PrintStream fileOutputStreamMS = new PrintStream("results/resultsRelCAsMS.txt");
 //			

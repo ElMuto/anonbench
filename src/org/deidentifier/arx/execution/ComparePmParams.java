@@ -1,6 +1,5 @@
 package org.deidentifier.arx.execution;
 
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.PrintStream;
