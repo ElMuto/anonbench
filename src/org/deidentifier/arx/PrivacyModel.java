@@ -85,7 +85,24 @@ public class PrivacyModel {
 		this.t = t;
 		this.d = d;
 		this.b = b;
-		this.dim2Val = null;
+		switch (criterion) {
+		case BASIC_BETA_LIKENESS:
+			dim2Val=b;
+			break;
+		case D_DISCLOSURE_PRIVACY:
+			dim2Val=d;
+			break;
+		case L_DIVERSITY_DISTINCT:
+		case L_DIVERSITY_ENTROPY:
+		case L_DIVERSITY_RECURSIVE:
+			dim2Val=Double.valueOf(l);
+			break;
+		case T_CLOSENESS_ED:
+			dim2Val=t;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid criterion: " + criterion);
+		}
 	}
 
 	public static Double getDefaultParam2(BenchmarkCriterion criterion2) {
