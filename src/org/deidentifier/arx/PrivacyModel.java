@@ -133,6 +133,34 @@ public class PrivacyModel {
 		return param2;
 	}
 
+	public static Double getMostRelaxedParam2(BenchmarkCriterion criterion2) {
+		double param2;
+		switch (criterion2) {
+		case BASIC_BETA_LIKENESS:
+			param2=Double.MAX_VALUE;
+			break;
+		case D_DISCLOSURE_PRIVACY:
+			param2=Double.MAX_VALUE;
+			break;
+		case L_DIVERSITY_DISTINCT:
+			param2=1d;
+			break;
+		case L_DIVERSITY_ENTROPY:
+			param2=1d;
+			break;
+		case L_DIVERSITY_RECURSIVE:
+			param2=1d;
+			break;
+		case T_CLOSENESS_ED:
+			param2=1d;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid criterion: " + criterion2);
+		}
+		
+		return param2;
+	}
+
 	private static BenchmarkCriterion toCrit(String critString) {
 		if ("t".equals(critString)) {
 			return BenchmarkCriterion.T_CLOSENESS_ED;

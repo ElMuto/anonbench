@@ -308,7 +308,7 @@ public class AttributeStatistics {
 			BenchmarkCriterion crit = BenchmarkCriterion.T_CLOSENESS_ED;
 			ParametrizationSetup compSetup =  new ParametrizationSetup(
 					dataset.getDatafile(),
-					attr, 1, PrivacyModel.getDefaultParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0d);
+					attr, 1, PrivacyModel.getMostRelaxedParam2(crit), crit, BenchmarkMeasure.ENTROPY, 0d);
 			int[] traFo = { 0, 0, 0 };
 			compSetup.anonymize(traFo, traFo);
             
