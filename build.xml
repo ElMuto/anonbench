@@ -39,10 +39,8 @@
 	    <filename name="**/guava-18.0.jar" />  
 	    <filename name="**/hadoop-core-1.2.1.jar" />   
 	    <filename name="**/slf4j-api-1.7.13.jar" />
-	  	
-	    <filename name="**/libarx-3.6.0-stripped.jar" />     
-	    <filename name="**/subframe-0.2-lib.jar" />  	   
-	    <filename name="**/utility-stripped.jar" />  		
+	  	  
+	    <filename name="**/libarx-3.6.0-min.jar" />  		
 	  	
 	  </or>
 	</fileset>
@@ -52,21 +50,9 @@
 	
 	<target name="clean">
 	  <delete dir="${build.dir}" failonerror="true" />
-	  <delete dir="${test.build.dir}" failonerror="true" />
-	  <delete file="${stripped.arx.jar}" failonerror="true" />
-	  <delete file="${stripped.utility.jar}" failonerror="true" />
-	</target>
-		
-	<target name="strip-jars">
-		<jar destfile="${stripped.arx.jar}">
-		    <zipfileset src="lib/libarx-3.6.0-min.jar" excludesfile="excludeClasses.txt"/>
-		</jar>
-		<jar destfile="${stripped.utility.jar}">
-		    <zipfileset src="lib/utility.jar" excludesfile="excludeClasses.txt"/>
-		</jar>
 	</target>
 	
-	<target name="prepare" depends="clean, strip-jars">
+	<target name="prepare" depends="clean">
 		  <mkdir dir="${build.dir}" />
 		  <mkdir dir="${test.build.dir}" />
 	</target>

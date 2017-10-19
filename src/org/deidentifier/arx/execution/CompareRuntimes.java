@@ -16,6 +16,7 @@ import org.deidentifier.arx.criteria.DDisclosurePrivacy;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
+import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.PrivacyCriterion;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
@@ -47,15 +48,16 @@ public class CompareRuntimes {
 
 			bw = new BufferedWriter(new FileWriter(resultFileName));
 
-			String header ="Measure;Dataset;SA;Model;Iteration;RuntimeMillis\n";
+			String header ="Dataset;SA;Model;Iteration;RuntimeMillis\n";
 			System.out.print(header);
 			bw.write(header);
 
 			// For each dataset
 			for (String datafile : new String[] {
 					"ss13acs",
-					"atus" ,
-			"ihis" }) {
+					"ihis",
+					"atus",
+			}) {
 
 				// for each sensitive attribute candidate
 				for (String sa : getSensitiveAttributeCandidates(datafile)) {
@@ -67,24 +69,20 @@ public class CompareRuntimes {
 							new EqualDistanceTCloseness(sa, 0.2),
 							new DDisclosurePrivacy(sa, 1)}) {
 
-						Data data = createArxDataset(datafile, sa);
-						ARXConfiguration config = createArxConfig(c);
-						ARXAnonymizer anonymizer = new ARXAnonymizer();
+						Data				data 		= createArxDataset(datafile, sa);
 
 						for (int rtIt = 1; rtIt <= numIterations; rtIt++) {
 
-							long ts1 = System.currentTimeMillis();
+							ARXConfiguration	config 		= createArxConfig(c);
+							ARXAnonymizer		anonymizer 	= new ARXAnonymizer();
 							ARXResult result = anonymizer.anonymize(data, config);
-							long ts2 = System.currentTimeMillis();
 							data.getHandle().release();
-							result.getOutput().release();
 
-							long rt = ts2 - ts1;
 							String line = String.format(new Locale ("DE", "de"), "%s;%s;%s;%d;%d\n", datafile, normalize(sa), 
-									c, rtIt, rt);
+									c, rtIt, result.getTime());
 							System.out.print(line);
 							bw.write(line);
-							bw.flush();
+
 						}
 					}
 				}
@@ -115,6 +113,7 @@ public class CompareRuntimes {
 		config.setQualityModel(Metric.createLossMetric(AggregateFunction.GEOMETRIC_MEAN));
 		config.setMaxOutliers(0.05d);
 		config.addPrivacyModel(c);
+		config.addPrivacyModel(new KAnonymity(5));
 		return config;
 	}
 
