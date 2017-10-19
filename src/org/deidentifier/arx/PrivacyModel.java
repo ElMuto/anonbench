@@ -56,6 +56,27 @@ public class PrivacyModel {
 		}
 	}
 	
+	public String getAbbreviation() {
+		switch(criterion) {
+		case BASIC_BETA_LIKENESS:
+			return "BL";
+		case D_DISCLOSURE_PRIVACY:
+			return "4_DP";
+		case L_DIVERSITY_DISTINCT:
+			return "0_DL";
+		case L_DIVERSITY_ENTROPY:
+			return "2_EL";
+		case L_DIVERSITY_RECURSIVE:
+			return "1_RL";
+		case T_CLOSENESS_ED:
+			return "3_TC";
+		case T_CLOSENESS_HD:
+			return "TCH";
+		default:
+			throw new IllegalArgumentException("Unsupported criterion: " + criterion);
+		}
+	}
+	
 	/**
 	 * @param dim2Qualifier
 	 * @param dim1Val
