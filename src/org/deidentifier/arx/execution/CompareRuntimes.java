@@ -41,7 +41,7 @@ public class CompareRuntimes {
 
 	private static void compareRuntimes() throws IOException {
 
-		final int numIterations = 10;
+		final int numIterations = 5;
 		final String resultFileName = "results/runtimes.csv";
 
 		BufferedWriter bw = null;
@@ -56,8 +56,8 @@ public class CompareRuntimes {
 
 			// For each dataset
 			for (String datafile : new String[] {
-					"ss13acs",
 					"ihis",
+					"ss13acs",
 					"atus",
 			}) {
 
@@ -99,9 +99,9 @@ public class CompareRuntimes {
 	}
 
 	private static String mapPmName(PrivacyCriterion c) {
-		
+
 		Map<String,String> map = new HashMap<>();
-		
+
 		map.put("distinct-3-diversity for attribute 'EDUC'", 	"0_DL");
 		map.put("distinct-3-diversity for attribute 'Education'", "0_DL");
 		map.put("distinct-3-diversity for attribute 'Highest level of school completed'", "0_DL");
@@ -127,7 +127,7 @@ public class CompareRuntimes {
 		map.put("1.0-disclosure privacy for attribute 'Highest level of school completed'", "4_DP");
 		map.put("1.0-disclosure privacy for attribute 'Marital status'", "4_DP");
 		map.put("1.0-disclosure privacy for attribute 'MARSTAT'", "4_DP");
-		
+
 		return map.get(c.toString());
 	}
 
@@ -186,11 +186,11 @@ public class CompareRuntimes {
 
 	public static String[] getQuasiIdentifyingAttributes(String datafile) {
 		if ("atus".equals(datafile))
-			return new String[] { "Age", "Sex", "Race", "Region", "Citizenship status", "Birthplace", "Labor force status" };
+			return new String[] { "Age", "Sex", "Race", "Citizenship status", "Region", "Birthplace" };
 		if ("ihis".equals(datafile))
-			return new String[] { "AGE", "SEX", "RACEA", "YEAR", "QUARTER", "REGION" };
+			return new String[] { "AGE", "SEX", "RACEA", "REGION", "YEAR", "QUARTER" };
 		if ("ss13acs".equals(datafile))
-			return new String[] { "Age", "Sex", "Race" , "Citizenship", "Workclass", "Mobility", "Military service" };
+			return new String[] { "Age", "Sex", "Race" , "Citizenship", "Workclass", "Mobility" };
 		throw new RuntimeException("Invalid datafile: " + datafile);
 	}
 
