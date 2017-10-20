@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
@@ -32,12 +34,12 @@ public class CompareRuntimes {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		comparePrivacyModels();
+		compareRuntimes();
 
 		System.out.println("done.");
 	}
 
-	private static void comparePrivacyModels() throws IOException {
+	private static void compareRuntimes() throws IOException {
 
 		final int numIterations = 10;
 		final String resultFileName = "results/runtimes.csv";
@@ -79,7 +81,7 @@ public class CompareRuntimes {
 							data.getHandle().release();
 
 							String line = String.format(new Locale ("DE", "de"), "%s;%s;%s;%d;%d\n", datafile, normalize(sa), 
-									c, rtIt, result.getTime());
+									mapPmName(c), rtIt, result.getTime());
 							System.out.print(line);
 							bw.write(line);
 
@@ -94,6 +96,39 @@ public class CompareRuntimes {
 		} finally {
 			if (bw != null) bw.close();
 		}
+	}
+
+	private static String mapPmName(PrivacyCriterion c) {
+		
+		Map<String,String> map = new HashMap<>();
+		
+		map.put("distinct-3-diversity for attribute 'EDUC'", 	"0_DL");
+		map.put("distinct-3-diversity for attribute 'Education'", "0_DL");
+		map.put("distinct-3-diversity for attribute 'Highest level of school completed'", "0_DL");
+		map.put("distinct-3-diversity for attribute 'Marital status'", "0_DL");
+		map.put("distinct-3-diversity for attribute 'MARSTAT'", "0_DL");
+		map.put("recursive-(4.0,3)-diversity for attribute 'EDUC'", "1_RL");
+		map.put("recursive-(4.0,3)-diversity for attribute 'Education'", "1_RL");
+		map.put("recursive-(4.0,3)-diversity for attribute 'Highest level of school completed'", "1_RL");
+		map.put("recursive-(4.0,3)-diversity for attribute 'Marital status'", "1_RL");
+		map.put("recursive-(4.0,3)-diversity for attribute 'MARSTAT'", "1_RL");
+		map.put("shannon-entropy-3.0-diversity for attribute 'EDUC'", "2_EL");
+		map.put("shannon-entropy-3.0-diversity for attribute 'Education'", "2_EL");
+		map.put("shannon-entropy-3.0-diversity for attribute 'Highest level of school completed'", "2_EL");
+		map.put("shannon-entropy-3.0-diversity for attribute 'Marital status'", "2_EL");
+		map.put("shannon-entropy-3.0-diversity for attribute 'MARSTAT'", "2_EL");
+		map.put("0.2-closeness with equal ground-distance for attribute 'EDUC'", "3_TC");
+		map.put("0.2-closeness with equal ground-distance for attribute 'Education'", "3_TC");
+		map.put("0.2-closeness with equal ground-distance for attribute 'Highest level of school completed'", "3_TC");
+		map.put("0.2-closeness with equal ground-distance for attribute 'Marital status'", "3_TC");
+		map.put("0.2-closeness with equal ground-distance for attribute 'MARSTAT'", "3_TC");
+		map.put("1.0-disclosure privacy for attribute 'EDUC'", "4_DP");
+		map.put("1.0-disclosure privacy for attribute 'Education'", "4_DP");
+		map.put("1.0-disclosure privacy for attribute 'Highest level of school completed'", "4_DP");
+		map.put("1.0-disclosure privacy for attribute 'Marital status'", "4_DP");
+		map.put("1.0-disclosure privacy for attribute 'MARSTAT'", "4_DP");
+		
+		return map.get(c.toString());
 	}
 
 	static private String[] getSensitiveAttributeCandidates(String datafile) {
@@ -151,11 +186,11 @@ public class CompareRuntimes {
 
 	public static String[] getQuasiIdentifyingAttributes(String datafile) {
 		if ("atus".equals(datafile))
-			return new String[] { "Age", "Sex", "Race" };
+			return new String[] { "Age", "Sex", "Race", "Region", "Citizenship status", "Birthplace", "Labor force status" };
 		if ("ihis".equals(datafile))
-			return new String[] { "AGE", "SEX", "RACEA" };
+			return new String[] { "AGE", "SEX", "RACEA", "YEAR", "QUARTER", "REGION" };
 		if ("ss13acs".equals(datafile))
-			return new String[] { "Age", "Sex", "Race" };
+			return new String[] { "Age", "Sex", "Race" , "Citizenship", "Workclass", "Mobility", "Military service" };
 		throw new RuntimeException("Invalid datafile: " + datafile);
 	}
 
