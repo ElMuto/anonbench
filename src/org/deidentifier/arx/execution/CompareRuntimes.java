@@ -128,7 +128,10 @@ public class CompareRuntimes {
 		map.put("1.0-disclosure privacy for attribute 'Marital status'", "4_DP");
 		map.put("1.0-disclosure privacy for attribute 'MARSTAT'", "4_DP");
 
-		return map.get(c.toString());
+		String key = c.toString();
+		if (map.containsKey(key))
+			return map.get(key);
+		else throw new RuntimeException("Could not find key '" + key + "'");
 	}
 
 	static private String[] getSensitiveAttributeCandidates(String datafile) {
@@ -186,11 +189,11 @@ public class CompareRuntimes {
 
 	public static String[] getQuasiIdentifyingAttributes(String datafile) {
 		if ("atus".equals(datafile))
-			return new String[] { "Age", "Sex", "Race", "Citizenship status", "Region", "Birthplace" };
+			return new String[] { "Age", "Sex", "Race"/*, "Citizenship status", "Region", "Birthplace"*/ };
 		if ("ihis".equals(datafile))
-			return new String[] { "AGE", "SEX", "RACEA", "REGION", "YEAR", "QUARTER" };
+			return new String[] { "AGE", "SEX", "RACEA"/*, "REGION", "YEAR", "QUARTER"*/ };
 		if ("ss13acs".equals(datafile))
-			return new String[] { "Age", "Sex", "Race" , "Citizenship", "Workclass", "Mobility" };
+			return new String[] { "Age", "Sex", "Race" /*, "Citizenship", "Workclass", "Mobility"*/ };
 		throw new RuntimeException("Invalid datafile: " + datafile);
 	}
 

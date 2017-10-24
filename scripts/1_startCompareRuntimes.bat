@@ -2,11 +2,11 @@
 
 Set _path=%WORKSPACE_PATH%\attribute-disclosure\code-adcc
 
-Set _cluster_node=2
+Set _cluster_node=4
 Set _remote_dir=/home/imse/pc-bench-helmut
 
 Set _commandfile=%_path%\scripts\plink-commands.txt
-Set _benchmark_jar_name=Compare_Runtimes.jar
+Set _benchmark_jar_name=CompareRuntimes.jar
 Set _benchmark_jar_path=%_path%\%_benchmark_jar_name%
 Set _run_sh_name=runCompareRuntimes.sh
 Set _run_sh_path=%_path%\scripts\%_run_sh_name%
