@@ -191,7 +191,7 @@ public class CompareRuntimes {
 		if ("atus".equals(datafile))
 			return new String[] { "Age", "Sex", "Race", "Citizenship status", "Region", "Birthplace" };
 		if ("ihis".equals(datafile))
-			return new String[] { "AGE", "SEX", "RACEA"/*, "REGION", "YEAR", "QUARTER"*/ };
+			return new String[] { "AGE", "SEX", "RACEA", "REGION", "YEAR", "QUARTER" };
 		if ("ss13acs".equals(datafile))
 			return new String[] { "Age", "Sex", "Race" , "Citizenship", "Workclass", "Mobility" };
 		throw new RuntimeException("Invalid datafile: " + datafile);
