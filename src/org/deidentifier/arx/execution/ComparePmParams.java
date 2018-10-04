@@ -27,7 +27,7 @@ public class ComparePmParams {
 	/**
 	 * Main entry point
 	 * 
-	 * @param args[0]: dataset, args[1]: dim2Qual
+	 * @param args[0]: dataset, args[1]: privacy model, args[2]: sensitive attribute
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
